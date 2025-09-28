@@ -1,0 +1,9 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    temperature = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+    threshold = 1.5 * (1.0 + temperature * 0.5)
+    next_node = nearest_node if distance_matrix[current_node][nearest_node] < threshold * distance_matrix[current_node][farthest_node] else farthest_node
+    return next_node

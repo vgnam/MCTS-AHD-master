@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = remaining_nodes + 1
+
+    # Calculate variance of distances to unvisited nodes
+    distances_to_unvisited = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    mean_distance = sum(distances_to_unvisited) / remaining_nodes
+    variance = sum((d - mean_distance) ** 2 for d in distances_to_unvisited) / remaining_nodes
+
+    # Normalize variance to [0, 1] range
+    max_variance = max(distances_to_unvisited) - min(distances_to_unvisited) if distances_to_unvisited else 0
+    normalized_variance = variance / max_variance if max_variance > 0 else 0
+
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight based on normalized variance
+        weight = normalized_variance * (remaining_nodes / total_nodes)
+        total_cost = (1 - weight) * immediate_distance + weight * potential_distance
+
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+
+    return next_node

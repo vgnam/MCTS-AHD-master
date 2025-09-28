@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1 - (remaining_nodes / total_nodes)
+    threshold = 1 / (1 + math.exp(-10 * (progress - 0.5)))  # Sigmoid threshold
+
+    best_score = float('-inf')
+    next_node = None
+
+    avg_distance = sum(sum(row) for row in distance_matrix) / (total_nodes * total_nodes)
+    diversity_bonus = {node: sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Multi-criteria scoring
+        immediate_score = (1 - threshold) * distance_to_current
+        destination_score = threshold * distance_to_destination
+        centrality_score = diversity_bonus[node] / avg_distance
+
+        # Late-game focus: intensify destination consideration in final 30%
+        if progress > 0.7:
+            destination_score *= 1.5
+
+        score = immediate_score - destination_score + 0.3 * centrality_score
+
+        # Probabilistic tie-breaker
+        if score > best_score or (score == best_score and random.random() < 0.4):
+            best_score = score
+            next_node = node
+
+    # Diversity enforcement: if all nodes are too close to destination, force selection from bottom 30% of diversity
+    if progress < 0.5 and all(distance_matrix[node][destination_node] < 0.7 * avg_distance for node in unvisited_nodes):
+        diversity_values = sorted(diversity_bonus.values())
+        cutoff = diversity_values[int(0.3 * len(diversity_values))]
+        candidates = [node for node in unvisited_nodes if diversity_bonus[node] <= cutoff]
+        if candidates:
+            next_node = random.choice(candidates)
+
+    return next_node

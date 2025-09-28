@@ -1,0 +1,48 @@
+importance, dynamic regret scaling, and a novel "path potential" metric that balances immediate distance, long-term connectivity, and node diversity, while using a decaying penalty for revisiting regions.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    node_scores = []
+    for node in unvisited_nodes:
+        # Immediate distance component
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Dynamic regret with adaptive scaling
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) ** 1.5 if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+
+        # Path potential: balance between immediate and long-term connectivity
+        future_potential = distance_matrix[node][destination_node]
+        connectivity = sum(1 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes if n != node)
+        path_potential = (immediate_distance + future_potential) / (1 + connectivity)
+
+        # Node diversity penalty: discourage revisiting similar regions
+        diversity_penalty = 0.2 * (1.0 / (immediate_distance + 1e-6)) if immediate_distance < 0.3 else 0
+
+        # Adaptive weights based on remaining nodes and path progress
+        remaining_nodes = len(unvisited_nodes)
+        total_nodes = len(distance_matrix)
+        progress = 1 - (remaining_nodes / total_nodes)
+        regret_weight = 0.5 * (1 - progress)
+        distance_weight = 0.4 * (1 - progress)
+        path_weight = 0.6 * progress
+        penalty_weight = 0.3 * progress
+
+        # Combined score
+        score = (regret_weight * regret +
+                 distance_weight * immediate_distance +
+                 path_weight * path_potential -
+                 penalty_weight * diversity_penalty)
+        node_scores.append(score)
+
+    # Select node with minimum score
+    selected_index = node_scores.index(min(node_scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

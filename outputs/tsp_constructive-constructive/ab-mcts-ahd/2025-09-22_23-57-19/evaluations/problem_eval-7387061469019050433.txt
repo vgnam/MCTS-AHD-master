@@ -1,0 +1,48 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    total_nodes = len(distance_matrix)
+    progress = (total_nodes - len(unvisited_nodes)) / total_nodes
+    temperature = 1 - progress ** 2
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+
+    min_cost = float('inf')
+    next_node = None
+    node_scores = {}
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+        normalized_centrality = centrality / avg_distance
+
+        exploration_score = (1 - temperature) * cost + temperature * (1 - normalized_centrality)
+        exploitation_score = cost * (1 + 0.5 * normalized_centrality)
+
+        combined_score = 0.7 * exploration_score + 0.3 * exploitation_score
+
+        node_scores[node] = combined_score
+
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+
+    if len(unvisited_nodes) > 2:
+        sorted_nodes = sorted(node_scores.items(), key=lambda x: x[1])
+        candidate_nodes = [node for node, score in sorted_nodes if score <= 1.1 * min_cost]
+
+        if candidate_nodes:
+            probabilities = [1 / (1 + score) for score in [node_scores[node] for node in candidate_nodes]]
+            total_prob = sum(probabilities)
+            probabilities = [p / total_prob for p in probabilities]
+            next_node = random.choices(candidate_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

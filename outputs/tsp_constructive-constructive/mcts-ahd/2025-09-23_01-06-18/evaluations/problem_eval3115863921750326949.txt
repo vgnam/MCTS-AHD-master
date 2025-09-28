@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    def calculate_pheromone(node):
+        distance = distance_matrix[current_node][node]
+        return (1.0 + distance) ** -1.5
+
+    def heuristic(node):
+        pheromone = calculate_pheromone(node)
+        local_distance = distance_matrix[current_node][node]
+        remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+        return (pheromone * remaining_ratio) + (1.0 / (1.0 + local_distance))
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

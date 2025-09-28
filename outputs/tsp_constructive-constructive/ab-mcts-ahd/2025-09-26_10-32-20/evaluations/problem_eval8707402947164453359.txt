@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    weight_distance = num_unvisited / (num_unvisited + 1)  # Dynamic weight for distance
+    weight_angle = 1 - weight_distance  # Dynamic weight for angle
+
+    def calculate_score(node):
+        distance = distance_matrix[current_node][node]
+        if num_unvisited == 1:
+            angle = 0  # No angle to consider when only one node remains
+        else:
+            # Calculate angle between vectors from current_node to node and from current_node to destination_node
+            vec1 = (distance_matrix[current_node][destination_node] - distance_matrix[node][destination_node],
+                    distance_matrix[current_node][node] - distance_matrix[node][node])
+            vec2 = (distance_matrix[current_node][destination_node] - distance_matrix[current_node][node],
+                    distance_matrix[current_node][destination_node] - distance_matrix[current_node][destination_node])
+            angle = abs(vec1[0] * vec2[1] - vec1[1] * vec2[0])  # Cross product magnitude
+        return weight_distance * distance + weight_angle * angle
+
+    next_node = max(unvisited_nodes, key=lambda node: calculate_score(node))
+    return next_node

@@ -1,0 +1,33 @@
+importance based on remaining nodes, favoring exploration early and exploitation later with a different penalty structure for path efficiency.}
+
+```python
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    best_score = float('-inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Centrality as inverse of average distance to remaining nodes, weighted more early in the process
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+        centrality = 1 / (avg_distance_to_remaining + 1e-6)
+        centrality_weight = 0.3 * (total_unvisited / (total_unvisited + 1))  # Decreases as progress advances
+        weighted_centrality = centrality_weight * centrality
+
+        # Path efficiency penalty: higher penalty for nodes far from the direct path
+        direct_path_distance = distance_matrix[current_node][destination_node]
+        path_efficiency_penalty = -0.5 * max(0, distance_to_current - 1.2 * direct_path_distance)
+
+        # Score combines local distance, centrality, and path efficiency
+        combined_score = -2 * distance_to_current + weighted_centrality + path_efficiency_penalty
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,12 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 25, in select_next_node
+    next_node = random.choices(bonus_candidates, weights=[1.5, 1.3, 1.1, 1.0, 1.0])[0]
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\random.py", line 532, in choices
+    raise ValueError('The number of weights does not match the population')
+ValueError: The number of weights does not match the population

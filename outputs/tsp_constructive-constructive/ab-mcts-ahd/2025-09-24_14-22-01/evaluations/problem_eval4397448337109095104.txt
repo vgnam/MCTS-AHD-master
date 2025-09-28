@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes) - 1
+    temperature = max(0.1, 1.0 - (remaining_nodes / total_nodes) ** 1.5)
+
+    costs = []
+    nodes = []
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Heuristic centrality: connectivity to destination and other nodes
+        centrality = (sum(distance_matrix[node]) / (total_nodes - 1)) + \
+                     (distance_matrix[node][destination_node] / max(distance_matrix[node]))
+
+        # Memory-based penalty for recently visited nodes
+        memory_penalty = 1.0 if node in unvisited_nodes else 1.5
+
+        # Dynamic weighted cost
+        weighted_cost = (0.5 * immediate_distance + 0.4 * potential_distance + 0.1 * centrality) * memory_penalty
+
+        costs.append(weighted_cost)
+        nodes.append(node)
+
+    if not nodes:
+        return destination_node
+
+    # Temperature-based probabilistic selection
+    exp_costs = [math.exp(-cost / temperature) for cost in costs]
+    sum_exp = sum(exp_costs)
+    probs = [exp / sum_exp for exp in exp_costs]
+
+    next_node = random.choices(nodes, weights=probs, k=1)[0]
+    return next_node

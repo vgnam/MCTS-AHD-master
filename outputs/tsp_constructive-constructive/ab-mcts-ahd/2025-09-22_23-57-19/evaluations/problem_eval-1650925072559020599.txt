@@ -1,0 +1,13 @@
+import random
+        selected_index = random.choices(range(len(top_candidates)), weights=probabilities)[0]
+        next_node = top_candidates[selected_index][0]
+
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            if potential_cost < min_score * 1.1:
+                next_node = node
+                break
+
+    return next_node

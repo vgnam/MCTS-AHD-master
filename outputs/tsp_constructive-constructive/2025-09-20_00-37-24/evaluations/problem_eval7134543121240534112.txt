@@ -1,0 +1,25 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Adaptive stochasticity: probability increases with unvisited nodes
+    exploration_prob = 0.1 + (0.8 * (len(unvisited_nodes) / len(distance_matrix)))
+
+    if random.random() < exploration_prob:
+        # Weighted random selection: closer nodes have higher chance
+        weights = [math.exp(-distance_matrix[current_node][node]) for node in nearest_neighbors]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+    else:
+        # Exploit top 3 nearest neighbors with higher probability for closer ones
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        weights = [1/(i+1) for i in range(len(candidates))]  # Higher weight for closer nodes
+        next_node = random.choices(candidates, weights=weights, k=1)[0]
+
+    return next_node

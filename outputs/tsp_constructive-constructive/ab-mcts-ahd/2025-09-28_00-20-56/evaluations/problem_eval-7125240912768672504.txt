@@ -1,0 +1,4 @@
+import random
+        next_node = random.choice(candidate_nodes)
+
+    return next_node

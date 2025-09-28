@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    def adaptive_cluster_threshold(nodes):
+        if not nodes:
+            return 1.5
+        avg_dist = sum(distance_matrix[node1][node2] for node1 in nodes for node2 in nodes if node1 != node2) / (len(nodes) * (len(nodes) - 1))
+        return max(1.0, 1.5 * (1 - len(nodes) / len(unvisited_nodes)))
+
+    def cluster_nodes(nodes, threshold):
+        clusters = []
+        nodes = list(nodes)
+        while nodes:
+            cluster = [nodes.pop(0)]
+            for node in list(nodes):
+                if any(distance_matrix[cluster[0]][node] <= threshold * distance_matrix[cluster[0]][c] for c in cluster):
+                    cluster.append(node)
+                    nodes.remove(node)
+            clusters.append(cluster)
+        return clusters
+
+    threshold = adaptive_cluster_threshold(unvisited_nodes)
+    clusters = cluster_nodes(unvisited_nodes, threshold)
+
+    if not clusters:
+        return min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] + 0.3 * distance_matrix[node][destination_node])
+
+    cluster_scores = []
+    for cluster in clusters:
+        density_weight = len(cluster) / len(unvisited_nodes)
+        cluster_score = 0
+        for node in cluster:
+            immediate_cost = distance_matrix[current_node][node]
+            future_cost = distance_matrix[node][destination_node]
+            cluster_score += (1 - density_weight) * immediate_cost + 0.7 * density_weight * future_cost
+        cluster_scores.append(cluster_score)
+
+    selected_cluster = clusters[cluster_scores.index(min(cluster_scores))]
+    next_node = min(selected_cluster, key=lambda node: distance_matrix[current_node][node] + 0.3 * (1 - len(selected_cluster)/len(unvisited_nodes)) * distance_matrix[node][destination_node])
+    return next_node

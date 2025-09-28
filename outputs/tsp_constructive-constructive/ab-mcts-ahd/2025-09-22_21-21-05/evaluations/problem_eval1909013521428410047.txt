@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_steps = len(unvisited_nodes)
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        direct_distance = distance_matrix[current_node][destination_node]
+
+        # Dynamic exploration factor using sigmoid function
+        exploration_factor = 1 / (1 + math.exp(-0.1 * (remaining_steps - 5)))
+
+        # Novel detour penalty considering current and future segments
+        detour_penalty = (distance_to_current + distance_to_destination - direct_distance) ** 2 * exploration_factor
+
+        # Step-dependent weight to prioritize exploration early and exploitation later
+        step_weight = 1.0 - 0.8 * (remaining_steps / (remaining_steps + 1))
+
+        # Combined score with adaptive weighting
+        combined_score = (1 - step_weight) * distance_to_current + step_weight * distance_to_destination + detour_penalty
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

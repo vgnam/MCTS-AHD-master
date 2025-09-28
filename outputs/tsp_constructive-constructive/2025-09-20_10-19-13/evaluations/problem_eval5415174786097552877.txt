@@ -1,0 +1,8 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visit_counts=None):
+    if not unvisited_nodes:
+        return destination_node
+    if visit_counts is None:
+        visit_counts = {node: 0 for node in unvisited_nodes}
+    penalty_factor = 1.0
+    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] + penalty_factor * visit_counts.get(node, 0))
+    return next_node

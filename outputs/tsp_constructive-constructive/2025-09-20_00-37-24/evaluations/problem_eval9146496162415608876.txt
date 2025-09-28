@@ -1,0 +1,32 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic weights based on proximity and visit history
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Inverse distance as primary factor, with a small random component
+        weight = 1.0 / (distance + 1e-10) * (0.9 + 0.2 * random.random())
+        weights.append(weight)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Introduce dynamic stochasticity: higher chance to pick from top 20% of candidates
+    top_candidates = sorted(zip(unvisited_nodes, normalized_weights), key=lambda x: -x[1])
+    top_threshold = len(top_candidates) // 5 if len(top_candidates) > 5 else 1
+    top_nodes = [node for node, _ in top_candidates[:top_threshold]]
+
+    if random.random() < 0.7:  # 70% chance to pick from top candidates
+        next_node = random.choices(top_nodes, weights=normalized_weights[:top_threshold])[0]
+    else:  # 30% chance to pick from all unvisited nodes
+        next_node = random.choices(unvisited_nodes, weights=normalized_weights)[0]
+
+    return next_node

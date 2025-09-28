@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 6, in <module>
+    from scipy.spatial import distance_matrix
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\spatial\__init__.py", line 110, in <module>
+    from ._kdtree import *
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\spatial\_kdtree.py", line 4, in <module>
+    from ._ckdtree import cKDTree, cKDTreeNode
+  File "_ckdtree.pyx", line 12, in init scipy.spatial._ckdtree
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\sparse\__init__.py", line 287, in <module>
+    from . import csgraph
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\sparse\csgraph\__init__.py", line 185, in <module>
+    from ._laplacian import laplacian
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\sparse\csgraph\_laplacian.py", line 7, in <module>
+    from scipy.sparse.linalg import LinearOperator
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\sparse\linalg\__init__.py", line 130, in <module>
+    from . import isolve, dsolve, interface, eigen, matfuncs
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 879, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 975, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1074, in get_data
+KeyboardInterrupt

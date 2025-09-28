@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if len(unvisited_nodes) == 1:
+        return next(iter(unvisited_nodes))
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            min_remaining_dist = min(distance_matrix[node][n] for n in remaining_nodes)
+        else:
+            avg_remaining_dist = 0
+            min_remaining_dist = 0
+
+        # Adaptive weights based on remaining nodes
+        local_weight = 0.8 - 0.3 * (1.0 / (len(unvisited_nodes) + 1))
+        global_weight = 0.2 + 0.3 * (1.0 / (len(unvisited_nodes) + 1))
+
+        # Exploration factor (decays as nodes are visited)
+        exploration = 0.1 * (1.0 / (len(unvisited_nodes) + 1))
+
+        # Reinforcement learning-inspired heuristic
+        heuristic = (local_weight * current_dist) + (global_weight * (0.7 * avg_remaining_dist + 0.3 * min_remaining_dist)) + exploration * (len(unvisited_nodes) ** 0.5)
+
+        return heuristic
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

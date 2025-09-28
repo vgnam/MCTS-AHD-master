@@ -1,0 +1,13 @@
+import random
+            selected_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+            return selected_node
+
+    # Fallback to nearest neighbor if destination is not in unvisited
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+    return next_node

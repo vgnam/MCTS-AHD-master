@@ -1,0 +1,21 @@
+import random
+    candidates = []
+    weights = []
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            candidates.append(node)
+            weights.append(0.1)  # High priority for destination
+        else:
+            candidates.append(node)
+            weights.append(current_distance)
+
+    # Normalize weights to probabilities
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    # Select node based on weighted probability
+    next_node = random.choices(candidates, weights=probabilities, k=1)[0]
+
+    return next_node

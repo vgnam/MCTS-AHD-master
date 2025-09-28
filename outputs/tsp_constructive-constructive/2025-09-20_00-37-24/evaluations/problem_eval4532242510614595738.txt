@@ -1,0 +1,27 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate a score combining distance to current node and average distance to other unvisited nodes
+    def node_score(node):
+        dist_to_current = distance_matrix[current_node][node]
+        avg_dist_to_others = np.mean([distance_matrix[node][other] for other in unvisited_nodes if other != node])
+        return dist_to_current * 0.7 + avg_dist_to_others * 0.3  # Weighted combination
+
+    scored_nodes = [(node, node_score(node)) for node in unvisited_nodes]
+    scored_nodes.sort(key=lambda x: x[1])
+
+    # 80% chance to pick from top 3 by score, 20% chance to pick randomly from top 10
+    if random.random() < 0.8:
+        candidates = [node for node, _ in scored_nodes[:min(3, len(scored_nodes))]]
+        next_node = random.choice(candidates)
+    else:
+        candidates = [node for node, _ in scored_nodes[:min(10, len(scored_nodes))]]
+        next_node = random.choice(candidates)
+
+    return next_node

@@ -1,0 +1,41 @@
+import random
+import math
+
+def calculate_angle(a, b, c, distance_matrix):
+    # Calculate angle between vectors a->b and b->c
+    ab = (distance_matrix[a][b],)
+    bc = (distance_matrix[b][c],)
+    dot_product = ab[0] * bc[0]
+    magnitude_ab = math.sqrt(ab[0]**2)
+    magnitude_bc = math.sqrt(bc[0]**2)
+    if magnitude_ab == 0 or magnitude_bc == 0:
+        return 0
+    cos_theta = dot_product / (magnitude_ab * magnitude_bc)
+    return math.acos(cos_theta)
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic probability based on distance and angle
+    probabilities = []
+    for node in nearest_neighbors:
+        distance = distance_matrix[current_node][node]
+        angle = calculate_angle(current_node, node, destination_node, distance_matrix) if destination_node in unvisited_nodes else 0
+        # Weighted probability: inverse distance and angle factor
+        weight = (1 / (1 + distance)) * (1 + angle)
+        probabilities.append(weight)
+
+    # Normalize probabilities
+    total = sum(probabilities)
+    if total == 0:
+        total = 1  # Avoid division by zero
+    normalized_probs = [p / total for p in probabilities]
+
+    # Select node based on dynamic probability
+    next_node = random.choices(nearest_neighbors, weights=normalized_probs, k=1)[0]
+    return next_node

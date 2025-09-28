@@ -1,0 +1,22 @@
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    mean_dist = np.mean(distances)
+    std_dev = np.std(distances) if len(distances) > 1 else 0
+
+    dynamic_threshold = mean_dist - (std_dev * (1 - (len(unvisited_nodes) / len(distance_matrix))))
+
+    candidates = [node for node, dist in zip(unvisited_nodes, distances) if dist <= dynamic_threshold]
+
+    if not candidates:
+        candidates = [node for node, dist in zip(unvisited_nodes, distances) if dist <= mean_dist + std_dev]
+
+    if not candidates:
+        candidates = list(unvisited_nodes)
+
+    next_node = min(candidates, key=lambda node: distance_matrix[current_node][node])
+    return next_node

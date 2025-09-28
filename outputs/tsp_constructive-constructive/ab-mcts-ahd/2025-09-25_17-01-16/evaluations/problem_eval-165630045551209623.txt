@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_score = float('inf')
+    weight_factor = 0.6  # Balanced weight for destination distance
+    lookahead_factor = 0.3  # Weight for lookahead evaluation
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Lookahead: Evaluate the next best node from the current candidate
+        remaining_nodes = [n for n in unvisited_nodes if n != node]
+        if remaining_nodes:
+            next_candidate = None
+            min_next_distance = float('inf')
+            for candidate in remaining_nodes:
+                distance = distance_matrix[node][candidate]
+                if distance < min_next_distance:
+                    min_next_distance = distance
+                    next_candidate = candidate
+            if next_candidate:
+                distance_to_next = distance_matrix[node][next_candidate]
+            else:
+                distance_to_next = 0
+        else:
+            distance_to_next = 0
+
+        combined_score = distance_to_current + (weight_factor * distance_to_destination) + (lookahead_factor * distance_to_next)
+
+        if combined_score < min_score:
+            min_score = combined_score
+            next_node = node
+
+    return next_node

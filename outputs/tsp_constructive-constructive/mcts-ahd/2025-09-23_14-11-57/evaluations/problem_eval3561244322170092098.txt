@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    immediate_distances = []
+    lookahead_distances = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        immediate_distances.append(immediate_distance)
+
+        best_lookahead_distance = float('inf')
+        for next_node in unvisited_nodes:
+            if next_node != node:
+                lookahead_distance = distance_matrix[node][next_node]
+                if lookahead_distance < best_lookahead_distance:
+                    best_lookahead_distance = lookahead_distance
+        lookahead_distances.append(best_lookahead_distance)
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    phase = 1 - (remaining_nodes / total_nodes)
+
+    if phase < 0.5:
+        immediate_weight = 0.6
+        lookahead_weight = 0.4
+    else:
+        immediate_weight = 0.3
+        lookahead_weight = 0.7
+
+    scores = [immediate_weight * immediate + lookahead_weight * lookahead
+             for immediate, lookahead in zip(immediate_distances, lookahead_distances)]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

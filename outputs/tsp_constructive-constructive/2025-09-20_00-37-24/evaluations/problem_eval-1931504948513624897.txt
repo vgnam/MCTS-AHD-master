@@ -1,0 +1,35 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate nearest neighbors and their distances
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    sorted_indices = np.argsort(distances)
+    nearest_neighbors = [unvisited_nodes[i] for i in sorted_indices]
+
+    # Calculate adaptive exploration probability
+    if len(unvisited_nodes) > 1:
+        # Higher exploration probability when distances are similar
+        distance_variance = np.var(distances)
+        exploration_prob = min(0.9, 0.5 + 0.4 * (1 - distance_variance / np.mean(distances) if np.mean(distances) > 0 else 0))
+    else:
+        exploration_prob = 0.1  # Default when only one node remains
+
+    # Select next node based on adaptive probability
+    if random.random() < exploration_prob:
+        # Consider both nearest neighbors and a small set of distant nodes
+        candidate_set = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        if len(nearest_neighbors) > 3:
+            candidate_set += random.sample(nearest_neighbors[3:], min(2, len(nearest_neighbors)-3))
+        next_node = random.choice(candidate_set)
+    else:
+        # Random selection with bias toward nodes with shorter average distances to unvisited nodes
+        weights = [1 / (1 + sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)) for node in nearest_neighbors]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+
+    return next_node

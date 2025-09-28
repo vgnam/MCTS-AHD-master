@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    decay_factor = 0.7
+    remaining_ratio = len(unvisited_nodes) / (len(distance_matrix) - 1)  # Ratio of remaining nodes
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weighting: more emphasis on destination distance when fewer nodes remain
+        dynamic_weight = 1.0 - remaining_ratio
+        weighted_destination = distance_to_destination * (1 + dynamic_weight)
+
+        # Penalty for nodes too far from current node
+        penalty = max(0, distance_to_current - 2 * distance_matrix[current_node][destination_node])
+
+        score = distance_to_current * (weighted_destination ** decay_factor) + penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = {}
+    total_unvisited = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        urgency = 1 / (1 + distance) if node != destination_node else 2
+        score = (0.7 * distance + 0.3 * urgency) * (1 - 0.1 * (total_unvisited - 1) / total_unvisited)
+        scores[node] = score
+
+    next_node = min(scores, key=scores.get)
+
+    if destination_node in unvisited_nodes and scores.get(destination_node, float('inf')) < min(scores.values()):
+        next_node = destination_node
+
+    return next_node

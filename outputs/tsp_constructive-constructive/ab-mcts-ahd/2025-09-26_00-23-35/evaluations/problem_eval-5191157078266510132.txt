@@ -1,0 +1,44 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    num_unvisited = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Adaptive weights based on node density and progress
+    progress_ratio = (total_nodes - num_unvisited) / total_nodes
+    weight_proximity = 0.5 + 0.3 * math.sin(progress_ratio * math.pi)
+    weight_future = 0.5 - 0.3 * math.sin(progress_ratio * math.pi)
+
+    # Dynamic randomness scaling with progress
+    randomness = 0.15 * (1 - progress_ratio) * random.random()
+
+    # Memory mechanism to avoid recent nodes
+    recent_nodes = set()
+    if len(unvisited_nodes) < total_nodes - 2:
+        recent_nodes = {node for node in distance_matrix if node not in unvisited_nodes and node != current_node}
+        if len(recent_nodes) >= 2:
+            recent_nodes = sorted(recent_nodes, key=lambda x: distance_matrix[current_node][x])[:2]
+
+    # Lookahead penalty factor
+    lookahead_penalty = 0.3 * (1 - progress_ratio) if num_unvisited > 4 else 0
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+
+        # Future efficiency with lookahead penalty
+        future_cost = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        avg_future_distance = (future_cost / max(1, num_unvisited - 1)) * (1 + lookahead_penalty)
+
+        # Recent node penalty
+        recent_penalty = 0.5 * distance_to_node if node in recent_nodes else 0
+
+        score = (weight_proximity * distance_to_node + weight_future * avg_future_distance) * (1 + randomness) + recent_penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

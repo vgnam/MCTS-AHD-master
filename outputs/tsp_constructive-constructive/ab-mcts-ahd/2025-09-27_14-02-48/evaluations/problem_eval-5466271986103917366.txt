@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_total = float('inf')
+    next_node = None
+    avg_distance_to_dest = sum(distance_matrix[node][destination_node] for node in unvisited_nodes) / len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        remaining_nodes = unvisited_nodes - {node}
+        if destination_node in remaining_nodes:
+            remaining_nodes.remove(destination_node)
+
+        local_cost = distance_matrix[current_node][node]
+        global_cost = distance_matrix[node][destination_node] - avg_distance_to_dest
+
+        if not remaining_nodes:
+            total = local_cost + global_cost
+        else:
+            total = local_cost + global_cost
+            for next_node_candidate in remaining_nodes:
+                total += distance_matrix[node][next_node_candidate] / len(remaining_nodes)
+
+        if total < min_total:
+            min_total = total
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        destination_local = distance_matrix[current_node][destination_node]
+        destination_global = 0
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = unvisited_nodes - {destination_node}
+            destination_global = sum(distance_matrix[destination_node][node] for node in remaining_nodes) / len(remaining_nodes)
+
+        destination_total = destination_local + destination_global
+        if destination_total < min_total:
+            next_node = destination_node
+
+    return next_node

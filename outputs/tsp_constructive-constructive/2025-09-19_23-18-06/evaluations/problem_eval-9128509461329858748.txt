@@ -1,0 +1,39 @@
+importance scores** (based on degree centrality, betweenness, and clustering coefficients) and **path diversity**, while using a **nonlinear cooling schedule** to dynamically adjust exploration/exploitation balance, prioritizing high-importance nodes early and optimizing for diversity as the search progresses.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    cooling_rate = 0.05
+    temperature = max(0.1, 1.0 - (remaining_nodes / total_nodes) ** cooling_rate)
+
+    def compute_node_importance(node):
+        degree = sum(1 for d in distance_matrix[node] if d > 0) - 1
+        betweenness = sum(distance_matrix[node][k] > 0 and distance_matrix[k][node] > 0 for k in range(total_nodes)) / total_nodes
+        clustering = sum(distance_matrix[node][i] > 0 and distance_matrix[node][j] > 0 and distance_matrix[i][j] > 0 for i in range(total_nodes) for j in range(total_nodes)) / (degree * (degree - 1)) if degree > 1 else 0
+        return degree * 0.4 + betweenness * 0.3 + clustering * 0.3
+
+    def potential_score(node):
+        immediate_dist = distance_matrix[current_node][node]
+        node_importance = compute_node_importance(node)
+
+        if remaining_nodes > 1:
+            remaining_unvisited = unvisited_nodes - {node}
+            avg_future_dist = sum(distance_matrix[node][n] for n in remaining_unvisited) / len(remaining_unvisited)
+            path_diversity = 1.0 / (1.0 + sum(distance_matrix[node][n] for n in remaining_unvisited))
+
+            exploration_term = temperature * (node_importance * path_diversity)
+        else:
+            exploration_term = 0.0
+
+        return (1.0 - temperature) * immediate_dist + exploration_term
+
+    candidates = []
+    for node in unvisited_nodes:
+        score = potential_score(node)
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

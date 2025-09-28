@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic probabilities based on inverse distance and node degree
+    probabilities = []
+    total = 0.0
+    alpha = 0.7  # Controls the balance between distance and degree (0.5-0.9)
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Inverse distance component (smaller distances have higher probability)
+        inv_dist = 1.0 / (distance + 1e-6)  # Avoid division by zero
+        # Node degree component (nodes with fewer connections are more likely)
+        degree = sum(1 for n in unvisited_nodes if distance_matrix[node][n] > 0)
+        node_degree = 1.0 / (degree + 1) if degree > 0 else 1.0
+
+        prob = (inv_dist ** alpha) * (node_degree ** (1 - alpha))
+        probabilities.append(prob)
+        total += prob
+
+    # Normalize probabilities
+    normalized_probs = [p / total for p in probabilities]
+
+    # Select node based on the dynamic probability distribution
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+
+    return next_node

@@ -1,0 +1,58 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    # Calculate the distance to the destination node
+    destination_distance = distance_matrix[current_node][destination_node]
+    
+    # Initialize the minimum distance and the next node
+    min_distance = float('inf')
+    next_node = None
+    
+    # Initialize the scores for the nodes
+    scores = {}
+    
+    # Calculate the scores for the unvisited nodes
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+        # Calculate a score based on the distance to the node and the distance to the destination node
+        score = distance / (distance_matrix[node][destination_node] + 1e-6)
+        scores[node] = score
+    
+    # Normalize the scores
+    min_score = min(scores.values())
+    max_score = max(scores.values())
+    for node in scores:
+        scores[node] = (scores[node] - min_score) / (max_score - min_score + 1e-6)
+    
+    # Calculate the temperature parameter based on the number of unvisited nodes
+    temperature = len(unvisited_nodes) / len(distance_matrix)
+    
+    # Select the next node based on the scores and the temperature parameter
+    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    threshold_distance = min_distance * 1.2
+    if destination_node in unvisited_nodes and destination_distance < threshold_distance:
+        probability = math.exp((1 - (destination_distance / threshold_distance)) / temperature)
+        if random.random() < probability:
+            next_node = destination_node
+    else:
+        # Apply a softmax function to the scores to get a probability distribution
+        probabilities = {node: math.exp(-scores[node] / temperature) for node in unvisited_nodes}
+        sum_probabilities = sum(probabilities.values())
+        probabilities = {node: probability / sum_probabilities for node, probability in probabilities.items()}
+        
+        # Select the next node based on the probability distribution
+        r = random.random()
+        cumulative_probability = 0
+        for node, probability in probabilities.items():
+            cumulative_probability += probability
+            if r < cumulative_probability:
+                next_node = node
+                break
+    
+    return next_node

@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_score = float('inf')
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+        adaptive_weight = 1.0 / (1.0 + lookahead_distance / len(unvisited_nodes))
+        total_score = immediate_distance + adaptive_weight * lookahead_distance
+
+        if total_score < best_score:
+            best_score = total_score
+            best_node = node
+
+    return next_node

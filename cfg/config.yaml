@@ -1,16 +1,21 @@
 defaults:
   - _self_
   - problem: tsp_constructive
-  - llm_client: openai
+  - llm_client: gemini
   - override hydra/output: local
 
 hydra:
   job:
-    name: ${problem.problem_name}-${problem.problem_type}
     chdir: True
+  run:
+    dir: outputs/${problem.problem_name}-${problem.problem_type}/${algorithm}/${now:%Y-%m-%d_%H-%M-%S}
+
+
+model: mistral/codestral-latest # LLM model
+temperature: 1  # temperature for chat completion
 
 # The chosen algorithm
-algorithm: mcts_ahd
+algorithm: mcts-ahd
 
 # Main GA loop parameters
 max_fe: 1000 # maximum number of function evaluations

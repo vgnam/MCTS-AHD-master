@@ -2,6 +2,15 @@ import logging
 import re
 import inspect
 import hydra
+from litellm import completion
+import time
+from litellm import completion
+import os
+import logging
+import concurrent.futures
+import time
+import re
+import inspect
 
 def init_client(cfg):
     global client
@@ -115,3 +124,63 @@ def get_heuristic_name(module, possible_names: list[str]):
         if hasattr(module, func_name):
             if inspect.isfunction(getattr(module, func_name)):
                 return func_name
+
+
+def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature):
+
+    assert isinstance(messages_list, list), "messages_list should be a list."
+    try:
+        if not isinstance(messages_list[0], list):
+            messages_list = [messages_list]
+    except:
+        print(messages_list)
+        raise IndexError("Something is wrong.")
+
+    if len(messages_list) > 1:
+        assert n == 1, "Currently, only n=1 is supported for multi-chat completion."
+
+    num_workers = os.cpu_count()
+    if "gpt" not in model:
+        # Transform messages if n > 1
+        messages_list *= n
+        n = 1
+        num_workers = 2
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
+        args = [(n, messages, model, temperature) for messages in messages_list]
+        choices = executor.map(lambda p: chat_completion(*p), args)
+
+    contents: list[str] = []
+    for choice in choices:
+        for c in choice:
+            contents.append(c.message.content)
+    return contents
+
+
+def chat_completion(n: int, messages: list[dict], temperature: float, model: str = "mistral/codestral-latest") -> list[dict]:
+    """
+    Generate n responses using OpenAI Chat Completions API
+    """
+
+    for attempt in range(100):
+        try:
+            response_cur = completion(model=model,
+                                      messages=messages,
+                                      temperature=temperature,
+                                      n=n)
+                                      # api_base="http://localhost:1234/v1",
+                                      # api_key="sk-no-key-required")
+            break
+        except Exception as e:
+            logging.info(f"Attempt {attempt + 1} failed with error: {e}")
+            time.sleep(3)
+    if response_cur is None:
+        logging.info("Code terminated due to too many failed attempts!")
+        exit()
+
+    return response_cur.choices
+
+def format_messages(cfg, pre_messages):
+    messages = [{"role": "system", "content": pre_messages["system"]},
+                {"role": "user", "content": pre_messages["user"]}]
+    return messages

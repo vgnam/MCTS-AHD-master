@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    total_nodes = len(unvisited_nodes) + 1
+    progress_ratio = 1 - (len(unvisited_nodes) / total_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            # Dynamic neighbor exploration (same as original)
+            neighbor_count = min(3, len(unvisited_nodes))
+            nearest_neighbors = sorted(unvisited_nodes, key=lambda n: distance_matrix[node][n])[:neighbor_count]
+            avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / neighbor_count if neighbor_count else 0
+
+            # Modified adaptive weights (emphasize connectivity)
+            connectivity_weight = 0.7 * (1 - progress_ratio ** 2)
+            distance_weight = 1 - connectivity_weight
+
+            # Modified non-linear transformations
+            transformed_current = distance_to_current ** 0.5
+            transformed_neighbor = avg_neighbor_distance ** 1.2
+
+            # Dynamic exploration bonus (inverse of original penalty)
+            exploration_bonus = 1 - 0.4 * (transformed_neighbor / (transformed_current + 1e-6)) * (1 - progress_ratio)
+
+            score = (distance_weight * transformed_current +
+                    connectivity_weight * transformed_neighbor) * exploration_bonus
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

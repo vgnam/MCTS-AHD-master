@@ -1,0 +1,30 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    # Calculate adaptive weights for nearest neighbors
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Inverse distance weighting with small randomness
+        weight = 1.0 / (distance + 1e-6)  # Avoid division by zero
+        weights.append(weight + random.uniform(0, 0.1 * weight))
+
+    # Normalize weights
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    # Occasionally override with a random node to ensure exploration
+    if random.random() < 0.1:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

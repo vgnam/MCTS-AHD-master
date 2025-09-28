@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    max_distance = float('-inf')
+    total_distance = 0
+    count = 0
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+        if distance > max_distance:
+            max_distance = distance
+        total_distance += distance
+        count += 1
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        avg_distance = total_distance / count
+        centrality_factor = (min_distance + avg_distance) * 0.6
+        if destination_distance < centrality_factor:
+            next_node = destination_node
+
+    return next_node

@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    best_score = -float('inf')
+
+    for node in unvisited_nodes:
+        dist_current = distance_matrix[current_node][node]
+        dist_dest = distance_matrix[node][destination_node]
+
+        if dist_current == 0:
+            angular_progress = 1.0
+        else:
+            angular_progress = dist_dest / dist_current
+
+        if len(unvisited_nodes) > 1:
+            avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1)
+        else:
+            avg_dist = 0
+
+        score = angular_progress + 0.5 * avg_dist - 2 * dist_current
+
+        if score > best_score or (score == best_score and dist_current < min_distance):
+            best_score = score
+            min_distance = dist_current
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        dist_current = distance_matrix[current_node][destination_node]
+        dist_dest = distance_matrix[destination_node][destination_node]
+
+        if dist_current == 0:
+            angular_progress = 1.0
+        else:
+            angular_progress = dist_dest / dist_current
+
+        if len(unvisited_nodes) > 1:
+            avg_dist = sum(distance_matrix[destination_node][other] for other in unvisited_nodes if other != destination_node) / (len(unvisited_nodes) - 1)
+        else:
+            avg_dist = 0
+
+        dest_score = angular_progress + 0.5 * avg_dist - 2 * dist_current
+
+        if dest_score > best_score or (dest_score == best_score and dist_current < min_distance):
+            next_node = destination_node
+
+    return next_node

@@ -1,0 +1,34 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    temperature = 1.0 - (len(unvisited_nodes) / total_nodes)  # Dynamic temperature
+
+    novelty_scores = {}
+    node_visits = {node: 0 for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        # Calculate centrality (inverse of average distance to all other nodes)
+        avg_distance = sum(distance_matrix[node][other] for other in range(total_nodes)) / total_nodes
+        centrality = 1.0 / (1.0 + avg_distance)
+
+        # Calculate path potential (future distance to destination)
+        future_distance = distance_matrix[node][destination_node]
+
+        # Novelty score combines centrality, future potential, and dynamic temperature
+        novelty_score = (centrality * (1 - temperature)) + (future_distance * temperature)
+
+        # Reinforcement learning effect - penalize frequently visited nodes
+        novelty_score *= (1.0 - 0.1 * node_visits[node])
+
+        novelty_scores[node] = novelty_score + random.uniform(-0.05, 0.05)
+
+    # Select node with highest novelty score
+    next_node = max(novelty_scores.items(), key=lambda x: x[1])[0]
+    node_visits[next_node] += 1  # Update visit count
+
+    return next_node

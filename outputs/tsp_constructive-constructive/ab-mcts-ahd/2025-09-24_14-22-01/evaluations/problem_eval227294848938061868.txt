@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_cost = float('inf')
+    next_node = None
+    centrality = sum(1 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        if immediate_distance == 0 or potential_distance == 0:
+            combined_weight = float('inf')
+        else:
+            weighted_immediate = immediate_distance * (1 + centrality)
+            weighted_potential = potential_distance * (1 - centrality)
+            combined_weight = weighted_immediate + weighted_potential
+
+        # Lookahead mechanism to evaluate the impact on subsequent path segments
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n not in (node, destination_node)]
+            if remaining_nodes:
+                next_potential_distance = min(distance_matrix[node][n] + distance_matrix[n][destination_node] for n in remaining_nodes)
+                combined_weight += 0.5 * next_potential_distance
+
+        if combined_weight < min_cost:
+            min_cost = combined_weight
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+
+    return next_node

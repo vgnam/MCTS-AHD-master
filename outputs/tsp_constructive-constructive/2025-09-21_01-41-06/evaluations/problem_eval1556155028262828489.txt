@@ -1,0 +1,5 @@
+import random
+        if random.random() < 0.3:
+            return random.choice(candidates)
+        else:
+            return next_node

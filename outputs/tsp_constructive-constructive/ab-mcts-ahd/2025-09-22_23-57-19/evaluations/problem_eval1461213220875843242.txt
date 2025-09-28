@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (remaining_nodes / (len(distance_matrix) - 1)))
+
+    scores = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        heuristic = distance_matrix[node][destination_node] if destination_node != node else 0
+        score = distance + (1 - temperature) * heuristic
+        scores.append((node, score))
+
+    if temperature > 0.5:
+        scores.sort(key=lambda x: x[1])
+        selected_nodes = scores[:max(1, len(scores) // 2)]
+        probabilities = [1.0 / (i + 1) for i in range(len(selected_nodes))]
+        total_prob = sum(probabilities)
+        probabilities = [p / total_prob for p in probabilities]
+        next_node = random.choices([n for n, _ in selected_nodes], weights=probabilities, k=1)[0]
+    else:
+        next_node = min(scores, key=lambda x: x[1])[0]
+
+    if len(unvisited_nodes) > 2 and random.random() < 0.2:
+        potential_nodes = [n for n in unvisited_nodes if n != next_node]
+        if potential_nodes:
+            alternative_node = random.choice(potential_nodes)
+            alternative_cost = distance_matrix[current_node][alternative_node] + distance_matrix[alternative_node][next_node]
+            current_cost = distance_matrix[current_node][next_node] + distance_matrix[next_node][destination_node]
+            if alternative_cost < current_cost * 1.2:
+                next_node = alternative_node
+
+    return next_node

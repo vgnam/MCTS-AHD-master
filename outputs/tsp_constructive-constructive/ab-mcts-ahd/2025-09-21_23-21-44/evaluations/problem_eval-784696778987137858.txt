@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_combined_cost = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate current node's centrality (average distance to all other nodes)
+    current_centrality = sum(distance_matrix[current_node]) / len(distance_matrix[current_node])
+
+    for node in unvisited_nodes:
+        immediate_cost = distance_matrix[current_node][node]
+
+        # Calculate node's centrality (average distance to all other nodes)
+        node_centrality = sum(distance_matrix[node]) / len(distance_matrix[node])
+
+        # Dynamic weight adjustment based on remaining nodes and centrality
+        centrality_factor = 0.3 if remaining_nodes > 3 else 0.5
+        weight = 0.6 + (0.3 * (1 - centrality_factor) * (current_centrality / max(distance_matrix[current_node])))
+
+        # Penalty for nodes with high historical path costs (simulated here)
+        penalty = 0.1 if immediate_cost > 2 * current_centrality else 0
+
+        combined_cost = weight * immediate_cost + (1 - weight) * node_centrality + penalty
+
+        if combined_cost < min_combined_cost:
+            min_combined_cost = combined_cost
+            next_node = node
+
+    return next_node

@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    distances = [(node, distance_matrix[current_node][node]) for node in unvisited_nodes]
+    closest_node, closest_dist = min(distances, key=lambda x: x[1])
+    farthest_node, farthest_dist = max(distances, key=lambda x: x[1])
+
+    # Balance between closest and farthest nodes
+    if farthest_dist - closest_dist > 0:
+        # Weighted selection (e.g., 70% closest, 30% farthest)
+        next_node = closest_node if (farthest_dist - closest_dist) * 0.3 < closest_dist else farthest_node
+    else:
+        next_node = closest_node
+
+    return next_node

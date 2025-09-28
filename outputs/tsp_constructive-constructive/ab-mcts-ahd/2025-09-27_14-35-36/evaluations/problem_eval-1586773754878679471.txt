@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    unvisited_count = len(unvisited_nodes)
+    total_unvisited = len(unvisited_nodes) + 1  # +1 for current node
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+
+        # Dynamic proximity factor based on remaining path length
+        proximity_factor = (1 / (1 + distance_to_node)) * (total_unvisited / (total_unvisited + 1))
+
+        # Destination pull metric combining distance and unvisited density
+        dest_pull = (distance_to_dest / (distance_to_node + 1)) * (unvisited_count / total_unvisited)
+
+        # Exploration term to encourage visiting more nodes
+        exploration_term = (1 / (1 + unvisited_count)) if unvisited_count > 1 else 0.5
+
+        # Combined score with weighted components
+        score = (proximity_factor * 0.4) + (dest_pull * 0.4) + (exploration_term * 0.2)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Special check with probabilistic element
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        threshold = 0.6 if unvisited_count < 3 else 0.8
+        if dest_distance < distance_matrix[current_node][next_node] * threshold:
+            next_node = destination_node
+
+    return next_node

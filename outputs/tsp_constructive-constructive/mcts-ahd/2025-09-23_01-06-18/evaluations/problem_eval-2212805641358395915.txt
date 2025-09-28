@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    def centrality_score(node):
+        return sum(distance_matrix[node]) / len(distance_matrix[node])
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        node_centrality = centrality_score(node)
+        exploration_weight = 0.5 * (1 - (len(unvisited_nodes) / len(distance_matrix)))
+        return to_current + (1 - exploration_weight) * to_destination + exploration_weight * node_centrality
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

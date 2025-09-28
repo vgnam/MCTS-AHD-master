@@ -1,0 +1,62 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    remaining_nodes = unvisited_nodes - {destination_node}
+    if not remaining_nodes:
+        return destination_node
+
+    # Calculate centrality and density with clustering coefficients
+    centrality = {}
+    density = {}
+    clustering = {}
+    for node in remaining_nodes:
+        neighbors = [n for n in remaining_nodes if n != node]
+        if neighbors:
+            centrality[node] = sum(1 / (distance_matrix[current_node][n] + 1e-6) for n in neighbors) / len(neighbors)
+            density[node] = sum(distance_matrix[node][n] for n in neighbors) / len(neighbors)
+            clustering[node] = sum(distance_matrix[n][m] for n in neighbors for m in neighbors if n != m) / (len(neighbors) * (len(neighbors) - 1)) if len(neighbors) > 1 else 0
+        else:
+            centrality[node] = 0
+            density[node] = 0
+            clustering[node] = 0
+
+    avg_centrality = sum(centrality.values()) / len(centrality) if centrality else 0
+    avg_density = sum(density.values()) / len(density) if density else 0
+
+    # Adaptive weights based on remaining nodes
+    gamma = len(remaining_nodes) / len(distance_matrix)
+    weight_centrality = math.tanh(gamma * 2)
+    weight_density = 1 - weight_centrality
+
+    # Probability-based selection with adaptive penalties
+    probabilities = {}
+    total_prob = 0
+    for node in remaining_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        centrality_factor = (centrality[node] / avg_centrality) if avg_centrality else 1
+        density_factor = (density[node] / avg_density) if avg_density else 1
+        clustering_factor = clustering[node]
+
+        # Adaptive cost function
+        cost = (immediate_distance * (1 + weight_centrality * centrality_factor) +
+                potential_distance * (1 - weight_centrality * centrality_factor))
+        penalty = (density_factor ** 2) * (1 + clustering_factor)
+        total_cost = cost * penalty
+
+        probabilities[node] = 1 / (total_cost + 1e-6)
+        total_prob += probabilities[node]
+
+    # Select node with weighted probability
+    if total_prob == 0:
+        return remaining_nodes.pop()
+
+    rand_val = random.random() * total_prob
+    cumulative_prob = 0
+    for node, prob in probabilities.items():
+        cumulative_prob += prob
+        if rand_val <= cumulative_prob:
+            return node
+
+    return next_node

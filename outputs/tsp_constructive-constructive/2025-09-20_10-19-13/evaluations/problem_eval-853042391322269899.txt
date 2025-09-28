@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate a heuristic value for each node (e.g., sum of distances to other unvisited nodes)
+    heuristic_values = {}
+    for node in unvisited_nodes:
+        heuristic_values[node] = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+
+    # Combine distance and heuristic with a weight factor (e.g., 0.7 distance, 0.3 heuristic)
+    def weighted_score(node):
+        distance = distance_matrix[current_node][node]
+        heuristic = heuristic_values[node]
+        return 0.7 * distance + 0.3 * heuristic
+
+    next_node = min(unvisited_nodes, key=weighted_score)
+    return next_node

@@ -1,0 +1,47 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate destination bias (closer destination gets higher weight)
+    if destination_node in unvisited_nodes:
+        dest_bias = 1.0 / (1.0 + distance_matrix[current_node][destination_node])
+    else:
+        dest_bias = 0.0
+
+    # Get nearest neighbors and their distances
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    nearest_distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+
+    # Probability distribution combining proximity and destination bias
+    weights = []
+    for i, node in enumerate(nearest_neighbors):
+        if node == destination_node:
+            # Strong pull toward destination if it's unvisited
+            weights.append(dest_bias * 2.0 + (1.0 / (1.0 + nearest_distances[i])))
+        else:
+            weights.append(1.0 / (1.0 + nearest_distances[i]))
+
+    # Normalize weights
+    total_weight = sum(weights)
+    if total_weight > 0:
+        weights = [w / total_weight for w in weights]
+    else:
+        weights = [1.0 / len(weights)] * len(weights)
+
+    # Stochastic selection with 80% chance to pick from top 3, 20% chance to pick randomly
+    if random.random() < 0.8:
+        top_candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        top_weights = [weights[i] for i, node in enumerate(nearest_neighbors) if node in top_candidates]
+        top_total = sum(top_weights)
+        if top_total > 0:
+            top_weights = [w / top_total for w in top_weights]
+        else:
+            top_weights = [1.0 / len(top_weights)] * len(top_weights)
+        next_node = random.choices(top_candidates, weights=top_weights, k=1)[0]
+    else:
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+
+    return next_node

@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_weighted_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    centrality_decay = 0.5 ** remaining_nodes
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate centrality: average distance to all unvisited nodes
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / remaining_nodes
+
+        # Weighted score with exponentially decaying centrality influence
+        weighted_score = (0.5 * distance_to_current +
+                         0.3 * distance_to_destination +
+                         0.2 * centrality_decay * centrality)
+
+        if weighted_score < min_weighted_score:
+            min_weighted_score = weighted_score
+            next_node = node
+
+    return next_node

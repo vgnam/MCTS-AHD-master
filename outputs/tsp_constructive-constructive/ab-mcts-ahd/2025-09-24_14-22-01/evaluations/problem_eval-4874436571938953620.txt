@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    immediate_weight = max(0.3, 0.5 - (0.05 * num_unvisited))
+    potential_weight = max(0.4, 0.6 - (0.05 * num_unvisited))
+    diversity_weight = min(0.3, 0.1 + (0.05 * num_unvisited))
+
+    candidates = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        centrality = sum(1 for other in unvisited_nodes if distance_matrix[node][other] < immediate_distance * 1.2) / (num_unvisited - 1 if num_unvisited > 1 else 1)
+        diversity_factor = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (num_unvisited - 1 if num_unvisited > 1 else 1)
+        weighted_cost = (immediate_weight * immediate_distance) + (potential_weight * potential_distance) + (diversity_weight * diversity_factor) + (0.2 * centrality)
+        candidates.append((node, weighted_cost))
+
+    if not candidates:
+        return destination_node
+
+    candidates.sort(key=lambda x: x[1])
+    top_candidates = candidates[:max(1, len(candidates) // 2)]
+    selected = random.choice(top_candidates) if top_candidates else candidates[0]
+    return next_node

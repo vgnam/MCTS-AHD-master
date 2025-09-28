@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    # Dynamic neighborhood size
+    neighborhood_size = max(1, int(3 + 3 * (1 - exploration_factor)))
+    candidates = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:neighborhood_size]
+
+    # Adaptive metrics
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Connectivity score (normalized variance of distances)
+        if remaining_nodes > 1:
+            remaining_dists = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            mean_dist = sum(remaining_dists) / (remaining_nodes - 1)
+            variance = sum((d - mean_dist) ** 2 for d in remaining_dists) / (remaining_nodes - 1)
+            connectivity = variance / (mean_dist + 1e-6)  # Normalized by mean distance
+        else:
+            connectivity = 0
+
+        # Dynamic weights with exponential adjustment
+        weight_dist = 0.5 * (1 - exploration_factor ** 3)
+        weight_connectivity = 0.4 * (1 - exploration_factor ** 2)
+        weight_dest = 0.3 + 0.4 * (1 - exploration_factor)
+
+        # Probabilistic selection component
+        prob_factor = exploration_factor ** 0.5
+        random_weight = np.random.uniform(0, 0.2 * prob_factor)
+
+        return (weight_dist * current_dist +
+                weight_connectivity * connectivity +
+                weight_dest * dest_dist +
+                random_weight)
+
+    # Select node with probabilistic twist
+    probabilities = [1 / (evaluate_node(node) + 1e-6) for node in candidates]
+    probabilities = [p / sum(probabilities) for p in probabilities]
+    next_node = np.random.choice(candidates, p=probabilities)
+
+    return next_node

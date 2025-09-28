@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Compute centroid and connectivity metrics
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        connectivity = {node: sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1) for node in unvisited_nodes}
+    else:
+        centroid_x = 0
+        connectivity = {}
+
+    remaining_path_length = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+        connectivity_score = connectivity.get(node, 0)
+
+        # Dynamic weights based on remaining path length
+        weight_current = 1.0 / (1 + 0.1 * remaining_path_length)
+        weight_centroid = 0.5 + 0.2 * (1 - centroid_penalty / (centroid_x + 1e-6))
+        weight_connectivity = 0.2 + 0.1 * (1 - connectivity_score / (sum(connectivity.values()) / len(connectivity) + 1e-6) if connectivity else 0)
+
+        # Weighted score with dynamic adjustments
+        score = (weight_current * distance_to_current +
+                 weight_centroid * centroid_penalty +
+                 weight_connectivity * connectivity_score +
+                 0.3 * distance_to_dest)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

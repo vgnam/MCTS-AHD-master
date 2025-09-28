@@ -1,0 +1,38 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    # {The algorithm prioritizes the destination if unvisited, then combines a cost-benefit analysis of nearest neighbors with a pheromone-inspired probability to diversify the search.}
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Cost-Benefit Analysis with Pheromone Inspiration
+    probabilities = []
+    total_score = 0
+    
+    for neighbor in nearest_neighbors:
+        distance = distance_matrix[current_node][neighbor]
+        # Benefit: Inverse of distance (closer is better)
+        benefit = 1.0 / (distance + 1e-6)  # Add a small value to avoid division by zero
+        
+        # Pheromone: Simulate attractiveness based on prior visits (initially uniform)
+        pheromone = 1.0 # Assume initial pheromone level is uniform
+
+        # Score: Combine benefit and pheromone
+        score = benefit * pheromone
+        total_score += score
+        probabilities.append(score)
+
+    # Normalize probabilities
+    if total_score > 0:
+        probabilities = [p / total_score for p in probabilities]
+    else:
+        probabilities = [1.0 / len(nearest_neighbors)] * len(nearest_neighbors)  # Uniform if all scores are zero
+
+    # Stochastic selection based on probabilities
+    next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+    
+    return next_node

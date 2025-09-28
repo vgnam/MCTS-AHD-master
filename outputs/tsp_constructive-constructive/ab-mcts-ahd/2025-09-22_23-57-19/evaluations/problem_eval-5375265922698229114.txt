@@ -1,0 +1,48 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    max_cost = -float('inf')
+    farthest_node = None
+    total_cost = 0
+    num_unvisited = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        total_cost += cost
+        if cost > max_cost:
+            max_cost = cost
+            farthest_node = node
+
+    if farthest_node is None:
+        return unvisited_nodes.pop()
+
+    avg_cost = total_cost / num_unvisited
+    threshold = avg_cost * 0.6
+
+    best_node = farthest_node
+    best_cost = max_cost
+
+    for node in unvisited_nodes:
+        if node == farthest_node:
+            continue
+        current_cost = distance_matrix[current_node][node]
+        future_cost = distance_matrix[node][farthest_node]
+        combined_cost = current_cost + future_cost
+
+        if current_cost < threshold and combined_cost < best_cost * 0.8:
+            best_node = node
+            best_cost = combined_cost
+
+    if num_unvisited > 2 and distance_matrix[current_node][unvisited_nodes[0]] < max_cost * 0.3:
+        closest_node = min(unvisited_nodes, key=lambda x: distance_matrix[current_node][x])
+        if distance_matrix[current_node][closest_node] < best_cost * 0.7:
+            best_node = closest_node
+
+    return next_node

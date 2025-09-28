@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(1.0, 10.0 / remaining_nodes)
+
+    costs = []
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if node == destination_node:
+            cost *= 0.8
+        costs.append(cost)
+
+    probabilities = [math.exp(-cost / temperature) for cost in costs]
+    sum_prob = sum(probabilities)
+    normalized_probs = [p / sum_prob for p in probabilities]
+
+    selected_index = np.random.choice(len(unvisited_nodes), p=normalized_probs)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    if len(unvisited_nodes) > 2:
+        candidate_nodes = [node for node in unvisited_nodes if node != next_node]
+        candidate_costs = [distance_matrix[current_node][node] for node in candidate_nodes]
+        min_candidate_cost = min(candidate_costs)
+        if min_candidate_cost < distance_matrix[current_node][next_node] * 1.5:
+            next_node = candidate_nodes[candidate_costs.index(min_candidate_cost)]
+
+    return next_node

@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_weighted_sum = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Lookahead: find the next closest node after the candidate
+        remaining_nodes = [n for n in unvisited_nodes if n != node]
+        if remaining_nodes:
+            next_closest_node = min(remaining_nodes, key=lambda n: distance_matrix[node][n])
+            lookahead_distance = distance_matrix[node][next_closest_node]
+        else:
+            lookahead_distance = 0
+
+        # Weighted sum: prioritize current node distance, then lookahead, then destination
+        weighted_sum = (0.5 * distance_to_current) + (0.3 * lookahead_distance) + (0.2 * distance_to_destination)
+
+        if weighted_sum < min_weighted_sum:
+            min_weighted_sum = weighted_sum
+            next_node = node
+
+    return next_node

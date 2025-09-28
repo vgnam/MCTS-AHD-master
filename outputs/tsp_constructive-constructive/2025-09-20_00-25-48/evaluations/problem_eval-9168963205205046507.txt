@@ -1,0 +1,17 @@
+import random
+    import math
+    weights = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if remaining_nodes:
+            min_remaining_distance = min(distance_matrix[node][n] for n in remaining_nodes)
+        else:
+            min_remaining_distance = distance_matrix[node][destination_node]
+        weight = math.exp(-(current_distance + min_remaining_distance))
+        weights.append(weight)
+        total_weight += weight
+    probabilities = [w / total_weight for w in weights]
+    next_node = random.choices(list(unvisited_nodes), weights=probabilities, k=1)[0]
+    return next_node

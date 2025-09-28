@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 0.5  # Controls exploration/exploitation trade-off
+
+    # Calculate weights for each unvisited node
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Weight is inversely proportional to distance (closer nodes have higher weight)
+        # Add a small random factor scaled by temperature
+        weight = (1 / (distance + 1e-10)) + temperature * np.random.rand()
+        weights.append(weight)
+
+    # Select node based on weighted probabilities
+    next_node = np.random.choice(unvisited_nodes, p=np.array(weights) / sum(weights))
+    return next_node

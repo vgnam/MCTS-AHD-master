@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    max_normalized_score = -float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        hub_score = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+
+        # Dynamic weights based on remaining nodes
+        if remaining_nodes <= 3:
+            weight_proximity = 0.8
+            weight_hub = 0.1
+            weight_progress = 0.1
+        else:
+            weight_proximity = 0.5
+            weight_hub = 0.3
+            weight_progress = 0.2
+
+        # Normalize scores to avoid bias from different scales
+        max_distance = max(distance_matrix[current_node]) if distance_matrix[current_node] else 1
+        max_hub = max(sum(distance_matrix[n]) for n in unvisited_nodes) if unvisited_nodes else 1
+        normalized_distance = distance_to_current / max_distance
+        normalized_hub = hub_score / max_hub
+        normalized_progress = distance_to_destination / (max_distance + 1e-6)
+
+        # Calculate adaptive score
+        adaptive_score = (weight_proximity * (1 - normalized_distance) +
+                          weight_hub * (normalized_hub) +
+                          weight_progress * (1 - normalized_progress))
+
+        if adaptive_score > max_normalized_score:
+            max_normalized_score = adaptive_score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    threshold_ratio = 1.2 + (distance_matrix[current_node][farthest_node] / avg_distance) * 0.3
+    if len(unvisited_nodes) > 1:
+        remaining_unvisited = [n for n in unvisited_nodes if n != nearest_node]
+        nearest_remaining = min(remaining_unvisited, key=lambda n: distance_matrix[nearest_node][n])
+        node_to_nearest = distance_matrix[nearest_node][nearest_remaining]
+        exploration_factor = len(unvisited_nodes) / (len(unvisited_nodes) + sum(distance_matrix[current_node][n] for n in unvisited_nodes))
+        threshold = 1.0 + exploration_factor * 1.0
+        nearest_score = distance_matrix[current_node][nearest_node] * 0.7 + node_to_nearest * threshold * 0.3
+        farthest_score = distance_matrix[current_node][farthest_node] * 0.7 + distance_matrix[farthest_node][nearest_remaining] * threshold * 0.3
+        next_node = farthest_node if (distance_matrix[current_node][farthest_node] > threshold_ratio * distance_matrix[current_node][nearest_node] and farthest_score < nearest_score) else nearest_node
+    else:
+        next_node = nearest_node
+    return next_node

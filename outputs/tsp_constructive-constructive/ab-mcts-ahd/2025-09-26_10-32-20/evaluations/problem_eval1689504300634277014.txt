@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    # Adaptive weighting based on centrality and density
+    avg_centrality = sum(sum(distance_matrix[node]) for node in range(total_nodes)) / (total_nodes ** 2)
+    current_centrality = sum(distance_matrix[current_node]) / total_nodes
+    centrality_ratio = current_centrality / avg_centrality if avg_centrality != 0 else 1.0
+
+    # Calculate node density for each unvisited node
+    node_density = {}
+    for node in unvisited_nodes:
+        distances = [distance_matrix[node][n] for n in range(total_nodes) if n != node]
+        node_density[node] = len([d for d in distances if d < 2 * sum(distances) / len(distances)]) / total_nodes
+
+    # Dynamic weights
+    weight_local = 0.2 + 0.5 * progress * (1 - centrality_ratio)
+    weight_centrality = 0.7 - 0.4 * progress * centrality_ratio
+    weight_density = 0.3 + 0.4 * (1 - progress) * (1 - centrality_ratio)
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = sum(distance_matrix[node]) / total_nodes
+        density = node_density[node]
+        return (weight_local * local_distance) - (weight_centrality * centrality) - (weight_density * density)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

@@ -1,0 +1,15 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+[*] Instance 0: 17.400114633823577
+[*] Instance 1: 17.47784544391962
+[*] Instance 2: 18.03349878189904
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 12, in select_next_node
+    normalized_weights = [weight / total_weight for weight in weights]
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 12, in <listcomp>
+    normalized_weights = [weight / total_weight for weight in weights]
+ZeroDivisionError: float division by zero

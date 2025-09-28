@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = set(unvisited_nodes) | {current_node, destination_node}
+    num_remaining = len(remaining_nodes)
+
+    # Dynamic weights based on remaining nodes
+    alpha = min(0.9, 0.2 + 0.7 * (num_remaining / len(distance_matrix)))
+    beta = 1 - alpha
+
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Centrality factor: average distance to all remaining nodes
+        centrality = sum(distance_matrix[node][n] for n in remaining_nodes) / num_remaining
+
+        # Diversity factor: variance of distances to remaining nodes
+        distances = [distance_matrix[node][n] for n in remaining_nodes]
+        mean_distance = sum(distances) / num_remaining
+        diversity = sum((d - mean_distance) ** 2 for d in distances) / num_remaining
+
+        # Weighted cost function with dynamic balance
+        weighted_cost = (alpha * immediate_distance +
+                        beta * potential_distance +
+                        0.4 * centrality -
+                        0.2 * diversity)  # Penalize low diversity
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    return next_node

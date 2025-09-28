@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    max_dist = max(distances)
+    normalized_distances = [min_dist / (dist if dist != 0 else 1) for dist in distances]
+    total_weight = sum(normalized_distances)
+    probabilities = [dist / total_weight for dist in normalized_distances]
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+    return next_node

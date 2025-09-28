@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        # Calculate bias based on distance to destination
+        dest_distance = distance_matrix[current_node][destination_node]
+        max_distance = max(distance_matrix[current_node][node] for node in unvisited_nodes)
+        bias_prob = 0.5 * (1 - dest_distance / max_distance)  # Higher probability if closer to destination
+
+        if random.random() < bias_prob:  # Use dynamic bias
+            return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic probability based on distance to nearest neighbor
+    nearest_distance = distance_matrix[current_node][nearest_neighbors[0]]
+    max_nearest_distance = max(distance_matrix[current_node][node] for node in nearest_neighbors)
+    prob_nearest = 0.7 * (1 - nearest_distance / max_nearest_distance)  # Higher if very close to nearest
+
+    if random.random() < prob_nearest:
+        return nearest_neighbors[0]
+    elif random.random() < 0.3:  # 30% chance to pick from top 2 nearest
+        return random.choice(nearest_neighbors[:min(2, len(nearest_neighbors))])
+    else:  # 70% chance to pick a random node with exponential decay
+        decay_factor = 0.9
+        weights = [decay_factor ** i for i in range(len(nearest_neighbors))]
+        return next_node

@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        if remaining_nodes > 1:
+            avg_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (remaining_nodes - 1)
+        else:
+            avg_distance = 0
+
+        # Dynamic weighting: higher immediate priority when few nodes left
+        weight = 0.1 if remaining_nodes > 3 else 0.3
+        score = immediate_distance + weight * avg_distance
+
+        # Penalize nodes that are too close to avoid revisiting
+        if immediate_distance < 0.1 * sum(distance_matrix[current_node]) / len(distance_matrix[current_node]):
+            score += 0.5 * immediate_distance
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

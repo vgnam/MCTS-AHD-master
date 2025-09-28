@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    exploration_factor = np.std(distances) if len(distances) > 1 else 1.0
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            farthest_node = max(remaining_nodes, key=lambda n: distance_matrix[node][n] + distance_matrix[n][destination_node])
+            farthest_dist = distance_matrix[node][farthest_node] + distance_matrix[farthest_node][destination_node]
+            weighted_dist = current_dist + exploration_factor * farthest_dist
+        else:
+            weighted_dist = current_dist
+        return weighted_dist
+
+    probabilities = [1.0 / (1.0 + evaluate_node(node)) for node in unvisited_nodes]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+    next_node = np.random.choice(unvisited_nodes, p=normalized_probs)
+    return next_node

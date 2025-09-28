@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        # Normalize lookahead distance by the maximum possible distance
+        max_possible_distance = max(distance_matrix[node]) if distance_matrix[node] else 0
+        normalized_lookahead = lookahead_distance / max_possible_distance if max_possible_distance else 0
+
+        # Time-decaying weight: prioritizes immediate distance early, then balances with lookahead
+        weight = (remaining_nodes / total_nodes) ** 2
+
+        # Penalty for revisiting nodes (simplified: higher penalty for nodes visited more often)
+        revisit_penalty = 1.0 / (1.0 + remaining_nodes)  # Placeholder for actual revisit tracking
+
+        # Combined score: immediate distance + normalized lookahead + revisit penalty
+        score = immediate_distance + weight * normalized_lookahead + revisit_penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

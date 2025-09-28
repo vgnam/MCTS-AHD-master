@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = 0
+
+        # 3-step lookahead
+        remaining_nodes = unvisited_nodes - {node}
+        if remaining_nodes:
+            next_candidates = remaining_nodes.copy()
+            if next_candidates:
+                next_candidate = min(next_candidates, key=lambda x: distance_matrix[node][x])
+                remaining_nodes_after_first = remaining_nodes - {next_candidate}
+                if remaining_nodes_after_first:
+                    second_candidate = min(remaining_nodes_after_first, key=lambda x: distance_matrix[next_candidate][x])
+                    remaining_nodes_after_second = remaining_nodes_after_first - {second_candidate}
+                    if remaining_nodes_after_second:
+                        third_candidate = min(remaining_nodes_after_second, key=lambda x: distance_matrix[second_candidate][x])
+                        lookahead_distance = distance_matrix[node][next_candidate] + distance_matrix[next_candidate][second_candidate] + distance_matrix[second_candidate][third_candidate]
+
+        score = immediate_distance + 0.7 * lookahead_distance
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

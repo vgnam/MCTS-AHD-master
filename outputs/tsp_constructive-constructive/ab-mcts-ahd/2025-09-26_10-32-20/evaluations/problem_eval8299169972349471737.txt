@@ -1,0 +1,55 @@
+importance scoring with dynamic entropy thresholds, incorporating a novel momentum-aware centrality metric and a probabilistic selection mechanism that balances immediate proximity, long-term connectivity, and path consistency through entropy-sensitive weight adjustments and a reinforced learning-like reward system.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Enhanced entropy calculation
+    distances = [distance_matrix[current_node][n] for n in unvisited_nodes]
+    entropy = np.std(distances) / (np.mean(distances) + 1e-10) if distances else 0
+    entropy_threshold = 0.5 + 0.3 * (remaining_nodes / total_nodes)
+
+    # Novel momentum-aware centrality
+    if len(distance_matrix) > 1:
+        prev_node = current_node - 1 if current_node > 0 else len(distance_matrix) - 1
+        momentum = -distance_matrix[prev_node][current_node] / (max(sum(row) for row in distance_matrix) + 1e-10)
+    else:
+        momentum = 0
+
+    # Dynamic weight adjustment with entropy thresholds
+    if entropy > entropy_threshold:
+        weight_proximity = 0.2 + 0.3 * momentum
+        weight_connectivity = 0.5 - 0.2 * momentum
+        weight_consistency = 0.3 + 0.4 * momentum
+    else:
+        weight_proximity = 0.5 + 0.2 * momentum
+        weight_connectivity = 0.3 - 0.1 * momentum
+        weight_consistency = 0.2 + 0.2 * momentum
+
+    def calculate_score(node):
+        proximity = distance_matrix[current_node][node]
+        connectivity = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        consistency = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1 if remaining_nodes > 1 else 1)
+
+        # Reinforced learning-like reward system
+        reward = (weight_proximity * (1 / (proximity + 1e-10)) +
+                 weight_connectivity * connectivity +
+                 weight_consistency * (1 / (consistency + 1e-10)))
+
+        # Entropy-sensitive scaling
+        if entropy > entropy_threshold:
+            reward *= (1 + 0.5 * entropy)
+        else:
+            reward *= (1 - 0.3 * entropy)
+
+        return -reward
+
+    # Probabilistic selection with temperature scaling
+    scores = [calculate_score(node) for node in unvisited_nodes]
+    probabilities = np.exp(scores) / np.sum(np.exp(scores))
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+
+    return next_node

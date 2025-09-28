@@ -1,0 +1,36 @@
+import math
+    import random
+
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    scores = []
+    nodes = []
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Adaptive weights based on remaining nodes
+        weight_short_term = 0.8 if remaining_nodes > 3 else 0.2
+        weight_long_term = 1.0 - weight_short_term
+
+        # Novelty factor based on historical path frequency (simulated here)
+        novelty_factor = 1.0 / (1.0 + math.exp(-random.uniform(-1, 1)))  # Simulated for demonstration
+
+        # Combined score with novelty
+        score = (weight_short_term * distance_to_node +
+                 weight_long_term * distance_to_destination -
+                 novelty_factor * distance_to_node)  # Novelty reduces short-term preference
+
+        scores.append(score)
+        nodes.append(node)
+
+    # Softmax selection to probabilistically choose next node
+    exp_scores = [math.exp(-s) for s in scores]
+    sum_exp_scores = sum(exp_scores)
+    probabilities = [e / sum_exp_scores for e in exp_scores]
+    next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+
+    return next_node

@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_total_distance = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        remaining_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight factor based on remaining nodes
+        weight = 1.0 if remaining_nodes <= 2 else 0.6 + (0.4 * remaining_nodes / len(unvisited_nodes))
+
+        total_distance = current_distance + (weight * remaining_distance)
+
+        if total_distance < min_total_distance:
+            min_total_distance = total_distance
+            next_node = node
+
+    # Adaptive threshold for destination prioritization
+    if destination_node in unvisited_nodes:
+        direct_distance = distance_matrix[current_node][destination_node]
+        threshold = 0.75 if remaining_nodes > 4 else 0.5
+        if direct_distance <= min_total_distance * threshold:
+            next_node = destination_node
+
+    return next_node

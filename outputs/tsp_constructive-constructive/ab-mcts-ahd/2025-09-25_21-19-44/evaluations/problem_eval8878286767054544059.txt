@@ -1,0 +1,30 @@
+import random
+
+    total_weight = 0.0
+    node_weights = []
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        weight = 1.0 / (distance + 1e-10)  # Avoid division by zero
+        node_weights.append((node, weight))
+        total_weight += weight
+
+    if total_weight == 0:
+        return random.choice(unvisited_nodes)
+
+    rand_val = random.uniform(0, total_weight)
+    cumulative_weight = 0.0
+
+    for node, weight in node_weights:
+        cumulative_weight += weight
+        if rand_val <= cumulative_weight:
+            next_node = node
+            break
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        destination_weight = 1.0 / (destination_distance + 1e-10)
+        if destination_weight > (1.0 / (distance_matrix[current_node][next_node] + 1e-10)):
+            next_node = destination_node
+
+    return next_node

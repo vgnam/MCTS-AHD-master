@@ -1,0 +1,46 @@
+importance" metric that considers both centrality and diversity, while dynamically adjusting selection pressure based on remaining nodes and introducing a "novelty bonus" to encourage exploring less-visited regions.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    exploration_pressure = 1.0 - (remaining_count / total_nodes) ** 2
+
+    node_scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = avg_distance
+            diversity = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+        else:
+            avg_distance = 0
+            node_centrality = 0
+            diversity = 0
+
+        connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+        connectivity_factor = 1.0 + (connectivity / remaining_count) * 0.5
+
+        node_importance = (node_centrality * 0.3 + diversity * 0.7) * (1 + exploration_pressure * 0.5)
+
+        distance_weight = 0.5 - 0.2 * exploration_pressure
+        importance_weight = 0.3 + 0.2 * exploration_pressure
+        connectivity_weight = 0.2 * (1 - exploration_pressure)
+
+        score = (distance_weight * immediate_distance +
+                importance_weight * node_importance +
+                connectivity_weight * connectivity_factor)
+
+        novelty_bonus = (1 / (1 + connectivity)) * exploration_pressure * 0.3
+        score -= novelty_bonus
+
+        node_scores.append((node, score))
+
+    node_scores.sort(key=lambda x: x[1])
+    selected_node = node_scores[0][0]
+
+    return next_node

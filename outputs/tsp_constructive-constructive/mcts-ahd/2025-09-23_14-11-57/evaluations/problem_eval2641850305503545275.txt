@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    lookaheads = []
+    regrets = []
+    progress = 1 - len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+
+    remaining_nodes = len(unvisited_nodes)
+    base_immediate_weight = 0.5
+    base_lookahead_weight = 0.3
+    base_regret_weight = 0.2
+    stage_factor = 1.0 / (1.0 + 0.1 * remaining_nodes)
+
+    immediate_weight = base_immediate_weight * (1.0 + stage_factor)
+    lookahead_weight = base_lookahead_weight * (1.0 + stage_factor)
+    regret_weight = base_regret_weight * (1.0 - stage_factor)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        best_lookahead = float('inf')
+        for next_node in unvisited_nodes:
+            if next_node != node:
+                lookahead = distance_matrix[node][next_node]
+                if lookahead < best_lookahead:
+                    best_lookahead = lookahead
+        lookaheads.append(best_lookahead if best_lookahead != float('inf') else 0)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (immediate_distance - second_best) if immediate_distance > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+    scores = [immediate_weight * distance + lookahead_weight * lookahead + regret_weight * regret for distance, lookahead, regret in zip(distances, lookaheads, regrets)]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

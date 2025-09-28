@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    destination_in_unvisited = destination_node in unvisited_nodes
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    if destination_in_unvisited:
+        destination_distance = distance_matrix[current_node][destination_node]
+        bias_factor = (min_distance - destination_distance) / min_distance if min_distance > 0 else 1.0
+        remaining_nodes = len(unvisited_nodes)
+        dynamic_bias = 0.3 + (0.2 * (1 - (remaining_nodes / (len(unvisited_nodes) + 1))))
+
+        centrality_factor = 0.0
+        if len(unvisited_nodes) > 1:
+            avg_distances = []
+            for node in unvisited_nodes:
+                avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1)
+                avg_distances.append(avg_dist)
+            avg_avg_distance = sum(avg_distances) / len(avg_distances)
+            centrality_factor = 1.0 - (avg_distances[unvisited_nodes.index(destination_node)] / (avg_avg_distance + 1e-6))
+
+        if bias_factor > dynamic_bias and centrality_factor > 0.5:
+            next_node = destination_node
+
+    return next_node

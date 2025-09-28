@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_weight = remaining_nodes / total_nodes  # Dynamic weighting
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+
+        # Calculate variance of distances to unvisited neighbors
+        neighbor_dists = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        if not neighbor_dists:
+            variance = 0
+        else:
+            mean_dist = sum(neighbor_dists) / len(neighbor_dists)
+            variance = sum((d - mean_dist) ** 2 for d in neighbor_dists) / len(neighbor_dists)
+
+        # Penalize high-variance nodes (potential hubs)
+        penalty = variance * (1 - exploration_weight)
+
+        # Temperature-based exploration/exploitation
+        temperature = 0.5 * exploration_weight
+        nearest_neighbor_dist = min(neighbor_dists) if neighbor_dists else 0
+        future_cost = nearest_neighbor_dist * (1 - temperature) + sum(neighbor_dists) * temperature
+
+        return current_dist + future_cost + penalty
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

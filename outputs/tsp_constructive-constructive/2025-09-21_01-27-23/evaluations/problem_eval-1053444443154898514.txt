@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    max_connectivity = -1
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+            # Calculate connectivity (number of connections to other unvisited nodes)
+            connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] != float('inf') and n != node)
+            max_connectivity = connectivity
+        elif distance == min_distance:
+            # Calculate connectivity for tie-breaker
+            connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] != float('inf') and n != node)
+            if connectivity > max_connectivity:
+                next_node = node
+                max_connectivity = connectivity
+
+    return next_node

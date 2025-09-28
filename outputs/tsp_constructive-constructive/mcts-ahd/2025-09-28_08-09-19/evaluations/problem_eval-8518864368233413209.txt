@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 / (1.0 + remaining_nodes)  # Decreases as more nodes are visited
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Normalize distances
+        max_distance = max(distance_to_current, distance_to_destination, 1.0)
+        normalized_current = distance_to_current / max_distance
+        normalized_destination = distance_to_destination / max_distance
+
+        # Combine with temperature using sigmoid function
+        combined_score = (1.0 - normalized_current) * (1.0 - normalized_destination)
+        sigmoid_score = 1.0 / (1.0 + math.exp(-combined_score / temperature))
+
+        scores.append((node, sigmoid_score))
+
+    # Select node with highest probability
+    scores.sort(key=lambda x: -x[1])
+    next_node = scores[0][0]
+
+    return next_node

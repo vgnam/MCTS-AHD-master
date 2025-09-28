@@ -1,0 +1,32 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate node centrality (inverse of average distance to other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        distances = [distance_matrix[node][other] for other in unvisited_nodes if other != node]
+        centrality[node] = 1 / (np.mean(distances) + 1e-6)  # Avoid division by zero
+
+    # Combine distance and centrality with weights
+    scores = {}
+    for node in unvisited_nodes:
+        distance_score = 1 / (distance_matrix[current_node][node] + 1e-6)
+        centrality_score = centrality[node]
+        scores[node] = 0.7 * distance_score + 0.3 * centrality_score  # Weighted combination
+
+    # Select based on scores with stochasticity
+    sorted_nodes = sorted(unvisited_nodes, key=lambda x: -scores[x])
+    if random.random() < 0.8:  # 80% chance to pick from top 3 by score
+        candidates = sorted_nodes[:min(3, len(sorted_nodes))]
+        next_node = random.choice(candidates)
+    else:  # 20% chance to pick a random node with high score
+        high_score_nodes = [node for node in unvisited_nodes if scores[node] >= np.percentile(list(scores.values()), 70)]
+        next_node = random.choice(high_score_nodes) if high_score_nodes else random.choice(unvisited_nodes)
+
+    return next_node

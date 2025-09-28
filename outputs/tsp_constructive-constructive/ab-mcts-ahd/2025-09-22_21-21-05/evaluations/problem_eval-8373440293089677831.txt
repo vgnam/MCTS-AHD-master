@@ -1,0 +1,42 @@
+importance, using a decaying weight for distance and an adaptive centrality factor that considers both local and global connectivity, with the priority score calculated as a weighted sum of these components.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    best_score = float('-inf')
+    next_node = None
+
+    # Calculate global centrality measure
+    global_centrality = {}
+    for node in unvisited_nodes:
+        global_centrality[node] = sum(distance_matrix[node][other] for other in unvisited_nodes) / total_unvisited
+
+    # Calculate local connectivity
+    local_connectivity = {}
+    for node in unvisited_nodes:
+        local_connectivity[node] = sum(1 for other in unvisited_nodes if distance_matrix[node][other] < sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited)
+
+    # Dynamic weight parameters
+    distance_weight = 0.6 * (1.0 - (total_unvisited - 1) / total_unvisited)
+    centrality_weight = 0.4 * (1.0 - (total_unvisited - 1) / total_unvisited)
+
+    for node in unvisited_nodes:
+        # Immediate distance component
+        distance_score = - (distance_weight * (distance_matrix[current_node][node] + distance_matrix[node][destination_node]))
+
+        # Centrality component
+        centrality_score = centrality_weight * (1.0 - global_centrality[node] / (sum(global_centrality.values()) / total_unvisited + 1e-6))
+
+        # Connectivity boost
+        connectivity_boost = 0.1 * local_connectivity[node] / total_unvisited
+
+        # Combined score
+        combined_score = distance_score + centrality_score + connectivity_boost
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

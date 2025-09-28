@@ -1,0 +1,11 @@
+import random
+    import math
+
+    scores = {node: evaluate_node(node) for node in unvisited_nodes}
+    min_score = min(scores.values())
+    probabilities = [math.exp(-(scores[node] - min_score) / temperature) for node in unvisited_nodes]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_probs, k=1)[0]
+    return next_node

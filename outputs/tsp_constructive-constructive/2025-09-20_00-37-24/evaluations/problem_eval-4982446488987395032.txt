@@ -1,0 +1,33 @@
+importance" (based on its neighborhood characteristics), with a small chance of selecting a random node to maintain exploration.}
+
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic weights for each unvisited node
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Importance factor: average distance to the 2 nearest neighbors (excluding current node)
+        neighbors = sorted(unvisited_nodes - {node}, key=lambda n: distance_matrix[node][n])
+        importance = sum(distance_matrix[node][n] for n in neighbors[:2]) / 2 if len(neighbors) >= 2 else 0
+        # Weight is inversely proportional to distance and directly proportional to importance
+        weight = (1 / (1 + distance)) * (1 + importance)
+        weights.append(weight)
+
+    # Normalize weights to form a probability distribution
+    total_weight = sum(weights)
+    prob_dist = [w / total_weight for w in weights]
+
+    # 95% chance to select based on weighted probabilities, 5% chance to select randomly
+    if random.random() < 0.95:
+        next_node = random.choices(unvisited_nodes, weights=prob_dist, k=1)[0]
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

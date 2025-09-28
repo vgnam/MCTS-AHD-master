@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    min_cost = float('inf')
+    next_node = None
+    node_costs = {}
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        node_costs[node] = cost
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        total_cost = sum(node_costs.values())
+        avg_cost = total_cost / len(unvisited_nodes)
+        dynamic_threshold = (min_cost + avg_cost) / 2
+
+        weighted_nodes = []
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            cost = node_costs[node]
+            weight = max(0, 1 - (cost - min_cost) / (dynamic_threshold - min_cost)) if dynamic_threshold > min_cost else 0
+            weighted_nodes.append((node, weight))
+
+        if weighted_nodes:
+            nodes, weights = zip(*weighted_nodes)
+            next_node = random.choices(nodes, weights=weights, k=1)[0]
+
+    return next_node

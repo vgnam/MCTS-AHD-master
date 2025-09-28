@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_path(node, depth=2):
+        if depth == 0 or not unvisited_nodes:
+            return distance_matrix[node][destination_node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return distance_matrix[node][destination_node]
+        next_nodes = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:depth]
+        return min(evaluate_path(n, depth - 1) for n in next_nodes)
+
+    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] + evaluate_path(node))
+    return next_node

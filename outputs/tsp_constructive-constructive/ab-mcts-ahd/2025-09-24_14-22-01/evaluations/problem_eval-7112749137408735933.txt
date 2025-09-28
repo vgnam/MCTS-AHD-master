@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    min_score = float('inf')
+    next_node = None
+    total_nodes = len(distance_matrix)
+    visited_nodes = total_nodes - len(unvisited_nodes)
+    ratio = visited_nodes / total_nodes if total_nodes > 0 else 0
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+        lookahead_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        weight_immediate = 1 - ratio
+        weight_destination = ratio
+        weight_lookahead = 0.5 * ratio
+        score = (weight_immediate * immediate_distance) + (weight_destination * destination_distance) + (weight_lookahead * lookahead_distance)
+        if score < min_score:
+            min_score = score
+            next_node = node
+    return next_node

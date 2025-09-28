@@ -1,0 +1,25 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate base probabilities based on inverse distance (exploitation)
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    inv_distances = [1.0 / (d + 1e-6) for d in distances]  # Avoid division by zero
+    probs = np.array(inv_distances) / np.sum(inv_distances)
+
+    # Add exploration bonus: higher for nodes less frequently visited
+    visit_counts = np.array([1.0 / (1 + random.random()) for _ in unvisited_nodes])  # Simulated historical visits
+    exploration_bonus = visit_counts / np.sum(visit_counts)
+    combined_probs = 0.7 * probs + 0.3 * exploration_bonus  # Weighted combination
+
+    # Normalize probabilities
+    combined_probs /= np.sum(combined_probs)
+
+    # Select node based on combined probabilities
+    next_node = np.random.choice(unvisited_nodes, p=combined_probs)
+    return next_node

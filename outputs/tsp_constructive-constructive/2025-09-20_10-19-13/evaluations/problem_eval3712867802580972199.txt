@@ -1,0 +1,18 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate proximity and connectivity scores
+    proximity_scores = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+    connectivity_scores = {node: sum(1 for n in unvisited_nodes if distance_matrix[node][n] > 0) for node in unvisited_nodes}
+
+    # Combine scores with a random factor for diversity
+    combined_scores = {
+        node: (proximity_scores[node] * 0.7) + (connectivity_scores[node] * 0.3) + (random.random() * 0.1)
+        for node in unvisited_nodes
+    }
+
+    next_node = min(unvisited_nodes, key=lambda node: combined_scores[node])
+    return next_node

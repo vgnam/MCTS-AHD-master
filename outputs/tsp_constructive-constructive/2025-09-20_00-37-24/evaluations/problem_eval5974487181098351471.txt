@@ -1,0 +1,32 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visit_counts=None):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate weights based on inverse visit counts to encourage less visited nodes
+    if visit_counts is None:
+        visit_counts = {node: 1 for node in unvisited_nodes}
+
+    weights = []
+    for node in nearest_neighbors:
+        distance_weight = 1 / (1 + distance_matrix[current_node][node])
+        visit_weight = 1 / (1 + visit_counts.get(node, 1))
+        weights.append(distance_weight * visit_weight)
+
+    # Normalize weights to form a probability distribution
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    # Introduce stochasticity: sometimes pick a node that's not the absolute nearest
+    if random.random() < 0.8:  # 80% chance to pick from weighted distribution
+        next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+    else:  # 20% chance to pick a random node
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

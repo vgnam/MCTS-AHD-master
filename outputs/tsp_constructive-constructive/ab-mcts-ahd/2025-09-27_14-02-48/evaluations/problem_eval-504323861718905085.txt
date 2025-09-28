@@ -1,0 +1,44 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 100
+    cooling_rate = 0.9
+    exploration_factor = 0.5
+
+    distances = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+    min_distance = min(distances.values())
+    nearest_neighbors = [node for node, distance in distances.items() if distance == min_distance]
+    nearest_neighbor = random.choice(nearest_neighbors)
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+    else:
+        destination_distance = float('inf')
+
+    while temperature > 1:
+        weights = {}
+        for node in unvisited_nodes:
+            distance = distance_matrix[current_node][node]
+            randomness = random.uniform(0, 1)
+            weights[node] = math.exp(-distance / temperature) * (1 + exploration_factor * randomness)
+
+        total_weight = sum(weights.values())
+        probabilities = {node: weight / total_weight for node, weight in weights.items()}
+        next_node = random.choices(list(unvisited_nodes), weights=list(probabilities.values()), k=1)[0]
+
+        if next_node not in unvisited_nodes:
+            temperature *= cooling_rate
+            continue
+
+        acceptance_prob = math.exp((min_distance - distance_matrix[current_node][next_node]) / temperature) * (1 - exploration_factor)
+        if next_node == destination_node or random.random() < acceptance_prob:
+            return next_node
+
+        temperature *= cooling_rate
+        exploration_factor *= 0.95
+
+    return next_node

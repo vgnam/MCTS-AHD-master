@@ -1,0 +1,33 @@
+importance of proximity to the current node, closeness to the destination, and centroid alignment based on the remaining path length, using a decay factor to prioritize immediate goals early in the search and balance long-term alignment later. The centroid is now computed as the weighted average of unvisited nodes' distances to the destination, with weights inversely proportional to their distances to the current node.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Dynamic decay factor based on remaining path length
+    remaining_nodes = len(unvisited_nodes)
+    decay_factor = 1.0 / (1.0 + remaining_nodes)
+
+    # Compute weighted centroid of unvisited nodes
+    if unvisited_nodes:
+        total_weight = sum(1.0 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes)
+        centroid_x = sum((1.0 / (distance_matrix[current_node][node] + 1e-6)) * distance_matrix[destination_node][node] for node in unvisited_nodes) / total_weight
+    else:
+        centroid_x = 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Dynamic weighted score with decay factor
+        score = (distance_to_current + 0.5 * distance_to_dest + 0.3 * centroid_penalty) * decay_factor
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

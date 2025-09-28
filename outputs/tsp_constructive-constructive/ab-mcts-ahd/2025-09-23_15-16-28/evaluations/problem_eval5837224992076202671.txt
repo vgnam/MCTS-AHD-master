@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+
+    # Dynamic weights based on remaining nodes' distribution
+    if len(unvisited_nodes) > 1:
+        avg_distance_to_current = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        avg_distance_to_destination = sum(distance_matrix[n][destination_node] for n in unvisited_nodes) / len(unvisited_nodes)
+        total_avg = avg_distance_to_current + avg_distance_to_destination
+        if total_avg > 0:
+            alpha = 0.5 * (avg_distance_to_current / total_avg)
+            beta = 1 - alpha
+        else:
+            alpha, beta = 0.5, 0.5
+    else:
+        alpha, beta = 0.7, 0.3
+
+    gamma = 0.5  # Base penalty factor
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate variance of distances to remaining unvisited nodes
+        remaining_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        if remaining_distances:
+            variance = sum((x - sum(remaining_distances)/len(remaining_distances))**2 for x in remaining_distances) / len(remaining_distances)
+        else:
+            variance = 0
+
+        # Locality penalty: penalize nodes that are too close to others in the remaining set
+        locality_penalty = 0
+        if len(unvisited_nodes) > 2:
+            min_distance = min(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+            locality_penalty = 1 / (1 + min_distance) if min_distance > 0 else 0
+
+        # Probabilistic scoring with dynamic weights
+        score = (alpha * distance_to_current + beta * distance_to_destination) + gamma * variance + 0.3 * locality_penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance scoring with adaptive neighborhood exploration, using a hybrid of proximity-based selection and connectivity-aware penalties, where node importance is recalculated iteratively with diminishing returns to prevent early convergence, while introducing a novelty factor based on historical visit frequencies to balance exploration and exploitation.}
+                                                                                                                                                                                                                                                                                                                                                                       ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance scoring with adaptive neighborhood exploration, using a hybrid of proximity-based selection and connectivity-aware penalties, where node importance is recalculated iteratively with diminishing returns to prevent early convergence, while introducing a novelty factor based on historical visit frequencies to balance exploration and exploitation.}
+                                                                                                                                                                                                                                                                                                                                                                       ^
+SyntaxError: unmatched '}'

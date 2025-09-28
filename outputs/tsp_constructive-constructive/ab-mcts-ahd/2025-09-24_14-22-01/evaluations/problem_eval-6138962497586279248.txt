@@ -1,0 +1,29 @@
+import random
+    import math
+    if not unvisited_nodes:
+        return destination_node
+    costs = []
+    nodes = []
+    remaining_nodes = len(unvisited_nodes)
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node] * 0.5
+        weight_factor = (remaining_nodes + 1) / (remaining_nodes + 2)
+        weighted_cost = immediate_distance + (potential_distance * weight_factor)
+        costs.append(weighted_cost)
+        nodes.append(node)
+    if not nodes:
+        return destination_node
+    min_cost = min(costs)
+    max_cost = max(costs)
+    probabilities = []
+    for cost in costs:
+        normalized_cost = (cost - min_cost) / (max_cost - min_cost + 1e-6)
+        probability = math.exp(-normalized_cost)
+        probabilities.append(probability)
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+    next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+    return next_node

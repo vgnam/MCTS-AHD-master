@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate node centrality (average distance to other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality[node] = total_distance / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+
+    # Combine distance and centrality with weights
+    scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Normalize centrality (higher centrality is better, so invert)
+        normalized_centrality = 1 / (1 + centrality[node]) if centrality[node] != 0 else 1
+        scores[node] = 0.7 * distance + 0.3 * normalized_centrality
+
+    # Select node with minimum score (distance + centrality)
+    next_node = min(scores, key=scores.get)
+    return next_node

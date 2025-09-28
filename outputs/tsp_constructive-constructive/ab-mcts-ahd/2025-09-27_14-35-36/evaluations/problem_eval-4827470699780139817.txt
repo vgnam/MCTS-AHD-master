@@ -1,0 +1,27 @@
+import numpy as np
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    mean_dist = np.mean(distances)
+    std_dist = np.std(distances)
+
+    # Dynamic threshold adjustment using sigmoid function
+    k = len(unvisited_nodes)
+    threshold_factor = 1 / (1 + np.exp(-0.1 * (k - mean_dist)))
+    threshold = mean_dist * threshold_factor
+
+    candidates = [node for node, dist in zip(unvisited_nodes, distances) if dist <= threshold]
+
+    if not candidates:
+        candidates = list(unvisited_nodes)
+
+    # Probabilistic selection based on inverse distance
+    inv_distances = [1 / (dist + 1e-6) for dist in distances]
+    probs = np.array(inv_distances) / sum(inv_distances)
+    next_node = np.random.choice(candidates, p=probs[np.isin(unvisited_nodes, candidates)])
+
+    return next_node

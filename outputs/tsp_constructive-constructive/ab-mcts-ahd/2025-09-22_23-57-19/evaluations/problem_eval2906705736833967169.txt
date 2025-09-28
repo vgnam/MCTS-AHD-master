@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Calculate centrality and distance scores
+    centrality = {}
+    distance_scores = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(1 / (distance_matrix[node][other] + 1e-10) for other in unvisited_nodes if other != node)
+        distance_scores[node] = distance_matrix[current_node][node]
+
+    # Non-linear exploration factor (quadratic decay)
+    exploration_factor = 1.0 / (len(unvisited_nodes) ** 2 + 1)
+
+    # Normalize scores
+    max_distance = max(distance_scores.values()) if distance_scores else 1
+    max_centrality = max(centrality.values()) if centrality else 1
+
+    normalized_distance = {node: dist / max_distance if max_distance else 0 for node, dist in distance_scores.items()}
+    normalized_centrality = {node: cent / max_centrality if max_centrality else 0 for node, cent in centrality.items()}
+
+    # Combine scores with dynamic exploration factor
+    best_score = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        score = (1 - exploration_factor) * normalized_distance[node] + exploration_factor * normalized_centrality[node]
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

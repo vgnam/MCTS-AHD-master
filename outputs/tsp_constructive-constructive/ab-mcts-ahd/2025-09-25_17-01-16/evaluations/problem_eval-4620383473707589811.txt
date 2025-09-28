@@ -1,0 +1,49 @@
+importance based on historical visitation patterns, adaptive weighting that considers both local and global context, and a reinforcement learning-inspired scoring mechanism that rewards nodes with high potential for improving overall path quality.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    from collections import defaultdict
+
+    # Initialize node importance scores
+    node_scores = defaultdict(float)
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate base scores
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Adaptive weighting based on remaining nodes and distance context
+        locality_weight = 0.8 if remaining_nodes > 3 else 0.95
+        progress_weight = 0.15 if remaining_nodes > 3 else 0.05
+        diversity_weight = 0.05 if remaining_nodes > 3 else 0.0
+
+        # Calculate diversity score (average distance to other unvisited nodes)
+        diversity_score = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (remaining_nodes - 1)
+
+        # Calculate reinforcement score (simplified RL approach)
+        reinforcement_score = 0.0
+        if node in node_scores:
+            reinforcement_score = node_scores[node] * 0.2
+
+        # Penalty for excessively distant nodes
+        avg_distance = sum(distance_matrix[current_node][other] for other in unvisited_nodes) / remaining_nodes
+        penalty = 0.0
+        if distance_to_current > 1.8 * avg_distance:
+            penalty = 0.4 * distance_to_current
+
+        # Combine scores with adaptive weights
+        total_score = (locality_weight * distance_to_current +
+                      progress_weight * distance_to_destination +
+                      diversity_weight * diversity_score +
+                      reinforcement_score -
+                      penalty)
+
+        node_scores[node] = total_score
+
+    # Select node with minimum score (shortest path consideration)
+    if node_scores:
+        next_node = min(node_scores.items(), key=lambda x: x[1])[0]
+    else:
+        next_node = destination_node if destination_node in unvisited_nodes else unvisited_nodes[0]
+
+    return next_node

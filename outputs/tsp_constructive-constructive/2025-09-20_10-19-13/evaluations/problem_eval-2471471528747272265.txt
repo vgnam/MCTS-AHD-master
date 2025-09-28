@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    best_node = None
+    max_reduction = -1
+    for node in unvisited_nodes:
+        reduction = distance_matrix[current_node][node] + distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+        if reduction > max_reduction:
+            max_reduction = reduction
+            best_node = node
+    return next_node

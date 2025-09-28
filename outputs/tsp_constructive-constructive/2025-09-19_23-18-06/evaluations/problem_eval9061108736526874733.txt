@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def cluster_centrality(node):
+        if len(unvisited_nodes) == 1:
+            return 0.0
+        distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        return sum(distances) / len(distances)
+
+    candidates = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        centrality = cluster_centrality(node)
+        dynamic_weight = 1.0 / (1.0 + 1.5 * (len(unvisited_nodes) / len(unvisited_nodes)))
+        score = dynamic_weight * distance + (1 - dynamic_weight) * centrality
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance" factor, which is calculated as the average distance from the node to all other unvisited nodes. This factor helps in identifying critical nodes that serve as good hubs, balancing proximity and centrality in the selection process. The weight for the current node is adjusted based on the remaining nodes, while the weight for the destination remains inversely proportional to the importance factor, ensuring a smooth transition between local and global planning.}
+              ^
+SyntaxError: unterminated string literal (detected at line 1)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance" factor, which is calculated as the average distance from the node to all other unvisited nodes. This factor helps in identifying critical nodes that serve as good hubs, balancing proximity and centrality in the selection process. The weight for the current node is adjusted based on the remaining nodes, while the weight for the destination remains inversely proportional to the importance factor, ensuring a smooth transition between local and global planning.}
+              ^
+SyntaxError: unterminated string literal (detected at line 1)

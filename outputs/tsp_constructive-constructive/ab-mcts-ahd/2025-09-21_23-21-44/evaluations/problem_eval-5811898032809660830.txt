@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    weight_current = max(0.5, 0.6 - 0.05 * num_unvisited)
+    weight_future = min(0.5, 0.4 + 0.05 * num_unvisited)
+    weight_centrality = 0.1 * (1 - num_unvisited / len(distance_matrix))
+
+    min_weighted_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = min(distance_matrix[node][n] for n in unvisited_nodes if n != node) if num_unvisited > 1 else 0
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / num_unvisited if num_unvisited > 0 else 0
+
+        weighted_score = (weight_current * current_distance +
+                          weight_future * future_distance +
+                          weight_centrality * centrality)
+
+        if weighted_score < min_weighted_score:
+            min_weighted_score = weighted_score
+            next_node = node
+
+    return next_node

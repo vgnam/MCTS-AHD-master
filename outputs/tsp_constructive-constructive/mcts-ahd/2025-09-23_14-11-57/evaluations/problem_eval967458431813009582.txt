@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    min_weighted_sum = float('inf')
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+        weighted_sum = 0.3 * current_to_node + 0.7 * node_to_dest  # Weighted sum with emphasis on efficiency
+
+        if weighted_sum < min_weighted_sum:
+            min_weighted_sum = weighted_sum
+            best_node = node
+
+    return next_node

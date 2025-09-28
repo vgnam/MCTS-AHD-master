@@ -1,0 +1,31 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visit_history=None, decay_factor=0.9):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Calculate novelty scores based on visit history (more recent visits get lower scores)
+    if visit_history is None:
+        visit_history = {node: 0 for node in unvisited_nodes}
+
+    novelty_scores = {node: decay_factor ** (-visit_history.get(node, 0)) for node in unvisited_nodes}
+
+    # Combine distance and novelty scores (distance is normalized)
+    max_distance = max(distance_matrix[current_node][node] for node in unvisited_nodes)
+    normalized_scores = {
+        node: (distance_matrix[current_node][node] / max_distance) * 0.7 + novelty_scores[node] * 0.3
+        for node in unvisited_nodes
+    }
+
+    # Select node with lowest combined score (favoring closer and less recently visited nodes)
+    next_node = min(unvisited_nodes, key=lambda node: normalized_scores[node])
+
+    # With 10% probability, pick a random node to introduce exploration
+    if random.random() < 0.1:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

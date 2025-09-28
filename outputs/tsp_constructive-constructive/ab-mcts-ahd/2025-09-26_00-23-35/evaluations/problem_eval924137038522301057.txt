@@ -1,0 +1,46 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+
+    if not unvisited_nodes:
+        return None
+
+    total_unvisited = len(unvisited_nodes)
+    max_nodes = len(distance_matrix)
+
+    # Calculate centrality for each node (average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality[node] = total_distance / max(1, len(unvisited_nodes) - 1)
+
+    # Dynamic exploration-exploitation trade-off using sigmoid function
+    exploration_weight = 1.0 / (1.0 + math.exp((total_unvisited - max_nodes/2) / (max_nodes/10)))
+
+    # Novelty factor: count unique connections to unvisited nodes
+    novelty = {}
+    for node in unvisited_nodes:
+        unique_connections = sum(1 for n in unvisited_nodes if n != node and distance_matrix[node][n] > 0)
+        novelty[node] = unique_connections / max(1, len(unvisited_nodes) - 1)
+
+    # Dynamic centrality weight based on unvisited nodes
+    centrality_weight = 1.0 + (0.5 * (total_unvisited - 1) / (max_nodes - 2)) if total_unvisited > 1 else 1.5
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance_to_dest = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Centrality factor for bias adjustment
+        centrality_factor = centrality.get(node, 0) / (centrality.get(destination_node, 1) + 1e-6)
+
+        # Combined score with novelty and exploration weight
+        score = (exploration_weight * (-1.5 * distance_to_node + 0.5 * avg_distance_to_dest) +
+                 (1 - exploration_weight) * centrality_weight * centrality_factor * novelty[node])
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    nearest_node = unvisited_nodes[distances.index(min(distances))]
+    farthest_node = unvisited_nodes[distances.index(max(distances))]
+
+    avg_distance = sum(distances) / len(distances)
+    std_dev = (sum((d - avg_distance) ** 2 for d in distances) / len(distances)) ** 0.5
+    threshold = avg_distance + 0.5 * std_dev
+
+    farthest_distance = distance_matrix[current_node][farthest_node]
+    probability = min(1.0, max(0.0, (farthest_distance - avg_distance) / (2 * std_dev)))
+
+    if farthest_distance > threshold:
+        next_node = farthest_node if random.random() < probability else nearest_node
+    else:
+        next_node = nearest_node
+
+    return next_node

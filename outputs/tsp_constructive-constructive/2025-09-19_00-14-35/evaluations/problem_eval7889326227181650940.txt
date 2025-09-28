@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    # Temperature parameter for probabilistic selection
+    temperature = 0.5 + 0.5 * (1 - exploration_factor ** 3)
+
+    # Stage 1: Adaptive neighborhood with probabilistic constraints
+    base_size = max(1, int(2 + 3 * (1 - exploration_factor)))
+    neighborhood_size = min(base_size, len(unvisited_nodes))
+    candidates = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:neighborhood_size]
+
+    # Stage 2: Hybrid evaluation with temperature-based scoring
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Connectivity score (normalized inverse of mean distance to remaining nodes)
+        if remaining_nodes > 1:
+            remaining_dists = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            mean_dist = sum(remaining_dists) / (remaining_nodes - 1)
+            connectivity_score = 1 / (1 + mean_dist) if mean_dist > 0 else 1
+        else:
+            connectivity_score = 1
+
+        # Dynamic weights with sigmoid adjustment
+        weight_dist = 1 / (1 + math.exp(-10 * (exploration_factor - 0.5)))
+        weight_connectivity = 1 - weight_dist
+        weight_dest = 0.3 + 0.7 * (1 - exploration_factor)
+
+        # Temperature-adjusted score
+        base_score = (weight_dist * current_dist +
+                     weight_connectivity * connectivity_score -
+                     weight_dest * dest_dist)
+        return base_score / temperature
+
+    # Probabilistic selection
+    scores = [evaluate_node(node) for node in candidates]
+    probabilities = softmax(scores)
+    next_node = np.random.choice(candidates, p=probabilities)
+
+    return next_node
+
+def softmax(x):
+    e_x = np.exp(x - np.max(x))
+    return next_node

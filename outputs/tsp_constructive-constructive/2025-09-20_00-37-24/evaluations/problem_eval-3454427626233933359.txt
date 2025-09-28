@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate visit frequencies (simplified for this example)
+    visit_frequencies = {node: 1.0 / (1 + len(unvisited_nodes)) for node in unvisited_nodes}
+    total_freq = sum(visit_frequencies.values())
+
+    # Temperature parameter for stochasticity control
+    temperature = 0.5 + 0.5 * (len(unvisited_nodes) / len(distance_matrix))
+
+    # Calculate selection probabilities
+    probabilities = []
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    for node in unvisited_nodes:
+        rank = nearest_neighbors.index(node) + 1
+        base_prob = (1.0 / rank) ** (1.0 / temperature)
+        # Combine with visit frequency bias
+        prob = base_prob * (1.0 - visit_frequencies[node] / total_freq)
+        probabilities.append(prob)
+
+    # Normalize probabilities
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+    return next_node

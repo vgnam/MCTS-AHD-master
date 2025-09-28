@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_distance == 0:
+            return destination_node
+        priority = remaining_distance / avg_distance
+        if priority <= 1.3:
+            return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = 1 - (remaining_nodes / total_nodes)
+    weight = 0.5 + 0.5 * (1 - (2 * progress_factor - 1) ** 2)
+    temperature = 0.9 - 0.8 * progress_factor
+
+    local_costs = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_cost, max_cost = min(local_costs), max(local_costs)
+    normalized_costs = [(max_cost - cost) / (max_cost - min_cost + 1e-6) for cost in local_costs]
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node]
+        global_potential = (distance_matrix[node][destination_node] +
+                           sum(distance_matrix[node][n] for n in unvisited_nodes if n != destination_node)) / (remaining_nodes + 1)
+        regret_penalty = sum(max(0, distance_matrix[current_node][n] - distance_matrix[current_node][node]) for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        clustering_penalty = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        normalized_cost = (max_cost - local_cost) / (max_cost - min_cost + 1e-6)
+
+        weighted_score = (local_cost * weight + global_potential * (1 - weight) +
+                          0.5 * regret_penalty - 0.3 * clustering_penalty) * temperature
+        weighted_score += 0.2 * normalized_cost
+        return weighted_score
+
+    scores = [heuristic(node) for node in unvisited_nodes]
+    probabilities = [math.exp(score / temperature) for score in scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

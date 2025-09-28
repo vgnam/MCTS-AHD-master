@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    node_scores = []
+    remaining_nodes = len(unvisited_nodes)
+    base_attraction = 0.3
+    exploration_rate = max(0.1, 0.5 / (1 + remaining_nodes))
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate centrality attraction (higher for nodes with more connections)
+        node_connections = sum(1 for d in distance_matrix[node] if d > 0)
+        attraction_factor = base_attraction * (node_connections / len(distance_matrix))
+
+        # Normalized scores with attraction
+        max_distance = max(distance_to_current, distance_to_destination, 1.0)
+        norm_current = distance_to_current / max_distance
+        norm_destination = distance_to_destination / max_distance
+
+        # Dynamic weight combining distance and attraction
+        weight = 0.7 * (1 - attraction_factor) + 0.3 * attraction_factor
+        score = (norm_current * 0.6 + norm_destination * 0.4) * (1 + attraction_factor * weight)
+
+        node_scores.append((node, score))
+
+    # Select node with probability inversely proportional to score
+    scores = [score for _, score in node_scores]
+    min_score, max_score = min(scores), max(scores)
+    normalized_scores = [(max_score - score + 1e-6) for score in scores]  # Avoid zero
+
+    # Add exploration randomness
+    if random.random() < exploration_rate:
+        selected_node = random.choice(unvisited_nodes)
+    else:
+        total = sum(normalized_scores)
+        probabilities = [s / total for s in normalized_scores]
+        selected_node = random.choices(
+            [node for node, _ in node_scores],
+            weights=probabilities,
+            k=1
+        )[0]
+
+    return next_node

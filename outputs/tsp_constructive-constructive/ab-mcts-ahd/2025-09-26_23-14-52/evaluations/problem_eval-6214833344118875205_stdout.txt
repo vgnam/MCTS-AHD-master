@@ -1,0 +1,12 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:14: RuntimeWarning: divide by zero encountered in scalar divide
+  distance_penalty = max(0, (potential_path - 2 * distance_matrix[current_node][destination_node]) / distance_matrix[current_node][destination_node])
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 22, in select_next_node
+    if destination_distance < distance_matrix[next_node][destination_node]:
+ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()

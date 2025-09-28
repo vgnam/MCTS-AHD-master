@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    # Weighted sum of distance and a secondary heuristic (e.g., node degree)
+    weights = {'distance': 0.7, 'degree': 0.3}
+    def heuristic(node):
+        distance = distance_matrix[current_node][node]
+        degree = len([1 for n in unvisited_nodes if distance_matrix[node][n] != 0])
+        return weights['distance'] * distance + weights['degree'] * degree
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

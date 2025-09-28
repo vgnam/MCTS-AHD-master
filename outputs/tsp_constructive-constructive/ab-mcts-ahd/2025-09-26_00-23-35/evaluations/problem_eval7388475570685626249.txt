@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    if remaining_nodes <= 3:
+        for node in unvisited_nodes:
+            distance_to_node = distance_matrix[current_node][node]
+            if distance_to_node < best_score:
+                best_score = distance_to_node
+                next_node = node
+    else:
+        centrality_scores = {}
+        for node in unvisited_nodes:
+            centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+            distance_to_node = distance_matrix[current_node][node]
+            centrality_scores[node] = (0.6 * centrality) + (0.4 * distance_to_node)
+
+        if centrality_scores:
+            next_node = min(centrality_scores, key=centrality_scores.get)
+
+    return next_node

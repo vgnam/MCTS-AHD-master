@@ -1,0 +1,34 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic exploration probability based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    exploration_prob = min(0.9, max(0.1, 0.5 + (remaining_nodes / 100)))
+
+    # Calculate average distances to other unvisited nodes for each candidate
+    def calculate_penalty(node):
+        if remaining_nodes == 1:
+            return 0
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        return total_distance / (remaining_nodes - 1)
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] + calculate_penalty(node))
+
+    if random.random() < exploration_prob:
+        # Exploitation: pick from top 2 nearest with penalty
+        candidates = nearest_neighbors[:min(2, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Exploration: pick from mid-range nodes (3rd to 6th nearest)
+        mid_range = nearest_neighbors[min(2, len(nearest_neighbors)):min(5, len(nearest_neighbors))]
+        if mid_range:
+            next_node = random.choice(mid_range)
+        else:
+            next_node = random.choice(nearest_neighbors)
+
+    return next_node

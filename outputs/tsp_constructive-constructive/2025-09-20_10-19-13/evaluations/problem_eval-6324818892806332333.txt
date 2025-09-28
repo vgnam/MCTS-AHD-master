@@ -1,0 +1,9 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, iteration=0):
+    if not unvisited_nodes:
+        return destination_node
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    probs = [math.exp(-dist / temperature) for dist in distances]
+    probs = [p / sum(probs) for p in probs]
+    next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+    temperature = max(0.1, temperature * 0.99)  # Decay temperature
+    return next_node

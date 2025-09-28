@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    total_distance = sum(distances)
+    probabilities = [(total_distance - d) / total_distance for d in distances]
+
+    threshold = 0.3 + (0.7 * (len(unvisited_nodes) / len(distance_matrix)))  # Dynamic threshold
+
+    selected_node = None
+    for node, prob in zip(unvisited_nodes, probabilities):
+        if random.random() < prob * threshold:
+            selected_node = node
+            break
+
+    if selected_node is None:
+        selected_node = max(unvisited_nodes, key=lambda node: (total_distance - distance_matrix[current_node][node]))
+
+    return next_node

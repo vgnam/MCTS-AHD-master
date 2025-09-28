@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Compute centroid of unvisited nodes
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    else:
+        centroid_x = 0
+
+    # Dynamic weight adjustment based on remaining nodes
+    remaining_nodes_ratio = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+    weight_distance_to_current = 1.0 * remaining_nodes_ratio
+    weight_distance_to_dest = 0.5 * (1 - remaining_nodes_ratio)
+    weight_centroid_penalty = 0.3 * (1 - remaining_nodes_ratio)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Additional angle-based penalty to reduce detours
+        angle_penalty = 0
+        if current_node != destination_node:
+            vec1 = (distance_matrix[current_node][node], distance_matrix[node][destination_node])
+            vec2 = (1, 0)
+            dot_product = vec1[0] * vec2[0] + vec1[1] * vec2[1]
+            magnitude1 = (vec1[0]**2 + vec1[1]**2)**0.5
+            magnitude2 = (vec2[0]**2 + vec2[1]**2)**0.5
+            angle_penalty = abs(1 - dot_product / (magnitude1 * magnitude2 + 1e-10))
+
+        # Weighted score with dynamic weights and angle penalty
+        score = (weight_distance_to_current * distance_to_current +
+                 weight_distance_to_dest * distance_to_dest +
+                 weight_centroid_penalty * centroid_penalty +
+                 0.2 * angle_penalty)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic weight adjustment (inspired by No.1)
+    weight = (1.0 / (1.0 + remaining_nodes)) * (remaining_nodes / (remaining_nodes + 1)) + 0.5
+
+    # Centrality and detour weights (inspired by No.2)
+    gamma = 0.7 * (remaining_nodes / total_nodes)
+    delta = 0.5 * (1 - remaining_nodes / total_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+        detour = immediate_distance + lookahead_distance - distance_matrix[current_node][destination_node]
+
+        # Centrality: average distance to unvisited nodes
+        centrality = 0.0
+        for other_node in unvisited_nodes:
+            if other_node != node:
+                centrality += distance_matrix[node][other_node]
+        centrality /= max(1, remaining_nodes - 1)
+
+        # Weighted score combining immediate, lookahead, centrality, and detour
+        score = immediate_distance - weight * lookahead_distance + gamma * centrality - delta * detour
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

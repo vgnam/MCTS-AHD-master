@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    best_score = float('inf')
+    next_node = None
+
+    # Calculate node degrees and betweenness centrality
+    node_degrees = []
+    for node in unvisited_nodes:
+        degree = sum(1 for neighbor in unvisited_nodes if distance_matrix[node][neighbor] > 0)
+        node_degrees.append(degree)
+
+    # Calculate betweenness centrality (simplified approximation)
+    betweenness = []
+    for node in unvisited_nodes:
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (total_unvisited - 1)
+        betweenness.append(centrality)
+
+    # Normalize metrics
+    max_degree = max(node_degrees) if node_degrees else 1
+    max_betweenness = max(betweenness) if betweenness else 1
+
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weights based on tour progress
+        progress = 1 - (total_unvisited / (total_unvisited + 1))
+        proximity_weight = 0.4 + 0.6 * progress
+        centrality_weight = 0.6 - 0.4 * progress
+
+        # Normalized metrics
+        norm_degree = node_degrees[i] / max_degree
+        norm_betweenness = betweenness[i] / max_betweenness
+
+        # Combined score with novel weighting
+        combined_score = (proximity_weight * distance_to_current +
+                         centrality_weight * (1 - norm_degree) * (1 + norm_betweenness) * distance_to_destination)
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

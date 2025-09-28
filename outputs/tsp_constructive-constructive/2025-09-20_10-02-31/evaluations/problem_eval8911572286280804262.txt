@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_score(node, temperature):
+        local_cost = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return local_cost
+        global_cost = max(distance_matrix[node][n] for n in remaining_nodes)
+        penalty = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+        return (0.7 * local_cost + 0.3 * global_cost) + (0.1 * penalty * temperature)
+
+    temperature = len(unvisited_nodes) / (len(unvisited_nodes) + 10)
+    if len(unvisited_nodes) % 2 == 1:
+        next_node = min(unvisited_nodes, key=lambda node: calculate_score(node, temperature))
+    else:
+        next_node = max(unvisited_nodes, key=lambda node: calculate_score(node, temperature))
+
+    return next_node

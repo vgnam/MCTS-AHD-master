@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_decay = 1.0 - (remaining_nodes / total_nodes) ** 2
+
+    def weighted_score(node):
+        local_distance = distance_matrix[current_node][node]
+        dest_distance = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            distances_to_unvisited = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distances_to_unvisited) / (remaining_nodes - 1)
+            normalized_variance = sum((d - avg_remaining_dist) ** 2 for d in distances_to_unvisited) / (remaining_nodes - 1)
+            connectivity_score = 1.0 / (1.0 + avg_remaining_dist) * (1.0 + (normalized_variance ** 0.5))
+        else:
+            connectivity_score = 0
+
+        weight_local = 0.6 - 0.3 * exploration_decay
+        weight_connectivity = 0.4 + 0.3 * exploration_decay
+        weight_dest = -0.3 + 0.2 * exploration_decay
+
+        return (weight_local * local_distance) + (weight_connectivity * connectivity_score) + (weight_dest * dest_distance)
+
+    next_node = min(unvisited_nodes, key=weighted_score)
+    return next_node

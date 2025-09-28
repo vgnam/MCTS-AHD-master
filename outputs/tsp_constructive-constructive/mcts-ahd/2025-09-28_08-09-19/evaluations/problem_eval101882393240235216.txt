@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Initialize historical selection memory (simplified for this context)
+    historical_selections = {node: 0 for node in unvisited_nodes}
+    for node in unvisited_nodes:
+        historical_selections[node] = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * distance_matrix[current_node][node])
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            # Node centrality: harmonic mean of distances to other nodes
+            centrality_numerator = sum(1 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes if n != node)
+            centrality_denominator = (remaining_nodes - 1)
+            centrality = centrality_numerator / centrality_denominator if centrality_denominator > 0 else 0
+
+            # Connectivity: normalized count of nearby nodes with historical selection bias
+            connectivity_base = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.3 * distance_to_current)
+            connectivity = (connectivity_base + historical_selections[node]) / (remaining_nodes + max(historical_selections.values()) + 1)
+
+            # Dynamic weights with exponential decay
+            progress_ratio = (total_nodes - remaining_nodes) / total_nodes
+            immediate_weight = 0.5 * (1 - progress_ratio)
+            centrality_weight = 0.3 * (1 - 0.5 * progress_ratio)
+            connectivity_weight = 0.2 * (1 - 0.3 * progress_ratio)
+
+            # Proximity pressure: penalizes nodes too close to destination early in tour
+            proximity_pressure = 0.4 * (1 - progress_ratio) * (distance_to_destination / (distance_to_current + 1e-6))
+
+            # Score combines weighted components with proximity pressure
+            score = (immediate_weight * distance_to_current +
+                     centrality_weight * (1 / (centrality + 1e-6)) +
+                     connectivity_weight * connectivity) + proximity_pressure
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

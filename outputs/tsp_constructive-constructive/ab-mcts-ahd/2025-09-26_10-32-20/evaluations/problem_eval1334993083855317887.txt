@@ -1,0 +1,34 @@
+importance.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    progress_ratio = 1 - remaining_ratio
+
+    # Dynamic weight adjustment with non-linear progression
+    local_weight = 0.6 * (1 - progress_ratio**2) + 0.4 * progress_ratio**2
+    global_weight = 1 - local_weight
+
+    # Path diversity factor (encourages less visited nodes)
+    visit_count = {node: sum(1 for n in unvisited_nodes if distance_matrix[node][n] < np.median(distance_matrix[node]))
+                  for node in unvisited_nodes}
+
+    # Non-linear centrality (exponential decay)
+    def centrality(node):
+        avg_dist = np.mean(distance_matrix[node])
+        return np.exp(-0.5 * avg_dist)
+
+    hybrid_score = lambda node: (
+        local_weight * distance_matrix[current_node][node] +
+        global_weight * (
+            0.6 * distance_matrix[node][destination_node] +
+            0.2 * centrality(node) +
+            0.2 * (1 - visit_count[node] / max(visit_count.values(), default=1))
+        )
+    )
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

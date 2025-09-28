@@ -1,0 +1,63 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    proximity_potentials = []
+    future_connectivities = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = max(0, distance_matrix[current_node][node] - second_best)
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        proximity_potential = (immediate_distance + future_potential) / (1 + sum(distance_matrix[node][n] for n in unvisited_nodes if n != node))
+        proximity_potentials.append(proximity_potential)
+
+        if len(unvisited_nodes) > 1:
+            connectivity = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+        else:
+            connectivity = 0
+        future_connectivities.append(connectivity)
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    if remaining_nodes > total_nodes * 0.6:  # Exploration phase
+        regret_weight = 0.5
+        proximity_weight = 0.4
+        connectivity_weight = 0.1
+        distance_weight = 0.0
+    elif remaining_nodes > total_nodes * 0.2:  # Transition phase
+        regret_weight = 0.3
+        proximity_weight = 0.3
+        connectivity_weight = 0.2
+        distance_weight = 0.2
+    else:  # Exploitation phase
+        regret_weight = 0.1
+        proximity_weight = 0.2
+        connectivity_weight = 0.4
+        distance_weight = 0.3
+
+    scores = [
+        regret_weight * regret +
+        proximity_weight * potential +
+        connectivity_weight * connectivity +
+        distance_weight * distance
+        for regret, potential, connectivity, distance in zip(regrets, proximity_potentials, future_connectivities, distances)
+    ]
+
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

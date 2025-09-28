@@ -1,0 +1,9 @@
+import random
+        total_score = sum(score for _, score in scores)
+        probabilities = [(1 - (score / total_score)) ** (1 / temperature) for _, score in scores]
+        probabilities = [p / sum(probabilities) for p in probabilities]
+        next_node = random.choices([node for node, _ in scores], weights=probabilities, k=1)[0]
+    else:
+        next_node = min(scores, key=lambda x: x[1])[0]
+
+    return next_node

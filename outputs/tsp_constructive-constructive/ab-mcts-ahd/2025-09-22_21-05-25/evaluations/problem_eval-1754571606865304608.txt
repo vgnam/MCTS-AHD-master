@@ -1,0 +1,3 @@
+import random
+    next_node = farthest_node if random.random() < prob else nearest_node
+    return next_node

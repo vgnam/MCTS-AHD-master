@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+
+    # Adaptive lookahead depth based on node density
+    density_factor = min(1.0, 0.5 + (remaining_count / len(distance_matrix)) * 0.5)
+    lookahead_depth = max(1, min(3, int(round(remaining_count * density_factor))))
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = 0
+
+        # Calculate exploration bonus (inverse of node visit frequency)
+        exploration_bonus = 1.0 / (sum(1 for n in distance_matrix if n in unvisited_nodes) + 1)
+
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            current = node
+            for _ in range(min(2, lookahead_depth)):
+                if not remaining_nodes:
+                    break
+                next_candidate = min(remaining_nodes, key=lambda x: distance_matrix[current][x])
+                lookahead_distance += distance_matrix[current][next_candidate]
+                current = next_candidate
+                remaining_nodes -= {next_candidate}
+
+        # Weighted score with exploration bonus
+        score = (0.6 * immediate_distance + 0.3 * (lookahead_distance / lookahead_depth if lookahead_depth > 0 else 0) + 0.1 * exploration_bonus)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

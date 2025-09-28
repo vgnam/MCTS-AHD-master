@@ -1,0 +1,21 @@
+import random
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+    
+    destination_distance = distance_matrix[current_node][destination_node]
+    threshold_distance = min_distance * 1.0  # More aggressive threshold
+    
+    if destination_node in unvisited_nodes and destination_distance < threshold_distance:
+        if random.random() < (1 - (destination_distance / min_distance) ** 2):  # More aggressive probability function
+            next_node = destination_node
+    
+    return next_node

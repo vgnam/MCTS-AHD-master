@@ -1,0 +1,31 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    if not nearest_neighbors:
+        return None
+
+    # Calculate weights based on inverse distance (closer nodes have higher probability)
+    weights = [1.0 / (distance_matrix[current_node][node] + 1e-10) for node in nearest_neighbors]
+    total_weight = sum(weights)
+
+    # Normalize weights for probability distribution
+    probabilities = [w / total_weight for w in weights]
+
+    # Introduce dynamic stochasticity based on remaining unvisited nodes
+    exploration_factor = 0.5 if len(unvisited_nodes) > 3 else 0.2
+    if random.random() < exploration_factor:
+        # Select from top 3 nearest with weighted probability
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        candidate_weights = [probabilities[i] for i, node in enumerate(nearest_neighbors) if node in candidates]
+        next_node = random.choices(candidates, weights=candidate_weights, k=1)[0]
+    else:
+        # Select from all remaining nodes with weighted probability
+        next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+
+    return next_node

@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    destination_weight = len(unvisited_nodes) / total_nodes
+    candidates = []
+    weights = []
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            weighted_distance = distance * destination_weight
+        else:
+            weighted_distance = distance * (1 + np.exp(-distance / total_nodes))
+
+        candidates.append(node)
+        weights.append(1 / (weighted_distance + 1e-9))  # Avoid division by zero
+
+    next_node = random.choices(candidates, weights=weights, k=1)[0]
+    return next_node

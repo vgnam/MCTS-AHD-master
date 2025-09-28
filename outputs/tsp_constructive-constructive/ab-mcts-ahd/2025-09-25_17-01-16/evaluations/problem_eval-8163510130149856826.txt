@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 / (1 + remaining_nodes)  # Decreases as more nodes are visited
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        future_connections = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        novelty_factor = sum(1 for d in future_connections if d > sum(future_connections)/len(future_connections)) if future_connections else 0
+
+        # Weighted score with probabilistic selection
+        immediate_weight = 0.5 + 0.5 * (1 - temperature)
+        future_weight = 0.5 - 0.5 * (1 - temperature)
+        penalty = 1.0 if node == destination_node else 0.0
+
+        weighted_score = (immediate_weight * distance_to_current + future_weight * (sum(future_connections)/len(future_connections) if future_connections else 0)) * (1 + penalty) + novelty_factor
+
+        # Probabilistic selection based on temperature
+        if temperature > 0.1:
+            prob = (weighted_score / temperature) ** 2
+            if prob > best_score:
+                best_score = prob
+                next_node = node
+        else:
+            if weighted_score > best_score:
+                best_score = weighted_score
+                next_node = node
+
+    return next_node

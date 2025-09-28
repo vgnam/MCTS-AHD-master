@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = (total_nodes - remaining_nodes) / total_nodes
+    weight = (1 - np.tanh(2 * progress)) ** 2
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node]
+        global_potential = distance_matrix[node][destination_node]
+        min_local = min(distance_matrix[current_node][n] for n in unvisited_nodes)
+        max_local = max(distance_matrix[current_node][n] for n in unvisited_nodes)
+        regret = (local_cost - min_local) / (max_local - min_local + 1e-6)
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        diversity = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        regret_threshold = 1 - np.exp(-progress * 2)
+        scaled_regret = regret if regret >= regret_threshold else 0
+        return (1 - weight) * scaled_regret + weight * (0.7 * local_cost + 0.3 * global_potential) - 0.2 * centrality - 0.3 * diversity
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

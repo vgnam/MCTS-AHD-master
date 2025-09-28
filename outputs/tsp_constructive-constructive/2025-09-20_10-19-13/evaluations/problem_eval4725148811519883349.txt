@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def heuristic(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+        return 0.75 * current_dist + 0.25 * remaining_dist
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

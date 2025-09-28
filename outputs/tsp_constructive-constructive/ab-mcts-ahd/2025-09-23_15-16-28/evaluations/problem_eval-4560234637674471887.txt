@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_weighted_value = float('inf')
+
+    # Calculate average distance of unvisited nodes to current node
+    avg_distance_to_current = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+
+    # Calculate ratio of current node's distance to destination to average distance
+    distance_to_destination = distance_matrix[current_node][destination_node]
+    ratio = distance_to_destination / avg_distance_to_current if avg_distance_to_current > 0 else 1.0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        sum_distance = distance_to_current + distance_to_destination
+        product_distance = distance_to_current * distance_to_destination
+
+        # Dynamic scaling factor based on ratio
+        scaling_factor = 1.0 / (1.0 + ratio)
+
+        # Adaptive weights based on scaling factor
+        weight_sum = scaling_factor
+        weight_product = 1 - scaling_factor
+
+        weighted_value = (weight_sum * sum_distance) + (weight_product * product_distance)
+
+        if weighted_value < min_weighted_value:
+            min_weighted_value = weighted_value
+            next_node = node
+
+    return next_node

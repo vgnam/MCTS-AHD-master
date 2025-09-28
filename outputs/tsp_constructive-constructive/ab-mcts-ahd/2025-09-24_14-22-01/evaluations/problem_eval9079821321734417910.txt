@@ -1,0 +1,32 @@
+import random
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes) - 1
+    total_nodes = len(distance_matrix)
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes
+
+    candidates = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        proximity_bias = 1.0 / (1.0 + potential_distance) * progress_ratio
+        dynamic_weight = 0.3 * (1 - progress_ratio) + 0.7 * proximity_bias
+        weighted_cost = immediate_distance + dynamic_weight * potential_distance
+        penalty = 0.5 * (potential_distance ** 2) if (potential_distance > 1.3 * immediate_distance) else 0
+        total_cost = weighted_cost + penalty
+        candidates.append((node, total_cost))
+
+    if not candidates:
+        return destination_node
+
+    min_cost = min(cost for _, cost in candidates)
+    max_cost = max(cost for _, cost in candidates)
+    normalized_costs = [(node, (max_cost - cost + 1) / (max_cost - min_cost + 1)) for node, cost in candidates]
+
+    probabilities = [cost for _, cost in normalized_costs]
+    probabilities = [p / sum(probabilities) for p in probabilities]
+    next_node = random.choices([node for node, _ in normalized_costs], weights=probabilities, k=1)[0]
+
+    return next_node

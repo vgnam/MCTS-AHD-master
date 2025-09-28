@@ -1,0 +1,27 @@
+import math
+    import random
+    min_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    temperature = 1.0 - (remaining_nodes / total_nodes)  # Decreases as more nodes are visited
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        estimated_distance = distance_matrix[node][destination_node]
+        penalty = 1.0 / (remaining_nodes + 1) if remaining_nodes > 0 else 0.0
+        weight_immediate = 0.6 + 0.3 * (remaining_nodes / total_nodes)
+        weight_estimated = 0.4 - 0.3 * (remaining_nodes / total_nodes)
+
+        # Novel distance metric: weighted combination of Euclidean and Manhattan distances
+        hybrid_distance = 0.7 * immediate_distance + 0.3 * (immediate_distance + estimated_distance)
+
+        score = (weight_immediate * hybrid_distance) + (weight_estimated * estimated_distance) + (1.5 * penalty * immediate_distance)
+
+        # Temperature-based probabilistic selection
+        if random.random() < math.exp(-score / (temperature + 1e-6)):
+            if score < min_score:
+                min_score = score
+                next_node = node
+
+    return next_node

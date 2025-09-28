@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    exploration_phase = remaining_count / total_nodes
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            centrality = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.1 * avg_distance) / len(remaining_nodes)
+        else:
+            avg_distance = 0
+            centrality = 0
+
+        path_potential = (immediate_distance + avg_distance) * (1 - centrality)
+        exploration_weight = 0.7 if exploration_phase > 0.5 else 0.3
+        exploitation_weight = 1 - exploration_weight
+
+        distance_factor = immediate_distance * (0.5 + 0.5 * exploration_weight)
+        potential_factor = path_potential * (0.5 + 0.5 * exploitation_weight)
+        centrality_bias = centrality * 0.2 * (1 - exploration_phase)
+
+        score = distance_factor + potential_factor - centrality_bias
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

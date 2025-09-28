@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    remaining_count = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1.0 - (remaining_count / total_nodes)
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        connectivity_penalty = (degree ** 2) * (1.0 - progress)
+
+        if remaining_count > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            min_distance = min(distance_matrix[node][n] for n in remaining_nodes)
+            max_distance = max(distance_matrix[node][n] for n in remaining_nodes)
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            locality = 1.0 / (avg_distance + 1e-6)
+            detour_cost = (max_distance - min_distance) * (1.0 - progress)
+
+            score = distance * (1.0 + 0.8 * (degree - connectivity_penalty) * locality) + 0.4 * avg_distance + 0.3 * detour_cost
+        else:
+            score = distance
+
+        candidates.append((node, score))
+
+    if remaining_count > 1:
+        scores = [s for _, s in candidates]
+        min_score = min(scores)
+        max_score = max(scores)
+        temperature = 1.0 - progress
+        exp_scores = [math.exp((min_score - s) / (temperature + 1e-6)) for s in scores]
+        total_exp = sum(exp_scores)
+        probabilities = [e / total_exp for e in exp_scores]
+        next_node = random.choices([n for n, _ in candidates], weights=probabilities, k=1)[0]
+    else:
+        next_node, _ = min(candidates, key=lambda x: x[1])
+
+    return next_node

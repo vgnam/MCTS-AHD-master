@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_heuristic = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Calculate path progress (0 to 1)
+    path_progress = 1 - (remaining_nodes / total_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate centrality
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Calculate path momentum (alignment with current path direction)
+        if current_node != destination_node:
+            current_vector = (distance_matrix[current_node][destination_node] - distance_to_destination) / max(1, distance_matrix[current_node][destination_node])
+            path_momentum = abs(current_vector)
+        else:
+            path_momentum = 0.5
+
+        # Adaptive weight scaling with sigmoid function
+        def sigmoid(x, k=5):
+            return 1 / (1 + math.exp(-k * (x - 0.5)))
+
+        weight_current = sigmoid(path_progress, k=5)
+        weight_destination = sigmoid(1 - path_progress, k=5)
+        weight_centrality = 0.3 * (1 - path_progress)
+        weight_momentum = 0.3 * path_progress
+
+        # Combine with weights
+        heuristic = (weight_current * distance_to_current +
+                     weight_destination * distance_to_destination +
+                     weight_centrality * centrality +
+                     weight_momentum * path_momentum)
+
+        if heuristic < min_heuristic:
+            min_heuristic = heuristic
+            next_node = node
+
+    return next_node

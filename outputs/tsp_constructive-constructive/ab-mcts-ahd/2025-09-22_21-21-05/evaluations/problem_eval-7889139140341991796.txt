@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        sum_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) if unvisited_nodes else 0
+        avg_distance_to_remaining = sum_distance_to_remaining / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        dynamic_weight = 1.0 / (1.0 + len(unvisited_nodes))
+
+        centrality_factor = 1.0 - (avg_distance_to_remaining / (sum(avg_distance_to_remaining for n in unvisited_nodes) / len(unvisited_nodes) + 1e-6)) if unvisited_nodes else 0
+
+        penalty = 0.0
+        for neighbor in unvisited_nodes:
+            if neighbor != node and distance_matrix[node][neighbor] < distance_to_current * 1.2:
+                penalty += 0.2
+
+        combined_score = (distance_to_current ** 0.5 * distance_to_destination ** 0.5) - (dynamic_weight * avg_distance_to_remaining) + (centrality_factor * 0.5) - penalty
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

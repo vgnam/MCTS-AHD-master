@@ -1,0 +1,9 @@
+import random
+            if random.random() < 0.3:
+                next_node = random.choice(candidates[:2])[0]
+            else:
+                next_node = candidates[0][0]
+        else:
+            next_node = candidates[0][0]
+
+    return next_node

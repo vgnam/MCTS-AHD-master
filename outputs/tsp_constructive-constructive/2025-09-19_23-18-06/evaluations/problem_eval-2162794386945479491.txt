@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def node_diversity(node, unvisited):
+        if len(unvisited) <= 2:
+            return 1.0
+        remaining = unvisited - {node}
+        distances = [distance_matrix[node][n] for n in remaining]
+        std_dev = (sum((d - sum(distances)/len(distances))**2 for d in distances) / len(distances))**0.5
+        if max(distances) == 0:
+            return 0.0
+        return std_dev / max(distances)
+
+    def tour_progress_penalty(node, current, unvisited):
+        if len(unvisited) <= 2:
+            return 0.0
+        remaining = unvisited - {node}
+        total_remaining = sum(distance_matrix[n][m] for n in remaining for m in remaining if n != m)
+        avg_remaining = total_remaining / (len(remaining) * (len(remaining) - 1)) if len(remaining) > 1 else 0
+        return (distance_matrix[current][node] - avg_remaining) / (avg_remaining + 1e-6)
+
+    def node_centrality(node, unvisited):
+        if len(unvisited) <= 2:
+            return 1.0
+        remaining = unvisited - {node}
+        total_dist = sum(distance_matrix[node][n] for n in remaining)
+        avg_dist = total_dist / len(remaining)
+        return 1 / (1 + avg_dist)
+
+    exploration_phase = len(unvisited_nodes) / 10
+    diversity_weight = 0.5 * (1 - exploration_phase)
+    progress_weight = 0.3 * exploration_phase
+    centrality_weight = 0.2 + 0.1 * (1 - exploration_phase)
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+        diversity = node_diversity(node, unvisited_nodes)
+        progress_penalty = tour_progress_penalty(node, current_node, unvisited_nodes)
+        centrality = node_centrality(node, unvisited_nodes)
+
+        score = (0.4 * immediate_dist +
+                 diversity_weight * diversity +
+                 progress_weight * progress_penalty +
+                 centrality_weight * centrality)
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

@@ -1,0 +1,39 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate modified distance: immediate distance plus estimated remaining path cost
+    def modified_distance(node):
+        immediate_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            # Estimate remaining path cost as average of distances to other unvisited nodes
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            remaining_distances = [distance_matrix[node][n] for n in remaining_nodes]
+            avg_remaining = sum(remaining_distances) / len(remaining_distances)
+        else:
+            avg_remaining = 0
+        return immediate_dist + 0.3 * avg_remaining  # Weighted sum
+
+    # Sort by modified distance
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: modified_distance(node))
+
+    # Probabilistic selection: higher chance for nodes with better balance
+    if random.random() < 0.7:  # 70% chance to pick from top 2 with bias
+        if len(nearest_neighbors) >= 2:
+            # Bias towards nodes that balance immediate and remaining distance
+            scores = [1/modified_distance(node) for node in nearest_neighbors[:2]]
+            total = sum(scores)
+            probabilities = [score/total for score in scores]
+            next_node = random.choices(nearest_neighbors[:2], weights=probabilities, k=1)[0]
+        else:
+            next_node = nearest_neighbors[0]
+    else:  # 30% chance to pick from remaining with lower bias
+        candidates = nearest_neighbors[2:] if len(nearest_neighbors) > 2 else nearest_neighbors
+        next_node = random.choice(candidates) if candidates else nearest_neighbors[0]
+
+    return next_node

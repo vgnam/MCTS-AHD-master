@@ -1,0 +1,32 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Parameters
+    exploration_factor = 0.3 * (len(unvisited_nodes) / (len(unvisited_nodes) + 10))  # Decays with remaining nodes
+    memory_weight = 0.5 * (1 - math.log(len(unvisited_nodes) + 1) / math.log(len(unvisited_nodes) + 2))  # Adapts to remaining nodes
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        local_distance = distance_matrix[current_node][node]
+        global_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        # Anticipation term: estimates how well this node connects to future nodes
+        anticipation = sum(distance_matrix[n][node] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        # Reinforcement component: prioritizes nodes that have historically performed well
+        reinforcement = 0.1 * (1 - exploration_factor)  # Placeholder for actual reinforcement value
+
+        # Combined score with dynamic weights
+        score = (1 - exploration_factor) * local_distance + \
+                exploration_factor * (memory_weight * global_distance + (1 - memory_weight) * anticipation) + \
+                reinforcement
+
+        return score
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

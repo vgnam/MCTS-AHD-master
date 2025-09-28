@@ -1,0 +1,9 @@
+import math
+    heuristics = [heuristic(node) for node in unvisited_nodes]
+    exp_heuristics = [math.exp(-h) for h in heuristics]
+    sum_exp = sum(exp_heuristics)
+    probabilities = [exp_h / sum_exp for exp_h in exp_heuristics]
+    import random
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

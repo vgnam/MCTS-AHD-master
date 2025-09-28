@@ -1,0 +1,37 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    # Calculate temperature based on remaining unvisited nodes
+    remaining = len(unvisited_nodes)
+    temperature = max(0.1, math.exp(-0.5 * remaining))
+
+    # Get nearest neighbors sorted by distance
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate dynamic bias towards destination if it's among nearest neighbors
+    bias_factor = 1.0
+    if destination_node in nearest_neighbors:
+        dest_distance = distance_matrix[current_node][destination_node]
+        min_distance = distance_matrix[current_node][nearest_neighbors[0]]
+        if dest_distance > 0:
+            bias_factor = min(1.0, (min_distance / dest_distance) * 2)  # More bias if destination is relatively close
+
+    # Temperature-adjusted selection
+    if random.random() < temperature * bias_factor:
+        # Exploitation: pick from top 3 nearest with bias
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        weights = [1.0 / (1.0 + i) for i in range(len(candidates))]  # Higher weight for closer nodes
+        next_node = random.choices(candidates, weights=weights, k=1)[0]
+    else:
+        # Exploration: pick randomly with lower probability for closer nodes
+        weights = [1.0 / (1.0 + distance_matrix[current_node][node]) for node in nearest_neighbors]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+
+    return next_node

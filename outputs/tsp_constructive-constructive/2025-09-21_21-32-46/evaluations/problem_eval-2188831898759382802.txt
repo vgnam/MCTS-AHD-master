@@ -1,0 +1,9 @@
+import random
+    rand_val = random.uniform(0, total_weight)
+    cumulative_weight = 0.0
+    for node, weight in probabilities:
+        cumulative_weight += weight
+        if rand_val <= cumulative_weight:
+            return node
+
+    return next_node

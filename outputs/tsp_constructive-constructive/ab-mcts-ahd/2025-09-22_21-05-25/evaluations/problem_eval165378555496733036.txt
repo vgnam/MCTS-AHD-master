@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, iteration=0):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate probabilities for each unvisited node
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_distance = min(distances)
+    max_distance = max(distances)
+
+    # Normalize distances to probabilities using temperature
+    probabilities = []
+    for d in distances:
+        if max_distance == min_distance:
+            p = 1.0 / len(unvisited_nodes)  # Uniform if all distances are equal
+        else:
+            p = math.exp(-(d - min_distance) / temperature)
+        probabilities.append(p)
+
+    # Normalize probabilities to sum to 1
+    total = sum(probabilities)
+    probabilities = [p / total for p in probabilities]
+
+    # Select next node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

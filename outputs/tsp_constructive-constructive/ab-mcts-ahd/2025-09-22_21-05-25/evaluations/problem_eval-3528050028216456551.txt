@@ -1,0 +1,22 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=0.5):
+    if not unvisited_nodes:
+        return destination_node
+
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    nearest_dist = distance_matrix[current_node][nearest_node]
+    farthest_dist = distance_matrix[current_node][farthest_node]
+
+    distance_ratio = farthest_dist / nearest_dist if nearest_dist != 0 else float('inf')
+
+    if distance_ratio > 1.5:
+        prob_farthest = 1 / (1 + math.exp(-(distance_ratio - 1) / temperature))
+        next_node = farthest_node if random.random() < prob_farthest else nearest_node
+    else:
+        next_node = nearest_node
+
+    return next_node

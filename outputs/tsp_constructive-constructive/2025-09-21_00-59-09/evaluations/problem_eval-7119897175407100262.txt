@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Compute centroid of unvisited nodes
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    else:
+        centroid_x = 0
+
+    # Dynamic weight adjustment based on remaining path length
+    remaining_nodes = len(unvisited_nodes)
+    weight_current = 1.0 + (0.2 * (10 / (remaining_nodes + 1)))  # Higher weight early, reduces later
+    weight_dest = 0.5 * (remaining_nodes / (remaining_nodes + 1))  # Lower weight as more nodes remain
+    weight_centroid = 0.3 + (0.1 * (1 - (remaining_nodes / (remaining_nodes + 1))))  # Increases as nodes remain
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Adaptive score with dynamic weights
+        score = (weight_current * distance_to_current) + \
+                (weight_dest * distance_to_dest) + \
+                (weight_centroid * centroid_penalty)
+
+        # Add probabilistic component to escape local optima
+        if score < min_score:
+            min_score = score
+            next_node = node
+        elif score == min_score and np.random.rand() < 0.2:  # 20% chance to pick equally scored nodes
+            next_node = node
+
+    return next_node

@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_pressure = 1.0 - (remaining_nodes / total_nodes)
+    temperature = 1.0 - exploration_pressure
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            remaining_nodes_list = [n for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in remaining_nodes_list) / len(remaining_nodes_list)
+            connectivity_score = 1.0 / (1.0 + avg_remaining_dist)
+            potential_gain = (distance_matrix[current_node][destination_node] - immediate_dist - dest_dist) / (1 + immediate_dist)
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] > 0 and n != node)
+            centrality_score = node_degree / (total_nodes - 1)
+            exploration_score = (1 - exploration_pressure) * connectivity_score + exploration_pressure * centrality_score
+        else:
+            exploration_score = 0
+            potential_gain = 0
+
+        weight_local = 0.5 - 0.3 * exploration_pressure
+        weight_exploration = 0.3 + 0.2 * exploration_pressure
+        weight_gain = 0.2 * (1 - exploration_pressure)
+
+        score = (weight_local * immediate_dist) + (weight_exploration * exploration_score) + (weight_gain * potential_gain)
+        return score
+
+    scores = [evaluate_node(node) for node in unvisited_nodes]
+    probabilities = [math.exp(-score / temperature) for score in scores]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+    return next_node

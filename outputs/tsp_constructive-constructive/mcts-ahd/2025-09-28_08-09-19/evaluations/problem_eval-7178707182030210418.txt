@@ -1,0 +1,67 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    base_weights = {
+        'proximity': 0.4,
+        'centrality': 0.3,
+        'connectivity': 0.2,
+        'novelty': 0.1
+    }
+
+    # Adaptive weight adjustment
+    proximity_weight = base_weights['proximity'] * (1.0 - 0.5 * visited_ratio)
+    centrality_weight = base_weights['centrality'] * (1.0 + 0.3 * visited_ratio)
+    connectivity_weight = base_weights['connectivity'] * (1.0 - 0.2 * visited_ratio)
+    novelty_weight = base_weights['novelty'] * (1.0 + 0.4 * visited_ratio)
+
+    # Historical performance tracking (simplified)
+    historical_scores = {}
+    for node in unvisited_nodes:
+        historical_scores[node] = 1.0  # Placeholder for actual historical performance
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        # Centrality calculation
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+            centrality_score = connectivity / len(remaining_nodes)
+        else:
+            avg_distance = 0
+            centrality_score = 0
+
+        # Connectivity calculation
+        if remaining_nodes:
+            connectivity_score = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.5 * avg_distance) / len(remaining_nodes)
+        else:
+            connectivity_score = 0
+
+        # Novelty bonus
+        novelty_bonus = 1.0 / (1.0 + immediate_distance) if immediate_distance > 0 else 0
+
+        # Risk-averse penalty
+        variance = sum((distance_matrix[node][n] - avg_distance) ** 2 for n in remaining_nodes) / len(remaining_nodes) if remaining_nodes else 0
+        risk_penalty = 1.0 + (variance ** 0.5) * 0.3
+
+        # Combined score
+        score = (
+            proximity_weight * immediate_distance +
+            centrality_weight * (1.0 - centrality_score) +
+            connectivity_weight * (1.0 - connectivity_score) +
+            novelty_weight * (1.0 - novelty_bonus)
+        ) * risk_penalty * historical_scores[node]
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

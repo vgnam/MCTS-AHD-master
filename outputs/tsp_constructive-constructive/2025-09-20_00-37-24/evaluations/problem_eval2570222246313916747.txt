@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate potential for each node: distance + inverse of node degree (higher degree = more connections)
+    node_potentials = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        node_degree = sum(1 for n in unvisited_nodes if distance_matrix[node][n] > 0)
+        potential = distance + (1.0 / (node_degree + 1))  # +1 to avoid division by zero
+        node_potentials[node] = potential
+
+    # Sort nodes by potential (lower is better)
+    sorted_nodes = sorted(unvisited_nodes, key=lambda node: node_potentials[node])
+
+    # 70% chance to pick from top 3 by potential, 30% chance to pick a node with higher potential
+    if random.random() < 0.7:
+        candidates = sorted_nodes[:min(3, len(sorted_nodes))]
+        next_node = random.choice(candidates)
+    else:
+        # Select a node with higher potential (more distant or lower degree)
+        next_node = random.choice(sorted_nodes[min(3, len(sorted_nodes)):])
+
+    return next_node

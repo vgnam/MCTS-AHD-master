@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1  # +1 for current_node
+    completion_ratio = 1 - (len(unvisited_nodes) / total_nodes)
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        # Predictive lookahead factor
+        future_distances = [distance_matrix[node][other] for other in remaining_nodes]
+        median_future_dist = sorted(future_distances)[len(future_distances)//2]
+
+        # Distance penalty for revisiting regions
+        visited_regions = set()
+        for n in unvisited_nodes:
+            if distance_matrix[current_node][n] < current_dist * 1.2:  # Threshold for "same region"
+                visited_regions.add(n)
+        penalty = len(visited_regions) * 0.1  # Adjustable penalty factor
+
+        # Dynamic weight adjustment
+        base_weight = 0.6 - 0.2 * completion_ratio  # Decreases as tour progresses
+        weight = max(0.4, min(0.8, base_weight))  # Clamp between 0.4 and 0.8
+
+        return (weight * current_dist + (1 - weight) * median_future_dist) + penalty
+
+    # Probabilistic selection for late-stage exploration
+    if completion_ratio > 0.8:
+        candidates = sorted(unvisited_nodes, key=evaluate_node)[:3]
+        return random.choice(candidates) if candidates else min(unvisited_nodes, key=evaluate_node)
+
+    return next_node

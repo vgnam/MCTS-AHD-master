@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (remaining_nodes / len(distance_matrix)))
+    total_nodes = len(distance_matrix)
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+
+        if remaining_nodes > 1:
+            remaining_unvisited = unvisited_nodes - {node}
+
+            # Calculate average future distance
+            avg_future_dist = sum(distance_matrix[node][n] for n in remaining_unvisited) / len(remaining_unvisited)
+
+            # Calculate node degree and closeness centrality
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] < float('inf'))
+            closeness_centrality = 1.0 / (sum(distance_matrix[node][n] for n in range(total_nodes)) / total_nodes + 1e-6)
+
+            # Dynamic exploration term
+            exploration_term = temperature * (1.0 / (avg_future_dist + 1e-6)) * (node_degree + closeness_centrality)
+        else:
+            exploration_term = 0.0
+
+        # Adaptive weighting based on remaining path length
+        remaining_path_factor = (remaining_nodes / total_nodes) ** 2
+        weighted_score = (1.0 - temperature) * immediate_dist + exploration_term * remaining_path_factor
+
+        # Add probabilistic selection component
+        if remaining_nodes > 1:
+            weighted_score *= (1.0 + 0.1 * (node_degree + closeness_centrality) / (total_nodes - 1))
+
+        candidates.append((node, weighted_score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

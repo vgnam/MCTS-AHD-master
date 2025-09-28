@@ -1,0 +1,15 @@
+import random
+    if destination_node in unvisited_nodes and len(unvisited_nodes) > 1:
+        if random.random() < 0.7:  # Higher probability to select destination
+            return destination_node
+    min_distance = float('inf')
+    next_node = None
+    distances = []
+    for node in unvisited_nodes:
+        distances.append(distance_matrix[current_node][node])
+    min_dist = min(distances)
+    max_dist = max(distances)
+    normalized_distances = [(max_dist - dist) / (max_dist - min_dist + 1e-10) for dist in distances]  # Normalized to [0,1]
+    selected_index = random.choices(range(len(unvisited_nodes)), weights=normalized_distances, k=1)[0]
+    next_node = unvisited_nodes[selected_index]
+    return next_node

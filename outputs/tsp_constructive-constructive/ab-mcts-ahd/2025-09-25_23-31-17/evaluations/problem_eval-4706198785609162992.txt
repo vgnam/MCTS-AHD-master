@@ -1,0 +1,5 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    next_node = min(unvisited_nodes, key=lambda node: (distance_matrix[current_node][node] / distance_matrix[node][destination_node]) if distance_matrix[node][destination_node] != 0 else float('inf'))
+    return next_node

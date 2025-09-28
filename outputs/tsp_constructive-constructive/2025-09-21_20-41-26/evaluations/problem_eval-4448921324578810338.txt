@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes and len(unvisited_nodes) > 1:
+        if np.random.rand() < 0.7:  # High probability to choose destination if unvisited
+            return destination_node
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        if distance_matrix[current_node][node] < min_distance:
+            min_distance = distance_matrix[current_node][node]
+            next_node = node
+    # Introduce stochasticity: select next_node with probability inversely proportional to distance
+    if next_node is not None:
+        prob = 1 / (1 + min_distance)
+        if np.random.rand() < prob:
+            return next_node
+    return next_node

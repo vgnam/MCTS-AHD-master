@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    remaining_count = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    for node in unvisited_nodes:
+        next_distance = distance_matrix[current_node][node]
+
+        if remaining_count > 1:
+            remaining_nodes = unvisited_nodes - {node}
+
+            # Calculate centrality of the node (average distance to remaining nodes)
+            centrality = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+
+            # Calculate historical path distance (simplified as average of current and next distances)
+            historical_distance = (distance_matrix[current_node][node] + min(distance_matrix[node][n] for n in remaining_nodes)) / 2
+
+            # Novel scaling factor combining remaining nodes, centrality, and historical distance
+            scaling_factor = (remaining_count / total_nodes) * (centrality / (historical_distance + 1e-6))
+
+            # Calculate detour cost with the new scaling factor
+            min_distance = min(distance_matrix[node][n] for n in remaining_nodes)
+            max_distance = max(distance_matrix[node][n] for n in remaining_nodes)
+            detour_cost = (max_distance - min_distance) * scaling_factor
+
+            total_distance = next_distance + detour_cost
+        else:
+            total_distance = next_distance
+
+        candidates.append((node, total_distance))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

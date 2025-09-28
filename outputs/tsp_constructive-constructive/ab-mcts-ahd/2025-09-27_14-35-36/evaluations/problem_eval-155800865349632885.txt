@@ -1,0 +1,22 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def weighted_probability(node):
+        base_distance = distance_matrix[current_node][node]
+        if base_distance == 0:
+            return float('inf')  # Avoid division by zero
+        if node in unvisited_nodes:
+            return 1.0 / base_distance  # Higher probability for unvisited nodes
+        else:
+            return (1.0 / base_distance) * 0.5  # Lower probability for revisited nodes
+
+    probabilities = [weighted_probability(node) for node in unvisited_nodes]
+    total_prob = sum(probabilities)
+    if total_prob == 0:
+        return random.choice(unvisited_nodes)  # Fallback if all probabilities are zero
+    normalized_probs = [p / total_prob for p in probabilities]
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+    return next_node

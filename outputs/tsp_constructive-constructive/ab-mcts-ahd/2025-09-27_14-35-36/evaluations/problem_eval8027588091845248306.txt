@@ -1,0 +1,11 @@
+import random
+        next_node = random.choices([s[1] for s in scores[:3]], weights=[s[0] for s in scores[:3]], k=1)[0]
+    else:
+        next_node = scores[0][1]
+
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        if dest_distance < distance_matrix[current_node][next_node] * 0.8:
+            next_node = destination_node
+
+    return next_node

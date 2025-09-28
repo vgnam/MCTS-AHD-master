@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    num_unvisited = len(unvisited_nodes)
+    max_nodes = len(distance_matrix)
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        max_future_dist = max(distance_matrix[node][other] for other in remaining_nodes)
+        weight_current = 1 / (1 + math.exp(5 * (num_unvisited / max_nodes - 0.5)))
+        weight_future_avg = 0.5 * (1 - weight_current) * (1 + math.tanh(num_unvisited / max_nodes))
+        weight_future_max = 0.5 * (1 - weight_current) * (1 - math.tanh(num_unvisited / max_nodes))
+        return weight_current * current_dist + weight_future_avg * avg_future_dist + weight_future_max * max_future_dist
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

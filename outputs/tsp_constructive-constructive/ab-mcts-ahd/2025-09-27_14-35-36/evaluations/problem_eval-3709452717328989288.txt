@@ -1,0 +1,17 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate the inverse of distances to unvisited nodes
+    inv_distances = [1 / distance_matrix[current_node][node] for node in unvisited_nodes]
+    
+    # Create a probability distribution
+    total_inv_distance = sum(inv_distances)
+    probabilities = [inv_dist / total_inv_distance for inv_dist in inv_distances]
+    
+    # Select the next node based on the probabilistic distribution
+    next_node = random.choices(list(unvisited_nodes), weights=probabilities, k=1)[0]
+    
+    return next_node

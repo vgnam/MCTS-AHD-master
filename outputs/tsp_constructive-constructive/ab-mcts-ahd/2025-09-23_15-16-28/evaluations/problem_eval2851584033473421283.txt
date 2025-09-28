@@ -1,0 +1,19 @@
+defaults to the destination if no unvisited nodes remain.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_product_distance = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        product_distance = distance_to_current * distance_to_destination
+
+        if product_distance < min_product_distance:
+            min_product_distance = product_distance
+            next_node = node
+
+    return next_node

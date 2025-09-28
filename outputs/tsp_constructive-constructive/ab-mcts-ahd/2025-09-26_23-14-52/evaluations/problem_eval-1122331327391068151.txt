@@ -1,0 +1,46 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    visited_nodes = total_nodes - len(unvisited_nodes)
+    exploration_weight = 0.1 + 0.9 * (visited_nodes / total_nodes)  # Decreases as more nodes are visited
+
+    temperature = max(0.1, 1.0 - 0.5 * (visited_nodes / total_nodes))  # Decreases over time
+
+    best_score = float('inf')
+    next_node = None
+    probabilities = []
+
+    # Calculate centrality for each node (average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][n] for n in range(total_nodes)) / total_nodes
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        node_centrality = centrality[node]
+
+        # Weighted score with exploration, centrality, and randomness
+        weighted_score = (0.5 * current_distance +
+                         0.3 * future_distance +
+                         0.2 * node_centrality +
+                         exploration_weight * random.uniform(0, 1))
+
+        probabilities.append(math.exp(-weighted_score / temperature))
+
+    # Normalize probabilities
+    sum_prob = sum(probabilities)
+    if sum_prob > 0:
+        probabilities = [p / sum_prob for p in probabilities]
+    else:
+        probabilities = [1.0 / len(probabilities)] * len(probabilities)
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

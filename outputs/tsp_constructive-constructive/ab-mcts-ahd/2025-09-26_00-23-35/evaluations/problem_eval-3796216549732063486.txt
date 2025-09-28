@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    total_unvisited = len(unvisited_nodes)
+    next_node = None
+    best_score = -float('inf')
+
+    # Initialize node visit probabilities and decay them over time
+    visit_prob = {}
+    for node in unvisited_nodes:
+        visit_prob[node] = 1.0 / total_unvisited
+
+    # Dynamic exploration factor based on node diversity and proximity
+    exploration_factor = 0.2 + 0.8 * (total_unvisited / len(distance_matrix)) * \
+                         (1 - sum(distance_matrix[current_node][node] for node in unvisited_nodes) / (total_unvisited * max(distance_matrix[current_node])))
+
+    # Calculate node diversity and novelty
+    diversity = {}
+    novelty = {}
+    for node in unvisited_nodes:
+        # Diversity: average distance to other unvisited nodes
+        diversity[node] = sum(distance_matrix[node][other] for other in unvisited_nodes) / total_unvisited
+
+        # Novelty: inverse of visit probability (higher for less visited)
+        novelty[node] = 1 / (visit_prob[node] + 1e-6)
+
+    # Calculate scores for each node
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+
+        # Hybrid score combining proximity, diversity, novelty, and exploration
+        score = (1 - exploration_factor) * (-distance_to_node) + \
+                0.5 * exploration_factor * diversity[node] + \
+                0.5 * exploration_factor * novelty[node]
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Update visit probabilities for the selected node
+    if next_node is not None:
+        visit_prob[next_node] *= 0.8  # Decay probability of visited node
+
+    return next_node

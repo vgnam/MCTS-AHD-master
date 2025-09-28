@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, cooling_rate=0.95):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if random.random() < 0.9 * (temperature ** 2):  # Higher temperature increases exploration
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Select a node with probability inversely proportional to its rank
+        ranks = list(range(1, len(nearest_neighbors) + 1))
+        probabilities = [1.0 / (rank ** 2) for rank in ranks]
+        probabilities = [p / sum(probabilities) for p in probabilities]
+        next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+
+    return next_node

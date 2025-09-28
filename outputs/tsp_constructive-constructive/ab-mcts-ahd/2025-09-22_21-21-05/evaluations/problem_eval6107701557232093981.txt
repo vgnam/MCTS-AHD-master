@@ -1,0 +1,4 @@
+import random
+    next_node = random.choices([n for (n, _) in candidates], weights=probabilities, k=1)[0]
+
+    return next_node

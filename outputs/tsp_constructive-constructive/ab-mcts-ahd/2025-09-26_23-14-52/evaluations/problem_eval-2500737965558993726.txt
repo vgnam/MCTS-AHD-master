@@ -1,0 +1,5 @@
+import random
+    next_node = random.choices([node for node, _ in probabilities], weights=[prob for _, prob in probabilities])[0]
+
+    memory[next_node] += 1
+    return next_node

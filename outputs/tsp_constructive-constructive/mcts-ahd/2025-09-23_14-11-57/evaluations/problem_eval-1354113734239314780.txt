@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    min_weighted_increase = float('inf')
+    progress = 1 - len(unvisited_nodes) / (len(unvisited_nodes) + 1)  # Normalized progress (0 to 1)
+    temperature = np.exp(-5 * progress)  # Exponential decay of exploration factor
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            future_cost = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            local_search_penalty = progress ** 2 * sum(distance_matrix[current_node][n] for n in remaining_nodes) / len(remaining_nodes)
+        else:
+            future_cost = 0
+            local_search_penalty = 0
+
+        # Sigmoid-weighted hybrid metric
+        exploration_weight = temperature * (1 / (1 + np.exp(-10 * (progress - 0.5))))
+        weighted_increase = current_to_node + exploration_weight * future_cost + local_search_penalty
+
+        if weighted_increase < min_weighted_increase:
+            min_weighted_increase = weighted_increase
+            best_node = node
+
+    return next_node

@@ -1,0 +1,7 @@
+import random
+        threshold = min_score * (1.0 + 0.2 * temperature)
+        filtered = [n for n, s in candidates if s <= threshold]
+        if filtered:
+            next_node = random.choice(filtered)
+
+    return next_node

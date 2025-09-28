@@ -1,0 +1,28 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    distances = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+    destination_distance = distance_matrix[current_node][destination_node] if destination_node in unvisited_nodes else float('inf')
+    min_distance = min(distances.values())
+    closest_nodes = [node for node, distance in distances.items() if distance <= min_distance * 1.5]
+    
+    temperature = 0.8
+    scores = {}
+    for node in closest_nodes:
+        score = math.exp(-distances[node] / temperature)
+        if node == destination_node:
+            score *= 2
+        scores[node] = score
+    
+    total_score = sum(scores.values())
+    probabilities = {node: score / total_score for node, score in scores.items()}
+    next_node = random.choices(list(probabilities.keys()), weights=probabilities.values(), k=1)[0]
+    
+    if destination_distance < distances[next_node]:
+        next_node = destination_node
+    
+    return next_node

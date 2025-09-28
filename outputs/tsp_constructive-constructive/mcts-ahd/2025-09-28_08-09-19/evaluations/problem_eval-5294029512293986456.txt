@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    temperatures = [0.1, 0.3, 0.5]  # Different temperature levels for exploration
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        if len(unvisited_nodes) == 1:
+            avg_distance = 0
+        else:
+            avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        # Dynamic temperature based on remaining nodes
+        remaining_nodes = len(unvisited_nodes)
+        temperature = temperatures[min(remaining_nodes // 3, 2)]  # Higher temp when more nodes remain
+
+        # Global connectivity score
+        connectivity_score = sum(distance_matrix[node][n] for n in unvisited_nodes) / (len(unvisited_nodes) + 1)
+
+        # Combined score with temperature scaling
+        score = (distance_to_current + connectivity_score) * (1 + temperature * (1 - distance_to_current / (2 * avg_distance)))
+
+        scores.append((node, score))
+
+    # Select node with highest score (inverse probability)
+    if scores:
+        scores.sort(key=lambda x: x[1], reverse=True)
+        selected_node = scores[0][0]
+    else:
+        selected_node = unvisited_nodes[0]
+
+    return next_node

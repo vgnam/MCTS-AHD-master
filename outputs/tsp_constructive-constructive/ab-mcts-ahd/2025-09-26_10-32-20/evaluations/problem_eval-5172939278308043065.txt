@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 0.5  # Controls exploration-exploitation balance
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        immediate_dist = distance_matrix[current_node][node]
+        avg_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        connectivity_penalty = sum(distance_matrix[n][node] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        # Dynamic weight adjustment based on temperature
+        local_weight = 2 * (1 - temperature)
+        global_weight = 0.25 * temperature
+
+        # Novel scoring function with connectivity penalty
+        return (local_weight * immediate_dist +
+                global_weight * avg_remaining -
+                0.1 * connectivity_penalty)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

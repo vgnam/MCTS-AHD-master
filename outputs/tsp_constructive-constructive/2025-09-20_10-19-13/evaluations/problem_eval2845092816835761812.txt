@@ -1,0 +1,12 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    exploration_factor = len(unvisited_nodes) / total_nodes
+
+    next_node = min(unvisited_nodes, key=lambda node: (
+        (1 - exploration_factor) * distance_matrix[current_node][node] +
+        exploration_factor * (1 / (distance_matrix[current_node][node] + 1e-10))
+    ))
+    return next_node

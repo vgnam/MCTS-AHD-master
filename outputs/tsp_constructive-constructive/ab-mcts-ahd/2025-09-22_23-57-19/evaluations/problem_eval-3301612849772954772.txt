@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_distance = min(distances)
+    max_distance = max(distances)
+
+    weighted_threshold = min_distance + (max_distance - min_distance) * (0.5 / len(unvisited_nodes))
+
+    candidates = []
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost <= weighted_threshold:
+            candidates.append((node, cost))
+
+    if candidates:
+        candidates.sort(key=lambda x: x[1])
+        best_node = candidates[0][0]
+        if len(unvisited_nodes) > 2:
+            threshold = min_distance * (1.0 + 0.1 * (len(unvisited_nodes) / len(distance_matrix)))
+            for node, cost in candidates[1:]:
+                potential_cost = cost + distance_matrix[node][best_node]
+                if cost <= threshold and potential_cost < min_distance * 1.2:
+                    best_node = node
+                    break
+        return best_node
+
+    return next_node

@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def adaptive_centrality(node, unvisited, current):
+        if len(unvisited) == 1:
+            return 0.0
+        local_distances = [distance_matrix[node][n] for n in unvisited if n != node]
+        global_distances = [distance_matrix[current][n] for n in unvisited]
+        local_centrality = sum(local_distances) / len(local_distances)
+        global_centrality = sum(global_distances) / len(global_distances)
+        return 0.6 * local_centrality + 0.4 * global_centrality
+
+    def enhanced_exploration_bonus(node, unvisited, current):
+        if len(unvisited) <= 2:
+            return 0.0
+        avg_dist = sum(distance_matrix[current][n] for n in unvisited) / len(unvisited)
+        bonus = (distance_matrix[current][node] - avg_dist) / avg_dist if avg_dist > 0 else 0.0
+        return bonus * (len(unvisited) / 10)
+
+    candidates = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        centrality = adaptive_centrality(node, unvisited_nodes, current_node)
+        bonus = enhanced_exploration_bonus(node, unvisited_nodes, current_node)
+        weight_dist = 0.7 if len(unvisited_nodes) > 5 else 0.4
+        weight_cent = 0.3 if len(unvisited_nodes) > 5 else 0.6
+        score = weight_dist * distance + weight_cent * centrality + 0.2 * bonus
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

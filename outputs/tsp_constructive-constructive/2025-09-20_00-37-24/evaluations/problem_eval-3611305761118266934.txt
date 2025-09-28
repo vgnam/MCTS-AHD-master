@@ -1,0 +1,37 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate nearest neighbors and their distances
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    nearest_distance = distance_matrix[current_node][nearest_neighbors[0]] if nearest_neighbors else 0
+
+    # Calculate global distance ratios for each node
+    def global_ratio(node):
+        if not unvisited_nodes:
+            return 0
+        local_dist = distance_matrix[current_node][node]
+        global_dist = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        return local_dist / (global_dist + 1e-10)  # Avoid division by zero
+
+    # Assign selection probabilities based on local distance and global ratio
+    probabilities = []
+    for node in unvisited_nodes:
+        local_dist = distance_matrix[current_node][node]
+        ratio = global_ratio(node)
+        # Higher probability for nodes with better local/global balance
+        prob = math.exp(-local_dist / nearest_distance) * (1 + ratio)
+        probabilities.append(prob)
+
+    # Normalize probabilities
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+    return next_node

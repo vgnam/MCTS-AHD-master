@@ -1,0 +1,38 @@
+import random
+    next_node = None
+    num_unvisited = len(unvisited_nodes)
+    if num_unvisited == 0:
+        return destination_node
+
+    progress_factor = 1.0 - (num_unvisited / len(distance_matrix))
+    centrality_weights = [sum(distance_matrix[node]) for node in unvisited_nodes]
+    normalized_centrality = [w / max(centrality_weights) if max(centrality_weights) else 0 for w in centrality_weights]
+
+    local_exploration = []
+    for node in unvisited_nodes:
+        neighbors = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        local_exploration.append(sum(neighbors) / len(neighbors) if neighbors else 0)
+
+    weighted_scores = []
+    for i, node in enumerate(unvisited_nodes):
+        if node == destination_node:
+            weighted_scores.append(0)
+            continue
+        immediate = distance_matrix[current_node][node]
+        potential = distance_matrix[node][destination_node]
+        exploration = local_exploration[i]
+        centrality = normalized_centrality[i]
+
+        dynamic_weight = (0.5 * (1 - progress_factor) + 0.3 * progress_factor)
+        score = (dynamic_weight * immediate) + (0.3 * (1 - dynamic_weight) * potential) + (0.2 * exploration) + (0.1 * centrality)
+        weighted_scores.append(score)
+
+    if all(s == 0 for s in weighted_scores):
+        next_node = destination_node
+    else:
+        probabilities = [1 / (1 + s) for s in weighted_scores]
+        total = sum(probabilities)
+        probabilities = [p / total for p in probabilities]
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

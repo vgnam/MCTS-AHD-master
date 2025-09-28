@@ -1,0 +1,10 @@
+import random
+        import math
+        exp_scores = [math.exp(-s[1] / temperature) for s in scores]
+        total_exp = sum(exp_scores)
+        probs = [exp / total_exp for exp in exp_scores]
+        next_node = random.choices([s[0] for s in scores], weights=probs)[0]
+    else:
+        next_node = min(scores, key=lambda x: x[1])[0]
+
+    return next_node

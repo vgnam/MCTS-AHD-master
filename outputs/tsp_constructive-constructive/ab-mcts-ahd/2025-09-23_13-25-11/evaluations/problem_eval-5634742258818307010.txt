@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    visit_counts = {node: 1 for node in distance_matrix}
+    visit_counts[current_node] += 1
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+
+        max_future_dist = max(distance_matrix[node][other] for other in remaining_nodes)
+        min_future_dist = min(distance_matrix[node][other] for other in remaining_nodes)
+
+        node_potential = (current_dist + min_future_dist) / (max_future_dist - min_future_dist + 1e-6)
+        exploration_score = (len(remaining_nodes) / len(unvisited_nodes)) * (1 / (visit_counts[node] + 1))
+
+        exploitation_weight = 0.7 * (1 - exploration_score) + 0.3 * (node_potential / max(node_potential, 1e-6))
+
+        return exploitation_weight * current_dist + (1 - exploitation_weight) * (node_potential * exploration_score)
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    visit_counts[next_node] += 1
+    return next_node

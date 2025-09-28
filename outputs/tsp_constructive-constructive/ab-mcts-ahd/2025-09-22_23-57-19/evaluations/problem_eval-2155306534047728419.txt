@@ -1,0 +1,12 @@
+import random
+    selected = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    lookahead_nodes = [node for node in unvisited_nodes if node != selected]
+    if lookahead_nodes:
+        lookahead_distances = [distance_matrix[selected][node] for node in lookahead_nodes]
+        avg_lookahead = sum(lookahead_distances) / len(lookahead_distances)
+        penalty = 1.0 + (avg_lookahead / (distance_matrix[current_node][selected] + 1e-6))
+        if penalty > 1.2:
+            selected = min(lookahead_nodes, key=lambda x: distance_matrix[current_node][x])
+
+    return next_node

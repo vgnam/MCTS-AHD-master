@@ -1,0 +1,30 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate distance variance for adaptive exploration
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    distance_variance = np.var(distances) if len(distances) > 1 else 0
+
+    # Dynamic bias towards destination if it's unvisited
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        bias_factor = 1.0 - min(0.8, destination_distance / (max(distances) + 1e-6))
+        if random.random() < bias_factor:
+            return destination_node
+
+    # Adaptive selection based on distance variance
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if distance_variance > 0:  # High variance: more exploration
+        exploration_prob = min(0.3, 0.1 + distance_variance / (max(distances) + 1e-6))
+        if random.random() < exploration_prob:
+            return random.choice(nearest_neighbors)
+
+    # Default selection: weighted by inverse distance
+    weights = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in nearest_neighbors]
+    weights = [w / sum(weights) for w in weights]
+    return next_node

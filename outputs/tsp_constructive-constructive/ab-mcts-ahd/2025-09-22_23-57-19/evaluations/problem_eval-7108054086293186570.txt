@@ -1,0 +1,20 @@
+import random
+            selected = random.choices([node for node, _ in candidates], weights=probabilities, k=1)[0]
+
+            if distance_matrix[current_node][selected] < min_cost * (1.0 + temp):
+                next_node = selected
+
+    if len(unvisited_nodes) > 2:
+        local_search_candidates = []
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            local_search_candidates.append((node, cost))
+
+        if local_search_candidates:
+            best_local_cost = min(cost for _, cost in local_search_candidates)
+            if best_local_cost < min_cost * 1.2:
+                next_node = min(local_search_candidates, key=lambda x: x[1])[0]
+
+    return next_node

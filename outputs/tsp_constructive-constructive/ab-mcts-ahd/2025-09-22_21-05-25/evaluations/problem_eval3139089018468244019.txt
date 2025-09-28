@@ -1,0 +1,4 @@
+import random
+        if random.random() < 0.3:
+            return farthest_node
+    return next_node

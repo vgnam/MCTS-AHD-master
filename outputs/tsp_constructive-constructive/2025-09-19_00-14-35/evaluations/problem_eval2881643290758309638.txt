@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    current_path_length = sum(distance_matrix[current_node][n] for n in unvisited_nodes if n != current_node)
+    avg_path_length = current_path_length / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+    normalized_path_length = avg_path_length / total_nodes
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            distances_to_unvisited = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distances_to_unvisited) / (remaining_nodes - 1)
+            variance_remaining_dist = sum((d - avg_remaining_dist) ** 2 for d in distances_to_unvisited) / (remaining_nodes - 1)
+            connectivity_score = 1.0 / (1.0 + avg_remaining_dist) * (1.0 + (variance_remaining_dist ** 0.5))
+
+            flow_disruption = max(distances_to_unvisited) - immediate_dist if distances_to_unvisited else 0
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] > 0 and n != node)
+            centrality_score = node_degree / (total_nodes - 1)
+
+            dynamic_threshold = 0.7 * exploration_factor + 0.3 * (1 - normalized_path_length)
+        else:
+            connectivity_score = 0
+            flow_disruption = 0
+            centrality_score = 0
+            dynamic_threshold = 0
+
+        weight_local = 0.5 - 0.3 * exploration_factor
+        weight_connectivity = 0.2 + 0.3 * exploration_factor
+        weight_dest = 0.1 + 0.1 * (1 - exploration_factor)
+        weight_flow = -0.1 * flow_disruption if flow_disruption > 0 else 0
+        weight_centrality = 0.2 * dynamic_threshold
+
+        score = (weight_local * immediate_dist) + (weight_connectivity * connectivity_score) + (weight_dest * dest_dist) + (weight_flow * flow_disruption) + (weight_centrality * centrality_score)
+        return score
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

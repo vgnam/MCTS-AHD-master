@@ -1,0 +1,48 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    weight = 0.5 + 0.5 * (1 / (1 + remaining_nodes))  # Higher weight for destination as nodes decrease
+
+    # Dynamic adjustment based on historical performance (simplified)
+    historical_penalty = {node: 0 for node in unvisited_nodes}
+    if hasattr(select_next_node, 'last_choices'):
+        for node in select_next_node.last_choices:
+            if node in unvisited_nodes:
+                historical_penalty[node] += 0.1  # Penalize nodes chosen in previous steps
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+
+        # Score combines distance and historical penalty
+        score = (weight * (1 / (1 + distance_to_node)) +
+                 (1 - weight) * (1 / (1 + distance_to_dest)) -
+                 historical_penalty[node])
+
+        # Add probabilistic element to escape local optima
+        if next_node is not None and score > best_score * 0.9:
+            if random.random() < 0.2:  # 20% chance to explore alternatives
+                score *= 0.9
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Final check for destination proximity
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        if dest_distance < distance_matrix[current_node][next_node] * 0.7:
+            next_node = destination_node
+
+    # Track last choices for historical penalty
+    if not hasattr(select_next_node, 'last_choices'):
+        select_next_node.last_choices = []
+    if len(select_next_node.last_choices) >= 3:
+        select_next_node.last_choices.pop(0)
+    select_next_node.last_choices.append(next_node)
+
+    return next_node

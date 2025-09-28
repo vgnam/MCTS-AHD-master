@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    temperature = 1.0 / (1 + 0.2 * total_unvisited)  # Decaying temperature
+    scores = []
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Novelty bonus: favors less visited nodes (simplified for this example)
+        novelty_bonus = math.log(len(unvisited_nodes) + 1) / (1 + distance_to_current)
+
+        # Dynamic weights with temperature scaling
+        exploration_weight = 0.4 * (1 - temperature)
+        exploitation_weight = 0.6 + exploration_weight
+
+        # Combined score with temperature-adjusted randomness
+        combined_score = exploitation_weight * distance_to_current + exploration_weight * distance_to_destination + novelty_bonus
+        scores.append((node, combined_score))
+
+    # Probabilistic selection with temperature-based softmax
+    exp_scores = [math.exp(-score / temperature) for (node, score) in scores]
+    sum_exp = sum(exp_scores)
+    probs = [exp_score / sum_exp for exp_score in exp_scores]
+
+    next_node = random.choices([node for (node, _) in scores], weights=probs, k=1)[0]
+    return next_node

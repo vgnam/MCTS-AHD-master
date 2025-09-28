@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes if total_nodes > 0 else 0.0
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        detour_cost = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+
+        # Time-decay weighting for proximity and detour reduction
+        time_decay = 1 - progress_ratio
+        weight_proximity = 0.7 * time_decay + 0.3 * (1 - time_decay)
+        weight_detour = 0.3 * time_decay + 0.7 * (1 - time_decay)
+
+        # Dynamic penalty based on node revisit likelihood
+        revisit_penalty = 0.2 * (1 - (1 / (1 + 0.1 * len(unvisited_nodes))))
+
+        return (weight_proximity * immediate_cost +
+                weight_detour * detour_cost +
+                revisit_penalty if node in unvisited_nodes and node != destination_node else 0)
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

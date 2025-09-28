@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    best_score = float('inf')
+    next_node = None
+    weight_factor = 0.4 if remaining_nodes > 1 else 0.5  # Adjust weight based on remaining nodes
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        normalized_score = (weight_factor * current_distance + (1 - weight_factor) * future_distance) / (1 + 0.1 * remaining_nodes)
+
+        if normalized_score < best_score:
+            best_score = normalized_score
+            next_node = node
+        elif normalized_score == best_score:
+            # Tie-break by selecting the node with the highest centrality (sum of distances to other unvisited nodes)
+            centrality_current = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+            centrality_next = sum(distance_matrix[next_node][other] for other in unvisited_nodes if other != next_node)
+            if centrality_current > centrality_next:
+                next_node = node
+
+    return next_node

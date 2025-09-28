@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    num_unvisited = len(unvisited_nodes)
+    if num_unvisited == 0:
+        return destination_node
+
+    # Dynamic weight adjustment using sigmoid function
+    transition_point = 0.5
+    weight_proximity = 0.8 * (1 / (1 + math.exp(-10 * (num_unvisited / (num_unvisited + 1) - transition_point))))
+    weight_future = 0.2 * (1 - weight_proximity)
+
+    # Calculate future distance statistics for outlier detection
+    future_distances = []
+    for node in unvisited_nodes:
+        avg_future = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, num_unvisited - 1)
+        future_distances.append(avg_future)
+    mean_future = sum(future_distances) / num_unvisited if num_unvisited > 0 else 0
+    std_future = (sum((x - mean_future) ** 2 for x in future_distances) / num_unvisited) ** 0.5 if num_unvisited > 0 else 0
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, num_unvisited - 1)
+
+        # Penalize outliers in future distances
+        penalty = 1.0
+        if std_future > 0:
+            z_score = abs(avg_future_distance - mean_future) / std_future
+            penalty = 1.0 + 0.5 * max(0, z_score - 1)  # Increase penalty for extreme outliers
+
+        score = weight_proximity * distance_to_node + weight_future * avg_future_distance * penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

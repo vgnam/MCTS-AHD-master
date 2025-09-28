@@ -1,0 +1,32 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    temperature = 50
+    cooling_rate = 0.92
+    
+    candidate_nodes = list(unvisited_nodes)
+    scores = []
+    for node in candidate_nodes:
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            total = distance_matrix[current_node][node] + distance_matrix[node][destination_node]
+        else:
+            total = distance_matrix[current_node][node] + min(distance_matrix[node][next_node] for next_node in remaining_nodes)
+        score = math.exp(-total / temperature)
+        scores.append(score)
+    
+    scores = [score / sum(scores) for score in scores]
+    cumulative_scores = [sum(scores[:i+1]) for i in range(len(scores))]
+    rand_num = random.random()
+    for i, score in enumerate(cumulative_scores):
+        if rand_num <= score:
+            next_node = candidate_nodes[i]
+            break
+    
+    temperature *= cooling_rate
+    
+    return next_node

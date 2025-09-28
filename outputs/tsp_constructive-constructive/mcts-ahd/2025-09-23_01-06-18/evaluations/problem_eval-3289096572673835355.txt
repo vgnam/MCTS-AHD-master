@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = remaining_nodes / total_nodes
+    exploration_weight = 0.5 + 0.5 * (1 - progress_factor)
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node]
+        global_connectivity = sum(distance_matrix[node][n] for n in unvisited_nodes) / remaining_nodes
+        regret_term = max(distance_matrix[current_node][n] - distance_matrix[current_node][node] for n in unvisited_nodes) if unvisited_nodes else 0
+        memory_penalty = 1.0 if node in unvisited_nodes else 1.5
+        probabilistic_factor = (1.0 / (1.0 + local_cost)) * exploration_weight
+
+        return (local_cost * 0.4 + global_connectivity * 0.6) + (regret_term * 0.3) * memory_penalty * probabilistic_factor
+
+    candidates = unvisited_nodes.copy()
+    if destination_node in candidates:
+        candidates.add(destination_node)
+        dest_score = heuristic(destination_node)
+        if dest_score <= 1.1 * min(heuristic(node) for node in unvisited_nodes):
+            return destination_node
+
+    next_node = min(candidates, key=heuristic)
+    return next_node

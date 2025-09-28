@@ -1,0 +1,24 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (1.0 / (1.0 + math.exp(-remaining_nodes / 10.0))))
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Adaptive neighborhood size based on temperature and remaining nodes
+    neighborhood_size = max(1, min(5, int(temperature * remaining_nodes * 0.5)))
+
+    if random.random() < temperature:
+        candidates = nearest_neighbors[:min(neighborhood_size, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

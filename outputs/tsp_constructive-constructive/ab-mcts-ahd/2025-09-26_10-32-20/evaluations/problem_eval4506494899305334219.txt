@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    # Calculate entropy
+    avg_distance = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / remaining_nodes
+    max_total_distance = max(sum(row) for row in distance_matrix)
+    entropy_factor = 1 - (avg_distance / max_total_distance) if max_total_distance != 0 else 1
+
+    # Dynamic weight adjustment
+    weight_local = 0.3 + 0.7 * progress
+    weight_centrality = 0.6 * (0.5 ** progress)
+    weight_coherence = 0.2 + 0.8 * progress
+
+    # Entropy-based adjustment
+    weight_coherence = weight_coherence * (1 + 0.5 * entropy_factor)
+    weight_local = weight_local * (1 - 0.3 * entropy_factor)
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1 if remaining_nodes > 1 else 1)
+
+        # Weighted scoring with entropy influence
+        local_term = weight_local * local_distance
+        centrality_term = weight_centrality * centrality
+        coherence_term = weight_coherence * coherence
+
+        return (local_term + centrality_term) - (coherence_term * (1 + 0.5 * entropy_factor))
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

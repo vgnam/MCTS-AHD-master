@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        destination_distance = distance_matrix[current_node][destination_node]
+        bias = 1 - (destination_distance / (avg_distance + 1e-10))  # Avoid division by zero
+
+        # Probabilistic selection based on bias
+        if bias > 0.5 and random.random() < bias:  # Higher bias increases chance of selecting destination
+            return destination_node
+
+    # Calculate inverse distance probabilities for nearby nodes
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    inv_distances = [1 / (d + 1e-10) for d in distances]  # Avoid division by zero
+    total_inv_distance = sum(inv_distances)
+    probabilities = [inv_d / total_inv_distance for inv_d in inv_distances]
+
+    # Select a node based on inverse distance probability
+    selected_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

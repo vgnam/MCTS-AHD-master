@@ -1,0 +1,9 @@
+import random
+    r = random.random()
+    cumulative_prob = 0.0
+    for i in range(len(probabilities)):
+        cumulative_prob += probabilities[i]
+        if r <= cumulative_prob:
+            return candidates[i][0]
+
+    return next_node

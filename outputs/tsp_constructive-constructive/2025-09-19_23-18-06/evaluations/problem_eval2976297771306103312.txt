@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_exploration_potential(node, remaining):
+        if len(remaining) <= 1:
+            return 0.0
+        distances = [distance_matrix[node][n] for n in remaining]
+        max_dist = max(distances)
+        avg_dist = sum(distances) / len(distances)
+        return (max_dist - avg_dist) * (1.0 / (1.0 + len(remaining)))
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+        remaining = unvisited_nodes - {node}
+        exploration_pot = calculate_exploration_potential(node, remaining)
+        combined_score = immediate_dist + 0.5 * exploration_pot
+        candidates.append((node, combined_score))
+
+    probabilities = []
+    total_score = sum(score for _, score in candidates)
+    for node, score in candidates:
+        prob = (total_score - score) / total_score if total_score > 0 else 1.0 / len(candidates)
+        probabilities.append((node, prob))
+
+    next_node = None
+    r = random.uniform(0, sum(p for _, p in probabilities))
+    cumulative = 0.0
+    for node, p in probabilities:
+        cumulative += p
+        if r <= cumulative:
+            next_node = node
+            break
+    return next_node

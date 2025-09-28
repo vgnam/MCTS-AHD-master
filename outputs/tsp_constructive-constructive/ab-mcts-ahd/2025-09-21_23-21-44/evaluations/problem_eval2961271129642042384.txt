@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    next_node = None
+    best_score = float('-inf')
+    total_unvisited = len(unvisited_nodes)
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        # Dynamic weight for degree based on unvisited nodes
+        degree_weight = 0.5 + 0.5 * (total_unvisited / (total_unvisited + 1))
+        # Penalty for nodes too close to destination
+        if distance_matrix[node][destination_node] < 0.2 * max(distance_matrix[node]):
+            degree_weight *= 0.8
+        score = -distance + degree_weight * (1 / (degree + 1))
+        if score > best_score:
+            best_score = score
+            next_node = node
+    return next_node

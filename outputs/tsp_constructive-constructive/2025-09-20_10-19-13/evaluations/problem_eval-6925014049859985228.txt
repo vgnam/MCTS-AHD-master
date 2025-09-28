@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate a weighted score combining immediate distance and estimated future cost
+    def score(node):
+        immediate_cost = distance_matrix[current_node][node]
+        if unvisited_nodes - {node}:
+            future_cost = sum(distance_matrix[node][other] for other in unvisited_nodes - {node}) / len(unvisited_nodes - {node})
+        else:
+            future_cost = distance_matrix[node][destination_node]
+        return immediate_cost + 0.5 * future_cost  # Weighted combination
+
+    next_node = min(unvisited_nodes, key=lambda node: score(node))
+    return next_node

@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) > 1:
+            # Phase 1: Weighted combination of immediate distance and destination proximity
+            immediate_score = 1 / (1 + current_dist)
+            dest_score = 1 / (1 + dest_dist)
+            phase1_score = 0.6 * immediate_score + 0.4 * dest_score
+
+            # Phase 2: Consider potential to connect to nearby nodes
+            nearby_scores = []
+            for neighbor in unvisited_nodes:
+                if neighbor != node:
+                    neighbor_dist = distance_matrix[node][neighbor]
+                    nearby_scores.append(1 / (1 + neighbor_dist))
+            avg_nearby = sum(nearby_scores) / len(nearby_scores) if nearby_scores else 0
+
+            # Combine both phases with exponential weighting
+            return phase1_score * 0.7 + avg_nearby * 0.3
+        else:
+            return immediate_score + dest_score
+
+    next_node = max(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

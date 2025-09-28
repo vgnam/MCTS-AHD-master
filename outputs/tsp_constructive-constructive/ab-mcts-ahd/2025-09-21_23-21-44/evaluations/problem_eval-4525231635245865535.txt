@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    candidates = []
+    min_immediate_cost = float('inf')
+    for node in unvisited_nodes:
+        immediate_cost = distance_matrix[current_node][node]
+        if immediate_cost < min_immediate_cost:
+            min_immediate_cost = immediate_cost
+        candidates.append((node, immediate_cost))
+    candidates = [node for node, cost in candidates if cost <= min_immediate_cost * 1.1]
+    remaining_nodes = len(unvisited_nodes)
+    if remaining_nodes > 3:
+        selected_node = min(candidates, key=lambda x: distance_matrix[current_node][x])
+    else:
+        selected_node = max(candidates, key=lambda x: distance_matrix[current_node][x])
+    return next_node

@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of local and global costs based on the ratio of remaining unvisited nodes to the total number of nodes, and introduces a penalty term for nodes that are not on the direction towards the destination node.}
+                                                                                                                                                                                                                          ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of local and global costs based on the ratio of remaining unvisited nodes to the total number of nodes, and introduces a penalty term for nodes that are not on the direction towards the destination node.}
+                                                                                                                                                                                                                          ^
+SyntaxError: unmatched '}'

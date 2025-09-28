@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            min_remaining_dist = min(distance_matrix[node][n] for n in remaining_nodes)
+            max_remaining_dist = max(distance_matrix[node][n] for n in remaining_nodes)
+            heuristic = (min_remaining_dist + max_remaining_dist) / 2
+        else:
+            heuristic = 0
+
+        score = current_to_node + 0.3 * heuristic
+        weight = 1.0 / (1.0 + score)
+        candidates.append((node, weight))
+        total_weight += weight
+
+    if not candidates:
+        return destination_node
+
+    threshold = random.uniform(0, total_weight)
+    cumulative_weight = 0.0
+
+    for node, weight in candidates:
+        cumulative_weight += weight
+        if cumulative_weight >= threshold:
+            return node
+
+    return next_node

@@ -1,0 +1,12 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 7, in select_next_node
+    scores = {
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 8, in <dictcomp>
+    node: distance_matrix[current_node][node] + (0.1 + 0.2 * random.random()) * max_distance
+NameError: name 'random' is not defined

@@ -1,0 +1,28 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        # Dynamic probability to choose destination based on remaining nodes
+        remaining_nodes = len(unvisited_nodes)
+        total_nodes = len(distance_matrix)
+        progress = (total_nodes - remaining_nodes) / total_nodes
+        sigmoid_bias = 1 / (1 + math.exp(-10 * (progress - 0.5)))  # Adjusts bias over time
+
+        if random.random() < sigmoid_bias:
+            return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Temperature-based stochasticity (decreases over time)
+    temperature = len(unvisited_nodes) / len(distance_matrix)
+    if random.random() < 0.8 * temperature:  # Higher chance to pick nearest when temperature is high
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:  # More exploration when temperature is low
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

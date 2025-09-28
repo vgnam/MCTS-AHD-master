@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_distance == 0:
+            return destination_node
+        threshold = 1.0 + (1.0 - (len(unvisited_nodes) / len(distance_matrix)))
+        if remaining_distance / avg_distance <= threshold:
+            return destination_node
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+        progress_factor = 1 - remaining_ratio
+
+        weight = 1.5 - 0.5 * progress_factor
+        weight = max(0.1, min(0.9, weight))
+
+        global_potential = (to_destination + sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)) / (len(unvisited_nodes) + 1)
+        regret_term = max(distance_matrix[current_node][other] - to_current for other in unvisited_nodes) if unvisited_nodes else 0
+        regret_scale = 0.3 * (1 + progress_factor)
+
+        diversity_bonus = sum(distance_matrix[node][other] for other in unvisited_nodes) / (len(unvisited_nodes) + 1e-6)
+        diversity_weight = -0.5 * (1 + 0.2 * progress_factor)
+
+        path_memory_penalty = 0.2 * sum(distance_matrix[node][other] for other in unvisited_nodes if other in path_memory) if 'path_memory' in globals() else 0
+
+        return (to_current * weight + global_potential * (1.0 - weight) + regret_scale * regret_term + diversity_weight * diversity_bonus) - path_memory_penalty
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    if 'path_memory' in globals():
+        path_memory.append(next_node)
+    else:
+        global path_memory
+        path_memory = [next_node]
+
+    return next_node

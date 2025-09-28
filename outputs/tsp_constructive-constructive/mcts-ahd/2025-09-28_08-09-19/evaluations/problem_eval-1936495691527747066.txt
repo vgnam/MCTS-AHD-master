@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_count = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+            entropy = -sum((count / len(remaining_nodes)) * math.log(count / len(remaining_nodes)) for count in [connectivity, len(remaining_nodes) - connectivity]) if len(remaining_nodes) > 1 else 0
+
+            distance_weight = math.exp(-immediate_distance / avg_distance) if avg_distance > 0 else 0
+            connectivity_weight = 1.0 + (entropy * 0.5) * (1 - (remaining_count / total_nodes))
+
+            exploration_factor = 1.0 + 0.1 * (1 - (remaining_count / total_nodes))
+            penalty = (1 + 0.2 * (avg_distance / (immediate_distance + 1e-6))) ** exploration_factor
+
+            score = distance_weight * connectivity_weight * penalty
+        else:
+            score = math.exp(-immediate_distance)
+
+        scores.append((node, score))
+
+    if not scores:
+        return destination_node
+
+    max_score = max(score for _, score in scores)
+    probabilities = [score / max_score for _, score in scores]
+    probabilities = [p / sum(probabilities) for p in probabilities]
+
+    next_node = random.choices([node for node, _ in scores], weights=probabilities, k=1)[0]
+    return next_node

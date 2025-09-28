@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def heuristic_score(node):
+        distance = distance_matrix[current_node][node]
+        priority_weight = 1.0 - (node / max(unvisited_nodes, default=1))  # Example priority adjustment
+        return distance * (1.0 + 0.3 * priority_weight)  # Weighted score
+
+    next_node = min(unvisited_nodes, key=lambda node: heuristic_score(node))
+    return next_node

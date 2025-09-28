@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    nearest_node = unvisited_nodes[distances.index(min(distances))]
+    farthest_node = unvisited_nodes[distances.index(max(distances))]
+    threshold = 1.5 * avg_distance if len(unvisited_nodes) > 2 else float('inf')
+    penalty = 0.1 * (distance_matrix[nearest_node][destination_node] - distance_matrix[farthest_node][destination_node])
+    if distance_matrix[current_node][farthest_node] > threshold:
+        next_node = farthest_node if penalty > 0 else nearest_node
+    else:
+        next_node = nearest_node
+    return next_node

@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = unvisited_nodes - {destination_node}
+    if not remaining_nodes:
+        return destination_node
+    avg_distance = sum(distance_matrix[current_node][node] for node in remaining_nodes) / len(remaining_nodes)
+    node_density = {}
+    for node in remaining_nodes:
+        neighbors = [n for n in remaining_nodes if n != node]
+        if neighbors:
+            node_density[node] = sum(distance_matrix[node][n] for n in neighbors) / len(neighbors)
+        else:
+            node_density[node] = 0
+    avg_density = sum(node_density.values()) / len(node_density) if node_density else 0
+    for node in remaining_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        heuristic_factor = (immediate_distance + potential_distance) / avg_distance
+        density_factor = (node_density[node] / avg_density) if avg_density else 1
+        total_cost = 0.55 * immediate_distance + 0.3 * potential_distance + 0.15 * (immediate_distance * heuristic_factor + density_factor)
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+    return next_node

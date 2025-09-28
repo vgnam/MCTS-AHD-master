@@ -1,0 +1,64 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate base metrics for each node
+    nodes = list(unvisited_nodes)
+    immediate_distances = [distance_matrix[current_node][node] for node in nodes]
+    future_distances = [distance_matrix[node][destination_node] for node in nodes]
+
+    # Dynamic regret threshold and calculation
+    mean_distance = sum(immediate_distances) / len(immediate_distances)
+    std_distance = (sum((d - mean_distance)**2 for d in immediate_distances) / len(immediate_distances))**0.5
+    regret_threshold = mean_distance + 2 * std_distance
+
+    regrets = []
+    for i, node in enumerate(nodes):
+        other_distances = [d for j, d in enumerate(immediate_distances) if j != i]
+        if other_distances:
+            second_best = min(other_distances)
+            regret = max(0, immediate_distances[i] - second_best)
+            normalized_regret = regret / (regret_threshold + 1e-6)
+        else:
+            normalized_regret = 0
+        regrets.append(normalized_regret)
+
+    # Adaptive distance normalization
+    max_distance = max(immediate_distances) if immediate_distances else 1.0
+    normalized_distances = [d / max_distance for d in immediate_distances]
+
+    # Diversity calculation
+    diversities = []
+    for i, node in enumerate(nodes):
+        diversity = sum(1 for j, other_node in enumerate(nodes) if j != i and
+                       distance_matrix[node][other_node] < 1.5 * immediate_distances[i])
+        diversities.append(diversity)
+
+    # Temperature-based probabilistic selection
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 / (1 + math.exp(-(remaining_nodes - len(distance_matrix)/2)))
+
+    # Weighted scores with inverse exponential decay
+    regret_weight = 0.5 * (0.9 ** remaining_nodes)
+    distance_weight = 0.3 * (0.9 ** remaining_nodes)
+    diversity_weight = 0.2 * (1 - 0.9 ** remaining_nodes)
+
+    scores = []
+    for i in range(len(nodes)):
+        score = (regret_weight * regrets[i] +
+                 distance_weight * normalized_distances[i] +
+                 diversity_weight * (diversities[i] / (sum(diversities) + 1e-6)))
+        scores.append(score)
+
+    # Select with probability proportional to inverse exponential scores
+    exp_scores = [math.exp(-s / temperature) for s in scores]
+    total = sum(exp_scores)
+    probabilities = [s / total for s in exp_scores]
+
+    selected_index = random.choices(range(len(nodes)), weights=probabilities, k=1)[0]
+    next_node = nodes[selected_index]
+
+    return next_node

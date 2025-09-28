@@ -1,0 +1,57 @@
+importance scores, dynamic regret penalties, and probabilistic selection based on normalized heuristic values, while maintaining a balance between local and global path considerations through weighted components and connectivity-aware diversity bonuses.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_distance == 0:
+            return destination_node
+        threshold = 1.0 + (1.0 - (len(unvisited_nodes) / len(distance_matrix)))
+        if remaining_distance / avg_distance <= threshold:
+            return destination_node
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+
+        # Adaptive importance score
+        importance_score = (1 - remaining_ratio) * 0.8 + 0.2
+        weight = 2.0 * importance_score
+
+        # Dynamic regret penalty
+        sorted_distances = sorted(distance_matrix[current_node][other] for other in unvisited_nodes)
+        regret_penalty = sum(sorted_distances[:3]) / 3 if len(sorted_distances) >= 3 else sorted_distances[0]
+        regret_factor = 0.6 * (1.0 - remaining_ratio) * regret_penalty
+
+        # Connectivity-aware diversity
+        local_connectivity = sum(1 for other in unvisited_nodes if distance_matrix[node][other] < 1.5 * to_current)
+        diversity_bonus = sum(distance_matrix[node][other] for other in unvisited_nodes) / (len(unvisited_nodes) + 1e-6)
+        diversity_factor = 0.3 * (1 + 0.2 * local_connectivity / len(unvisited_nodes)) * diversity_bonus
+
+        # Global predictive component
+        predictive_factor = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / len(unvisited_nodes)
+        global_factor = (to_destination + predictive_factor) * (1.0 - weight)
+
+        # Normalized local component
+        local_factor = to_current * weight * (1 + regret_factor) * (1 + 0.1 * local_connectivity / len(unvisited_nodes))
+
+        return (local_factor + global_factor) - diversity_factor
+
+    # Probabilistic selection based on heuristic values
+    heuristic_values = {node: heuristic(node) for node in unvisited_nodes}
+    min_heuristic = min(heuristic_values.values())
+    max_heuristic = max(heuristic_values.values())
+    normalized_values = {node: (max_heuristic - val + 1e-6) / (max_heuristic - min_heuristic + 1e-6) for node, val in heuristic_values.items()}
+
+    if sum(normalized_values.values()) == 0:
+        return min(unvisited_nodes, key=lambda x: distance_matrix[current_node][x])
+
+    probabilities = [normalized_values[node] for node in unvisited_nodes]
+    probabilities = [p / sum(probabilities) for p in probabilities]
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+
+    return next_node

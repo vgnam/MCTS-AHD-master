@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    n_total = len(distance_matrix)
+    n_unvisited = len(unvisited_nodes)
+
+    # Dynamic weight based on remaining nodes (sigmoid transition)
+    progress = (n_total - n_unvisited) / n_total
+    weight_factor = 1 / (1 + math.exp(-10 * (progress - 0.5)))  # Smooth transition around 50% completion
+    global_weight = 0.6 * weight_factor
+    local_weight = 0.4 * (1 - weight_factor)
+
+    # Global centrality with dynamic penalty for recently visited nodes
+    global_centrality = lambda node: 1 / (sum(distance_matrix[node][n] for n in range(n_total)) + 1e-10)
+
+    # Local proximity with dynamic adjustment
+    local_proximity = lambda node: distance_matrix[current_node][node]
+
+    # Hybrid score with exploration penalty
+    hybrid_score = lambda node: (local_weight * local_proximity(node) +
+                                global_weight * global_centrality(node))
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

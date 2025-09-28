@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate potential cost increase for each unvisited node
+    potential_costs = []
+    for node in unvisited_nodes:
+        cost_increase = distance_matrix[current_node][node] - distance_matrix[current_node][destination_node]
+        potential_costs.append((node, cost_increase))
+
+    # Sort by cost increase (prioritize nodes that don't increase cost much)
+    potential_costs.sort(key=lambda x: x[1])
+
+    # Adaptive stochasticity: higher probability of randomness if current tour is inefficient
+    efficiency_threshold = 0.7  # Threshold for considering current tour "inefficient"
+    current_efficiency = min(1.0, len(unvisited_nodes) / len(distance_matrix))  # Simplified efficiency metric
+
+    if random.random() < (0.9 if current_efficiency > efficiency_threshold else 0.5):
+        # Exploit: pick from top 3 nodes with smallest cost increase
+        candidates = [node for node, _ in potential_costs[:min(3, len(potential_costs))]]
+        next_node = random.choice(candidates)
+    else:
+        # Explore: pick a random node with higher cost increase (but still within a reasonable range)
+        max_explore_index = min(5, len(potential_costs))
+        candidates = [node for node, _ in potential_costs[:max_explore_index]]
+        next_node = random.choice(candidates)
+
+    return next_node

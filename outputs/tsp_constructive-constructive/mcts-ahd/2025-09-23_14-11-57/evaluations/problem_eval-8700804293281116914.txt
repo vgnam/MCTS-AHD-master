@@ -1,0 +1,17 @@
+importance later
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    regret_weight = 0.5 * (remaining_nodes / total_nodes)
+    distance_weight = 0.9 - 0.4 * (remaining_nodes / total_nodes)
+    proximity_weight = 0.4 * (1 - remaining_nodes / total_nodes)
+
+    # Combine weighted scores: balance immediate distance, regret, and proximity potential
+    scores = [
+        regret_weight * regret + distance_weight * distance + proximity_weight * potential
+        for regret, distance, potential in zip(regrets, distances, proximity_potentials)
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

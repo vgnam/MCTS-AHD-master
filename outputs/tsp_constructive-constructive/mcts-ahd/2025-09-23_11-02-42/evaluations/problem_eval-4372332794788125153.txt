@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_value = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    if remaining_nodes == 0:
+        return destination_node
+
+    # Calculate MST-based heuristic for each node
+    mst_heuristic = {}
+    for node in unvisited_nodes:
+        temp_unvisited = unvisited_nodes - {node}
+        if len(temp_unvisited) == 0:
+            mst_heuristic[node] = distance_matrix[node][destination_node]
+        else:
+            # Approximate MST cost for remaining nodes
+            mst_cost = 0
+            visited = {node}
+            while len(visited) < len(unvisited_nodes):
+                min_edge = float('inf')
+                min_node = None
+                for v in visited:
+                    for u in unvisited_nodes - visited:
+                        if distance_matrix[v][u] < min_edge:
+                            min_edge = distance_matrix[v][u]
+                            min_node = u
+                if min_node is None:
+                    break
+                mst_cost += min_edge
+                visited.add(min_node)
+            mst_heuristic[node] = mst_cost + distance_matrix[node][destination_node]
+
+    # Calculate degree penalty for each node
+    degree_penalty = {}
+    for node in unvisited_nodes:
+        degree = sum(1 for i in range(len(distance_matrix)) if distance_matrix[node][i] < float('inf') and i != node)
+        degree_penalty[node] = degree
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        heuristic_cost = mst_heuristic[node]
+        dynamic_weight = 1.0 / (1.0 + remaining_nodes) ** 2  # More aggressive shift to heuristic
+        total_cost = (1 - dynamic_weight) * distance_to_node + dynamic_weight * heuristic_cost
+        total_cost += degree_penalty[node] * 0.1  # Penalize high-degree nodes
+
+        if total_cost < best_value:
+            best_value = total_cost
+            next_node = node
+
+    return next_node

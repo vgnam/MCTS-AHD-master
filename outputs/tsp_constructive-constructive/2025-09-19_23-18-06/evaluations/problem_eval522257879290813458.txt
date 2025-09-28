@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining = len(unvisited_nodes)
+    temperature = min(1.0, max(0.1, 1.0 / (remaining + 1)))
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+
+        if remaining > 1:
+            remaining_unvisited = unvisited_nodes - {node}
+            future_dists = [distance_matrix[node][n] for n in remaining_unvisited]
+            avg_future_dist = sum(future_dists) / len(future_dists)
+            max_future_dist = max(future_dists)
+            normalized_future_dist = avg_future_dist / (max_future_dist + 1e-6)
+
+            entropy = -sum((d / sum(future_dists)) * math.log(d / sum(future_dists) + 1e-6) for d in future_dists)
+            exploration_term = temperature * (entropy * (1.0 - normalized_future_dist))
+        else:
+            exploration_term = 0.0
+
+        weighted_score = (1.0 - temperature) * immediate_dist + exploration_term
+        candidates.append((node, weighted_score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

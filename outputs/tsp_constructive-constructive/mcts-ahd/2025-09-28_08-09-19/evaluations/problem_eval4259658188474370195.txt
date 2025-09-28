@@ -1,0 +1,51 @@
+importance.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    scores = []
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = avg_distance
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+            future_connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.5 * avg_distance)
+        else:
+            avg_distance = 0
+            node_centrality = 0
+            connectivity = 0
+            future_connectivity = 0
+
+        connectivity_factor = 1.0 + (connectivity / (total_nodes - 1)) * 0.3
+        future_factor = 1.0 - (future_connectivity / (total_nodes - 1)) * 0.2
+
+        immediate_weight = 0.5 + 0.2 * np.tanh(visited_ratio * 3 - 1.5)
+        connectivity_weight = 0.3 * (1.0 - visited_ratio)
+        future_weight = 0.2 * (1.0 - visited_ratio)
+
+        score = immediate_weight * (immediate_distance - avg_distance) + connectivity_weight * (immediate_distance * connectivity_factor) + future_weight * (immediate_distance * future_factor)
+
+        exploration_bonus = np.random.normal(0, 0.1 * (1 - visited_ratio))
+        score += exploration_bonus
+
+        scores.append((node, score))
+
+    if scores:
+        nodes, scores = zip(*scores)
+        probabilities = softmax(np.array(scores) * (1 + visited_ratio * 0.5))
+        next_node = np.random.choice(nodes, p=probabilities)
+
+    return next_node
+
+def softmax(x):
+    e_x = np.exp(x - np.max(x))
+    return next_node

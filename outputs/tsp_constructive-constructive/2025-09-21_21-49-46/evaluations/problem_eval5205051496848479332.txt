@@ -1,0 +1,10 @@
+import random
+        next_node = random.choices([node for node, _ in filtered_candidates], weights=probabilities, k=1)[0]
+
+    # Override with destination if it's within 1.2 times the average distance
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance < average_distance * 1.2:
+            next_node = destination_node
+
+    return next_node

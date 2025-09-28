@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_unvisited = len(unvisited_nodes)
+    weight_factor = max(0.1, 0.5 * (total_unvisited / (total_unvisited + 1)))
+    centrality_weight = 0.3 * (1 - weight_factor)
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Calculate centrality as the median distance to all other unvisited nodes
+        other_distances = [distance_matrix[node][other] for other in unvisited_nodes if other != node]
+        centrality = sorted(other_distances)[len(other_distances) // 2] if other_distances else 0
+
+        # Weighted score with adaptive centrality weighting
+        weighted_score = (1 - weight_factor - centrality_weight) * current_distance + weight_factor * future_distance + centrality_weight * centrality
+        scores.append((node, weighted_score))
+
+    # Normalize scores and apply softmax for probabilistic selection
+    max_score = max(score for _, score in scores)
+    min_score = min(score for _, score in scores)
+    normalized_scores = [(node, (score - min_score) / (max_score - min_score + 1e-9)) for node, score in scores]
+    probabilities = [score for _, score in normalized_scores]
+    probabilities = [p / sum(probabilities) for p in probabilities]
+
+    # Select node based on weighted probability
+    next_node = np.random.choice([node for node, _ in normalized_scores], p=probabilities)
+    return next_node

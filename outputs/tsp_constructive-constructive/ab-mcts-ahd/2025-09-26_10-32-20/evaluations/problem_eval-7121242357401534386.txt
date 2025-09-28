@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    # Adaptive phase transitions
+    phase = (1 / (1 + np.exp(-10 * (progress - 0.5))))  # Sigmoid transition
+
+    # Dynamic weight adjustments
+    weight_local = 0.5 * (0.9 ** progress) + 0.2 * phase
+    weight_global = 0.3 * (0.8 ** (1 - progress)) + 0.2 * (1 - phase)
+    weight_coherence = 0.2 + 0.6 * (0.7 ** abs(progress - 0.5))
+
+    # Progress momentum (bias toward nodes that align with recent traversal)
+    momentum = 0.3 if progress < 0.3 else 0.1 if progress < 0.7 else 0.5
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        global_connectivity = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+
+        # Hybrid scoring with momentum adjustment
+        base_score = (weight_local * local_distance) + (weight_global * global_connectivity) - (weight_coherence * coherence)
+        adjusted_score = base_score * (1 + momentum * (1 if node in unvisited_nodes[:max(1, int(len(unvisited_nodes)*0.2))] else 0))
+
+        return adjusted_score
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

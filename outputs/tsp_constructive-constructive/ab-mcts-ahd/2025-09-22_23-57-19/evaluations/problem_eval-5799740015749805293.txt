@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    candidates = []
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        candidates.append((node, cost))
+
+    if not candidates:
+        return unvisited_nodes.pop()
+
+    candidates.sort(key=lambda x: x[1])
+    min_cost = candidates[0][1]
+
+    centralities = {}
+    for node in unvisited_nodes:
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / (len(unvisited_nodes) - 1)
+        centralities[node] = centrality
+
+    temperature = 1.0 / (1.0 + min_cost)
+    selected_node = None
+
+    for node, cost in candidates:
+        centrality = centralities[node]
+        exploration_threshold = 1.0 + temperature * (centrality / (min_cost + 1e-6))
+        if cost <= min_cost * exploration_threshold:
+            selected_node = node
+            break
+
+    if selected_node is None:
+        selected_node = candidates[0][0]
+
+    if len(unvisited_nodes) > 2:
+        for node, cost in candidates:
+            if node == selected_node:
+                continue
+            potential_cost = cost + distance_matrix[node][selected_node]
+            if potential_cost > min_cost * (1.0 + 2.0 * temperature):
+                selected_node = node
+                break
+
+    return next_node

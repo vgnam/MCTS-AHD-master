@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Temperature-based exploration control
+    temperature = len(unvisited_nodes) / (len(distance_matrix) * 2)
+    exploration_prob = 1 / (1 + math.exp(-temperature))
+
+    # Check if destination is unvisited and prioritize it
+    if destination_node in unvisited_nodes:
+        if random.random() < 0.9:  # High priority for destination
+            return destination_node
+
+    # Get nearest neighbors and calculate penalties
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    penalties = [1 / (1 + math.exp(-distance_matrix[current_node][node])) for node in nearest_neighbors]
+
+    # Adjust selection based on exploration probability
+    if random.random() < exploration_prob:
+        # Explore: select from top 5 with penalties
+        candidates = nearest_neighbors[:min(5, len(nearest_neighbors))]
+        weights = [1 - penalties[i] for i in range(len(candidates))]
+        next_node = random.choices(candidates, weights=weights, k=1)[0]
+    else:
+        # Exploit: select from top 3 with penalties
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        weights = [1 - penalties[i] for i in range(len(candidates))]
+        next_node = random.choices(candidates, weights=weights, k=1)[0]
+
+    return next_node

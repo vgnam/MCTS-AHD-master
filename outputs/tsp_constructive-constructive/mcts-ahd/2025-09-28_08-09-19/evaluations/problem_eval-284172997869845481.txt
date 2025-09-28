@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    total_nodes = len(unvisited_nodes) + 1
+    progress_ratio = 1 - (len(unvisited_nodes) / total_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            # Global structural analysis
+            structural_weight = 0.3 + 0.7 * progress_ratio
+            local_weight = 1 - structural_weight
+
+            # Distance decay factor
+            distance_decay = min(1, 0.5 + 0.5 * (distance_to_current / max(distance_matrix[current_node])))
+
+            # Connectivity-aware neighbor analysis
+            neighbor_count = min(4, len(unvisited_nodes))
+            neighbors = sorted(unvisited_nodes, key=lambda n: distance_matrix[node][n])[:neighbor_count]
+            avg_neighbor_distance = sum(distance_matrix[node][n] for n in neighbors) / neighbor_count if neighbor_count else 0
+
+            # Progress-dependent exploration bias
+            exploration_bias = 1 + 0.5 * (1 - progress_ratio) * (avg_neighbor_distance / (distance_to_current + 1e-6))
+
+            # Composite scoring
+            local_score = distance_to_current ** 0.6 * distance_decay
+            structural_score = (distance_to_destination ** 0.8 + avg_neighbor_distance ** 0.7) * exploration_bias
+
+            score = local_weight * local_score + structural_weight * structural_score
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

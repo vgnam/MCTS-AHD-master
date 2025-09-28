@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        # Calculate node centrality potential
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+            # Novel: centrality potential considers both connectivity and potential detour utility
+            centrality_potential = (connectivity / remaining_count) * (1 + (1 - (immediate_distance / (avg_distance + 1e-6))) ** 2)
+        else:
+            avg_distance = 0
+            connectivity = 0
+            centrality_potential = 0
+
+        # Dynamic lookahead based on progress and remaining nodes
+        lookahead_depth = min(3, max(1, int(remaining_count * (1 - visited_ratio ** 2))))
+
+        # Node significance based on historical patterns
+        node_significance = 1 + (0.5 * (1 - visited_ratio) * (1 if node in unvisited_nodes and len(unvisited_nodes) > 2 else 0))
+
+        # Progress-aware penalty system
+        progress_penalty = 1 - (0.4 * (1 - visited_ratio) * (immediate_distance / (sum(distance_matrix[current_node][n] for n in unvisited_nodes) / remaining_count + 1e-6)))
+
+        # Adaptive weight distribution
+        immediate_weight = 0.5 - 0.3 * visited_ratio
+        centrality_weight = 0.3 + 0.2 * visited_ratio
+        significance_weight = 0.2 * (1 - visited_ratio)
+
+        # Combined scoring with novel components
+        score = (immediate_weight * immediate_distance +
+                 centrality_weight * (immediate_distance * centrality_potential) +
+                 significance_weight * node_significance) * progress_penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

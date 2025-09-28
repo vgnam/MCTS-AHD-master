@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_distance = float('inf')
+    total_distance = 0
+    count = 0
+    centrality_scores = {}
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+        total_distance += distance
+        count += 1
+
+        # Calculate centrality as average distance to other unvisited nodes
+        node_centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (count - 1) if count > 1 else 0
+        centrality_scores[node] = node_centrality
+
+    if destination_node in unvisited_nodes:
+        avg_distance = total_distance / count
+        destination_distance = distance_matrix[current_node][destination_node]
+        destination_centrality = centrality_scores.get(destination_node, 0)
+
+        # Dynamic threshold combining distance and centrality
+        threshold = 0.6 * avg_distance + 0.4 * destination_centrality
+
+        if destination_distance < threshold:
+            next_node = destination_node
+        else:
+            # Consider potential path gain by visiting destination next
+            potential_gain = (distance_matrix[current_node][destination_node] +
+                             distance_matrix[destination_node][next_node]) - \
+                            (distance_matrix[current_node][next_node] +
+                             distance_matrix[next_node][destination_node])
+            if potential_gain < 0 and next_node != destination_node:
+                next_node = destination_node
+
+    return next_node

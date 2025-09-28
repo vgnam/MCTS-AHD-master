@@ -1,0 +1,61 @@
+importance based on their connectivity to remaining unvisited nodes.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    exploration_weight = 1.0 - (visited_ratio ** 3)
+    exploitation_weight = visited_ratio ** 3
+
+    best_score = float('inf')
+    next_node = None
+
+    remaining_unvisited = len(unvisited_nodes)
+    destination_bias = (total_nodes - remaining_unvisited) / total_nodes
+    decay_factor = 0.8
+
+    # Calculate node centrality and anticipation factors
+    centrality_scores = []
+    anticipation_factors = []
+    for node in unvisited_nodes:
+        # Centrality: average distance to all other nodes
+        centrality = sum(distance_matrix[node][other] for other in range(total_nodes)) / total_nodes
+        centrality_scores.append(centrality)
+
+        # Anticipation: connectivity to remaining unvisited nodes
+        anticipation = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_unvisited
+        anticipation_factors.append(anticipation)
+
+    avg_centrality = sum(centrality_scores) / remaining_unvisited if remaining_unvisited > 0 else 0
+    avg_anticipation = sum(anticipation_factors) / remaining_unvisited if remaining_unvisited > 0 else 0
+
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Normalized centrality and anticipation
+        normalized_centrality = 1.0 - (centrality_scores[i] / (avg_centrality + 1e-6))
+        normalized_anticipation = 1.0 - (anticipation_factors[i] / (avg_anticipation + 1e-6))
+
+        # Dynamic penalty based on progress
+        progress_penalty = max(0, (distance_to_current - centrality_scores[i]) * (1 - visited_ratio))
+
+        if node == destination_node:
+            distance_to_current *= (1 - destination_bias)
+
+        # Reinforcement score combining multiple factors
+        combined_score = (
+            exploration_weight * distance_to_current +
+            exploitation_weight * distance_to_destination +
+            decay_factor * normalized_centrality +
+            0.5 * normalized_anticipation -
+            0.3 * progress_penalty
+        )
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

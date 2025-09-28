@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    scores = []
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if remaining_nodes:
+            avg_remaining_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+        else:
+            avg_remaining_distance = distance_matrix[node][destination_node]
+        score = current_distance + 0.3 * avg_remaining_distance
+        scores.append((node, score))
+    min_score = min(score[1] for score in scores)
+    temp = 1.0
+    probabilities = []
+    for node, score in scores:
+        prob = math.exp(-(score - min_score) / temp)
+        probabilities.append((node, prob))
+    total_prob = sum(prob for _, prob in probabilities)
+    normalized_probs = [(node, prob / total_prob) for node, prob in probabilities]
+    r = random.random()
+    cumulative_prob = 0.0
+    for node, prob in normalized_probs:
+        cumulative_prob += prob
+        if r <= cumulative_prob:
+            return node
+    return next_node

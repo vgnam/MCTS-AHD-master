@@ -1,0 +1,44 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    exploration_rate = max(0.1, 0.6 * (remaining_nodes / len(distance_matrix)))
+    exploitation_rate = 1.0 - exploration_rate
+
+    # Temperature decay based on traversal progress
+    temperature = 1.0 - 0.8 * (1.0 - remaining_nodes / len(distance_matrix))
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+
+        # Novelty factor: reward nodes with high potential future connections
+        novelty = math.log(future_potential + 1e-6) if future_potential > 0 else 0
+
+        # Dynamic learning rate based on traversal progress
+        learning_rate = 0.3 + 0.7 * (1.0 - remaining_nodes / len(distance_matrix))
+
+        # Penalize very close nodes to avoid cycles
+        penalty = 0.2 * (1.0 / (immediate_distance + 1e-6)) if immediate_distance < 0.5 else 0
+
+        # Combine immediate, future, and novelty factors with adaptive weights
+        combined_score = (exploration_rate * immediate_distance +
+                         exploitation_rate * future_potential +
+                         0.2 * novelty) * learning_rate - penalty
+
+        scores.append(combined_score)
+
+    # Boltzmann selection: higher temperature increases randomness
+    probabilities = [math.exp(-score / temperature) for score in scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    # Select node based on probability distribution
+    next_node = random.choices(list(unvisited_nodes), weights=probabilities, k=1)[0]
+
+    return next_node

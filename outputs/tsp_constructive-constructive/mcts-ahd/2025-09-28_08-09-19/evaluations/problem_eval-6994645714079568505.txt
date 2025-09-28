@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    exploration_factor = 1.0 - (remaining_count / total_nodes) * 0.5
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = avg_distance
+        else:
+            avg_distance = 0
+            node_centrality = 0
+
+        connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+        connectivity_factor = 1.0 + (connectivity / (total_nodes - 1)) * 0.5
+
+        lookahead_depth = min(5, remaining_count // 2) if remaining_count > 3 else 2
+        nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth] if remaining_nodes else []
+        avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+        immediate_weight = 0.55 - 0.2 * exploration_factor
+        lookahead_weight = 0.35 * (1.0 - exploration_factor)
+        centrality_weight = 0.7 * (1.0 - lookahead_weight)
+        penalty_weight = 0.55 * (1 - visited_ratio)
+
+        score = immediate_weight * immediate_distance + lookahead_weight * (immediate_distance - avg_distance) - centrality_weight * node_centrality
+        penalty = 1 + (0.4 * avg_neighbor_distance / (immediate_distance + 1e-6)) * (1 - visited_ratio)
+        score *= penalty * connectivity_factor
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

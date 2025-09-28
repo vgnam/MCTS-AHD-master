@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    exploration_weight = 1.0 / (1.0 + math.exp(-10 * (visited_ratio - 0.5)))
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+        distances_to_unvisited = [distance_matrix[node][n] for n in unvisited_nodes]
+        avg_distance = sum(distances_to_unvisited) / len(unvisited_nodes)
+        variance = sum((d - avg_distance) ** 2 for d in distances_to_unvisited) / len(unvisited_nodes)
+        connectivity_penalty = 0.5 * variance
+        centrality_score = 1.0 / (1.0 + avg_distance)
+        return (exploration_weight * distance_matrix[current_node][node] +
+                (1 - exploration_weight) * centrality_score +
+                connectivity_penalty)
+
+    scores = [calculate_score(node) for node in unvisited_nodes]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - s) / (max_score - min_score + 1e-6) for s in scores]
+    total = sum(normalized_scores)
+    probabilities = [s / total for s in normalized_scores]
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

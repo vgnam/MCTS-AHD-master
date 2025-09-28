@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_remaining_distance = sum(distance_matrix[node][destination_node] for node in unvisited_nodes)
+    avg_remaining_distance = total_remaining_distance / len(unvisited_nodes)
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 2:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            # 3-step lookahead: select best path over three nodes
+            best_path = []
+            best_cost = float('inf')
+            for node1 in remaining_nodes:
+                remaining_nodes1 = [n for n in remaining_nodes if n != node1]
+                for node2 in remaining_nodes1:
+                    cost = distance_matrix[node][node1] + distance_matrix[node1][node2] + distance_matrix[node2][destination_node]
+                    if cost < best_cost:
+                        best_cost = cost
+                        best_path = [node1, node2]
+            lookahead_dist = distance_matrix[node][best_path[0]] + distance_matrix[best_path[0]][best_path[1]] + distance_matrix[best_path[1]][destination_node]
+            adjusted_lookahead_dist = lookahead_dist * (avg_remaining_distance / lookahead_dist)
+        else:
+            adjusted_lookahead_dist = distance_matrix[node][destination_node]
+        return 0.7 * current_dist + 0.3 * adjusted_lookahead_dist
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

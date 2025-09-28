@@ -1,0 +1,26 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Dynamic exploration factor: increases as fewer nodes remain unvisited
+    exploration_factor = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+
+    # Calculate weights combining distance and exploration factor
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Penalize nodes visited in the last few steps (avoid immediate revisits)
+        if node in visited_nodes[-3:] if 'visited_nodes' in globals() else []:
+            distance *= 1.5
+        weight = (1 - exploration_factor) * (1 / (distance + 1e-6)) + exploration_factor * random.random()
+        weights.append(weight)
+
+    # Select node based on weights
+    next_node = random.choices(unvisited_nodes, weights=weights, k=1)[0]
+
+    return next_node

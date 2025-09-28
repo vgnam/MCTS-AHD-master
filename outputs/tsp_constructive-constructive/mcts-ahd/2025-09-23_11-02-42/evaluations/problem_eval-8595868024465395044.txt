@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Simplified lookahead: average detour impact
+        lookahead_score = 0
+        if len(unvisited_nodes) > 1:
+            detour_sum = 0
+            count = 0
+            for next_node_candidate in unvisited_nodes:
+                if next_node_candidate != node:
+                    detour = (distance_matrix[current_node][node] +
+                             distance_matrix[node][next_node_candidate] +
+                             distance_matrix[next_node_candidate][destination_node])
+                    direct = (distance_matrix[current_node][next_node_candidate] +
+                             distance_matrix[next_node_candidate][destination_node])
+                    detour_sum += (direct - detour) / (direct + 1e-6)
+                    count += 1
+            lookahead_score = detour_sum / count if count > 0 else 0
+
+        # Fixed weights
+        weight_immediate = 0.6
+        weight_lookahead = 0.4
+
+        # Score combines immediate distance and lookahead
+        score = (weight_immediate * (1 / (distance_to_node + 1e-6)) +
+                 weight_lookahead * lookahead_score)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

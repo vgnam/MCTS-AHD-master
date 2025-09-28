@@ -1,0 +1,36 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate nearest neighbors and their distances
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+
+    # Dynamic stochasticity: higher probability for closer nodes, lower for distant ones
+    if not hasattr(select_next_node, 'visit_count'):
+        select_next_node.visit_count = {node: 1 for node in unvisited_nodes}
+
+    total_weight = sum(math.exp(-d) for d in distances)
+    probabilities = [math.exp(-d) / total_weight for d in distances]
+
+    # Adjust probabilities based on visit frequency (less visited nodes get a small boost)
+    visit_counts = [select_next_node.visit_count[node] for node in nearest_neighbors]
+    min_visit = min(visit_counts)
+    adjusted_probs = [p * (1 + 0.1 * (min_visit / (v + 1))) for p, v in zip(probabilities, visit_counts)]
+
+    # Normalize probabilities
+    total_adjusted = sum(adjusted_probs)
+    normalized_probs = [p / total_adjusted for p in adjusted_probs]
+
+    # Select node based on adjusted probabilities
+    next_node = random.choices(nearest_neighbors, weights=normalized_probs, k=1)[0]
+
+    # Update visit count
+    select_next_node.visit_count[next_node] += 1
+
+    return next_node

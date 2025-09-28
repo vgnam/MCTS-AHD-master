@@ -1,0 +1,15 @@
+import random
+    next_node = random.choices(
+        population=list(probabilities.keys()),
+        weights=list(probabilities.values()),
+        k=1
+    )[0]
+
+    # Fallback to nearest neighbor if probabilities are skewed
+    if len(unvisited_nodes) > 2:
+        min_distance = min(distance_matrix[current_node][node] for node in unvisited_nodes)
+        nearest_neighbors = [node for node in unvisited_nodes if distance_matrix[current_node][node] == min_distance]
+        if nearest_neighbors and random.random() < 0.3:  # 30% chance to stick with nearest neighbor
+            next_node = nearest_neighbors[0]
+
+    return next_node

@@ -1,0 +1,8 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+    dynamic_weight = 0.6 + 0.3 * remaining_ratio
+    next_node = min(unvisited_nodes, key=lambda node: dynamic_weight * (distance_matrix[current_node][node] / sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)) + (1 - dynamic_weight) * distance_matrix[current_node][node])
+    return next_node

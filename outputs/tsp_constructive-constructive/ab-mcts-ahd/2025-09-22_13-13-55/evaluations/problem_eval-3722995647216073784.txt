@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    candidates = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        heuristic = len(unvisited_nodes) / (distance + 1e-6)  # Avoid division by zero
+        candidates.append((node, distance, heuristic))
+    if not candidates:
+        return destination_node
+    # Weighted selection: balance distance and heuristic
+    weights = [(d + 0.1 * h) for _, d, h in candidates]  # 0.1 is a tunable parameter
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+    next_node = np.random.choice([c[0] for c in candidates], p=probabilities)
+    return next_node

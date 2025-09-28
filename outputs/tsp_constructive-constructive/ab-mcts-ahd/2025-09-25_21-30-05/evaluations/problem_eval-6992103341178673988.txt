@@ -1,0 +1,31 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    best_score = float('inf')
+    candidates = []
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        dynamic_weight = 0.7 * (remaining_nodes / (remaining_nodes + 1)) + 0.3 * (distance_to_destination / max(distance_to_destination, 1))
+        penalty = 0.2 * (1 / (remaining_nodes + 1)) if node in unvisited_nodes else 0
+
+        total_score = distance_to_current + (dynamic_weight * distance_to_destination) + penalty
+        candidates.append((node, total_score))
+
+    if not candidates:
+        return None
+
+    min_score = min(score for _, score in candidates)
+    max_score = max(score for _, score in candidates)
+
+    for node, score in candidates:
+        normalized_score = (score - min_score) / (max_score - min_score + 1e-6)
+        acceptance_prob = 0.5 * (1 - normalized_score) + 0.5 * random.random()
+
+        if acceptance_prob > 0.5:
+            return node
+
+    return next_node

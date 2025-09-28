@@ -1,0 +1,39 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Adaptive exploration: probability of random selection increases as unvisited nodes decrease
+    exploration_prob = 0.1 + (0.9 * (1 - len(unvisited_nodes) / len(distance_matrix)))
+
+    if random.random() < (1 - exploration_prob):
+        # Favor nodes with better local/global balance (distance + inverse of node degree)
+        node_scores = []
+        for node in nearest_neighbors[:5]:  # Consider top 5 nearest
+            distance = distance_matrix[current_node][node]
+            # Approximate node degree as number of nodes within 1.5x the current distance
+            degree = sum(1 for n in unvisited_nodes if distance_matrix[current_node][n] <= 1.5 * distance)
+            score = distance + (1 / (degree + 1))  # Lower score is better
+            node_scores.append((node, score))
+
+        # Select node with lowest score (balance of distance and degree)
+        next_node = min(node_scores, key=lambda x: x[1])[0]
+    else:
+        # Random selection with bias towards nodes with lower degree (less connected)
+        degrees = []
+        for node in nearest_neighbors:
+            degree = sum(1 for n in unvisited_nodes if distance_matrix[node][n] <= 1.5 * distance_matrix[current_node][node])
+            degrees.append((node, degree))
+
+        # Lower degree nodes have higher probability
+        nodes, degree_values = zip(*degrees)
+        weights = [1 / (d + 1) for d in degree_values]
+        next_node = random.choices(nodes, weights=weights, k=1)[0]
+
+    return next_node

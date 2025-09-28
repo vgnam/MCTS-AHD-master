@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining / total_nodes)
+    lookahead_weight = 1 / (1 + math.exp(-5 * (progress - 0.5)))
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+
+        if remaining > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            best_lookahead = min(remaining_nodes, key=lambda n: distance_matrix[node][n] + distance_matrix[n][destination_node])
+            lookahead_dist = distance_matrix[node][best_lookahead] + distance_matrix[best_lookahead][destination_node]
+        else:
+            lookahead_dist = distance_matrix[node][destination_node]
+
+        centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+        combined_score = current_dist + lookahead_weight * lookahead_dist + 0.2 * centrality
+        return combined_score
+
+    candidates = []
+    for node in unvisited_nodes:
+        score = evaluate_node(node)
+        candidates.append((node, score))
+
+    if random.random() < 0.1 * (1 - progress):
+        return random.choice(unvisited_nodes)
+    else:
+        return next_node

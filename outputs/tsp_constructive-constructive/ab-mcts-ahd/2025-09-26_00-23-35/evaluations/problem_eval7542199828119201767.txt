@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_distance = float('inf')
+    dest_distance = distance_matrix[current_node][destination_node]
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            next_node = node
+            break
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    if next_node != destination_node and remaining_nodes > 1:
+        bias_factor = dest_distance / (min_distance + 1e-6)
+        centrality = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / remaining_nodes
+        prob_dest = min(1.0, 0.5 * bias_factor + 0.3 * (dest_distance / centrality))
+
+        if random.random() < prob_dest:
+            next_node = destination_node if destination_node in unvisited_nodes else next_node
+
+    return next_node

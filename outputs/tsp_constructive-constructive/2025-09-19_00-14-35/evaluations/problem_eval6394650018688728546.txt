@@ -1,0 +1,50 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    def softmax(x, temp):
+        e_x = [math.exp(i/temp) for i in x]
+        return [i/sum(e_x) for i in e_x]
+
+    temp = 1.0 / (1.0 + exploration_factor)
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            connectivity_score = sum(1.0 / (1.0 + distance_matrix[node][n]) for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+            flow_disruption = max(distance_matrix[node][n] for n in unvisited_nodes if n != node) - current_dist
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] > 0 and n != node)
+            centrality_score = node_degree / (total_nodes - 1)
+        else:
+            connectivity_score = 0
+            flow_disruption = 0
+            centrality_score = 0
+
+        path_diversity = 1.0 / (1.0 + sum(distance_matrix[node][n] for n in unvisited_nodes if n != node))
+
+        weight_local = 0.6 - 0.2 * exploration_factor
+        weight_connectivity = 0.2 + 0.2 * exploration_factor
+        weight_dest = 0.2 - 0.1 * exploration_factor
+        weight_flow = -0.1 * flow_disruption if flow_disruption > 0 else 0
+        weight_centrality = 0.1 + 0.1 * exploration_factor
+        weight_diversity = 0.1 * exploration_factor
+
+        score = (weight_local * current_dist) + (weight_connectivity * connectivity_score) + \
+                (weight_flow * flow_disruption) + (weight_dest * dest_dist) + \
+                (weight_centrality * centrality_score) + (weight_diversity * path_diversity)
+
+        scores.append((node, score))
+
+    probabilities = softmax([s[1] for s in scores], temp)
+    next_node = random.choices([s[0] for s in scores], weights=probabilities, k=1)[0]
+    return next_node

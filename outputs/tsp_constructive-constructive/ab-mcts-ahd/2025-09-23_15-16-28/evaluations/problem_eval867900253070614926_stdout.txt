@@ -1,0 +1,10 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:18: RuntimeWarning: divide by zero encountered in scalar divide
+  weighted_distance = (distance_to_current * distance_to_destination) / (centrality * decay_factor)
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 52, in eval_heuristic
+    raise KeyError(f"Node {next_node} is already visited.")
+KeyError: 'Node None is already visited.'

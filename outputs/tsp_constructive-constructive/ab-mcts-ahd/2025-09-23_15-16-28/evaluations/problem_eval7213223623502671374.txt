@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_heuristic = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    path_progress = (total_nodes - remaining_nodes) / total_nodes
+
+    # Calculate momentum vector (direction of current path)
+    momentum = 0
+    if remaining_nodes < total_nodes - 1:
+        last_node = current_node
+        for node in unvisited_nodes:
+            if distance_matrix[last_node][node] < distance_matrix[last_node][destination_node]:
+                momentum += 1
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Centrality calculation
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Dynamic weight adjustment with path progress
+        weight_current = max(0.3, 0.5 - 0.2 * path_progress)
+        weight_destination = max(0.3, 0.4 + 0.2 * path_progress)
+        weight_centrality = max(0.2, 0.3 - 0.1 * path_progress)
+        weight_momentum = 0.1 * momentum
+
+        # Lookahead: evaluate potential 2-step paths
+        lookahead_value = 0
+        if remaining_nodes > 1:
+            closest_neighbor = min(unvisited_nodes, key=lambda n: distance_matrix[node][n] if n != node else float('inf'))
+            lookahead_value = distance_matrix[node][closest_neighbor] + distance_matrix[closest_neighbor][destination_node]
+
+        # Combine with dynamic weights
+        heuristic = (weight_current * distance_to_current +
+                     weight_destination * distance_to_destination +
+                     weight_centrality * centrality +
+                     weight_momentum * (1 if distance_matrix[current_node][node] < distance_matrix[current_node][destination_node] else 0) +
+                     0.1 * lookahead_value)
+
+        if heuristic < min_heuristic:
+            min_heuristic = heuristic
+            next_node = node
+
+    return next_node

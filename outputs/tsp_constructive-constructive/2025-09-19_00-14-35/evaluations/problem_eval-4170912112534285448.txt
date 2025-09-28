@@ -1,0 +1,9 @@
+import random
+    total_score = sum(score for _, score in candidate_scores)
+    rand_val = random.uniform(0, total_score)
+    cumulative = 0
+    for node, score in candidate_scores:
+        cumulative += score
+        if rand_val <= cumulative:
+            return node
+    return next_node

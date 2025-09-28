@@ -1,0 +1,40 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Initialize Q-values (preference scores) if not present
+    if not hasattr(select_next_node, 'Q'):
+        select_next_node.Q = {node: 0 for node in range(len(distance_matrix))}
+
+    # Calculate exploration probability based on remaining nodes
+    exploration_prob = max(0.1, 0.5 * (len(unvisited_nodes) / len(distance_matrix)))
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if random.random() < exploration_prob:
+        # Exploration: Select a node based on a combination of distance and learned preference
+        scores = []
+        for node in unvisited_nodes:
+            distance_score = 1 / (1 + distance_matrix[current_node][node])
+            preference_score = select_next_node.Q[node]
+            scores.append(distance_score + 0.3 * preference_score)  # Weighted combination
+
+        # Select the node with the highest combined score
+        next_node = unvisited_nodes[np.argmax(scores)]
+
+        # Update Q-value (reinforcement learning step)
+        select_next_node.Q[next_node] += 0.1
+    else:
+        # Exploitation: Prefer the nearest node with some stochasticity
+        if random.random() < 0.7:  # 70% chance to pick the absolute nearest
+            next_node = nearest_neighbors[0]
+        else:  # 30% chance to pick from top 3 nearest
+            candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+            next_node = random.choice(candidates)
+
+    return next_node

@@ -1,0 +1,55 @@
+import math
+    import random
+
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes) - 1
+
+    # Temperature for probabilistic selection (decreases over iterations)
+    temperature = max(0.1, 1.0 - (1 - remaining_nodes / total_nodes))
+
+    # Recency penalty factor (penalize recently visited nodes)
+    recency_penalty = 1.0 + (1 - remaining_nodes / total_nodes) * 0.5
+
+    costs = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Centrality measure: average distance to all other nodes
+        centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+
+        # Dynamic weight adjustment
+        exploration_weight = 0.6 * (1 - (remaining_nodes / total_nodes) ** 2)
+        exploitation_weight = 0.4 * (remaining_nodes / total_nodes)
+
+        # Weighted cost with recency penalty
+        weighted_cost = (1 - exploration_weight - exploitation_weight) * immediate_distance + \
+                        exploration_weight * potential_distance + \
+                        exploitation_weight * centrality
+        weighted_cost *= recency_penalty
+
+        costs.append((node, weighted_cost))
+
+    if not costs:
+        return destination_node
+
+    # Softmax probabilistic selection
+    costs = [(node, cost) for node, cost in costs if cost > 0]
+    if not costs:
+        return random.choice(unvisited_nodes)
+
+    costs = [(node, math.exp(-cost / temperature)) for node, cost in costs]
+    total = sum(weight for _, weight in costs)
+    if total == 0:
+        return random.choice(unvisited_nodes)
+
+    probabilities = [weight / total for _, weight in costs]
+    next_node = random.choices([node for node, _ in costs], weights=probabilities, k=1)[0]
+
+    return next_node

@@ -1,0 +1,28 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate relative distances and probabilities
+    distances = [(node, distance_matrix[current_node][node]) for node in unvisited_nodes]
+    min_dist = min(dist for (_, dist) in distances)
+    max_dist = max(dist for (_, dist) in distances)
+
+    # Normalize distances to [0,1] range
+    normalized_distances = [(node, (max_dist - dist) / (max_dist - min_dist + 1e-9)) for node, dist in distances]
+
+    # Create a weighted probability distribution
+    total_weight = sum(weight for (_, weight) in normalized_distances)
+    probabilities = [(node, weight / total_weight) for node, weight in normalized_distances]
+
+    # Introduce stochasticity: sometimes pick based on probability, sometimes pick a random node
+    if random.random() < 0.8:  # 80% chance to pick based on probability
+        next_node = random.choices([node for node, _ in probabilities], weights=[weight for _, weight in probabilities], k=1)[0]
+    else:  # 20% chance to pick a random node
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

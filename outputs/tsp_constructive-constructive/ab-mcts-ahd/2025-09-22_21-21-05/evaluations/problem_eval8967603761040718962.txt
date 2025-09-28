@@ -1,0 +1,21 @@
+default, but if the destination node is unvisited and its distance is within 1.2 times the nearest alternative, it selects the destination instead, balancing exploration with destination focus.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    max_distance = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance > max_distance:
+            max_distance = distance
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance < max_distance * 1.2:
+            next_node = destination_node
+
+    return next_node

@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    progress = 1 - (remaining_count / total_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+            path_entropy = -sum((d/avg_distance) * math.log(d/avg_distance + 1e-6) for d in [distance_matrix[node][n] for n in remaining_nodes])
+        else:
+            avg_distance = 0
+            connectivity = 0
+            path_entropy = 0
+
+        lookahead_depth = min(5, max(1, int(math.log2(remaining_count + 1))))
+        nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth] if remaining_nodes else []
+        neighbor_centrality = sum(1 for n in nearest_neighbors if distance_matrix[node][n] < avg_distance * 0.8) / (lookahead_depth + 1e-6)
+
+        distance_weight = 0.35 * (1 - progress ** 1.5)
+        entropy_weight = 0.3 * (1 - math.exp(-progress * 2))
+        centrality_weight = 0.25 * (progress ** 2)
+        penalty_weight = 0.1 * (1 - math.log(remaining_count + 1) / math.log(total_nodes + 1))
+
+        score = distance_weight * (immediate_distance - avg_distance) + entropy_weight * path_entropy
+        score += centrality_weight * (1 - neighbor_centrality)
+        score *= (1 + penalty_weight * (1 - progress ** 2))
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

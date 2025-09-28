@@ -1,0 +1,52 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    k = min(3, len(unvisited_nodes))  # Lookahead window size
+    centralities = []
+    regrets = []
+    anticipation_scores = []
+
+    for node in unvisited_nodes:
+        # Calculate node centrality (average distance to other nodes)
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes)-1)
+        centralities.append(centrality)
+
+        # Calculate regret with dynamic multiplier
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) * (1 + centrality/max(distance_matrix[current_node][node], 1))
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Future path anticipation: estimate cost of next k nodes
+        anticipation = 0
+        current = node
+        for _ in range(k):
+            next_options = [n for n in unvisited_nodes if n != current]
+            if not next_options:
+                break
+            next_node = min(next_options, key=lambda n: distance_matrix[current][n])
+            anticipation += distance_matrix[current][next_node]
+            current = next_node
+        anticipation_scores.append(anticipation)
+
+    # Adaptive weights based on tour progress and node density
+    progress = (len(distance_matrix) - len(unvisited_nodes)) / len(distance_matrix)
+    density = len(unvisited_nodes) / len(distance_matrix)
+    regret_weight = 0.5 * (1 - progress) + 0.3 * density
+    centrality_weight = 0.3 * (1 - progress) + 0.2 * density
+    anticipation_weight = 0.2 * progress + 0.5 * density
+
+    # Combine scores
+    scores = [
+        regret_weight * regret + centrality_weight * centrality + anticipation_weight * anticipation
+        for regret, centrality, anticipation in zip(regrets, centralities, anticipation_scores)
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

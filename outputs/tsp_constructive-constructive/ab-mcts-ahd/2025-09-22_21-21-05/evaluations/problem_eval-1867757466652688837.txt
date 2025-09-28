@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    remaining_nodes = len(unvisited_nodes)
+    weight_factor = 0.5
+    temperature = 1.0 / (1.0 + remaining_nodes)  # Decreases as nodes are visited
+
+    avg_distances = []
+    for node in unvisited_nodes:
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_nodes
+        avg_distances.append(avg_dist)
+
+    avg_avg_distance = sum(avg_distances) / remaining_nodes if remaining_nodes > 0 else 0
+
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        centrality_factor = 1.0 - (avg_distances[i] / (avg_avg_distance + 1e-6))
+        normalized_centrality = 1.0 / (1.0 + math.exp(-centrality_factor))  # Sigmoid normalization
+        distance_penalty = (distance_to_current + distance_to_destination) * math.exp(remaining_nodes / len(distance_matrix))
+        combined_score = distance_penalty + weight_factor * normalized_centrality
+        scores.append(combined_score)
+
+    # Convert scores to probabilities using softmax with temperature
+    exp_scores = [math.exp(-score / temperature) for score in scores]
+    sum_exp_scores = sum(exp_scores)
+    probabilities = [exp_score / sum_exp_scores for exp_score in exp_scores]
+
+    # Select next node probabilistically
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(unvisited_nodes) + 1
+
+    # Calculate current path length
+    current_path_length = 0
+    if total_nodes > 1:
+        current_path_length = sum(distance_matrix[n1][n2] for n1, n2 in zip([current_node] + list(unvisited_nodes)[:remaining_nodes-1], list(unvisited_nodes)[:remaining_nodes-1] + [destination_node]))
+
+    for node in unvisited_nodes:
+        # Immediate distance component
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Long-term potential assessment
+        potential_distance = distance_matrix[node][destination_node]
+        neighborhood_diversity = sum(abs(distance_matrix[node][other] - distance_matrix[current_node][other]) for other in unvisited_nodes if other != node) / remaining_nodes
+
+        # Path momentum factor
+        path_momentum = (current_path_length + immediate_distance) / (total_nodes * max(distance_matrix[n][m] for n in unvisited_nodes for m in unvisited_nodes if n != m))
+
+        # Adaptive weights
+        w_immediate = 0.7 * (remaining_nodes / total_nodes)
+        w_potential = 0.3 * (1 - remaining_nodes / total_nodes)
+        w_diversity = 0.5 * (1 - path_momentum)
+        w_momentum = 0.2 * path_momentum
+
+        # Composite score
+        score = (w_immediate * immediate_distance +
+                w_potential * potential_distance +
+                w_diversity * neighborhood_diversity -
+                w_momentum * path_momentum)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

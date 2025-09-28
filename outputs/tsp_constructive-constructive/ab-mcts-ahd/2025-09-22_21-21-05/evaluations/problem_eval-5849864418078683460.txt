@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_count = len(unvisited_nodes)
+    exploration_factor = (remaining_count / total_nodes) ** 1.5
+    temperature = 1.0 - (remaining_count / total_nodes)
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        local_density = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 0.25 * (sum(distance_matrix[node]) / total_nodes))
+        global_contribution = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_count + 1)
+
+        adaptive_weight = 0.5 + 0.5 * (1 - temperature)
+        score = (distance_to_destination - exploration_factor * global_contribution) / (1 + adaptive_weight * local_density)
+        scores.append((node, score))
+
+    if scores:
+        max_score = max(score for _, score in scores)
+        min_score = min(score for _, score in scores)
+        normalized_scores = [(node, (score - min_score) / (max_score - min_score + 1e-6)) for node, score in scores]
+
+        if temperature > 0.7:
+            weights = [s ** 2 for _, s in normalized_scores]
+        else:
+            weights = [s for _, s in normalized_scores]
+
+        total_weight = sum(weights)
+        if total_weight > 0:
+            weights = [w / total_weight for w in weights]
+            next_node = random.choices([node for node, _ in normalized_scores], weights=weights)[0]
+        else:
+            next_node = max(normalized_scores, key=lambda x: x[1])[0]
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

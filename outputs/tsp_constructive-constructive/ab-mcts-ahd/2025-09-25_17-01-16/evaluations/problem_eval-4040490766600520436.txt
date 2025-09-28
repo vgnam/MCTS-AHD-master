@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    exploration_factor = 0.3 * (1 / remaining_nodes)  # Decays as nodes are visited
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        # Calculate maximum future distance to ensure no long detours
+        max_future_distance = max(distance_matrix[node][n] for n in unvisited_nodes if n != node) if unvisited_nodes else 0
+
+        # Penalty for nodes that are already in the path (to avoid cycles)
+        penalty = 2.0 if node == destination_node else 0.0
+
+        # Combine immediate distance with probabilistic exploration of future potential
+        weighted_score = (1 - exploration_factor) * distance_to_current + exploration_factor * max_future_distance + penalty
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+
+    return next_node

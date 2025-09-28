@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    max_score = -float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+        if distance == 0:
+            continue
+
+        # Calculate hub factor: number of unvisited nodes connected to 'node'
+        hub_factor = sum(1 for n in unvisited_nodes if distance_matrix[node][n] > 0)
+
+        # Dynamic weighting: balance proximity to destination and hub potential
+        weight = 0.7  # Higher weight for destination proximity
+        score = (weight * (destination_distance / distance)) + ((1 - weight) * hub_factor)
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+    return next_node

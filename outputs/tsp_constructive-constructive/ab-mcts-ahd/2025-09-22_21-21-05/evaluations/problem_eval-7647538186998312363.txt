@@ -1,0 +1,46 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic temperature with non-linear cooling
+    temperature = max(0.1, 1.0 - (1.0 - num_unvisited / total_nodes) ** 3)
+
+    # Adaptive exploration weight based on problem progress
+    exploration_weight = 0.3 + 0.7 * (1.0 - math.exp(-num_unvisited / total_nodes))
+
+    # Novel: Node centrality metric
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][n] for n in unvisited_nodes) / num_unvisited
+
+    scores = []
+    for node in unvisited_nodes:
+        # Local score with distance and centrality
+        local_score = distance_matrix[current_node][node] * (1.0 + 0.3 * centrality[node])
+
+        # Global score with destination proximity and centrality
+        global_score = distance_matrix[node][destination_node] + exploration_weight * centrality[node]
+
+        # Combined score with temperature-driven randomness
+        combined_score = (0.5 * local_score + 0.5 * global_score) * (1.0 + temperature * random.uniform(-0.2, 0.2))
+
+        # Novel: Add small penalty for nodes with high centrality if temperature is low
+        if temperature < 0.3:
+            combined_score *= (1.0 + 0.1 * centrality[node])
+
+        scores.append((node, combined_score))
+
+    # Selection with adaptive probability
+    selection_threshold = 0.7 * temperature
+    if random.random() < selection_threshold:
+        next_node, _ = random.choice(scores)
+    else:
+        next_node, _ = min(scores, key=lambda x: x[1])
+
+    return next_node

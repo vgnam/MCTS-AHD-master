@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_product = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        product = distance_to_node * distance_to_destination
+
+        if product < best_product:
+            best_product = product
+            next_node = node
+
+    return next_node

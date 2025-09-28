@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = remaining_nodes / (remaining_nodes + 1)
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        combined_score = (0.6 * distance_to_node) + (0.4 * distance_to_destination)
+        scores.append((node, combined_score))
+
+    if destination_node in unvisited_nodes:
+        dest_score = (0.6 * distance_matrix[current_node][destination_node]) + (0.4 * 0)
+        scores.append((destination_node, dest_score))
+
+    probabilities = [math.exp(-score / temperature) for _, score in scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    selected_index = numpy.random.choice(len(scores), p=probabilities)
+    next_node = scores[selected_index][0]
+
+    return next_node

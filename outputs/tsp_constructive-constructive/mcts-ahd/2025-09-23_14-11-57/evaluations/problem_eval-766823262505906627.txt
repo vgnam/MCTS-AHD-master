@@ -1,0 +1,42 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1.0 - remaining_nodes / total_nodes
+
+    # Dynamic neighborhood density factor
+    local_density = 1.0 / (1.0 + sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes))
+
+    # Adaptive weights with density influence
+    short_term_weight = 0.5 - 0.3 * progress + 0.2 * local_density
+    long_term_weight = 0.3 + 0.4 * progress - 0.1 * local_density
+    revisit_weight = 0.2 + 0.3 * progress + 0.2 * local_density
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Average future distances to remaining nodes
+        if remaining_nodes > 1:
+            remaining = [n for n in unvisited_nodes if n != node]
+            avg_future_dist = sum(distance_matrix[node][n] for n in remaining) / len(remaining)
+            revisit_penalty = revisit_weight * distance_matrix[current_node][node]
+        else:
+            avg_future_dist = 0
+            revisit_penalty = 0
+
+        # Combined score with dynamic components
+        score = (short_term_weight * immediate_distance +
+                 long_term_weight * avg_future_dist +
+                 revisit_penalty)
+        scores.append(score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

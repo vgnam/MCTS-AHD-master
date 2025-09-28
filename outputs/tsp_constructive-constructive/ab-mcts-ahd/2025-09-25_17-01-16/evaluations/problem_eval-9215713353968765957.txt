@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        hub_score = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+
+        if visited_ratio < 0.5:
+            weight_proximity = 0.6
+            weight_progress = 0.3
+            weight_hub = 0.1
+        else:
+            weight_proximity = 0.3
+            weight_progress = 0.6
+            weight_hub = 0.1
+
+        visibility = 1 / (1 + distance_to_current)
+        total_score = (weight_proximity * distance_to_current +
+                       weight_progress * distance_to_destination +
+                       weight_hub * hub_score) * (1 - visibility)
+
+        if total_score < min_total_score and distance_to_current > 0.1 * sum(distance_matrix[current_node][n] for n in unvisited_nodes):
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    def cluster_nodes(nodes, threshold=1.5):
+        clusters = []
+        nodes = list(nodes)
+        while nodes:
+            cluster = [nodes.pop(0)]
+            for node in list(nodes):
+                if any(distance_matrix[cluster[0]][node] <= threshold * distance_matrix[cluster[0]][c] for c in cluster):
+                    cluster.append(node)
+                    nodes.remove(node)
+            clusters.append(cluster)
+        return clusters
+
+    clusters = cluster_nodes(unvisited_nodes)
+    if not clusters:
+        return destination_node
+
+    cluster_weights = []
+    for cluster in clusters:
+        density = len(cluster)
+        proximity = sum(distance_matrix[current_node][node] for node in cluster) / len(cluster)
+        weight = density / (proximity + 1e-6)
+        cluster_weights.append(weight)
+
+    selected_cluster_idx = cluster_weights.index(max(cluster_weights))
+    selected_cluster = clusters[selected_cluster_idx]
+
+    def hybrid_cost(node):
+        immediate = distance_matrix[current_node][node]
+        future = distance_matrix[node][destination_node]
+        cluster_density = len(selected_cluster)
+        weight_immediate = 0.5 + 0.4 * (cluster_density / len(unvisited_nodes))
+        return immediate * weight_immediate + future * (1 - weight_immediate)
+
+    next_node = min(selected_cluster, key=hybrid_cost)
+    return next_node

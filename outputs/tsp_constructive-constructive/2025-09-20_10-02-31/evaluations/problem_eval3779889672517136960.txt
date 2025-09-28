@@ -1,0 +1,28 @@
+defined as the difference between the current distance and the best possible distance to remaining nodes, balancing immediate and long-term efficiency with a dynamic weight factor.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_regret(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+        best_remaining_dist = min(distance_matrix[node][n] for n in remaining_nodes)
+        return current_dist - best_remaining_dist
+
+    def calculate_weight():
+        remaining = len(unvisited_nodes)
+        return 0.5 + 0.5 * (remaining / (remaining + 1))  # Dynamic weight based on remaining nodes
+
+    if len(unvisited_nodes) % 2 == 1:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    else:
+        weight = calculate_weight()
+        next_node = min(
+            unvisited_nodes,
+            key=lambda node: weight * distance_matrix[current_node][node] + (1 - weight) * calculate_regret(node)
+        )
+
+    return next_node

@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    min_weighted_score = float('inf')
+    progress = 1 - len(unvisited_nodes) / (len(unvisited_nodes) + 1)  # Normalized progress (0 to 1)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            remaining_distances = [distance_matrix[node][n] for n in remaining_nodes]
+            avg_remaining_dist = sum(remaining_distances) / len(remaining_distances)
+            variance_remaining = sum((d - avg_remaining_dist) ** 2 for d in remaining_distances) / len(remaining_distances)
+            penalty = (sum(distance_matrix[current_node][n] for n in remaining_nodes) / len(remaining_nodes)) * (1 + variance_remaining) if progress > 0.5 else 0
+        else:
+            avg_remaining_dist = 0
+            variance_remaining = 0
+            penalty = 0
+
+        dynamic_weight = 0.7 - 0.5 * progress  # More aggressive reduction in future weight
+        weighted_score = immediate_distance + dynamic_weight * future_potential + penalty
+
+        if weighted_score < min_weighted_score:
+            min_weighted_score = weighted_score
+            best_node = node
+
+    return next_node

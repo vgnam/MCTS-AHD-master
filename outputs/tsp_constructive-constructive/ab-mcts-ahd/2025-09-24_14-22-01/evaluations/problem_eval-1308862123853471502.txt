@@ -1,0 +1,53 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = set(unvisited_nodes) | {current_node, destination_node}
+    num_remaining = len(remaining_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic weights using sigmoid function for smoother transitions
+    alpha = 1 / (1 + math.exp(-(num_remaining - total_nodes / 2) / (total_nodes / 4)))
+    beta = 1 - alpha
+    gamma = 0.3  # Fixed centrality weight
+
+    # Track revisitation likelihood (novelty factor)
+    revisitation_penalty = {}
+    for node in unvisited_nodes:
+        revisitation_penalty[node] = sum(distance_matrix[node][n] for n in remaining_nodes) / num_remaining
+
+    # Normalize revisitation penalties
+    max_penalty = max(revisitation_penalty.values()) if revisitation_penalty else 1
+    min_penalty = min(revisitation_penalty.values()) if revisitation_penalty else 0
+    normalized_penalties = {node: (val - min_penalty) / (max_penalty - min_penalty) if max_penalty != min_penalty else 0.5
+                           for node, val in revisitation_penalty.items()}
+
+    # Calculate costs with novelty factor
+    costs = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node][n] for n in remaining_nodes) / num_remaining
+
+        # Novelty factor: penalize high revisitation likelihood
+        novelty_factor = 0.2 * normalized_penalties[node]
+
+        weighted_cost = (alpha * immediate_distance +
+                         beta * potential_distance +
+                         gamma * centrality -
+                         novelty_factor)  # Subtract to penalize
+
+        costs.append((weighted_cost, node))
+
+    # Probabilistic selection based on cost
+    if costs:
+        costs.sort()
+        min_cost = costs[0][0]
+        max_cost = costs[-1][0]
+        normalized_costs = [(max_cost - cost + 1e-6) / (max_cost - min_cost + 1e-6) for cost, _ in costs]
+        total_weight = sum(normalized_costs)
+        probabilities = [cost / total_weight for cost in normalized_costs]
+        next_node = random.choices([node for _, node in costs], weights=probabilities, k=1)[0]
+        return next_node
+    else:
+        return next_node

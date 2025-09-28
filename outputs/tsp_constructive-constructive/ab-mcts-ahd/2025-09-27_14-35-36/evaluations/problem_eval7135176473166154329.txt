@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1  # +1 for the current node
+    unvisited_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0.0
+    dynamic_penalty = 0.2 * (1 - unvisited_ratio)  # Higher penalty when fewer nodes remain
+
+    def weighted_distance(node):
+        base_distance = distance_matrix[current_node][node]
+        revisit_factor = 1.0 - dynamic_penalty if node in unvisited_nodes else 1.0 + dynamic_penalty
+        return base_distance * revisit_factor
+
+    next_node = min(unvisited_nodes, key=lambda node: weighted_distance(node))
+    return next_node

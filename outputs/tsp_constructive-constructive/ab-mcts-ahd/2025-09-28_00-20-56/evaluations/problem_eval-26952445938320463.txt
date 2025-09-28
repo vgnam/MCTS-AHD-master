@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 2:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            best_lookahead = None
+            min_lookahead = float('inf')
+            for n1 in remaining_nodes:
+                for n2 in [n for n in remaining_nodes if n != n1]:
+                    total = distance_matrix[node][n1] + distance_matrix[n1][n2] + distance_matrix[n2][destination_node]
+                    if total < min_lookahead:
+                        min_lookahead = total
+                        best_lookahead = total
+            lookahead_dist = best_lookahead if best_lookahead is not None else distance_matrix[node][destination_node]
+        else:
+            lookahead_dist = distance_matrix[node][destination_node]
+
+        # Dynamic penalty for nodes already in the path
+        penalty = 0.1 * len(unvisited_nodes) / len(distance_matrix) if node in unvisited_nodes else 0
+        return current_dist + 0.3 * lookahead_dist + penalty
+
+    # Temperature-based probabilistic selection
+    temperatures = [0.1, 0.3, 0.5]
+    temp = random.choice(temperatures)
+    scores = [evaluate_node(node) for node in unvisited_nodes]
+    min_score = min(scores)
+    probabilities = [math.exp((min_score - score) / temp) for score in scores]
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

@@ -1,0 +1,56 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    connectivity_scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_connectivity = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+
+        # Calculate regret with dynamic scaling
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            base_regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+            remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+            regret_scale = 1 / (1 + math.exp(-10 * (remaining_ratio - 0.5)))  # Sigmoid scaling
+            regret = base_regret * regret_scale
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Calculate connectivity score with normalized future distances
+        future_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        avg_future_distance = sum(future_distances) / len(future_distances) if future_distances else 0
+        connectivity_score = (immediate_distance + future_connectivity) / (1 + avg_future_distance)
+        connectivity_scores.append(connectivity_score)
+
+    # Adaptive weights
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    distance_weight = max(0.3, 0.9 * (remaining_nodes / total_nodes))
+    connectivity_weight = 1.0 - distance_weight
+    regret_weight = max(0.1, 0.2 * (remaining_ratio))
+
+    # Combine weighted scores
+    scores = [
+        distance_weight * distance + connectivity_weight * connectivity + regret_weight * regret
+        for distance, connectivity, regret in zip(distances, connectivity_scores, regrets)
+    ]
+
+    # Probabilistic selection based on scores
+    min_score = min(scores)
+    if min_score == min(scores):
+        selected_index = scores.index(min_score)
+    else:
+        # Normalize scores to probabilities
+        exp_scores = [math.exp(-score) for score in scores]
+        total_exp = sum(exp_scores)
+        probabilities = [exp / total_exp for exp in exp_scores]
+        selected_index = np.random.choice(len(unvisited_nodes), p=probabilities)
+
+    next_node = list(unvisited_nodes)[selected_index]
+    return next_node

@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (remaining_nodes / (remaining_nodes + 1)))  # Decaying exploration factor
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Calculate path scores
+    scores = []
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+        path_score = current_to_node + 0.8 * node_to_dest  # Weighted path cost
+        scores.append((node, path_score))
+
+    # Apply softmax with temperature for probabilistic selection
+    exp_scores = [math.exp(-score / temperature) for (_, score) in scores]
+    sum_exp = sum(exp_scores)
+    probs = [exp / sum_exp for exp in exp_scores]
+
+    # Select node based on probabilities
+    next_node = random.choices([node for (node, _) in scores], weights=probs, k=1)[0]
+    return next_node

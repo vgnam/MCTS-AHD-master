@@ -1,0 +1,5 @@
+import random
+        if random.random() < prob_dest and destination_node in unvisited_nodes:
+            next_node = destination_node
+
+    return next_node

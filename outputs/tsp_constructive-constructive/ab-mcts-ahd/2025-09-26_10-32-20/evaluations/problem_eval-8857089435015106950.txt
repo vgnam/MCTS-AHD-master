@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining = len(unvisited_nodes)
+    weight_factor = 1 / (1 + math.exp(-(remaining - 5)))  # Sigmoid-based dynamic weight
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        if not unvisited_nodes:
+            return local_distance
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        penalty = 1 if node == current_node else 0  # Avoid revisiting
+        return local_distance + weight_factor * avg_distance + penalty
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

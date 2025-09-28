@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_length = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - remaining_length / len(distance_matrix))  # Decreases as path progresses
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Local optimization term
+        local_term = distance_to_current
+
+        # Global optimization term (centrality)
+        centrality = sum(distance_matrix[node][n] for n in range(len(distance_matrix))) / (len(distance_matrix) - 1)
+
+        # Detour penalty (avoid nodes that create long paths)
+        detour_penalty = (distance_to_current + distance_to_destination - distance_matrix[current_node][destination_node]) / 2
+
+        # Combined score with temperature-based weighting
+        score = (1 - temperature) * local_term + temperature * centrality + 0.5 * detour_penalty
+        scores.append(score)
+
+    # Probabilistic selection based on scores
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - s + 1e-6) / (max_score - min_score + 1e-6) for s in scores]  # Invert and normalize
+
+    total = sum(normalized_scores)
+    probabilities = [s / total for s in normalized_scores]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

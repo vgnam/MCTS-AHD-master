@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    max_distance = max(distances)
+
+    if len(unvisited_nodes) % 2 == 1:
+        threshold = avg_distance * 0.8
+        candidates = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= threshold]
+        if candidates:
+            next_node = min(candidates, key=lambda x: distance_matrix[current_node][x])
+        else:
+            next_node = min(unvisited_nodes, key=lambda x: distance_matrix[current_node][x])
+    else:
+        threshold = max_distance * 0.9
+        candidates = [node for node in unvisited_nodes if distance_matrix[current_node][node] >= threshold]
+        if candidates:
+            next_node = max(candidates, key=lambda x: distance_matrix[current_node][x])
+        else:
+            next_node = max(unvisited_nodes, key=lambda x: distance_matrix[current_node][x])
+
+    return next_node

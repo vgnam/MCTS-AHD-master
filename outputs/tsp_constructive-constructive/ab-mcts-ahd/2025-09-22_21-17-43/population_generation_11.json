@@ -1,0 +1,65 @@
+[
+     {
+          "algorithm": "The algorithm selects the next node to visit by choosing the unvisited node closest to the current node, prioritizing unvisited nodes over the destination node until all nodes are visited, then returning to the destination. The `select_next_node` function prioritizes `unvisited_nodes` over the `destination_node` by checking if `unvisited_nodes` is empty before returning the destination. It uses the `distance_matrix` to find the closest unvisited node, ensuring efficiency and correctness in TSP path construction.",
+          "thought": "The algorithm selects the next node to visit by choosing the unvisited node closest to the current node, prioritizing unvisited nodes to ensure all nodes are visited before returning to the destination node.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])\n    return next_node",
+          "objective": 7.00437,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by balancing local distance, destination proximity, and deviation from the average distance to unvisited nodes. It prioritizes shorter local distances (weighted 1.0) and penalizes nodes farther from the destination (weighted 0.3), while dynamically adjusting for how much a node's distance deviates from the average (weighted 0.2). The structure ensures exploration while favoring nodes that are both locally close and strategically positioned relative to the destination.",
+          "thought": "The new algorithm modifies the selection criterion by incorporating a dynamic penalty term based on the average distance from the current node to all unvisited nodes, combined with a distance-to-destination penalty, to balance exploration and local optimality more effectively.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    def adjusted_score(node):\n        local_distance = distance_matrix[current_node][node]\n        penalty = 0.3 * distance_matrix[node][destination_node]\n        average_distance = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes)\n        dynamic_penalty = 0.2 * (distance_matrix[current_node][node] - average_distance)\n        return local_distance + penalty + dynamic_penalty\n    next_node = min(unvisited_nodes, key=lambda node: adjusted_score(node))\n    return next_node",
+          "objective": 7.33284,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm combines local and global considerations: it prioritizes immediate proximity (local distance) while also accounting for the average distance to remaining unvisited nodes (global factor), with a 20% weight given to the global factor. The `combined_score` function balances these two factors, and the next node is selected based on the minimum score. The global factor is only computed if there are multiple unvisited nodes, ensuring efficiency.",
+          "thought": "The new algorithm combines the local distance optimization from No.2 with a global consideration inspired by No.1, balancing immediate proximity to the current node with the average distance to remaining unvisited nodes to guide the selection.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    def combined_score(node):\n        local_distance = distance_matrix[current_node][node]\n        global_factor = 0\n        if len(unvisited_nodes) > 1:\n            for other_node in unvisited_nodes:\n                if other_node != node:\n                    global_factor += distance_matrix[node][other_node]\n            global_factor /= (len(unvisited_nodes) - 1)\n        return local_distance + 0.2 * global_factor\n    next_node = min(unvisited_nodes, key=lambda node: combined_score(node))\n    return next_node",
+          "objective": 7.3983,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by balancing local distance, a non-linear penalty for distance to the destination, and a proximity bonus to encourage diversity. It prioritizes nodes closer to the current node but penalizes those too far from the destination, while slightly rewarding intermediate distances. The `adjusted_score` function combines these factors to guide the selection toward a trade-off between proximity and global efficiency.",
+          "thought": "The new algorithm modifies the selection by incorporating a dynamic penalty that grows non-linearly with the distance to the destination, ensuring a balance between proximity to the current node and exploration of less direct but potentially more efficient paths, while also favoring nodes that are neither too close nor too far from the current node to encourage diversity in the path.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    def adjusted_score(node):\n        local_distance = distance_matrix[current_node][node]\n        penalty = 0.3 * (distance_matrix[node][destination_node] ** 1.5)\n        proximity_bonus = 0.2 * (1 / (1 + distance_matrix[current_node][node]))\n        return local_distance + penalty - proximity_bonus\n    next_node = min(unvisited_nodes, key=lambda node: adjusted_score(node))\n    return next_node",
+          "objective": 7.41142,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by balancing immediate distance (local optimization) with potential long-term tour impact (global consideration), prioritizing nodes that minimize both the distance from the current node and the average distance to remaining unvisited nodes. The `combined_score` function weights the local distance (100%) and global factor (30%) to guide the selection, while the `min` function ensures the node with the lowest combined score is chosen. The algorithm defaults to the destination when no unvisited nodes remain.",
+          "thought": "The algorithm dynamically selects the next node by combining local distance optimization with global tour balance, favoring nodes that minimize the immediate distance while also considering their potential to reduce the overall tour length by connecting to the destination or remaining unvisited nodes.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    def combined_score(node):\n        local_distance = distance_matrix[current_node][node]\n        global_factor = 0\n        if len(unvisited_nodes) > 1:\n            for other_node in unvisited_nodes:\n                if other_node != node:\n                    global_factor += distance_matrix[node][other_node]\n            global_factor /= (len(unvisited_nodes) - 1)\n        return local_distance + 0.3 * global_factor\n    next_node = min(unvisited_nodes, key=lambda node: combined_score(node))\n    return next_node",
+          "objective": 7.44662,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by prioritizing the shortest distance from the current node while penalizing nodes that are too close to the destination, balancing local optimality and exploration. The `adjusted_score` function combines the direct distance to the current node with a penalty proportional to the distance from the chosen node to the destination, ensuring intermediate nodes are favored. The `min` function then selects the node with the lowest adjusted score from the unvisited set.",
+          "thought": "The algorithm selects the next node by considering the minimum distance to the current node while also incorporating a penalty for nodes that are too close to the destination, encouraging exploration of intermediate nodes and potentially reducing tour length.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    def adjusted_score(node):\n        local_distance = distance_matrix[current_node][node]\n        penalty = 0.5 * distance_matrix[node][destination_node]\n        return local_distance + penalty\n    next_node = min(unvisited_nodes, key=lambda node: adjusted_score(node))\n    return next_node",
+          "objective": 7.45266,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm prioritizes selecting the next node by balancing the distance from the current node (60% weight) and the distance to the destination (40% weight), ensuring a trade-off between immediate proximity and overall path efficiency. The `weighted_score` function combines these distances linearly, and the next node is chosen as the unvisited node with the minimal weighted score. The weights reflect a bias toward minimizing the distance to the destination, while still considering local step efficiency.",
+          "thought": "The new algorithm prioritizes nodes with a balance between minimal distance from the current node and minimal distance to the destination, using a weighted sum of these distances to guide the selection, favoring nodes that are closer to the destination without overly penalizing intermediate steps.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    def weighted_score(node):\n        local_weight = 0.6\n        destination_weight = 0.4\n        local_distance = distance_matrix[current_node][node]\n        destination_distance = distance_matrix[node][destination_node]\n        return local_weight * local_distance + destination_weight * destination_distance\n    next_node = min(unvisited_nodes, key=lambda node: weighted_score(node))\n    return next_node",
+          "objective": 7.63302,
+          "other_inf": null
+     },
+     {
+          "algorithm": "This heuristic algorithm prioritizes selecting the next node by balancing **local proximity** (minimizing `distance_matrix[current_node][node]`) and **global exploration** (maximizing `distance_matrix[node][destination_node]` via a penalty term). The `adjusted_score` function combines these factors, with the penalty term (scaled by 2.0) emphasizing nodes far from the destination. The algorithm iteratively selects the node with the lowest adjusted score from unvisited nodes, ensuring a trade-off between immediate proximity and long-term path efficiency.",
+          "thought": "The new algorithm prioritizes nodes that are both close to the current node and far from the destination, balancing local optimality with global exploration by adjusting the penalty term.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    def adjusted_score(node):\n        local_distance = distance_matrix[current_node][node]\n        penalty = 2.0 * distance_matrix[node][destination_node]\n        return local_distance + penalty\n    next_node = min(unvisited_nodes, key=lambda node: adjusted_score(node))\n    return next_node",
+          "objective": 8.97191,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node to visit by minimizing the average distance to all remaining unvisited nodes, prioritizing global optimization over local choices. It balances exploration of unvisited nodes by considering their collective distances, ensuring a more balanced tour length. The function iteratively evaluates each unvisited node's average distance to the rest, choosing the one with the smallest value, and defaults to the destination node if no unvisited nodes remain.",
+          "thought": "The new algorithm constructs the path by iteratively selecting the node that minimizes the average distance to all remaining unvisited nodes, balancing local and global optimization to improve the overall tour length.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    def average_distance(node):\n        total = 0\n        for other_node in unvisited_nodes:\n            if other_node != node:\n                total += distance_matrix[node][other_node]\n        return total / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0\n    next_node = min(unvisited_nodes, key=lambda node: average_distance(node))\n    return next_node",
+          "objective": 32.0389,
+          "other_inf": null
+     }
+]

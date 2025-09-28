@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate centrality for each unvisited node (average distance to others)
+    centrality = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality[node] = total_distance / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+
+    # Temperature parameter (decreases as more nodes are visited)
+    temp = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+
+    # Combine distance and centrality with temperature
+    def selection_score(node):
+        distance_score = 1 / (distance_matrix[current_node][node] + 1e-6)
+        centrality_score = 1 / (centrality[node] + 1e-6)
+        return (temp * distance_score) + ((1 - temp) * centrality_score)
+
+    # Select based on weighted scores
+    weighted_nodes = [(node, selection_score(node)) for node in unvisited_nodes]
+    total_score = sum(score for _, score in weighted_nodes)
+    probabilities = [score / total_score for _, score in weighted_nodes]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

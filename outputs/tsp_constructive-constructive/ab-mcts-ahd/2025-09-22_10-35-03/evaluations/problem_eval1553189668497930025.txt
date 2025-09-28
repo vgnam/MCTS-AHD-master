@@ -1,0 +1,28 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        candidates.append((node, distance))
+
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        candidates.append((destination_node, dest_distance * 0.8))  # Slight bias toward destination
+
+    candidates.sort(key=lambda x: x[1])
+
+    # Select top 3 candidates and pick one with probability inversely proportional to rank
+    top_candidates = candidates[:3]
+    if not top_candidates:
+        return candidates[0][0]
+
+    weights = [1.0 / (i + 1) for i in range(len(top_candidates))]
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    selected = random.choices([c[0] for c in top_candidates], weights=probabilities, k=1)[0]
+    return next_node

@@ -1,0 +1,6 @@
+import numpy as np
+    scores = {node: evaluate_node(node) for node in unvisited_nodes}
+    probabilities = np.array([1/s for s in scores.values()])
+    probabilities = probabilities / probabilities.sum()
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+    return next_node

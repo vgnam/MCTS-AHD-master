@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic probabilities for unvisited nodes
+    total_weight = 0.0
+    probabilities = []
+    decay_factor = 0.7  # Controls how quickly probability decays with distance
+
+    # Check if destination is among top 5 nearest unvisited nodes
+    nearest_nodes = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    top_5_nearest = nearest_nodes[:min(5, len(nearest_nodes))]
+
+    if destination_node in top_5_nearest:
+        return destination_node
+
+    # Calculate probabilities with decay
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        weight = math.exp(-decay_factor * distance)
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    normalized_probs = [p / total_weight for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+
+    return next_node

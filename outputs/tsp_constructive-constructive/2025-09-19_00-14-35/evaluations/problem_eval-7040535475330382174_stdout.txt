@@ -1,0 +1,14 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 10, in select_next_node
+    next_node = min(unvisited_nodes, key=lambda node: dynamic_weight(node))
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 10, in <lambda>
+    next_node = min(unvisited_nodes, key=lambda node: dynamic_weight(node))
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 6, in dynamic_weight
+    max_distance = max(distance_matrix[node]) if distance_matrix[node] else 0
+ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()

@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    exploration_factor = 1.0 / (total_unvisited + 1)  # Decreases as more nodes are visited
+
+    def calculate_score(node):
+        immediate_distance = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited
+        return (2 * immediate_distance) + (0.5 * avg_distance) + (exploration_factor * immediate_distance)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

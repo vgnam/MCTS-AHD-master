@@ -1,0 +1,55 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = (total_nodes - remaining_nodes) / total_nodes
+
+    # Calculate node centrality and influence
+    node_centralities = []
+    node_influences = []
+    for node in unvisited_nodes:
+        # Centrality: average distance to all other nodes
+        total_distance = sum(distance_matrix[node][other] for other in range(total_nodes))
+        centrality = total_distance / (total_nodes - 1)
+        node_centralities.append(centrality)
+
+        # Influence: sum of distances to unvisited nodes
+        influence = sum(distance_matrix[node][other] for other in unvisited_nodes)
+        node_influences.append(influence)
+
+    for i, node in enumerate(unvisited_nodes):
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Sigmoid-based weight adjustment
+        sigmoid = 1 / (1 + math.exp(-10 * (progress_factor - 0.5)))
+
+        # Dynamic weights
+        distance_weight = (1 - sigmoid) * 0.8 + 0.2
+        future_weight = sigmoid * 0.7 + 0.3
+        influence_weight = 0.3 * (1 - sigmoid)
+
+        # Path diversity bonus
+        diversity_bonus = node_influences[i] / (sum(node_influences) + 1e-6)
+
+        # Exploration bonus
+        exploration_bonus = (1 / (1 + immediate_distance)) * (remaining_nodes / total_nodes) * (1 / (1 + node_influences[i]))
+
+        # Combined score
+        combined_score = (distance_weight * immediate_distance) + \
+                         (future_weight * (1 / (1 + future_distance))) + \
+                         (influence_weight * node_influences[i]) - \
+                         (0.5 * diversity_bonus) - \
+                         (0.3 * exploration_bonus)
+
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

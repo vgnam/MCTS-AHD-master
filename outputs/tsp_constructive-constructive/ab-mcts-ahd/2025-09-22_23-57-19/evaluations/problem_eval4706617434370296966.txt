@@ -1,0 +1,10 @@
+import random
+    if random.random() < temperature:
+        # Explore closer nodes with probability proportional to normalized cost
+        probabilities = [1 - normalized_costs[node] for node in unvisited_nodes]
+        selected_node = random.choices(list(unvisited_nodes), weights=probabilities, k=1)[0]
+    else:
+        # Exploit farthest node
+        selected_node = farthest_node
+
+    return next_node

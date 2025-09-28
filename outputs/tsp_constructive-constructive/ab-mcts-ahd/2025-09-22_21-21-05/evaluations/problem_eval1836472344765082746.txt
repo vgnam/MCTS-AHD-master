@@ -1,0 +1,8 @@
+import random
+    selected = random.choices([c[0] for c in top_candidates], weights=normalized_probs, k=1)[0]
+
+    # Update memory
+    for node, _ in candidates:
+        visited_memory[node] = visited_memory.get(node, 0) * 0.7 + 0.3  # Decay and update
+
+    return next_node

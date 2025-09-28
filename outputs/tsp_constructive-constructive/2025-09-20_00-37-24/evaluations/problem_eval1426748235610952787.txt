@@ -1,0 +1,34 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate diversity score for each node based on its nearest neighbors
+    diversity_scores = {}
+    for node in unvisited_nodes:
+        neighbors = sorted(unvisited_nodes, key=lambda n: distance_matrix[node][n])
+        diversity = sum(distance_matrix[node][n] for n in neighbors[:3])  # Sum of distances to top 3 neighbors
+        diversity_scores[node] = diversity
+
+    # Normalize diversity scores for weighted random selection
+    max_diversity = max(diversity_scores.values()) if diversity_scores else 1
+    normalized_scores = {node: (score / max_diversity) for node, score in diversity_scores.items()}
+
+    # Combine proximity and diversity: higher weight for nodes with higher diversity
+    weighted_scores = {}
+    for node in unvisited_nodes:
+        proximity_weight = 1 / (1 + distance_matrix[current_node][node])
+        diversity_weight = normalized_scores[node]
+        combined_weight = 0.7 * proximity_weight + 0.3 * diversity_weight
+        weighted_scores[node] = combined_weight
+
+    # Select node based on weighted scores
+    nodes = list(weighted_scores.keys())
+    weights = list(weighted_scores.values())
+    next_node = random.choices(nodes, weights=weights, k=1)[0]
+
+    return next_node

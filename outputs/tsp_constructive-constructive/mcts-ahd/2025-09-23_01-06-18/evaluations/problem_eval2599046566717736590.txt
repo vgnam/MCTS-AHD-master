@@ -1,0 +1,22 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        if len(unvisited_nodes) == 1:
+            return destination_node
+
+        # Calculate dynamic adjustment factor
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        adjustment = max(0.1, min(0.9, remaining_distance / avg_distance))
+
+        # Combine temperature and adjustment
+        prob = adjustment + (1 - adjustment) * (1 - 1 / (1 + math.exp(-temperature)))
+        return destination_node if random.random() < prob else min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    return next_node

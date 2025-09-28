@@ -1,0 +1,13 @@
+importance, using a custom scoring function to prioritize nodes based on both distance and a heuristic importance score, while still falling back to the destination if no unvisited nodes remain.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def node_score(node):
+        distance = distance_matrix[current_node][node]
+        importance = 1 / (distance + 1e-6)  # Avoid division by zero
+        return distance * (1 + importance)  # Weighted score
+
+    next_node = min(unvisited_nodes, key=lambda node: node_score(node))
+    return next_node

@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Temperature-based stochastic selection
+    temperature = 1.0 / (len(unvisited_nodes) + 1)  # Decreases as nodes are visited
+    distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+    min_dist = min(distances) if distances else 0
+
+    # Calculate selection probabilities
+    probabilities = []
+    for dist in distances:
+        if min_dist == 0:
+            prob = 1.0 / len(distances)  # Uniform if all distances are equal
+        else:
+            prob = math.exp(-(dist - min_dist) / temperature)
+        probabilities.append(prob)
+
+    # Normalize probabilities
+    total = sum(probabilities)
+    probabilities = [p / total for p in probabilities]
+
+    # Select next node based on probabilities
+    next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+
+    return next_node

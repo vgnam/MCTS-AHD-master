@@ -1,0 +1,14 @@
+important later)
+        centrality_weight = 0.3 + 0.7 * (1 - remaining_ratio)
+        adjusted_score = weighted_score + centrality_weight * degree
+
+        return adjusted_score
+
+    # Apply softmax selection with decreasing temperature
+    scores = [evaluate_node(node) for node in unvisited_nodes]
+    exp_scores = [math.exp(score / temperature) for score in scores]
+    sum_exp = sum(exp_scores)
+    probabilities = [exp_score / sum_exp for exp_score in exp_scores]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

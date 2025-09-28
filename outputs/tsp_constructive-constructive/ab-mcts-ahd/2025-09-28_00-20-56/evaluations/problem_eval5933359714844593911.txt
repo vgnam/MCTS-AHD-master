@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        # Immediate distance
+        current_dist = distance_matrix[current_node][node]
+        # Lookahead to next two nodes
+        if len(unvisited_nodes) > 2:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            best_lookahead = None
+            min_dist = float('inf')
+            for first_step in remaining_nodes:
+                second_step_candidates = [n for n in remaining_nodes if n != first_step]
+                if second_step_candidates:
+                    best_second_step = min(second_step_candidates, key=lambda n: distance_matrix[first_step][n] + distance_matrix[n][destination_node])
+                    total_dist = distance_matrix[node][first_step] + distance_matrix[first_step][best_second_step] + distance_matrix[best_second_step][destination_node]
+                    if total_dist < min_dist:
+                        min_dist = total_dist
+                        best_lookahead = total_dist
+            lookahead_dist = best_lookahead if best_lookahead is not None else distance_matrix[node][destination_node]
+        elif len(unvisited_nodes) == 2:
+            first_step, second_step = unvisited_nodes
+            lookahead_dist = distance_matrix[node][first_step] + distance_matrix[first_step][second_step] + distance_matrix[second_step][destination_node]
+        else:
+            lookahead_dist = distance_matrix[node][destination_node]
+        # Combine immediate and lookahead distances
+        return current_dist + 0.3 * lookahead_dist
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if distance_to_destination == 0:
+            score = float('inf')
+        else:
+            normalized_ratio = distance_to_current / distance_to_destination
+            bias_factor = 1.0 + (1.0 / (1.0 + remaining_nodes)) * 2.0
+            weight = 1.0 + (bias_factor * (1.0 - normalized_ratio))
+            score = (distance_to_current ** weight) / (distance_to_destination ** (1.0 / weight))
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

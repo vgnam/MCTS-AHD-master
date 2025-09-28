@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def min_max_distance(node):
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return distance_matrix[current_node][node]
+        return max(distance_matrix[node][n] for n in remaining_nodes)
+
+    def node_centrality(node):
+        return sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+    if len(unvisited_nodes) % 2 == 1:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    else:
+        global_weight = 0.5 + (0.5 * (len(unvisited_nodes) / len(distance_matrix)))
+        local_candidates = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= node_centrality(node)]
+        if local_candidates:
+            next_node = min(local_candidates, key=lambda node: global_weight * min_max_distance(node) + (1 - global_weight) * distance_matrix[current_node][node])
+        else:
+            next_node = min(unvisited_nodes, key=min_max_distance)
+
+    return next_node

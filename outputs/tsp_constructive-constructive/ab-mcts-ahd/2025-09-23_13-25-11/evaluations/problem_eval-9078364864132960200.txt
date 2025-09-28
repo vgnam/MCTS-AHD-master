@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    weight_current = 1.0 / (1.0 + total_unvisited)
+    weight_future = 1.0 - weight_current
+    weight_explore = 0.5 * (1.0 / (1.0 + total_unvisited))  # Exploration bonus weight
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        min_future_dist = min(distance_matrix[node][other] for other in remaining_nodes)
+        avg_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+
+        # Exploration bonus: penalize nodes with higher average distance to remaining nodes
+        exploration_bonus = avg_dist / max(distance_matrix[current_node][other] for other in unvisited_nodes)
+
+        return (weight_current * current_dist +
+                weight_future * min_future_dist -
+                weight_explore * exploration_bonus)
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

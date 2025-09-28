@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    max_score = -float('inf')
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    exploration_phase = 1 - visited_ratio  # Higher in early exploration
+
+    for node in unvisited_nodes:
+        dist_current = distance_matrix[current_node][node]
+        dist_dest = distance_matrix[node][destination_node]
+
+        if dist_current == 0:
+            angular_progress = 1.0
+        else:
+            angular_progress = dist_dest / dist_current
+
+        # Centrality-based exploration bonus
+        centrality = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < dist_current * 1.2)
+        exploration_bonus = centrality * exploration_phase
+
+        # Dynamic revisit penalty
+        revisit_penalty = 0.5 if node in [current_node, destination_node] else 0.9
+
+        # Hybrid score
+        score = (angular_progress * visited_ratio * 1.5) + exploration_bonus - (dist_current * (1.2 - revisit_penalty))
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    return next_node

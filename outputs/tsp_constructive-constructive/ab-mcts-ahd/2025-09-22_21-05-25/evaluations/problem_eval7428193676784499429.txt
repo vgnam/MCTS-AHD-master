@@ -1,0 +1,23 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_to_node = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_unvisited = [n for n in unvisited_nodes if n != node]
+            nearest_remaining = min(remaining_unvisited, key=lambda n: distance_matrix[node][n])
+            node_to_nearest = distance_matrix[node][nearest_remaining]
+            exploration_factor = len(unvisited_nodes) / (len(unvisited_nodes) + sum(distance_matrix[current_node][n] for n in unvisited_nodes))
+            threshold = 1.5 + exploration_factor * 0.5
+            return current_to_node + node_to_nearest * threshold
+        else:
+            return current_to_node
+
+    scores = [1.0 / (1.0 + evaluate_node(node)) for node in unvisited_nodes]
+    probabilities = [score / sum(scores) for score in scores]
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

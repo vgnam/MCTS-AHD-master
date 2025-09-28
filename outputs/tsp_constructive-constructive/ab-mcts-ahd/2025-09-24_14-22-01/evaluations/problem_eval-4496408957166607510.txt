@@ -1,0 +1,30 @@
+import math
+    import random
+
+    if not unvisited_nodes:
+        return destination_node
+
+    centrality = sum(1 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes) / len(unvisited_nodes)
+    exploration_factor = 0.5 + 0.5 * centrality  # Higher centrality -> more exploitation
+
+    costs = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            costs.append(0.0)  # Always consider destination as a viable option
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        weighted_cost = (immediate_distance * (1 - exploration_factor) +
+                         potential_distance * exploration_factor)
+        costs.append(weighted_cost)
+
+    if all(c == 0.0 for c in costs):
+        return destination_node
+
+    # Softmax selection
+    exp_costs = [math.exp(-cost) for cost in costs]
+    probs = [exp_cost / sum(exp_costs) for exp_cost in exp_costs]
+    next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+
+    return next_node

@@ -1,0 +1,14 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 37, in select_next_node
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 37, in <lambda>
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 30, in evaluate_node
+    score = (weight_local * immediate_dist * avg_remaining_dist) + \
+UnboundLocalError: local variable 'avg_remaining_dist' referenced before assignment

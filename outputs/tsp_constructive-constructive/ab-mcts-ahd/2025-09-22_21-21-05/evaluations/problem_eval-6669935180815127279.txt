@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    best_score = float('inf')
+    next_node = None
+    selection_counts = {node: 1 for node in unvisited_nodes}  # Initialize novelty tracking
+
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / total_unvisited
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        weight = 0.8 - (0.3 * (total_unvisited - 1) / total_unvisited) ** 1.5
+        normalized_distance = distance_to_current / (avg_distance + 1e-6)  # Avoid division by zero
+
+        remaining_nodes = [n for n in unvisited_nodes if n != node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes) if remaining_nodes else 0
+
+        density_factor = len(remaining_nodes) / total_unvisited if total_unvisited > 0 else 0
+        normalized_density = 1 - density_factor if density_factor != 0 else 0
+
+        novelty_factor = 1 / (1 + selection_counts.get(node, 1))  # Reward less-visited nodes
+
+        combined_score = (distance_to_current + weight * distance_to_destination) * (1 + normalized_distance) + \
+                         0.5 * avg_distance_to_remaining + \
+                         0.5 * normalized_density + \
+                         0.3 * novelty_factor
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    if next_node:
+        selection_counts[next_node] = selection_counts.get(next_node, 0) + 1  # Update selection count
+
+    return next_node

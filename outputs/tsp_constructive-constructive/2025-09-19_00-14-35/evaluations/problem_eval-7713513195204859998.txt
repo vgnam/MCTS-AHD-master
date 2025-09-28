@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    visited_count = total_nodes - len(unvisited_nodes)
+    learning_rate = 0.9 ** visited_count  # Exponentially decaying learning rate
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) > 1:
+            # Calculate node centrality (average distance to all other unvisited nodes)
+            remaining_dists = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            avg_remaining = sum(remaining_dists) / len(remaining_dists) if remaining_dists else 0
+
+            # Estimate novelty factor (potential to reduce MST cost)
+            novelty_factor = 0
+            if len(unvisited_nodes) > 2:
+                submatrix = [[distance_matrix[i][j] for j in unvisited_nodes] for i in unvisited_nodes]
+                mst_cost = sum(sorted(sum(row) for row in submatrix)[:len(unvisited_nodes) - 1])
+                submatrix_with_node = [[distance_matrix[i][j] for j in unvisited_nodes + [node]] for i in unvisited_nodes + [node]]
+                mst_cost_with_node = sum(sorted(sum(row) for row in submatrix_with_node)[:len(unvisited_nodes)])
+                novelty_factor = mst_cost_with_node - mst_cost
+
+            # Dynamic weight balancing with novelty
+            immediate_weight = 1.0 - learning_rate
+            centrality_weight = learning_rate * 0.5
+            destination_weight = learning_rate * 0.3
+            novelty_weight = learning_rate * 0.2
+
+            return (immediate_weight * current_dist +
+                    centrality_weight * avg_remaining +
+                    destination_weight * dest_dist +
+                    novelty_weight * novelty_factor)
+        else:
+            return current_dist + dest_dist
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

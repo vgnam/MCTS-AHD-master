@@ -1,0 +1,34 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+    scores = []
+
+    # Calculate base score for each node
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        dest_distance = distance_matrix[node][destination_node]
+        bias_factor = math.exp(-len(unvisited_nodes) / len(unvisited_nodes))  # Exponential decay
+        score = -current_distance + bias_factor * dest_distance
+        scores.append((node, score))
+
+    # Sort nodes by score in descending order
+    scores.sort(key=lambda x: -x[1])
+
+    # Select top candidates (top 30% or at least 2 nodes)
+    num_candidates = max(2, int(0.3 * len(scores)))
+    candidates = [node for node, score in scores[:num_candidates]]
+
+    # Probabilistic selection with softmax
+    if candidates:
+        # Calculate probabilities using softmax
+        exp_scores = [math.exp(score) for _, score in scores[:num_candidates]]
+        sum_exp = sum(exp_scores)
+        probs = [exp / sum_exp for exp in exp_scores]
+
+        # Select node based on probabilities
+        next_node = random.choices(candidates, weights=probs, k=1)[0]
+
+    return next_node

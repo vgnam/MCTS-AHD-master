@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate a heuristic score for each unvisited node: distance + potential (inverse of degree)
+    def heuristic_score(node):
+        distance = distance_matrix[current_node][node]
+        # Potential is inversely proportional to the number of connections (simplified degree)
+        potential = 1.0 / (sum(1 for n in unvisited_nodes if n != node) + 1)  # Avoid division by zero
+        return distance + potential
+
+    # Sort nodes by the heuristic score
+    ranked_nodes = sorted(unvisited_nodes, key=lambda node: heuristic_score(node))
+
+    # Adaptive selection: higher probability for top 3 nodes, lower for others
+    if random.random() < 0.8:  # 80% chance to pick from top 3
+        candidates = ranked_nodes[:min(3, len(ranked_nodes))]
+        # Weighted selection: top node has 50% chance, next 2 have 25% and 25% respectively
+        weights = [0.5, 0.25, 0.25] if len(candidates) >= 3 else [1.0 / len(candidates)] * len(candidates)
+        next_node = random.choices(candidates, weights=weights, k=1)[0]
+    else:  # 20% chance to pick a random node
+        next_node = random.choice(ranked_nodes)
+
+    return next_node

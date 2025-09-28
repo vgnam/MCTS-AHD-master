@@ -1,0 +1,60 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Adaptive temperature initialization
+    temperature = len(unvisited_nodes) * 10
+    cooling_rate = 0.98 - (0.01 * len(unvisited_nodes) / (len(distance_matrix) if distance_matrix else 1))
+
+    # Find nearest neighbor
+    min_distance = float('inf')
+    nearest_neighbor = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            nearest_neighbor = node
+
+    # Check if destination node is a valid choice
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+    else:
+        destination_distance = float('inf')
+
+    # Dynamic probability function
+    while temperature > 0.1:
+        # Probability of exploration vs. exploitation
+        exploration_prob = (temperature / (temperature + len(unvisited_nodes))) ** 2
+
+        if random.random() < exploration_prob:
+            # Choose a random unvisited node with bias towards closer nodes
+            candidates = list(unvisited_nodes)
+            weights = [1 / (distance_matrix[current_node][node] + 1) for node in candidates]
+            next_node = random.choices(candidates, weights=weights, k=1)[0]
+        else:
+            # Choose between nearest neighbor and destination node with adaptive bias
+            if destination_distance < min_distance * (1 - (temperature / 100)):
+                next_node = destination_node
+            else:
+                next_node = nearest_neighbor
+
+        # Check if the chosen node is valid
+        if next_node not in unvisited_nodes:
+            temperature *= cooling_rate
+            continue
+
+        # Acceptance probability with adaptive threshold
+        acceptance_prob = math.exp((min_distance - distance_matrix[current_node][next_node]) / (temperature * (1 + 0.1 * len(unvisited_nodes))))
+
+        if next_node == destination_node or random.random() < acceptance_prob:
+            return next_node
+
+        temperature *= cooling_rate
+
+    # Fallback to nearest neighbor with probabilistic destination check
+    if destination_node in unvisited_nodes and random.random() < 0.5:
+        return destination_node
+    return next_node

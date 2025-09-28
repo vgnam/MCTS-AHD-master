@@ -39,11 +39,8 @@ class Evolution():
         self.model_LLM = model_LLM
         self.debug_mode = debug_mode  # close prompt checking
 
-        # -------------------- RZ: use local LLM --------------------
-        if self._use_local_llm:
-            self.interface_llm = LocalLLM(self._url)
-        else:
-            self.interface_llm = InterfaceLLM(self.api_endpoint, self.api_key, self.model_LLM, self.debug_mode)
+
+        self.interface_llm = InterfaceLLM(self.api_endpoint, self.api_key, self.model_LLM, self.debug_mode)
 
     def get_prompt_post(self, code, algorithm):
 
@@ -179,7 +176,7 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
 
     def _get_thought(self, prompt_content):
 
-        response = self.interface_llm.get_response(prompt_content, 0)
+        response = self.interface_llm.get_response(prompt_content)
 
         # algorithm = response.split(':')[-1]
         return response

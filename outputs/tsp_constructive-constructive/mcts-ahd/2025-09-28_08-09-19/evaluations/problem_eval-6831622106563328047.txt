@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            # Node centrality: average distance to other unvisited nodes
+            centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+            # Path diversity: average distance to already visited nodes (approximated)
+            diversity = sum(distance_matrix[node][n] for n in range(len(distance_matrix)) if n not in unvisited_nodes and n != current_node) / max(1, len(distance_matrix) - remaining_nodes - 1)
+
+            # Weight adjustment based on remaining nodes
+            weight_factor = 0.7 * (remaining_nodes / (remaining_nodes + 3))
+            immediate_weight = 0.5 * weight_factor
+            centrality_weight = 0.3 * (1 - weight_factor)
+            diversity_weight = 0.2 * (1 - weight_factor)
+
+            # Penalty for nodes too close to destination
+            penalty = 0.5 * (distance_to_destination ** 2) / (1.0 + centrality) if centrality > 0 else 0
+
+            score = immediate_weight * distance_to_current + centrality_weight * centrality + diversity_weight * diversity - penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

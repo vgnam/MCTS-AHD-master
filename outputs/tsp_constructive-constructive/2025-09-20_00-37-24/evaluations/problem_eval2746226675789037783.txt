@@ -1,0 +1,37 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    
+    # Introduce stochasticity:  sometimes pick a node that's not the absolute nearest
+    if random.random() < 0.9: # 90% chance to pick from top 3 nearest
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else: # 10% chance to pick a random node
+        next_node = random.choice(nearest_neighbors)
+    
+    return next_node
+
+#{The new algorithm prioritizes the destination node if unvisited, then favors closer unvisited neighbors with reduced stochasticity and a larger candidate pool, balancing proximity and exploration.}
+
+def select_next_node_new(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    
+    # Introduce stochasticity with different parameters
+    if random.random() < 0.95:  # 95% chance to pick from top 5 nearest
+        candidates = nearest_neighbors[:min(5, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:  # 5% chance to pick a random node
+        next_node = random.choice(nearest_neighbors)
+    
+    return next_node

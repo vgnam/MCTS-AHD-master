@@ -1,0 +1,8 @@
+import random
+    r = random.random()
+    cumulative_prob = 0.0
+    for node, prob in normalized_probs.items():
+        cumulative_prob += prob
+        if r <= cumulative_prob:
+            return node
+    return next_node

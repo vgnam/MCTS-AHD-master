@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if not unvisited_nodes - {node}:
+            return current_dist
+        max_future_dist = max(distance_matrix[node][other] for other in unvisited_nodes - {node})
+        weight_immediate = remaining_ratio
+        weight_future = 1 - remaining_ratio
+        return weight_immediate * current_dist + weight_future * max_future_dist
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

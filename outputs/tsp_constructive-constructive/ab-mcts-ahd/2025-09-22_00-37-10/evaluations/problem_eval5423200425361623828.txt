@@ -1,0 +1,28 @@
+import math
+    import random
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    temperature = max(0.1, 1.0 - (total_nodes - remaining_nodes) / total_nodes)  # Decreasing temperature
+
+    # Precompute node centrality (average distance to all other nodes)
+    centrality = {node: sum(distance_matrix[node]) / (total_nodes - 1) for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+        penalty = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+        # Dynamic weight combining immediate, lookahead, and centrality
+        weight = 0.5 + 0.3 * (1 - temperature) + 0.2 * (centrality[node] / max(centrality.values()) if centrality else 0)
+        score = - (immediate_distance + weight * (lookahead_distance + penalty))
+
+        # Probabilistic selection with Boltzmann distribution
+        probability = math.exp(score / temperature)
+        if random.random() < probability and score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

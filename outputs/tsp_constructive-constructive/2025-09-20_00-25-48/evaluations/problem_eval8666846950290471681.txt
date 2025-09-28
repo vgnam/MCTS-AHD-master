@@ -1,0 +1,11 @@
+import random
+    min_score = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        random_factor = random.uniform(0, 1)
+        score = current_distance * (1 + random_factor)
+        if score < min_score:
+            min_score = score
+            next_node = node
+    return next_node

@@ -1,0 +1,36 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (total_unvisited / (total_unvisited + 2)) ** 2)
+    best_score = float('-inf')
+    candidates = []
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        degree = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < float('inf'))
+        novelty = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < current_distance) / total_unvisited
+        diversity = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / total_unvisited
+
+        weighted_score = (1 - temperature) * (current_distance + 0.3 * future_distance) + temperature * (0.5 * degree + 0.3 * novelty - 0.1 * diversity)
+
+        if weighted_score > best_score:
+            best_score = weighted_score
+            candidates = [node]
+        elif weighted_score == best_score:
+            candidates.append(node)
+
+    if len(candidates) > 1:
+        selection_prob = [math.exp(sum(distance_matrix[node][n] for n in unvisited_nodes) / (100 * total_unvisited)) for node in candidates]
+        total_prob = sum(selection_prob)
+        selection_prob = [p / total_prob for p in selection_prob]
+        next_node = random.choices(candidates, weights=selection_prob, k=1)[0]
+    else:
+        next_node = candidates[0]
+
+    return next_node

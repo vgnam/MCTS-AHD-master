@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining_nodes = len(unvisited_nodes)
+    balance_factor = 1.0 / (1.0 + remaining_nodes)  # Decreases as more nodes are visited
+    min_score = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+        scaled_dest_distance = node_to_dest * (remaining_nodes / (remaining_nodes + 1))  # Adjusts for remaining path
+        weighted_sum = (1 - balance_factor) * current_to_node + balance_factor * scaled_dest_distance
+        if weighted_sum < min_score:
+            min_score = weighted_sum
+            next_node = node
+    return next_node

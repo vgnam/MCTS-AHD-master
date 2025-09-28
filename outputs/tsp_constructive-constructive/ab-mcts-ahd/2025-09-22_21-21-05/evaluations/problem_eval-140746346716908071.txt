@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    remaining_length = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Track visited nodes for novelty factor (simplified for this example)
+    visited_count = {node: 0 for node in range(total_nodes)}
+    for node in unvisited_nodes:
+        visited_count[node] = 1 if node == current_node else 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        max_distance = max(distance_to_current, distance_to_destination)
+
+        # Dynamic weights: prioritize local optimization early, global later
+        weight_max = 0.5 + 0.3 * (1 - min(remaining_length, 10) / 10)
+        weight_avg = 0.3 + 0.2 * (min(remaining_length, 10) / 10)
+        weight_novelty = 0.2 * (1 - visited_count[node] / (sum(visited_count.values()) + 1))
+
+        # Calculate centrality (average distance to all other nodes)
+        centrality = sum(distance_matrix[node][n] for n in range(total_nodes)) / (total_nodes - 1)
+
+        # Combine factors with dynamic weights
+        combined_score = (weight_max * max_distance +
+                          weight_avg * centrality -
+                          weight_novelty * (distance_matrix[current_node][node] * visited_count[node]))
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

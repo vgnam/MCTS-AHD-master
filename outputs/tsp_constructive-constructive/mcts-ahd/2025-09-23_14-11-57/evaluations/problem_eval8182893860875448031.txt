@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = (total_nodes - remaining_nodes) / total_nodes
+    time_decay = 1 - (progress_factor ** 2)
+
+    scores = []
+    probabilities = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        node_centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+        centrality_weight = (node_centrality / max(distance_matrix[node])) if max(distance_matrix[node]) != 0 else 0
+
+        distance_priority = (1 - progress_factor) * 0.9 + 0.1
+        future_priority = progress_factor * 0.8 + 0.2
+        exploration_priority = time_decay * 0.5
+
+        distance_score = distance_priority * immediate_distance
+        future_score = future_priority * (1 / (1 + future_distance))
+        exploration_score = exploration_priority * (1 / (1 + immediate_distance)) * (1 + 0.3 * centrality_weight)
+
+        hybrid_score = distance_score + future_score - exploration_score
+        scores.append(hybrid_score)
+
+        probabilities.append(1 / (1 + hybrid_score))
+
+    probabilities = [p / sum(probabilities) for p in probabilities]
+    next_node = np.random.choice(list(unvisited_nodes), p=probabilities)
+
+    return next_node

@@ -1,0 +1,49 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+[*] Instance 0: 12.73299203878738
+[*] Instance 1: 11.795118958879387
+[*] Instance 2: 14.345057387263747
+[*] Instance 3: 14.10967810815644
+[*] Instance 4: 13.601246759903992
+[*] Instance 5: 14.26778682248081
+[*] Instance 6: 13.166829563389424
+[*] Instance 7: 11.9246169795462
+[*] Instance 8: 11.820403291331578
+[*] Instance 9: 12.484716024438885
+[*] Instance 10: 13.781649481472074
+[*] Instance 11: 11.846693152275952
+[*] Instance 12: 13.165050726274874
+[*] Instance 13: 13.398482887116186
+[*] Instance 14: 11.915839570892611
+[*] Instance 15: 12.839292050020875
+[*] Instance 16: 12.208545311763443
+[*] Instance 17: 13.406307854324739
+[*] Instance 18: 12.965995946614637
+[*] Instance 19: 12.845040798904886
+[*] Instance 20: 12.127904875809808
+[*] Instance 21: 12.039906109436005
+[*] Instance 22: 11.857589901275272
+[*] Instance 23: 12.103936394943814
+[*] Instance 24: 12.191847467447161
+[*] Instance 25: 13.341278434321659
+[*] Instance 26: 12.506506799263082
+[*] Instance 27: 12.659528198973312
+[*] Instance 28: 11.327974185325553
+[*] Instance 29: 17.501553473768645
+[*] Instance 30: 14.541845578493577
+[*] Instance 31: 12.621371257313621
+[*] Instance 32: 12.047841045079238
+[*] Instance 33: 11.718084687255244
+[*] Instance 34: 15.149063983638987
+[*] Instance 35: 12.088653555519453
+[*] Instance 36: 13.542516631711639
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 44, in select_next_node
+    normalized_probs = [p / sum_prob for p in probabilities]
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 44, in <listcomp>
+    normalized_probs = [p / sum_prob for p in probabilities]
+ZeroDivisionError: float division by zero

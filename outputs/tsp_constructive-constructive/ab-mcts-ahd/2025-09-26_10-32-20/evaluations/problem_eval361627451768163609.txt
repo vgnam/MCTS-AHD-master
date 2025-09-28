@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    # Dynamic weight adaptation with non-linear scaling
+    weight_local = 0.1 + 0.4 * (progress ** 2)
+    weight_centrality = 0.6 - 0.3 * (progress ** 1.5)
+    weight_coherence = 0.3 + 0.2 * (progress ** 0.5)
+    weight_momentum = 0.1 * (1 - progress)  # Path momentum factor
+
+    # Precompute node statistics for efficiency
+    node_stats = {}
+    for node in unvisited_nodes:
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        node_stats[node] = (local_distance, centrality, coherence)
+
+    def calculate_score(node):
+        local_dist, centrality, coherence = node_stats[node]
+        # Hybrid scoring with momentum term
+        return (weight_local * local_dist +
+                weight_centrality * centrality -
+                weight_coherence * coherence +
+                weight_momentum * (1 / (local_dist + 1e-10)))
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

@@ -1,0 +1,28 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic probability distribution based on distance and temperature
+    distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+    if not distances:
+        return random.choice(nearest_neighbors)
+
+    max_dist = max(distances) if max(distances) != 0 else 1.0
+    probabilities = [(max_dist - dist + 1e-6) / (max_dist * len(nearest_neighbors)) for dist in distances]
+
+    # Adjust probabilities with temperature (lower temp = more greedy)
+    probabilities = [p ** (1.0 / temperature) for p in probabilities]
+    total = sum(probabilities)
+    probabilities = [p / total for p in probabilities]
+
+    # Select node based on probability
+    next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+
+    return next_node

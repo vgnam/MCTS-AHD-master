@@ -1,0 +1,9 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining = len(unvisited_nodes)
+    weight = 1.0 / (1.0 + remaining)  # Exponential decay weighting
+    next_node = min(unvisited_nodes, key=lambda node:
+        (1 - weight) * distance_matrix[current_node][node] +
+        weight * sum(distance_matrix[node][other] for other in unvisited_nodes))
+    return next_node

@@ -1,0 +1,13 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes and len(unvisited_nodes) > 1:
+        return destination_node
+    min_score = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node]) / len(distance_matrix[node])
+        score = distance_to_node + avg_distance
+        if score < min_score:
+            min_score = score
+            next_node = node
+    return next_node

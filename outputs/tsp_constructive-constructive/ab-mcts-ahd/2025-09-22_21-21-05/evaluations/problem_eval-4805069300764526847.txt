@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate centrality measure
+    avg_distances = []
+    for node in unvisited_nodes:
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_nodes
+        avg_distances.append(avg_dist)
+
+    avg_avg_distance = sum(avg_distances) / remaining_nodes if remaining_nodes > 0 else 0
+
+    for i, node in enumerate(unvisited_nodes):
+        distance = distance_matrix[current_node][node]
+        centrality_factor = 1.0 - (avg_distances[i] / (avg_avg_distance + 1e-6))
+        adjusted_threshold = 1.0 + (1.0 - centrality_factor) * 0.5  # Scale threshold based on centrality
+
+        if distance < min_distance * adjusted_threshold:
+            min_distance = distance
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance < min_distance * 1.5:
+            next_node = destination_node
+
+    return next_node

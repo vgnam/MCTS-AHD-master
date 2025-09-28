@@ -1,0 +1,38 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    exploration_factor = math.log(total_unvisited + 1) / 5  # Logarithmic exploration scaling
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Probabilistic local search with triplet evaluation
+        if total_unvisited > 3:
+            for neighbor1 in unvisited_nodes:
+                if neighbor1 != node:
+                    for neighbor2 in unvisited_nodes:
+                        if neighbor2 != node and neighbor2 != neighbor1:
+                            segment_distance = (current_distance + distance_matrix[node][neighbor1] +
+                                              distance_matrix[neighbor1][neighbor2] +
+                                              distance_matrix[neighbor2][destination_node]) * (1 - exploration_factor)
+                            if segment_distance < best_score:
+                                best_score = segment_distance
+                                next_node = node
+
+        # Novel weighted score with logarithmic exploration
+        weighted_score = (0.5 * current_distance) + (0.3 * future_distance) + (exploration_factor * 0.2 * random.uniform(0, 1))
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+
+    return next_node

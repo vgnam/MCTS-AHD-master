@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    base_immediate_weight = 0.6
+    base_regret_weight = 0.3
+    base_future_weight = 0.1
+    stage_factor = 1.0 / (1.0 + 0.1 * remaining_nodes)
+
+    immediate_weight = base_immediate_weight * (1.0 + stage_factor)
+    regret_weight = base_regret_weight * (1.0 - stage_factor)
+    future_weight = base_future_weight * (1.0 - 0.5 * stage_factor)
+
+    distances = []
+    regrets = []
+    future_scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+        future_scores.append(avg_future_distance)
+
+    exploration_factor = 1.0 + 0.4 * (remaining_nodes / len(distance_matrix))
+    memory_penalty = 0.2 * (remaining_nodes / len(distance_matrix)) * exploration_factor
+
+    combined_scores = [
+        immediate_weight * distance +
+        regret_weight * regret +
+        future_weight * future_score -
+        memory_penalty
+        for distance, regret, future_score in zip(distances, regrets, future_scores)
+    ]
+
+    min_score = min(combined_scores)
+    candidates = [i for i, score in enumerate(combined_scores) if score == min_score]
+    selected_index = candidates[0] if len(candidates) == 1 else candidates[int(len(candidates) * 0.7)]
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

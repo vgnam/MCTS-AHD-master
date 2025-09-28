@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm prioritizes selecting the destination node if unvisited, otherwise it employs a stochastic nearest neighbor approach. It primarily chooses from the three nearest unvisited nodes but occasionally selects a random node to diversify the search. This balances exploitation of proximity with exploration of potentially better, less obvious routes.\n",
+     "thought": "This algorithm uses a nearest neighbor approach with a stochastic element, favoring closer nodes but occasionally selecting a more distant one to potentially escape local optima.",
+     "code": "import random\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        return destination_node\n    if not unvisited_nodes:\n        return None\n\n    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])\n    \n    # Introduce stochasticity:  sometimes pick a node that's not the absolute nearest\n    if random.random() < 0.9: # 90% chance to pick from top 3 nearest\n        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]\n        next_node = random.choice(candidates)\n    else: # 10% chance to pick a random node\n        next_node = random.choice(nearest_neighbors)\n    \n    return next_node",
+     "objective": 12.53987,
+     "other_inf": null
+}

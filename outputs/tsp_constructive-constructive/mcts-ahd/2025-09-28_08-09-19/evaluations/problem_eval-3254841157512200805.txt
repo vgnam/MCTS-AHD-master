@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = 1 - (len(unvisited_nodes) / total_nodes)
+    exploration_factor = 1.0 - (len(unvisited_nodes) / total_nodes) * 0.8
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = avg_distance
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+        else:
+            avg_distance = 0
+            node_centrality = 0
+            connectivity = 0
+
+        connectivity_factor = 1.0 + (connectivity / (total_nodes - 1)) * 0.3
+        lookahead_depth = min(3, len(remaining_nodes) // 2) if len(remaining_nodes) > 2 else 1
+        nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth] if remaining_nodes else []
+        avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+        immediate_weight = 0.5 - 0.2 * visited_ratio
+        centrality_weight = 0.4 * (1.0 - exploration_factor)
+        exploration_penalty = 0.3 * (1 - visited_ratio) * (1 + (connectivity / (total_nodes - 1)))
+
+        score = (immediate_weight * immediate_distance +
+                centrality_weight * (node_centrality * connectivity_factor) +
+                exploration_penalty * avg_neighbor_distance)
+
+        candidates.append((node, score))
+
+    if not candidates:
+        return destination_node
+
+    candidates.sort(key=lambda x: x[1])
+    selected_index = min(int(len(candidates) * 0.3), len(candidates) - 1)
+    next_node = candidates[selected_index][0]
+
+    return next_node

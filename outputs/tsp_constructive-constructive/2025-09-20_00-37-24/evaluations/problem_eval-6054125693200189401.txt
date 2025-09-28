@@ -1,0 +1,30 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate heuristic values for unvisited nodes (e.g., potential path reduction)
+    heuristic_values = {}
+    for node in unvisited_nodes:
+        # Example heuristic: inverse distance (closer nodes have higher weight)
+        heuristic_values[node] = 1.0 / distance_matrix[current_node][node]
+
+    # Normalize heuristic values to form a probability distribution
+    total_heuristic = sum(heuristic_values.values())
+    probabilities = {node: val / total_heuristic for node, val in heuristic_values.items()}
+
+    # Introduce stochasticity: sometimes pick a node based on probability, sometimes pick randomly
+    if random.random() < 0.8:  # 80% chance to select based on heuristic
+        next_node = random.choices(
+            list(probabilities.keys()),
+            weights=list(probabilities.values()),
+            k=1
+        )[0]
+    else:  # 20% chance to pick a random node
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

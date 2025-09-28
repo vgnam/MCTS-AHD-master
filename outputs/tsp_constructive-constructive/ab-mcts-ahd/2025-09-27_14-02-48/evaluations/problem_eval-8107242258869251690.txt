@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    min_score = float('inf')
+    next_node = None
+    
+    for node in unvisited_nodes:
+        local_cost = distance_matrix[current_node][node]
+        global_cost = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        score = 0.7 * local_cost + 0.3 * global_cost
+        
+        if score < min_score:
+            min_score = score
+            next_node = node
+    
+    if destination_node in unvisited_nodes:
+        local_cost = distance_matrix[current_node][destination_node]
+        global_cost = 0
+        score = 0.7 * local_cost + 0.3 * global_cost
+        
+        if score < min_score:
+            next_node = destination_node
+    
+    return next_node

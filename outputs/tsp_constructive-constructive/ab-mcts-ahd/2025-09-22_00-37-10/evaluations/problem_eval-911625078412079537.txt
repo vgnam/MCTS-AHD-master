@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visit_history=None):
+    if visit_history is None:
+        visit_history = {}
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight based on remaining nodes and visit frequency
+        base_weight = 0.5 + (0.5 * (remaining_nodes / (remaining_nodes + 1)))
+        visit_penalty = visit_history.get(node, 0) * 0.1  # Penalize frequently visited nodes
+        adjusted_weight = base_weight * (1 - visit_penalty)
+
+        # Combine with a novel heuristic: prefer nodes closer to the centroid of unvisited nodes
+        centroid = sum(unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+        centroid_bias = abs(node - centroid) * 0.05  # Small bias towards central nodes
+
+        score = immediate_distance + adjusted_weight * lookahead_distance + centroid_bias
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

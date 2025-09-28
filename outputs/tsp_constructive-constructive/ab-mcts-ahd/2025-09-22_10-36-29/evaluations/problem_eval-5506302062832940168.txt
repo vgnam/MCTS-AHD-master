@@ -1,0 +1,26 @@
+import random
+    selected_node = random.choices([node for node, _ in candidates], weights=probabilities, k=1)[0]
+
+    best_node = selected_node
+    best_score = float('inf')
+
+    for node in [selected_node] + random.sample(unvisited_nodes, min(3, len(unvisited_nodes))):
+        if node not in unvisited_nodes:
+            continue
+
+        current_distance = distance_matrix[current_node][node]
+        min_future_distance = float('inf')
+
+        for next_node in unvisited_nodes:
+            if next_node != node:
+                future_distance = distance_matrix[node][next_node]
+                if future_distance < min_future_distance:
+                    min_future_distance = future_distance
+
+        total_score = current_distance + min_future_distance
+
+        if total_score < best_score:
+            best_score = total_score
+            best_node = node
+
+    return next_node

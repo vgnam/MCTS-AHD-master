@@ -1,0 +1,17 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        current_to_dest = distance_matrix[current_node][destination_node]
+        avg_dist = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        progress = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+        temperature = max(0.1, math.exp(-5 * progress))
+        prob = 0.5 * (1 + math.tanh(2 * (current_to_dest / (avg_dist + 1e-6)) * (1 - progress)))
+        return destination_node if random.random() < prob else min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    return next_node

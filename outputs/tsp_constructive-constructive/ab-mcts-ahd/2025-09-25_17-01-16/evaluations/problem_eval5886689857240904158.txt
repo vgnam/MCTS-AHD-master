@@ -1,0 +1,21 @@
+importance
+        importance = (dist_to_current + dist_to_dest) / (sum(distance_matrix[node]) + 1)
+        weight_adj = 1.0 / (1.0 + 0.2 * importance)
+
+        # Outlier penalty (same as original)
+        distances_to_current = [distance_matrix[current_node][other] for other in unvisited_nodes]
+        mean_dist = sum(distances_to_current) / len(distances_to_current)
+        std_dev = (sum((d - mean_dist) ** 2 for d in distances_to_current) / len(distances_to_current)) ** 0.5
+        outlier_penalty = 0.0 if std_dev == 0 else (dist_to_current - mean_dist) / std_dev
+
+        # Combined score calculation
+        total_score = (0.35 * dist_to_current +
+                       0.3 * dist_to_dest +
+                       0.25 * hub_score +
+                       0.1 * novelty) * weight_adj + 0.1 * outlier_penalty
+
+        if total_score < best_score:
+            best_score = total_score
+            next_node = node
+
+    return next_node

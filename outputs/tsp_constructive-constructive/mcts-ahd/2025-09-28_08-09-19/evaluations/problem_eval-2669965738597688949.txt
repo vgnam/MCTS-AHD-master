@@ -1,0 +1,60 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    exploration_factor = 1.0 / (1.0 + math.exp(-(remaining_count - 5)))  # Sigmoid-based exploration factor
+
+    # Calculate immediate distance scores
+    immediate_scores = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+    min_immediate = min(immediate_scores.values())
+    max_immediate = max(immediate_scores.values())
+    normalized_immediate = {node: (max_immediate - score + min_immediate) / (max_immediate - min_immediate + 1e-6)
+                            for node, score in immediate_scores.items()}
+
+    # Calculate centrality scores
+    centrality_scores = {}
+    for node in unvisited_nodes:
+        remaining_nodes = unvisited_nodes - {node}
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            centrality_scores[node] = avg_distance
+        else:
+            centrality_scores[node] = 0
+    min_centrality = min(centrality_scores.values()) if centrality_scores else 0
+    max_centrality = max(centrality_scores.values()) if centrality_scores else 1
+    normalized_centrality = {node: (score - min_centrality) / (max_centrality - min_centrality + 1e-6)
+                           for node, score in centrality_scores.items()}
+
+    # Calculate promise scores (distance to destination + estimated remaining path)
+    promise_scores = {}
+    for node in unvisited_nodes:
+        distance_to_dest = distance_matrix[node][destination_node]
+        if remaining_count > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            estimated_remaining = sum(sorted(distance_matrix[node][n] for n in remaining_nodes)[:2])  # Top 2 closest
+        else:
+            estimated_remaining = 0
+        promise_scores[node] = distance_to_dest + 0.5 * estimated_remaining
+    min_promise = min(promise_scores.values()) if promise_scores else 0
+    max_promise = max(promise_scores.values()) if promise_scores else 1
+    normalized_promise = {node: (max_promise - score + min_promise) / (max_promise - min_promise + 1e-6)
+                         for node, score in promise_scores.items()}
+
+    # Combine scores with dynamic weights
+    next_node = None
+    best_score = -float('inf')
+    for node in unvisited_nodes:
+        immediate_weight = 0.5 + 0.3 * (1 - exploration_factor)
+        centrality_weight = 0.3 * exploration_factor
+        promise_weight = 0.2 + 0.1 * exploration_factor
+
+        combined_score = (immediate_weight * normalized_immediate[node] +
+                          centrality_weight * normalized_centrality[node] +
+                          promise_weight * normalized_promise[node])
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

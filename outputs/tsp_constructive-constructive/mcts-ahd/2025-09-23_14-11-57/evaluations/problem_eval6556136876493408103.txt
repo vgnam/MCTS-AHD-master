@@ -1,0 +1,21 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    unvisited_indices = [node for node in unvisited_nodes]
+    scores = []
+
+    for node in unvisited_indices:
+        immediate_cost = distance_matrix[current_node][node]
+        future_cost = distance_matrix[node][destination_node] * 0.5  # Heuristic for long-term potential
+        combined_score = immediate_cost + future_cost
+        scores.append(1 / combined_score)  # Inverse to prioritize lower costs
+
+    normalized_scores = np.array(scores) / np.sum(scores)
+    selected_index = random.choices(range(len(unvisited_indices)), weights=normalized_scores, k=1)[0]
+    next_node = unvisited_indices[selected_index]
+
+    return next_node

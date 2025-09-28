@@ -1,0 +1,6 @@
+import random
+                probs = [1 - (node_costs[node] / (min_cost + 1e-6)) ** (1 / (1 - temperature)) for node in candidate_nodes]
+                probs = [p / sum(probs) for p in probs]
+                next_node = random.choices(candidate_nodes, weights=probs)[0]
+
+    return next_node

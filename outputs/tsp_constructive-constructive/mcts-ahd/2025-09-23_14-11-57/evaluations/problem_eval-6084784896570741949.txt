@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = (total_nodes - remaining_nodes) / total_nodes
+
+    # Calculate centrality scores for each node
+    centrality_scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Calculate node centrality based on average distance to all other nodes
+        node_centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+
+        # Dynamic exploration-influence factor
+        exploration_influence = (1 - progress_factor) * 0.5 + 0.5 * (node_centrality / max(distance_matrix[node]))
+
+        # Non-linear penalty for long-term inefficiencies
+        future_penalty = (future_distance ** 1.5) if future_distance > 1.2 * sum(distance_matrix[node]) / total_nodes else future_distance
+
+        # Combined score with probabilistic selection weight
+        combined_score = (0.4 * immediate_distance) + \
+                        (0.6 * (1 / (1 + future_penalty))) - \
+                        (0.8 * exploration_influence * (1 / (1 + immediate_distance)))
+
+        scores.append(combined_score)
+
+    # Probabilistic selection based on scores
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - s + 0.1) / (max_score - min_score + 0.1) for s in scores]  # Inverse mapping with small offset
+
+    # Adjust probabilities based on centrality
+    centrality_weights = [1 + (centrality_scores[i] / max(centrality_scores)) for i in range(len(unvisited_nodes))]
+    weighted_scores = [normalized_scores[i] * centrality_weights[i] for i in range(len(unvisited_nodes))]
+
+    # Select node with probability proportional to weighted scores
+    selected_index = weighted_scores.index(max(weighted_scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

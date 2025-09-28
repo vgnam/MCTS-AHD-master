@@ -1,0 +1,38 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    weight_factor = 1.0 / (remaining_nodes + 1)  # Normalized weight for balancing
+
+    # Memory of recently visited nodes to avoid short-term revisits
+    memory = set()
+    if hasattr(select_next_node, 'last_visited'):
+        memory.add(select_next_node.last_visited)
+
+    def cost_function(node):
+        local_dist = distance_matrix[current_node][node]
+        global_dist = distance_matrix[node][destination_node]
+        detour_penalty = (local_dist + global_dist) - distance_matrix[current_node][destination_node]
+
+        # Dynamic weight adjustment: prioritize global distance as fewer nodes remain
+        dynamic_weight = weight_factor * (1 + 0.1 * (1 - weight_factor))
+
+        # Penalize nodes that were recently visited
+        memory_penalty = 1.0 if node in memory else 0.0
+
+        weighted_cost = (1 - dynamic_weight) * local_dist + dynamic_weight * global_dist + detour_penalty + memory_penalty
+        return weighted_cost
+
+    # Probabilistic selection: higher cost nodes have lower probability of being chosen
+    candidates = list(unvisited_nodes)
+    costs = [cost_function(node) for node in candidates]
+    total_cost = sum(costs)
+    probabilities = [(total_cost - cost) / total_cost for cost in costs]  # Inverse cost for selection
+
+    next_node = random.choices(candidates, weights=probabilities, k=1)[0]
+    select_next_node.last_visited = next_node  # Update memory
+
+    return next_node

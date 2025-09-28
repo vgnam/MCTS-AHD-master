@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_score = 0.0
+    remaining_nodes = len(unvisited_nodes)
+
+    # Adaptive temperature based on remaining nodes
+    temperature = 1.0 / (1 + 0.1 * remaining_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        if remaining_nodes == 1:
+            avg_distance = 0
+        else:
+            avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes - 1)
+
+        # Reinforcement learning inspired reward
+        reward = (1 - distance_to_current / (max(distance_matrix[current_node]) + 1e-6)) * \
+                 (1 - avg_distance / (max(max(row) for row in distance_matrix) + 1e-6))
+
+        # Dynamic weight based on remaining nodes and performance
+        dynamic_weight = 0.2 + 0.8 * (1 - 0.1 * min(remaining_nodes, 10))
+
+        # Penalty for long distances
+        penalty = 0.3 * distance_to_current if distance_to_current > 1.5 * avg_distance else 0
+
+        # Combined score with reinforcement
+        score = (1 - dynamic_weight) * distance_to_current + dynamic_weight * (reward * 100) - penalty
+        scores.append(score)
+        total_score += score
+
+    # Probabilistic selection with adaptive temperature
+    if total_score == 0:
+        return unvisited_nodes[0]
+
+    probabilities = [score / total_score for score in scores]
+    probabilities = [p ** (1 / temperature) for p in probabilities]
+    sum_prob = sum(probabilities)
+    probabilities = [p / sum_prob for p in probabilities]
+
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+
+    return next_node

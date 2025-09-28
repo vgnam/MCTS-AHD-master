@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    best_score = float('-inf')
+    next_node = None
+    frequency_penalty = {}
+    recent_selections = []
+
+    # Dynamic adaptive weights
+    progress_ratio = (1 - (total_unvisited / len(distance_matrix)))
+    current_weight = 0.7 * (1 - progress_ratio) + 0.3
+    destination_weight = 0.3 * progress_ratio + 0.7
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Novelty factor with reinforcement learning elements
+        base_novelty = 1 / (1 + frequency_penalty.get(node, 0))
+        recency_penalty = 0.1 if node in recent_selections[-3:] else 0
+        novelty = base_novelty * (1 - recency_penalty)
+
+        # Adaptive scoring with dynamic weights
+        combined_score = (current_weight * distance_to_current + destination_weight * distance_to_destination) * novelty
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    # Update frequency and recency tracking
+    if next_node in frequency_penalty:
+        frequency_penalty[next_node] += 1
+    else:
+        frequency_penalty[next_node] = 1
+    recent_selections.append(next_node)
+
+    return next_node

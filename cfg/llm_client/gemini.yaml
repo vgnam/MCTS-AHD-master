@@ -1,0 +1,5 @@
+target: utils.llm_client.gemini.GeminiClient
+
+model: gemini-2.5-flash  # or your Gemini model name
+temperature: 1.0
+api_key: "AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc"

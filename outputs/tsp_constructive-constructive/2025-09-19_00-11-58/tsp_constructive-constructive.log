@@ -1,0 +1,22 @@
+[2025-09-19 00:11:58,520][root][INFO] - Workspace: D:\MCTS-AHD-master\outputs\tsp_constructive-constructive\2025-09-19_00-11-58
+[2025-09-19 00:11:58,520][root][INFO] - Project Root: D:\MCTS-AHD-master
+[2025-09-19 00:11:58,520][root][INFO] - Using LLM: mistral/codestral-latest
+[2025-09-19 00:11:58,521][root][INFO] - Using Algorithm: mcts_ahd
+[2025-09-19 00:11:58,530][LiteLLM][INFO] - 
+LiteLLM completion() model= gpt-3.5-turbo-1106; provider = openai
+[2025-09-19 00:11:58,634][root][INFO] - Attempt 1 failed with error: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
+[2025-09-19 00:12:01,645][LiteLLM][INFO] - 
+LiteLLM completion() model= gpt-3.5-turbo-1106; provider = openai
+[2025-09-19 00:12:01,650][root][INFO] - Attempt 2 failed with error: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
+[2025-09-19 00:12:04,658][LiteLLM][INFO] - 
+LiteLLM completion() model= gpt-3.5-turbo-1106; provider = openai
+[2025-09-19 00:12:04,663][root][INFO] - Attempt 3 failed with error: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
+[2025-09-19 00:12:07,666][LiteLLM][INFO] - 
+LiteLLM completion() model= gpt-3.5-turbo-1106; provider = openai
+[2025-09-19 00:12:07,667][root][INFO] - Attempt 4 failed with error: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
+[2025-09-19 00:12:10,679][LiteLLM][INFO] - 
+LiteLLM completion() model= gpt-3.5-turbo-1106; provider = openai
+[2025-09-19 00:12:10,684][root][INFO] - Attempt 5 failed with error: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
+[2025-09-19 00:12:13,689][LiteLLM][INFO] - 
+LiteLLM completion() model= gpt-3.5-turbo-1106; provider = openai
+[2025-09-19 00:12:13,690][root][INFO] - Attempt 6 failed with error: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable

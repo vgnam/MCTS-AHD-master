@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Temperature-based cooling schedule
+    temperature = len(unvisited_nodes) / (len(unvisited_nodes) + 1)  # Starts at ~1, cools to 0
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Weight candidates by inverse distance and temperature
+    weights = []
+    for i, node in enumerate(nearest_neighbors):
+        distance = distance_matrix[current_node][node]
+        weight = (1 / (distance + 1e-6)) ** (1 / temperature)  # Avoid division by zero
+        weights.append(weight)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Select node based on weighted probabilities
+    next_node = random.choices(nearest_neighbors, weights=normalized_weights, k=1)[0]
+
+    return next_node

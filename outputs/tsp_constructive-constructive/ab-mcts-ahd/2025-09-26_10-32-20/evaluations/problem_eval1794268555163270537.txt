@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    weight_local = 0.6 * (0.9 ** progress)
+    weight_centrality = 0.3 + 0.4 * (progress ** 2)
+    weight_coherence = 0.1 + 0.9 * (progress ** 3)
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        momentum = (1 - progress) * distance_matrix[current_node][node] + progress * sum(distance_matrix[n][node] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        return (weight_local * (0.5 ** local_distance)) + (weight_centrality * (1 / (1 + centrality))) - (weight_coherence * (momentum ** 0.5))
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

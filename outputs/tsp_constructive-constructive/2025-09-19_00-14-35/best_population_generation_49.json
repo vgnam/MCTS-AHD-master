@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm selects the next node to visit by choosing the unvisited node closest to the current node based on the distance matrix. If no unvisited nodes remain, it returns the destination node, prioritizing destination over other nodes when all are visited. The design emphasizes greedy selection (shortest distance) while ensuring the path ends at the destination.",
+     "thought": "The algorithm selects the next node to visit based on the shortest distance from the current node, prioritizing unvisited nodes and considering the destination node if all other nodes are visited.",
+     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])\n    return next_node",
+     "objective": 7.00437,
+     "other_inf": null
+}

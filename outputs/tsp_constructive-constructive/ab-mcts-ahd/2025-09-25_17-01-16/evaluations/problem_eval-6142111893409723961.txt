@@ -1,0 +1,32 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    progress = 1 - (len(unvisited_nodes) / len(distance_matrix))
+    temperature = 0.3 + 0.7 * (1 - progress)
+    visit_counts = {node: sum(row[node] for row in distance_matrix) for node in unvisited_nodes}
+    avg_visits = sum(visit_counts.values()) / len(visit_counts) if visit_counts else 1
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        nearby_nodes = [n for n in unvisited_nodes if n != node and distance_matrix[node][n] < 1.5 * min(distance_matrix[node][other] for other in unvisited_nodes if other != node)]
+        cluster_density = len(nearby_nodes) / (1 + sum(distance_matrix[node][n] for n in nearby_nodes) / (len(nearby_nodes) + 1e-6))
+        novelty_factor = (avg_visits - visit_counts.get(node, 0)) / (avg_visits + 1e-6)
+        total_score = (1.2 * distance_to_current + 0.4 * distance_to_destination) * (0.6 + 0.4 * cluster_density) + 0.5 * novelty_factor
+        scores.append((node, total_score))
+
+    if not scores:
+        return None
+
+    min_score = min(score for _, score in scores)
+    max_score = max(score for _, score in scores)
+    normalized_scores = [(node, (score - min_score) / (max_score - min_score + 1e-6)) for node, score in scores]
+
+    probabilities = [math.exp(-score / temperature) for _, score in normalized_scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices([node for node, _ in normalized_scores], weights=probabilities, k=1)[0]
+    return next_node

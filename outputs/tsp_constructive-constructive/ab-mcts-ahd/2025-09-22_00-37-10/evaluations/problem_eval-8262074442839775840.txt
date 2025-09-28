@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(unvisited_nodes) + 1  # +1 to include current_node
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        if immediate_distance == 0:
+            ratio = 0.0
+        else:
+            ratio = lookahead_distance / immediate_distance
+
+        # Dynamic weight combining ratio and non-linear scaling
+        weight = (1.0 / (1.0 + ratio)) * (1.0 / (1.0 + (remaining_nodes / total_nodes) ** 2))
+
+        # Angular deviation penalty (simplified)
+        if current_node != destination_node and node != destination_node:
+            angle_penalty = abs((distance_matrix[current_node][node] ** 2 + distance_matrix[node][destination_node] ** 2 - distance_matrix[current_node][destination_node] ** 2) /
+                               (2 * distance_matrix[current_node][node] * distance_matrix[node][destination_node]))
+        else:
+            angle_penalty = 0.0
+
+        score = immediate_distance + weight * lookahead_distance + angle_penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

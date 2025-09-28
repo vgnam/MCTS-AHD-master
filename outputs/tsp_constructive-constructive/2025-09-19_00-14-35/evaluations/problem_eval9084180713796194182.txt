@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate inverse distances for probability weighting
+    inv_distances = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes]
+    total_inv_dist = sum(inv_distances)
+    probabilities = [inv_dist / total_inv_dist for inv_dist in inv_distances]
+
+    # Combine with destination proximity (smaller distances get higher weights)
+    dest_weights = [1.0 / (distance_matrix[node][destination_node] + 1e-6) for node in unvisited_nodes]
+    total_dest_weight = sum(dest_weights)
+    dest_probabilities = [dest_weight / total_dest_weight for dest_weight in dest_weights]
+
+    # Hybrid score: 70% inverse distance, 30% destination proximity
+    combined_scores = [0.7 * prob + 0.3 * dest_prob for prob, dest_prob in zip(probabilities, dest_probabilities)]
+
+    # Select node with highest combined score
+    next_node = unvisited_nodes[combined_scores.index(max(combined_scores))]
+    return next_node

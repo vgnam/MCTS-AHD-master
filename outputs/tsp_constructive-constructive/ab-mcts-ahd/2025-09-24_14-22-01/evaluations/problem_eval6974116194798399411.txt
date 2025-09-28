@@ -1,0 +1,28 @@
+import exp
+    import random
+
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes) - 1
+    novelty_factor = 1 / (1 + exp(-remaining_nodes / len(unvisited_nodes)))  # S-shaped novelty factor
+
+    candidates = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        dynamic_weight = 0.3 + 0.7 * (1 - novelty_factor)  # Weight adjusts with novelty
+        weighted_cost = immediate_distance + dynamic_weight * potential_distance
+        candidates.append((node, weighted_cost))
+
+    if not candidates:
+        return destination_node
+
+    # Select probabilistically based on inverse cost and novelty
+    total_inverse_cost = sum(1 / (cost + 1e-6) for _, cost in candidates)
+    probabilities = [(1 / (cost + 1e-6)) / total_inverse_cost for _, cost in candidates]
+    selected_node = random.choices([node for node, _ in candidates], weights=probabilities)[0]
+
+    return next_node

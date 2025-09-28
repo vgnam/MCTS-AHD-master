@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    total_unvisited = len(unvisited_nodes)
+
+    if total_unvisited == 0:
+        return destination_node
+
+    # Calculate median distance to current node for outlier detection
+    distances_to_current = [distance_matrix[current_node][n] for n in unvisited_nodes]
+    median_distance = sorted(distances_to_current)[len(distances_to_current) // 2]
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distances_to_unvisited = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        avg_distance = sum(distances_to_unvisited) / max(1, len(distances_to_unvisited))
+
+        # Dynamic weight based on progress and remaining nodes
+        progress_weight = 0.3 + 0.5 * (1 - min(1, total_unvisited / 10))
+        weight = 0.5 + 0.3 * progress_weight
+
+        # Outlier penalty using median
+        penalty = max(0, (distance_to_node - median_distance) * 0.5)
+
+        # Logarithmic scaling for centrality
+        centrality_factor = math.log(1 + avg_distance) if avg_distance > 0 else 0
+
+        score = distance_to_node + weight * centrality_factor + penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance increases (0.6 + 0.2*progress), exploration decreases (0.2 - 0.1*progress), and destination proximity remains constant (0.2). The score combines these factors to select the next node, balancing short-term efficiency with long-term optimization.}
+                                                                                                                                                                                                                                                                   ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance increases (0.6 + 0.2*progress), exploration decreases (0.2 - 0.1*progress), and destination proximity remains constant (0.2). The score combines these factors to select the next node, balancing short-term efficiency with long-term optimization.}
+                                                                                                                                                                                                                                                                   ^
+SyntaxError: unmatched '}'

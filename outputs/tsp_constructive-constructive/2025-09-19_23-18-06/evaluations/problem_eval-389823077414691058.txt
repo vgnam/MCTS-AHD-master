@@ -1,0 +1,6 @@
+import random
+    weights = [1 / (distance_matrix[current_node][node] + 1e-10) for node in unvisited_nodes]
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

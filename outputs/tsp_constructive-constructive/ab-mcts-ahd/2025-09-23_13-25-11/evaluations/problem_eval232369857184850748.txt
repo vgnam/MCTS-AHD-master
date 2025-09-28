@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def angularity(node):
+        if current_node == node:
+            return 0.0
+        vec_current = distance_matrix[current_node]
+        vec_node = distance_matrix[node]
+        dot_product = sum(vec_current[i] * vec_node[i] for i in range(len(vec_current)))
+        norm_current = sum(x**2 for x in vec_current) ** 0.5
+        norm_node = sum(x**2 for x in vec_node) ** 0.5
+        if norm_current == 0 or norm_node == 0:
+            return 0.0
+        cosine = dot_product / (norm_current * norm_node)
+        return 1 - cosine
+
+    weighted_scores = {
+        node: (0.7 * distance_matrix[current_node][node] + 0.3 * angularity(node)) * (1 + 0.1 * (len(unvisited_nodes) / len(distance_matrix)))
+        for node in unvisited_nodes
+    }
+
+    next_node = max(weighted_scores, key=weighted_scores.get)
+    return next_node

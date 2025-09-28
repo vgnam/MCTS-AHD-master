@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+    scaling_factor = math.log(remaining_nodes + 1) / math.log(total_nodes + 1)
+    weight_current = (remaining_nodes / total_nodes) ** scaling_factor
+    weight_future = 1 - (weight_current ** (1 / scaling_factor))
+    def heuristic(node):
+        current_dist = distance_matrix[current_node][node]
+        future_dist = distance_matrix[node][destination_node]
+        proximity_penalty = 1 / (1 + future_dist) if future_dist > 0 else 0
+        return weight_current * current_dist + weight_future * future_dist * (1 + proximity_penalty)
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

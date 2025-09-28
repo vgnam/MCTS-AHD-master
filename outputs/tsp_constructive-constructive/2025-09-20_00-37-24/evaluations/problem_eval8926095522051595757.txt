@@ -1,0 +1,30 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on distance and novelty (inverse of frequency)
+    weights = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Novelty factor: higher if node is less frequently visited (simulated here)
+        novelty = 1.0 / (len(unvisited_nodes) - unvisited_nodes.index(node) + 1)
+        weight = math.exp(-distance) * novelty
+        weights.append(weight)
+        total_weight += weight
+
+    # Normalize weights
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Select node based on weighted probability
+    if random.random() < 0.8:  # 80% chance to use weighted selection
+        next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+    else:  # 20% chance to pick a random node
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

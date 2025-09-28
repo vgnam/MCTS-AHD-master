@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - remaining_nodes / total_nodes
+    exploration_factor = 0.5 + 0.5 * (1 - progress) ** 2
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node]
+        global_potential = (distance_matrix[node][destination_node] +
+                           sum(distance_matrix[node][n] for n in unvisited_nodes if n != destination_node)) / (remaining_nodes + 1)
+        regret_term = max(distance_matrix[current_node][n] - distance_matrix[current_node][node] for n in unvisited_nodes) if unvisited_nodes else 0
+        detour_cost = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+        path_coherence = sum(distance_matrix[n][node] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+
+        fitness = (local_cost * (1 - progress) + global_potential * progress +
+                  0.3 * regret_term + 0.2 * detour_cost - 0.1 * path_coherence) * exploration_factor
+        return fitness
+
+    candidates = sorted(unvisited_nodes, key=heuristic)
+    if len(candidates) > 1:
+        top_two = candidates[:2]
+        probs = [0.7, 0.3] if heuristic(top_two[0]) < heuristic(top_two[1]) else [0.6, 0.4]
+        next_node = top_two[0] if np.random.rand() < probs[0] else top_two[1]
+    else:
+        next_node = candidates[0]
+    return next_node

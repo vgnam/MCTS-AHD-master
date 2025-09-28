@@ -1,0 +1,24 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    for node in unvisited_nodes:
+        distances.append((node, distance_matrix[current_node][node]))
+
+    distances.sort(key=lambda x: -x[1])  # Sort by distance in descending order
+    farthest_node, farthest_distance = distances[0]
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        threshold = farthest_distance * (0.5 + 0.5 * (len(unvisited_nodes) / len(distance_matrix)))  # Dynamic threshold
+
+        if destination_distance < threshold:
+            candidates = [farthest_node, destination_node]
+            weights = [0.7, 0.3]  # Favor farthest node but allow probabilistic selection
+            next_node = random.choices(candidates, weights=weights, k=1)[0]
+            return next_node
+
+    return next_node

@@ -1,0 +1,54 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Early destination check with adaptive threshold
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_distance == 0:
+            return destination_node
+        progress = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+        threshold = 0.6 + 0.4 * math.sin(progress * math.pi/2)
+        if remaining_distance <= threshold * avg_distance:
+            return destination_node
+
+    # Dynamic temperature for probabilistic selection
+    temperature = max(0.1, 0.9 * (len(unvisited_nodes) / len(distance_matrix)))
+
+    def heuristic(node):
+        # Adaptive distance weighting
+        progress = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+        distance_weight = 1.0 - 0.5 * progress
+
+        # Regret-based lookahead
+        regret = 0
+        for other in unvisited_nodes:
+            if other != node:
+                direct_cost = distance_matrix[current_node][other] + distance_matrix[other][node]
+                detour_cost = distance_matrix[current_node][node] + distance_matrix[node][other]
+                regret += max(0, detour_cost - direct_cost)
+
+        # Global potential with diversity consideration
+        global_potential = sum(distance_matrix[node][other] for other in unvisited_nodes) / (len(unvisited_nodes) + 1e-6)
+        diversity = len(unvisited_nodes) / len(distance_matrix)
+
+        # Combined score with temperature scaling
+        score = (distance_matrix[current_node][node] * distance_weight +
+                 global_potential * (1.0 - distance_weight) +
+                 regret * 0.7 +
+                 diversity * 0.2)
+
+        # Apply temperature to create probabilistic selection
+        return math.exp(-score / temperature)
+
+    # Select node with probability proportional to heuristic score
+    probabilities = [heuristic(node) for node in unvisited_nodes]
+    total = sum(probabilities)
+    probabilities = [p/total for p in probabilities]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

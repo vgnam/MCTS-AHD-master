@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        direct_distance = distance_matrix[current_node][destination_node]
+        avg_local_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_local_distance == 0:
+            return destination_node
+        threshold = 1.0 + 0.4 * (1.0 - (len(unvisited_nodes) / len(distance_matrix)))
+        if direct_distance / avg_local_distance <= threshold:
+            return destination_node
+
+    def heuristic(node):
+        # Connection strength: combines local and global connectivity
+        local_connectivity = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+        global_connectivity = sum(distance_matrix[other][destination_node] for other in unvisited_nodes) / len(unvisited_nodes)
+        connection_strength = 0.6 * local_connectivity + 0.4 * global_connectivity
+
+        # Dynamic exploration-exploitation trade-off
+        exploration_weight = 0.5 * (1.0 - (len(unvisited_nodes) / len(distance_matrix)))
+        exploitation_weight = 1.0 - exploration_weight
+
+        # Adaptive temperature cooling
+        temp = 1.0 - 0.3 * (1.0 - (len(unvisited_nodes) / len(distance_matrix)))
+
+        # Probabilistic selection with connection strength and temperature
+        selection_score = (exploitation_weight * distance_matrix[current_node][node] +
+                          exploration_weight * connection_strength) * temp
+
+        return selection_score
+
+    # Probabilistic selection with softmax
+    scores = [heuristic(node) for node in unvisited_nodes]
+    exp_scores = [math.exp(-score) for score in scores]  # Inverse for minimization
+    probabilities = [exp_score / sum(exp_scores) for exp_score in exp_scores]
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

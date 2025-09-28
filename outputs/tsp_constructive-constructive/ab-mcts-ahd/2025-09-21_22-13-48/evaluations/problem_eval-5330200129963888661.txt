@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+
+    # Calculate dynamic weight based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    dynamic_weight = 1.0 if remaining_nodes <= 3 else 0.5
+
+    # Precompute node centrality (average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality[node] = total_distance / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_savings = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+        node_centrality = centrality[node]
+
+        # Weighted score with dynamic weight and centrality
+        score = (dynamic_weight * immediate_distance) - (0.5 * future_savings) + (0.3 * node_centrality)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

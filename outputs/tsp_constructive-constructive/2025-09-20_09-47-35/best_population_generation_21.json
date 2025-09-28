@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm greedily selects the next unvisited node to minimize the increase in total distance compared to directly going to the destination. For each unvisited node, it calculates the added distance by visiting it before returning to the destination node. The node with the smallest added distance is then chosen as the next node to visit.\n",
+     "thought": "node: distance_matrix[current_node][node] + distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node] for node in unvisited_nodes",
+     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n\n    # Calculate savings for each unvisited node\n    savings = {node: distance_matrix[current_node][node] + distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node] for node in unvisited_nodes}\n\n    # Select the node with the maximum savings\n    next_node = max(savings, key=savings.get)\n\n    return next_node\n# The algorithm greedily selects the next unvisited node that maximizes the \"savings,\" calculated as the reduction in total distance by visiting that node before return next_node",
+     "objective": 32.06483,
+     "other_inf": null
+}

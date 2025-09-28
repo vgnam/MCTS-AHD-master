@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    # Calculate the maximum distance to the farthest unvisited neighbor
+    max_distance = max(distance_matrix[current_node][node] for node in unvisited_nodes)
+    
+    # Calculate the average distance to unvisited nodes
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    
+    # Initialize next node as the farthest unvisited neighbor
+    next_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    
+    # Check if destination node is in unvisited nodes
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        # Dynamic threshold based on average distance and max distance
+        threshold = (max_distance + avg_distance) / 2
+        
+        # Calculate a penalty term for the destination node
+        closer_nodes = sum(1 for node in unvisited_nodes if distance_matrix[current_node][node] < destination_distance)
+        penalty_term = 0.1 * closer_nodes / len(unvisited_nodes) * max_distance
+        
+        # Adjust the threshold with the penalty term
+        if destination_distance < (threshold - penalty_term):
+            next_node = destination_node
+    
+    return next_node

@@ -1,0 +1,57 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    # {The new algorithm enhances the original by incorporating a "regret" factor to prioritize nodes that, if missed, would significantly increase the total path length, balancing proximity with potential future cost.}
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate a regret value for each neighbor
+    regret_values = {}
+    for node in nearest_neighbors:
+        # Find the two nearest neighbors to the current node excluding the current node.
+        temp_unvisited = unvisited_nodes.copy()
+        temp_unvisited.remove(node)
+
+        if not temp_unvisited:
+             regret_values[node] = 0 #last node
+             continue
+             
+        second_nearest_neighbor = sorted(temp_unvisited, key=lambda x: distance_matrix[current_node][x])
+
+        if second_nearest_neighbor:
+            regret_values[node] = distance_matrix[current_node][second_nearest_neighbor[0]] - distance_matrix[current_node][node]
+        else:
+            regret_values[node] = 0 # no more neighbors
+
+    # Normalize regret values to a range [0, 1]
+    max_regret = max(regret_values.values()) if regret_values else 0
+    if max_regret > 0:
+        normalized_regret = {node: regret / max_regret for node, regret in regret_values.items()}
+    else:
+        normalized_regret = {node: 0 for node in regret_values.keys()}
+
+
+    # Combine distance and regret in a weighted manner
+    weighted_values = {}
+    alpha = 0.7 # Weight for distance (higher = prioritize distance)
+    beta = 1 - alpha # Weight for regret (higher = prioritize regret)
+
+    for node in nearest_neighbors:
+        distance_score = distance_matrix[current_node][node] / sum(distance_matrix[current_node][n] for n in unvisited_nodes) if sum(distance_matrix[current_node][n] for n in unvisited_nodes) > 0 else 0
+        weighted_values[node] = alpha * distance_score + beta * normalized_regret[node]
+    
+    # Introduce stochasticity based on the weighted values
+    probabilities = [1 - weighted_values[node] for node in nearest_neighbors] # Invert to prefer lower weighted values (i.e., closer and higher regret)
+    total_probability = sum(probabilities)
+    if total_probability > 0:
+        probabilities = [p / total_probability for p in probabilities]
+        next_node = random.choices(nearest_neighbors, probabilities)[0]
+    else:
+        # If all probabilities are zero (e.g., due to all distances being zero), pick a random node
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

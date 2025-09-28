@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    temperature = 1.0 - (remaining_count / total_nodes) * 0.7
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+            connectivity_penalty = (connectivity / remaining_count) ** 2
+        else:
+            avg_distance = 0
+            connectivity_penalty = 0
+
+        distance_score = immediate_distance - avg_distance
+        connectivity_score = immediate_distance * (1 + connectivity_penalty * 0.5)
+
+        combined_score = 0.6 * distance_score + 0.4 * connectivity_score
+        adjusted_score = combined_score * (1 - 0.3 * (1 - temperature))
+
+        scores.append((node, adjusted_score))
+
+    probabilities = [np.exp(-score[1] / temperature) for score in scores]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    next_node = np.random.choice([score[0] for score in scores], p=normalized_probs)
+    return next_node

@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+    ratio = remaining_nodes / total_nodes
+
+    best_score = float('inf')
+    next_node = None
+    candidate_scores = []
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight based on remaining node ratio
+        weight = 0.2 + 0.6 * (1 - ratio)
+
+        # Centrality score: average of distances to other unvisited nodes
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Penalty for long future distances relative to centrality
+        penalty = 0.1 * (future_distance - centrality)
+
+        weighted_score = current_distance + weight * future_distance - penalty
+        candidate_scores.append((node, weighted_score))
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+
+    # Probabilistic selection among top 3 candidates
+    if len(candidate_scores) > 3:
+        candidate_scores.sort(key=lambda x: x[1])
+        top_candidates = candidate_scores[:3]
+        probabilities = [1/(i+1) for i in range(len(top_candidates))]
+        total_prob = sum(probabilities)
+        normalized_prob = [p/total_prob for p in probabilities]
+        selected = np.random.choice([c[0] for c in top_candidates], p=normalized_prob)
+        return selected
+
+    return next_node

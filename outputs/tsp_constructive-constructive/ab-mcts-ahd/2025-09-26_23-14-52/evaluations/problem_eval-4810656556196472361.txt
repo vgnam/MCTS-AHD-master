@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    phase_ratio = total_unvisited / (total_unvisited + 1)
+    temperature = max(0.1, 1.0 - phase_ratio)
+    exploration_factor = 1.0 - phase_ratio ** 2
+
+    best_score = float('-inf')
+    next_node = None
+    visited_history = {}
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited
+
+        recency_penalty = visited_history.get(node, 0) * 0.1
+
+        if phase_ratio > 0.5:
+            weight_distance = 0.7
+            weight_centrality = 0.3
+        else:
+            weight_distance = 0.4
+            weight_centrality = 0.6
+
+        score = (weight_distance * (1 - current_distance / max(distance_matrix[current_node])) +
+                weight_centrality * (1 - centrality / max(distance_matrix[node])) -
+                recency_penalty)
+
+        if phase_ratio < 0.3 and exploration_factor > 0.5:
+            score += exploration_factor * (1 - phase_ratio)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+        elif score == best_score:
+            if centrality < sum(distance_matrix[next_node][n] for n in unvisited_nodes) / total_unvisited:
+                next_node = node
+
+    if next_node:
+        visited_history[next_node] = visited_history.get(next_node, 0) + 1
+
+    return next_node

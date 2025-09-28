@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = (remaining_nodes / total_nodes) ** 2
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            remaining_nodes_list = [n for n in unvisited_nodes if n != node]
+            prob_connectivity = sum(1/distance_matrix[node][n] for n in remaining_nodes_list) / len(remaining_nodes_list)
+            historical_gain = (distance_matrix[current_node][destination_node] - immediate_dist) / (1 + immediate_dist)
+            path_diversity = len(set(distance_matrix[node][n] for n in remaining_nodes_list)) / len(remaining_nodes_list)
+        else:
+            prob_connectivity = 0
+            historical_gain = 0
+            path_diversity = 0
+
+        weight_local = 0.5 - 0.4 * exploration_factor
+        weight_connectivity = 0.3 + 0.3 * exploration_factor
+        weight_gain = 0.2 * (1 - exploration_factor)
+        weight_diversity = 0.1 * path_diversity
+
+        score = (weight_local * immediate_dist) + (weight_connectivity * prob_connectivity) + \
+                (weight_gain * historical_gain) + (weight_diversity * path_diversity)
+        return score
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

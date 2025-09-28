@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    best_node = None
+    min_angle_diff = float('inf')
+    
+    for node in unvisited_nodes:
+        # Calculate the angle between the current_node-node vector and the current_node-destination_node vector
+        vector1 = (distance_matrix[current_node][node], 0)
+        vector2 = (distance_matrix[current_node][destination_node], 0)
+        
+        # Normalize the vectors
+        magnitude1 = distance_matrix[current_node][node]
+        magnitude2 = distance_matrix[current_node][destination_node]
+
+        if magnitude1 == 0:
+            unit_vector1 = (0, 0)
+        else:
+            unit_vector1 = (vector1[0] / magnitude1, 0)
+        if magnitude2 == 0:
+            unit_vector2 = (0, 0)
+        else:
+            unit_vector2 = (vector2[0] / magnitude2, 0)
+
+        # Calculate the dot product and angle
+        dot_product = unit_vector1[0] * unit_vector2[0] #+ unit_vector1[1] * unit_vector2[1]
+        angle = abs(dot_product)
+        
+        angle_diff = distance_matrix[current_node][node] + (1 - angle) * distance_matrix[current_node][destination_node]
+
+        if angle_diff < min_angle_diff:
+            min_angle_diff = angle_diff
+            best_node = node
+            
+    return next_node

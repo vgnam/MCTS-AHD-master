@@ -1,0 +1,28 @@
+defined by nodes within 1.5 times the average distance, with the weight factor decaying linearly with remaining nodes to emphasize immediate distance early on.}
+
+```python
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = remaining_nodes + 1
+    weight_factor = max(0.1, 1.0 - (remaining_nodes / total_nodes))
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        avg_distance_to_all = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.5 * avg_distance_to_all)
+        connectivity_factor = 1.0 + (connectivity / (total_nodes - 1)) * 0.4
+
+        weighted_distance = (0.6 * (1 - weight_factor) * distance_to_current) + (0.4 * weight_factor * avg_distance_to_all)
+        score = weighted_distance * connectivity_factor
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

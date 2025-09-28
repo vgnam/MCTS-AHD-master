@@ -1,0 +1,36 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate potential candidates and their heuristic scores
+    candidates = unvisited_nodes.copy()
+    candidate_scores = []
+
+    for node in candidates:
+        # Proximity score (inverse of distance)
+        proximity = 1.0 / (distance_matrix[current_node][node] + 1e-6)
+
+        # Heuristic: estimate impact on remaining tour length
+        # Using average distance to other unvisited nodes as a rough estimate
+        avg_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes) - 1)
+        heuristic_score = 1.0 / (avg_distance + 1e-6)
+
+        # Combine scores with dynamic weighting
+        alpha = 0.7  # Higher weight for proximity
+        beta = 0.3   # Lower weight for heuristic
+        total_score = alpha * proximity + beta * heuristic_score
+        candidate_scores.append(total_score)
+
+    # Select node with highest score, with some randomness
+    if random.random() < 0.8:  # 80% chance to pick best scored node
+        best_node = candidates[candidate_scores.index(max(candidate_scores))]
+    else:  # 20% chance to pick randomly (but weighted by score)
+        weights = [math.exp(score) for score in candidate_scores]  # Convert scores to weights
+        best_node = random.choices(candidates, weights=weights, k=1)[0]
+
+    return next_node

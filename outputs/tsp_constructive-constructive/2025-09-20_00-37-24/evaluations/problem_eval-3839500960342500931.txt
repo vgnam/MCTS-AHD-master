@@ -1,0 +1,32 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    # {The algorithm adaptively balances exploitation and exploration by considering both distance and a node-attractiveness score that decays with distance from the destination, biasing selection towards nodes closer to the destination and the current node, with a stochastic element to avoid local optima.}
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate attractiveness score based on distance to destination and current node
+    attractiveness = {}
+    for node in unvisited_nodes:
+        dist_to_dest = distance_matrix[node][destination_node]
+        dist_from_current = distance_matrix[current_node][node]
+        # Define the attractiveness score - higher score means more attractive
+        # Here, we use a simple inverse relationship with distance
+        attractiveness[node] = 1.0 / (dist_to_dest + dist_from_current + 1e-6) # Add a small constant to avoid division by zero
+
+    # Normalize attractiveness scores to create a probability distribution
+    total_attractiveness = sum(attractiveness.values())
+    probabilities = {node: attractiveness[node] / total_attractiveness for node in unvisited_nodes}
+
+    # Introduce stochasticity based on probabilities
+    if random.random() < 0.95: # High chance to pick based on attractiveness
+        # Weighted random choice based on probabilities
+        nodes = list(probabilities.keys())
+        weights = list(probabilities.values())
+        next_node = random.choices(nodes, weights=weights, k=1)[0]
+    else: # Low chance to pick a random node to ensure exploration
+        next_node = random.choice(list(unvisited_nodes))
+
+    return next_node

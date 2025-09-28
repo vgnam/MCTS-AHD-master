@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    total_unvisited = len(unvisited_nodes)
+    if total_unvisited == 0:
+        return None
+
+    # Calculate probability for destination node
+    if destination_node in unvisited_nodes:
+        distance = distance_matrix[current_node][destination_node]
+        probability = min(1.0, (1.0 / (1.0 + distance)) * (1.0 - (total_unvisited - 1) / total_unvisited))
+        if random.random() < probability:
+            return destination_node
+
+    # Fallback to nearest unvisited node
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        if distance_matrix[current_node][node] < min_distance:
+            min_distance = distance_matrix[current_node][node]
+            next_node = node
+    return next_node

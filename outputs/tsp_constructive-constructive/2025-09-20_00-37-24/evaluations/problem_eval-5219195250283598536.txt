@@ -1,0 +1,24 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate a dynamic probability based on the distance to the destination
+    dest_distance = distance_matrix[current_node][destination_node] if destination_node != current_node else 0
+    max_distance = max(distance_matrix[current_node][node] for node in unvisited_nodes) if unvisited_nodes else 0
+    proximity_bias = 0.5 + 0.5 * (1 - (dest_distance / max_distance)) if max_distance > 0 else 0.5
+
+    # Adjust selection probability based on the proximity bias
+    if random.random() < proximity_bias:
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

@@ -1,0 +1,9 @@
+import random
+    if random.random() < exploration_prob:
+        return random.choice(list(unvisited_nodes))
+
+    penalties = {node: penalty_factor * (1 if node in current_node else 0) for node in unvisited_nodes}
+    scores = {node: distance_matrix[current_node][node] * (1 + penalties[node]) for node in unvisited_nodes}
+    next_node = min(unvisited_nodes, key=lambda node: scores[node])
+
+    return next_node

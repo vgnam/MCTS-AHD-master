@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Track visited nodes and their frequencies (simplified for this example)
+    visit_frequency = {node: 1 for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, remaining_nodes - 1)
+
+        # Centrality measure: higher if node is closer to many other nodes
+        centrality = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < (sum(distance_matrix[node]) / len(unvisited_nodes))) / max(1, remaining_nodes)
+
+        # Dynamic weighting based on remaining nodes and centrality
+        weight_immediate = 0.8 if remaining_nodes <= 3 else 0.5 * (1 + 0.5 * centrality)
+        weight_future = 0.2 if remaining_nodes <= 3 else 0.5 * (1 - 0.5 * centrality)
+        weight_destination = 0.1 if remaining_nodes <= 3 else 0.4 * (1 + 0.3 * centrality)
+
+        # Penalty for frequently visited nodes
+        penalty = visit_frequency[node] * 0.1
+
+        score = (weight_immediate * distance_to_node +
+                 weight_future * avg_future_distance +
+                 weight_destination * distance_to_destination +
+                 penalty)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    # Update visit frequency for the selected node
+    if next_node in visit_frequency:
+        visit_frequency[next_node] += 1
+
+    return next_node

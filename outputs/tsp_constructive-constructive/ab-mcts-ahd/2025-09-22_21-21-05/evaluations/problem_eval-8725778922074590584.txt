@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    candidates = []
+    weights = []
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            future_cost = sum(distance_matrix[destination_node][n] for n in unvisited_nodes if n != destination_node)
+            weight_global = min(1.0, remaining_nodes / (remaining_nodes + 3))
+            weight_local = 1.0 - weight_global
+            score = (weight_local * distance) + (weight_global * (distance + future_cost))
+        else:
+            future_cost = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+            weight_global = min(1.0, remaining_nodes / (remaining_nodes + 5))
+            weight_local = 1.0 - weight_global
+            score = (weight_local * distance) + (weight_global * future_cost)
+
+        candidates.append(node)
+        weights.append(score)
+
+    if not candidates:
+        return destination_node
+
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+    next_node = random.choices(candidates, weights=normalized_weights, k=1)[0]
+
+    return next_node

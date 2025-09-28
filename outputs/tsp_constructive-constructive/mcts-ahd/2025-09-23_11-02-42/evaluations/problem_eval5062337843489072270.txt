@@ -1,0 +1,45 @@
+import random
+    next_node = None
+    scores = []
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_node + distance_to_destination
+        else:
+            direct_distance = distance_matrix[current_node][destination_node]
+            detour_ratio = direct_distance / (distance_to_node + distance_to_destination)
+            dynamic_detour_factor = 1.0 + (1.0 / (remaining_nodes + 1))  # Scales detour penalty based on remaining nodes
+            detour_penalty = (1.0 - detour_ratio) * direct_distance * dynamic_detour_factor
+
+            exploration_bonus = 0.0
+            for other_node in unvisited_nodes:
+                if other_node != node:
+                    exploration_bonus += distance_matrix[node][other_node]
+            if remaining_nodes > 1:
+                exploration_bonus /= (remaining_nodes - 1)
+
+            score = distance_to_node + 0.4 * detour_penalty - 0.3 * exploration_bonus
+        scores.append((node, score))
+
+    if not scores:
+        return None
+
+    # Normalize scores and select probabilistically
+    min_score = min(score[1] for score in scores)
+    normalized_scores = [(node, (min_score - score + 1e-6)) for node, score in scores]  # Avoid division by zero
+    total = sum(score for _, score in normalized_scores)
+    probabilities = [(node, score / total) for node, score in normalized_scores]
+
+    r = random.random()
+    cumulative = 0.0
+    for node, prob in probabilities:
+        cumulative += prob
+        if r <= cumulative:
+            next_node = node
+            break
+
+    return next_node

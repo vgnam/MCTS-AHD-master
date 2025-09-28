@@ -1,0 +1,32 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    scores = []
+    total_unvisited = len(unvisited_nodes)
+    weight = max(0.1, 0.5 * (total_unvisited / (total_unvisited + 1)))
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+        score = immediate_distance - weight * lookahead_distance
+        scores.append(score)
+
+    if not scores:
+        return None
+
+    min_score = min(scores)
+    max_score = max(scores)
+    score_range = max_score - min_score if max_score != min_score else 1
+
+    probabilities = []
+    for score in scores:
+        normalized_score = (score - min_score) / score_range
+        adjusted_score = 1 - normalized_score  # Higher score gets lower probability
+        probabilities.append(adjusted_score)
+
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    selected_index = random.choices(range(len(unvisited_nodes)), weights=probabilities, k=1)[0]
+    return next_node

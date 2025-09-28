@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    direct_distance = distance_matrix[current_node][destination_node]
+
+    # Adaptive proximity threshold
+    proximity_threshold = 1.5 * (remaining_nodes / (remaining_nodes + 1))
+
+    # Filter candidates based on adaptive threshold
+    filtered_nodes = [
+        node for node in unvisited_nodes
+        if distance_matrix[current_node][node] <= proximity_threshold * direct_distance
+    ]
+    if not filtered_nodes:
+        filtered_nodes = unvisited_nodes.copy()
+
+    # Dynamic weights for cost function
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes if total_nodes > 0 else 0.0
+    proximity_weight = 0.7 + 0.3 * (remaining_nodes / (remaining_nodes + 1))
+    detour_weight = 0.3 * (1 - (remaining_nodes / (remaining_nodes + 1))) + 0.2 * progress_ratio
+
+    def cost_function(node):
+        immediate_cost = distance_matrix[current_node][node]
+        detour_cost = distance_matrix[node][destination_node] - direct_distance
+        return (proximity_weight * immediate_cost) + (detour_weight * detour_cost)
+
+    next_node = min(filtered_nodes, key=cost_function)
+    return next_node

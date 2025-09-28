@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visit_counts=None):
+    if not unvisited_nodes:
+        return destination_node
+
+    if visit_counts is None:
+        visit_counts = {node: 0 for node in unvisited_nodes}
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic penalty based on visit history and distance
+        visit_penalty = 1.0 + (visit_counts[node] * 0.5)
+        proximity_penalty = 1.0 + (1.0 / (1.0 + distance_to_destination))
+        weighted_score = distance_to_current + (visit_penalty * proximity_penalty * distance_to_destination)
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+
+    if next_node is not None:
+        visit_counts[next_node] += 1
+
+    return next_node

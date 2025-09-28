@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    max_score = -float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+        if distance == 0:
+            continue
+
+        # Calculate the angle between current node, candidate node, and destination
+        # Using dot product formula: cosθ = (a·b) / (||a|| ||b||)
+        # Vectors: a = (distance_matrix[current_node][node], 0), b = (0, distance_matrix[node][destination_node])
+        # Dot product: a·b = 0 (since they are orthogonal in this simplified 2D projection)
+        # Angle is 90 degrees, so cosθ = 0, which is not useful here. Instead, use a different angle measure.
+        # Alternative: Use the ratio of distances to approximate the angle's effect.
+        angle_factor = 1.0 / (1.0 + distance)  # Smaller distance means steeper angle
+
+        # Combine ratio and angle factor
+        score = (destination_distance / distance) * angle_factor
+        if score > max_score:
+            max_score = score
+            next_node = node
+    return next_node

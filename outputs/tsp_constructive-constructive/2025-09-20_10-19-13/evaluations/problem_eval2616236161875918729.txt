@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def heuristic_cost(node):
+        direct_cost = distance_matrix[current_node][node]
+        estimated_remaining_cost = min(distance_matrix[node][dest] for dest in unvisited_nodes - {node}) if unvisited_nodes - {node} else 0
+        return direct_cost + 0.5 * estimated_remaining_cost
+
+    next_node = min(unvisited_nodes, key=heuristic_cost)
+    return next_node

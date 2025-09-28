@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+        candidates.append((node, current_dist, dest_dist))
+
+    if len(candidates) == 1:
+        return candidates[0][0]
+
+    candidates.sort(key=lambda x: x[1])
+    candidate_pool = [x[0] for x in candidates[:max(3, len(candidates)//2)]]
+
+    refined_scores = []
+    for node in candidate_pool:
+        connectivity = sum(1.0 / (1.0 + distance_matrix[node][n]) for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+        alignment = distance_matrix[current_node][node] / (distance_matrix[node][destination_node] + 1e-6)
+        refined_scores.append((node, connectivity, alignment))
+
+    refined_scores.sort(key=lambda x: (x[1], x[2]))
+    selected_node = refined_scores[0][0]
+
+    remaining_factor = len(unvisited_nodes) / len(distance_matrix)
+    if remaining_factor > 0.7:
+        selected_node = min(unvisited_nodes, key=lambda n: distance_matrix[current_node][n])
+    elif remaining_factor < 0.3:
+        selected_node = min(unvisited_nodes, key=lambda n: distance_matrix[n][destination_node])
+
+    return next_node

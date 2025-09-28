@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_steps = len(unvisited_nodes)
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Adaptive weighting based on remaining steps
+        weight = 1.0 - 0.7 * (remaining_steps / (remaining_steps + 1))
+
+        # Penalize excessive detours with a quadratic term
+        detour_penalty = (distance_to_current + distance_to_destination - distance_matrix[current_node][destination_node]) ** 2
+
+        # Combine scores with max-distance consideration
+        combined_score = max(distance_to_current, weight * distance_to_destination) + detour_penalty
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

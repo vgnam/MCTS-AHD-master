@@ -1,0 +1,26 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Initialize or update historical success rates (simplified for this example)
+    if not hasattr(select_next_node, 'success_rates'):
+        select_next_node.success_rates = {node: 1.0 for node in range(len(distance_matrix))}
+
+    # Calculate hybrid scores: balance distance and success rate
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        success_rate = select_next_node.success_rates[node]
+        hybrid_score = (1.0 / immediate_distance) * success_rate
+        scores.append(hybrid_score)
+
+    # Select node with highest hybrid score (deterministic)
+    best_index = scores.index(max(scores))
+    next_node = unvisited_nodes[best_index]
+
+    # Update success rate for the selected node (simplified feedback)
+    select_next_node.success_rates[next_node] *= 0.9  # Penalize selection to encourage diversity
+
+    return next_node

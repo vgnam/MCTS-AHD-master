@@ -1,0 +1,24 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        local_dist = distance_matrix[current_node][node]
+        avg_global_dist = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        # Dynamic weighting with sigmoid function
+        progress = 1 - (len(unvisited_nodes) / len(distance_matrix))
+        dynamic_weight = 1 / (1 + math.exp(-10 * (progress - 0.5)))
+
+        local_weight = 0.5 + 0.5 * (1 - dynamic_weight)
+        global_weight = 1.5 + 1.0 * dynamic_weight
+
+        return local_weight * local_dist + global_weight * avg_global_dist
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

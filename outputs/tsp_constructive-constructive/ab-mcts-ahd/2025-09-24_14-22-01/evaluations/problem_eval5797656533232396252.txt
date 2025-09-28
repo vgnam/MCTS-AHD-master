@@ -1,0 +1,32 @@
+import math
+    import random
+
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 / (remaining_nodes + 1))  # Higher temp for fewer nodes
+    costs = []
+    nodes = []
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        dynamic_weight = 0.5 * (remaining_nodes / (remaining_nodes + 1))
+        weighted_cost = immediate_distance + dynamic_weight * potential_distance
+        weighted_cost += 1.0 / (1 + math.exp(-0.5 * (len(unvisited_nodes) - 3)))  # Aggressive revisit penalty
+        costs.append(weighted_cost)
+        nodes.append(node)
+
+    if not nodes:
+        return destination_node
+
+    # Softmax selection based on costs
+    exp_costs = [math.exp(-cost / temperature) for cost in costs]
+    sum_exp_costs = sum(exp_costs)
+    probs = [exp_cost / sum_exp_costs for exp_cost in exp_costs]
+    next_node = random.choices(nodes, weights=probs, k=1)[0]
+
+    return next_node

@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    num_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if distance_to_destination == 0:
+            return node
+
+        centrality = sum(1 for d in distance_matrix[node] if d < distance_to_node)
+        avg_distance = sum(distance_matrix[node]) / num_nodes
+        detour_factor = (distance_to_node + distance_to_destination) / distance_matrix[current_node][destination_node]
+
+        priority = (1 - (centrality / (num_nodes - 1))) * (1 + (remaining_nodes / num_nodes))
+        score = distance_to_node * (1 + (detour_factor * priority))
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

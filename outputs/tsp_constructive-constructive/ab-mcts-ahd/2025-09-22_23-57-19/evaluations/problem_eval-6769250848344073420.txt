@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    max_dist = max(distances)
+
+    if max_dist == min_dist:
+        return unvisited_nodes[distances.index(min_dist)]
+
+    temperature = len(unvisited_nodes) / len(distance_matrix)
+    weights = [math.exp(-(d - min_dist) / (temperature * (max_dist - min_dist))) for d in distances]
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    selected_index = random.choices(range(len(unvisited_nodes)), weights=probabilities, k=1)[0]
+    return next_node

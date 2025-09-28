@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    exploration_factor = 0.5 * (len(unvisited_nodes) / total_nodes) ** 2
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        future_potential = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        geometric_mean = (current_dist * future_potential) ** 0.5
+        return (1 - exploration_factor) * current_dist + exploration_factor * geometric_mean
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

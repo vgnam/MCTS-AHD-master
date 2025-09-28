@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    proximity_weight = 0.5 * (1 + 1 / (1 + remaining_nodes))  # Non-linear adjustment
+    destination_weight = 0.5 * (1 - 1 / (1 + remaining_nodes))
+    future_weight = 0.2 / (1 + remaining_nodes)  # Decreasing weight for future cost
+
+    min_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+
+        # Estimate future cost by averaging distances to remaining nodes
+        future_cost = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, remaining_nodes - 1)
+
+        # Weighted score combining current, destination, and future costs
+        score = (proximity_weight * current_distance +
+                 destination_weight * destination_distance +
+                 future_weight * future_cost)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

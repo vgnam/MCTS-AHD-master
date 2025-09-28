@@ -1,0 +1,12 @@
+importance
+
+            # Combine with distance factors
+            score = (local_weight * distance_to_current +
+                    global_weight * distance_to_destination +
+                    (1 - local_weight - global_weight) * (centrality / 2))
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

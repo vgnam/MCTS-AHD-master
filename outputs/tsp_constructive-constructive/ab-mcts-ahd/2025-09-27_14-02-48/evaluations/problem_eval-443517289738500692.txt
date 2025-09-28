@@ -1,0 +1,46 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    base_temperature = 100
+    cooling_rate = 0.9
+    path_length_factor = 0.1
+
+    # Calculate current path length as a factor for temperature adjustment
+    current_path_length = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+    temperature = base_temperature * (1 + path_length_factor * current_path_length)
+
+    distances = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+    min_distance = min(distances.values()) if distances else float('inf')
+
+    # Calculate node centrality as inverse of average distance to all other nodes
+    centrality = {}
+    for node in unvisited_nodes:
+        avg_distance = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+        centrality[node] = 1 / (avg_distance + 1e-6)  # Avoid division by zero
+
+    while temperature > 1:
+        # Combine distance and centrality in the weight calculation
+        weights = {}
+        for node in unvisited_nodes:
+            distance_weight = math.exp(-distances[node] / temperature)
+            centrality_weight = centrality[node] ** (temperature / base_temperature)
+            weights[node] = distance_weight * centrality_weight
+
+        total_weight = sum(weights.values())
+        probabilities = {node: weight / total_weight for node, weight in weights.items()}
+
+        next_node = random.choices(list(unvisited_nodes), weights=list(probabilities.values()), k=1)[0]
+
+        # Adaptive acceptance criterion
+        if next_node == destination_node:
+            return next_node
+        elif random.random() < math.exp((min_distance - distances[next_node]) / temperature) * (1 + centrality[next_node]):
+            return next_node
+
+        temperature *= cooling_rate
+
+    return next_node

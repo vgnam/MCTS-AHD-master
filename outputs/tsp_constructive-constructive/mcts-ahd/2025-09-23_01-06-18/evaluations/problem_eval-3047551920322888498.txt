@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = 1 - (remaining_nodes / total_nodes)
+    base_pressure = 0.3 + 0.7 * progress_factor ** 2
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node]
+        global_connectivity = sum(1 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes) / remaining_nodes
+        min_cost = min(distance_matrix[current_node][n] for n in unvisited_nodes)
+        max_cost = max(distance_matrix[current_node][n] for n in unvisited_nodes)
+        normalized_regret = (local_cost - min_cost) / (max_cost - min_cost + 1e-6)
+        regret_weight = 1 - (progress_factor ** 1.5)
+        neighborhood_awareness = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes ** 2 + 1e-6)
+        hub_probability = 1 / (1 + neighborhood_awareness ** 0.5)
+        stochastic_factor = (remaining_nodes / total_nodes) ** 0.3
+
+        weighted_score = (regret_weight * (0.5 * normalized_regret + 0.3 * local_cost / (max_cost + 1e-6)) +
+                         (1 - regret_weight) * (0.4 * global_connectivity + 0.2 * hub_probability) +
+                         0.2 * stochastic_factor * (0.5 - (local_cost / (max_cost + 1e-6))))
+
+        return weighted_score
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

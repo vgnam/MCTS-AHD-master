@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    total_nodes = len(distance_matrix)
+    num_unvisited = len(unvisited_nodes)
+    ratio_unvisited = num_unvisited / total_nodes
+
+    # Adaptive weight balancing with non-linear adjustment
+    weight_proximity = 0.6 + 0.4 * (1 - ratio_unvisited**2)
+    weight_future = 0.4 + 0.6 * (1 - ratio_unvisited**2)
+
+    # Dynamic penalty for revisiting recently considered nodes
+    recent_penalty = 1.0 + 0.2 * (1 - ratio_unvisited)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, num_unvisited - 1)
+
+        # Apply dynamic penalty if node was recently considered
+        if node in [current_node, destination_node]:
+            penalty = recent_penalty
+        else:
+            penalty = 1.0
+
+        score = (weight_proximity * distance_to_node + weight_future * avg_future_distance) * penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

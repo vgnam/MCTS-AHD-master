@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+
+        # Calculate local efficiency: average distance to remaining nodes
+        local_efficiency = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+
+        # Calculate global efficiency: maximum distance to remaining nodes
+        global_efficiency = max(distance_matrix[node][other] for other in remaining_nodes)
+
+        # Dynamic weighting: higher weight for local when few nodes remain, higher for global when many nodes remain
+        weight = 0.3 + 0.7 * (len(remaining_nodes) / len(distance_matrix))
+
+        # Combine with current distance
+        return current_dist + weight * (0.5 * local_efficiency + 0.5 * global_efficiency)
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

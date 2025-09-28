@@ -1,0 +1,5 @@
+import random
+    if random.random() < prob_nearest:
+        return nearest_node
+    else:
+        return next_node

@@ -1,0 +1,51 @@
+importance of proximity to the destination based on the current temperature, and incorporating a penalty term for nodes that are likely to lead to longer paths.
+}
+
+```python
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    initial_temperature = 1000
+    cooling_rate = 0.95
+    temperature = initial_temperature
+    
+    min_total = float('inf')
+    next_node = None
+    
+    for node in unvisited_nodes:
+        remaining_nodes = unvisited_nodes - {node}
+        if destination_node in remaining_nodes:
+            remaining_nodes.remove(destination_node)
+        
+        if not remaining_nodes:
+            total = distance_matrix[current_node][node] + distance_matrix[node][destination_node]
+        else:
+            total = distance_matrix[current_node][node]
+            for next_node_candidate in remaining_nodes:
+                total += distance_matrix[node][next_node_candidate]
+            total += distance_matrix[next_node_candidate][destination_node] * (0.7 + 0.3 * (1 - temperature / initial_temperature))
+        
+        if total < min_total:
+            min_total = total
+            next_node = node
+    
+    if destination_node in unvisited_nodes:
+        destination_total = distance_matrix[current_node][destination_node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = unvisited_nodes - {destination_node}
+            for node in remaining_nodes:
+                destination_total += distance_matrix[destination_node][node] * (0.7 + 0.3 * (1 - temperature / initial_temperature))
+            destination_total += distance_matrix[node][current_node]
+        if destination_total < min_total or random.random() < temperature / initial_temperature:
+            next_node = destination_node
+    
+    temperature *= cooling_rate
+    
+    # To avoid the temperature going too low too quickly and getting stuck in local optima,
+    # we ensure it doesn't go below a certain threshold.
+    temperature = max(temperature, initial_temperature * 0.01)
+    
+    return next_node

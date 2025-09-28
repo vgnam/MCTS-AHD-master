@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm implements a nearest-neighbor heuristic for TSP, prioritizing the destination node if it's unvisited but otherwise selecting the closest unvisited node from the current node based on the distance matrix. The function checks if the destination is unvisited first (highest priority), otherwise it iterates through unvisited nodes to find the nearest neighbor (lower priority). The distance matrix and unvisited nodes set are key inputs, while the current and destination nodes guide the selection.",
+     "thought": "The algorithm selects the next node to visit based on the nearest neighbor heuristic, choosing the closest unvisited node from the current node, with a preference for the destination node if it is among the unvisited nodes.",
+     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        return destination_node\n    min_distance = float('inf')\n    next_node = None\n    for node in unvisited_nodes:\n        if distance_matrix[current_node][node] < min_distance:\n            min_distance = distance_matrix[current_node][node]\n            next_node = node\n    return next_node",
+     "objective": 7.00437,
+     "other_inf": null
+}

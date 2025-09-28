@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate average distance to unvisited nodes
+    total_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes)
+    avg_distance = total_distance / len(unvisited_nodes) if unvisited_nodes else 0
+
+    # Dynamic threshold based on average distance
+    threshold = avg_distance * 1.2
+
+    min_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    # Prioritize destination node if within dynamic threshold
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance <= threshold:
+            # Add probabilistic element to explore alternatives
+            if random.random() < 0.7:  # 70% chance to prioritize destination
+                next_node = destination_node
+            else:
+                # Consider second-best node if destination is not chosen
+                second_best = None
+                second_min = float('inf')
+                for node in unvisited_nodes:
+                    if node != next_node:
+                        distance = distance_matrix[current_node][node]
+                        if distance < second_min:
+                            second_min = distance
+                            second_best = node
+                if second_best is not None and second_min <= threshold * 1.1:
+                    next_node = second_best
+
+    return next_node

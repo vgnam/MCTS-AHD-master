@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+    remaining_count = len(unvisited_nodes)
+    dynamic_weight = 0.3 + 0.7 * (1 - (remaining_count / (remaining_count + 1))) ** 2  # Non-linear adjustment
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Exploration factor: node density in remaining graph
+        exploration_factor = sum(1 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1) if remaining_count > 1 else 0
+
+        # Proximity factor: weighted sum of local distances
+        proximity_factor = 0.6 * distance_to_current + 0.4 * distance_to_destination
+
+        # Combined score with dynamic weight
+        combined_score = proximity_factor * (1 - dynamic_weight) + exploration_factor * dynamic_weight
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,55 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    min_distance = float('inf')
+    candidates = []
+
+    # Calculate centrality and energy for each node
+    centrality = {}
+    energy = {}
+    total_energy = 0.0
+
+    for node in unvisited_nodes:
+        # Centrality as average distance to all other unvisited nodes
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality[node] = total_distance / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+
+        # Energy combines distance and centrality with path progress weight
+        path_progress = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+        energy[node] = (1 - path_progress) * distance_matrix[current_node][node] + \
+                       path_progress * (centrality[node] / (centrality.get(destination_node, 1) + 1e-6))
+        total_energy += energy[node]
+
+    # Dynamic temperature based on path progress and energy distribution
+    remaining_nodes = len(unvisited_nodes)
+    avg_energy = total_energy / remaining_nodes if remaining_nodes > 0 else 0
+    temperature = max(0.1, 0.5 * (1.0 - (remaining_nodes / len(distance_matrix))) + 0.5 * (avg_energy / (avg_energy + 1)))
+
+    # Find nearest neighbor with energy-based bias
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    # Dynamic energy threshold for rerouting
+    energy_threshold = 0.7 * avg_energy * (1.0 - (remaining_nodes / len(distance_matrix)))
+
+    # Probabilistic rerouting based on energy and temperature
+    if next_node != destination_node and remaining_nodes > 1:
+        current_energy = energy.get(next_node, 0)
+        dest_energy = energy.get(destination_node, 0)
+
+        reroute_prob = (1.0 - temperature) * (current_energy / (energy_threshold + 1e-6)) + \
+                       temperature * (dest_energy / (current_energy + 1e-6))
+
+        if (current_energy > energy_threshold and random.random() < reroute_prob) or \
+           (random.random() < temperature * (1.0 - (remaining_nodes / len(distance_matrix)))):
+            next_node = destination_node if destination_node in unvisited_nodes else next_node
+
+    return next_node

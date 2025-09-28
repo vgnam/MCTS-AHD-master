@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    progress_ratio = 1.0 - (remaining_count / total_nodes)
+    exploration_threshold = 0.7 - 0.4 * progress_ratio
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_density = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.1 * avg_distance) / len(remaining_nodes)
+        else:
+            avg_distance = 0
+            node_density = 0
+
+        lookahead_depth = max(1, min(4, remaining_count // 3))
+        nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth] if remaining_nodes else []
+        lookahead_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+        immediate_weight = 0.5 + 0.4 * (1 - progress_ratio)
+        lookahead_weight = 0.3 + 0.2 * progress_ratio
+        density_weight = 0.4 * (1 - node_density)
+
+        base_score = immediate_weight * immediate_distance + lookahead_weight * lookahead_distance - density_weight * node_density
+        penalty_factor = 1 + 0.2 * (node_density ** 2) * (1 - progress_ratio)
+
+        if immediate_distance < exploration_threshold * avg_distance:
+            penalty_factor *= 1.2
+
+        score = base_score * penalty_factor
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

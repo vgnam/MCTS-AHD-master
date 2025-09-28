@@ -1,0 +1,26 @@
+import random
+    import math
+
+    probabilities = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        exploration_potential = sum(distance_matrix[node][n] for n in remaining_nodes) if remaining_nodes else 0
+
+        weight = math.exp(-distance_to_node) * (1 + exploration_potential)
+        probabilities.append((node, weight))
+        total_weight += weight
+
+    if total_weight == 0:
+        return random.choice(list(unvisited_nodes))
+
+    normalized_probabilities = [(node, weight / total_weight) for node, weight in probabilities]
+    selected_node = random.choices(
+        [node for node, _ in normalized_probabilities],
+        weights=[prob for _, prob in normalized_probabilities],
+        k=1
+    )[0]
+
+    return next_node

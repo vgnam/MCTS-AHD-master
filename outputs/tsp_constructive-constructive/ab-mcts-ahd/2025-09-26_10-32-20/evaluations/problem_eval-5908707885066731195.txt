@@ -1,0 +1,27 @@
+importance as the path length grows, favoring closer nodes in later stages to prevent excessive detours.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    current_path_length = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / total_nodes if unvisited_nodes else 0
+
+    def global_centrality(node):
+        return 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+
+    def adaptive_weight(path_length):
+        base_weight = 0.5
+        growth_rate = 0.01
+        return min(base_weight + growth_rate * path_length, 0.8)
+
+    local_weight = adaptive_weight(current_path_length)
+    global_weight = 1 - local_weight
+
+    def hybrid_score(node):
+        local_score = distance_matrix[current_node][node]
+        global_score = global_centrality(node)
+        return global_weight * global_score + local_weight * local_score
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

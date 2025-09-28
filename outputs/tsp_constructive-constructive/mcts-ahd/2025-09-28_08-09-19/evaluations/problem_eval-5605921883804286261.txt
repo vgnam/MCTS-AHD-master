@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    scores = []
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Adaptive temperature for probabilistic selection
+    temperature = 1.0 - (remaining_nodes / total_nodes) ** 2
+    novelty_bonus = {node: 1.0 + (1.0 / (1.0 + distance_matrix[current_node][node])) for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+        destination_distance = distance_matrix[node][destination_node]
+
+        # Hybrid scoring with novelty bonus
+        distance_score = (1.0 / (1.0 + immediate_distance)) ** 2
+        potential_score = (1.0 / (1.0 + future_potential)) ** 0.5
+        alignment_score = 1.0 / (1.0 + destination_distance)
+
+        combined_score = (0.5 * distance_score + 0.3 * potential_score + 0.2 * alignment_score) * novelty_bonus[node]
+        scores.append((node, combined_score))
+
+    # Temperature-controlled probabilistic selection
+    probabilities = [score ** (1.0 / temperature) for (_, score) in scores]
+    sum_probs = sum(probabilities)
+    normalized_probs = [p / sum_probs for p in probabilities]
+
+    next_node = random.choices([node for (node, _) in scores], weights=normalized_probs, k=1)[0]
+    return next_node

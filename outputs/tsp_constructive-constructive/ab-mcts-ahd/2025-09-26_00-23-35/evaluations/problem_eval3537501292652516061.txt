@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = -float('inf')
+
+    # Calculate connectivity (number of nearby nodes)
+    connectivity = {}
+    for node in unvisited_nodes:
+        threshold = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+        connectivity[node] = sum(1 for other in unvisited_nodes if other != node and distance_matrix[node][other] <= threshold)
+
+    # Fixed exploration factor
+    exploration_factor = 0.5
+
+    # Calculate scores for each node
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+
+        # Score combines proximity and connectivity equally
+        score = (1 - exploration_factor) * (-distance_to_node) + \
+                exploration_factor * connectivity[node]
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

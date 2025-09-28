@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1 or (destination_node in unvisited_nodes and len(unvisited_nodes) <= 3):
+        return destination_node
+
+    if len(unvisited_nodes) % 2 == 1:
+        min_distance = float('inf')
+        next_node = None
+        for node in unvisited_nodes:
+            if distance_matrix[current_node][node] < min_distance:
+                min_distance = distance_matrix[current_node][node]
+                next_node = node
+    else:
+        max_distance = -float('inf')
+        next_node = None
+        for node in unvisited_nodes:
+            if distance_matrix[current_node][node] > max_distance:
+                max_distance = distance_matrix[current_node][node]
+                next_node = node
+
+    return next_node

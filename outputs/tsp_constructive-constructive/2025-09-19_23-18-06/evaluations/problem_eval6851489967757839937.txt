@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    immediate_weight = 0.2 + 0.6 * (1.0 / (num_unvisited + 1))
+    future_weight = 0.8 - 0.6 * (1.0 / (num_unvisited + 1))
+
+    def potential_reduction(node):
+        immediate_dist = distance_matrix[current_node][node]
+        if num_unvisited <= 1:
+            return immediate_dist
+
+        remaining = unvisited_nodes - {node}
+        if not remaining:
+            return immediate_dist
+
+        closest_remaining = min(remaining, key=lambda n: distance_matrix[node][n])
+        future_dist = distance_matrix[node][closest_remaining]
+        avg_future_dist = sum(distance_matrix[node][n] for n in remaining) / len(remaining)
+        return immediate_weight * immediate_dist + future_weight * (0.7 * future_dist + 0.3 * avg_future_dist)
+
+    candidates = []
+    for node in unvisited_nodes:
+        reduction = potential_reduction(node)
+        candidates.append((node, reduction))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

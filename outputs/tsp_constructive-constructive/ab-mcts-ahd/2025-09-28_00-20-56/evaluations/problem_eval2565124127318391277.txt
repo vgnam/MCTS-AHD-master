@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_dist = distance_matrix[node][destination_node]
+        num_unvisited = len(unvisited_nodes)
+
+        if current_dist == 0:
+            ratio = float('inf')
+        else:
+            ratio = remaining_dist / current_dist
+
+        threshold = 0.8 - 0.05 * (num_unvisited / (num_unvisited + 1))
+
+        lookahead_score = (num_unvisited * current_dist + remaining_dist) * (1 / ratio)
+
+        detour_penalty = 0
+        for other_node in unvisited_nodes:
+            if other_node != node:
+                detour_penalty += max(0, current_dist + distance_matrix[node][other_node] - distance_matrix[current_node][other_node])
+
+        return 0.6 * current_dist + 0.2 * lookahead_score + 0.2 * detour_penalty
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

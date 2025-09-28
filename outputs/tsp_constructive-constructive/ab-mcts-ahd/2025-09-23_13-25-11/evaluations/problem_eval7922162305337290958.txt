@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes else 1.0
+    decay_factor = 0.8 ** (1 - remaining_ratio)  # Decay factor based on remaining nodes
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        # Calculate average future distance
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+
+        # Combine with decayed historical performance
+        combined_score = (1 - decay_factor) * current_dist + decay_factor * avg_future_dist
+
+        # Add probabilistic bias based on node centrality
+        centrality_bias = sum(1 / distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        final_score = combined_score * (1 + 0.1 * centrality_bias)
+
+        return final_score
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

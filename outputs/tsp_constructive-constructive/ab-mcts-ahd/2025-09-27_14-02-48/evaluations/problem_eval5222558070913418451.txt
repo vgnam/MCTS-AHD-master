@@ -1,0 +1,53 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    temperature = 100
+    cooling_rate = 0.9
+    
+    # Calculate node potentials
+    node_potentials = {node: sum(1 / (distance_matrix[node][other_node] + 1e-6) for other_node in unvisited_nodes if other_node != node) for node in unvisited_nodes}
+    
+    # Find nearest neighbor based on a weighted sum of distance and node potential
+    min_score = float('inf')
+    nearest_neighbor = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        potential = node_potentials[node]
+        score = distance - 0.1 * potential  # Weighted sum
+        if score < min_score:
+            min_score = score
+            nearest_neighbor = node
+    
+    # Check if destination node is a valid choice
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        destination_potential = node_potentials[destination_node]
+        destination_score = destination_distance - 0.1 * destination_potential
+    else:
+        destination_score = float('inf')
+    
+    while temperature > 1:
+        if random.random() < (temperature / 100) ** 2:
+            next_node = random.choice(list(unvisited_nodes))
+        else:
+            if destination_score < min_score:
+                next_node = destination_node
+            else:
+                next_node = nearest_neighbor
+        
+        if next_node not in unvisited_nodes:
+            temperature *= cooling_rate
+            continue
+        
+        # Sigmoid function to calculate probability
+        prob = 1 / (1 + math.exp((distance_matrix[current_node][next_node] - min_score) / (temperature + 1)))
+        if next_node == destination_node or random.random() < prob:
+            return next_node
+        
+        temperature *= cooling_rate
+    
+    return next_node

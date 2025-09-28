@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = 1 - (remaining_nodes / total_nodes)
+    momentum_factor = progress_factor ** 2
+
+    max_distance = max(max(row) for row in distance_matrix)
+    dynamic_threshold = max_distance * (0.7 + 0.3 * progress_factor)
+
+    local_distances = [distance_matrix[current_node][i] for i in unvisited_nodes]
+    avg_local = sum(local_distances) / remaining_nodes if remaining_nodes else 0
+    std_local = (sum((d - avg_local) ** 2 for d in local_distances) / remaining_nodes) ** 0.5 if remaining_nodes else 0
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node] / dynamic_threshold
+        detour_cost = (distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]) / dynamic_threshold
+        global_potential = (detour_cost + sum(distance_matrix[node][n] for n in unvisited_nodes if n != destination_node)) / (remaining_nodes + 1)
+
+        node_degree = sum(1 for d in distance_matrix[node] if d < dynamic_threshold)
+        centrality_score = node_degree / total_nodes
+        exploration_bonus = centrality_score * (1 - momentum_factor)
+
+        weighted_score = (1 - momentum_factor) * local_cost + momentum_factor * global_potential - 0.3 * exploration_bonus
+        return weighted_score
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

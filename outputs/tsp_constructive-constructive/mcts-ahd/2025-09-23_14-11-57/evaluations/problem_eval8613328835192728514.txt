@@ -1,0 +1,26 @@
+import random
+    import math
+
+    weights = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+        combined_score = immediate_distance + 0.3 * lookahead_distance
+        weight = 1.0 / (combined_score + 1e-6)  # Avoid division by zero
+        weights.append((node, weight))
+        total_weight += weight
+
+    if total_weight == 0:
+        return random.choice(unvisited_nodes)
+
+    rand_val = random.uniform(0, total_weight)
+    cumulative_weight = 0.0
+
+    for node, weight in weights:
+        cumulative_weight += weight
+        if rand_val <= cumulative_weight:
+            return node
+
+    return next_node

@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic heuristic factor based on remaining nodes
+        heuristic_factor = 0.3 + 0.7 * (remaining_nodes / (remaining_nodes + 1))  # Adjusts between 0.3 and 1.0
+
+        # Weighted score with dynamic factor
+        score = (heuristic_factor * (1 / distance_to_node)) + ((1 - heuristic_factor) * (1 / distance_to_destination))
+
+        # Additional penalty for nodes far from destination in later stages
+        if remaining_nodes < 3:
+            score *= (1 / (1 + distance_to_destination))
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

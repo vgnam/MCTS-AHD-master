@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    candidates = []
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        score = current_distance + avg_distance
+        candidates.append((node, score))
+
+    candidates.sort(key=lambda x: x[1])
+    top_candidates = [node for node, score in candidates[:min(3, len(candidates))]]
+
+    if random.random() < 0.9:
+        next_node = random.choice(top_candidates)
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

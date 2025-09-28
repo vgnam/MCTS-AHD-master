@@ -1,0 +1,5 @@
+import random
+    if random.random() < probability:
+        return destination_node
+    else:
+        return next_node

@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    base_alpha = 0.7
+    base_beta = 0.3
+    gamma = 0.5
+
+    # Dynamic weighting based on remaining unvisited nodes
+    if len(unvisited_nodes) > 1:
+        alpha = base_alpha * (1 - 0.5 * (len(unvisited_nodes) / len(distance_matrix)))
+        beta = base_beta * (1 + 0.5 * (len(unvisited_nodes) / len(distance_matrix)))
+    else:
+        alpha, beta = base_alpha, base_beta
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate variance of distances to remaining unvisited nodes
+        remaining_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        if remaining_distances:
+            mean_distance = sum(remaining_distances) / len(remaining_distances)
+            variance = sum((x - mean_distance)**2 for x in remaining_distances) / len(remaining_distances)
+        else:
+            variance = 0
+
+        # Novelty factor: prioritize nodes with intermediate distances
+        novelty = abs(distance_to_current - distance_to_destination)
+
+        # Weighted sum with dynamic weighting and novelty factor
+        score = (alpha * distance_to_current + beta * distance_to_destination) + gamma * (variance / (distance_to_current + 1e-6)) + novelty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

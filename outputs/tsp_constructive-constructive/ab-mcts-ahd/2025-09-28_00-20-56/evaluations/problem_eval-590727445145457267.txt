@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        euclidean_to_dest = ((node[0] - destination_node[0])**2 + (node[1] - destination_node[1])**2)**0.5
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            best_lookahead = min(remaining_nodes, key=lambda n: distance_matrix[node][n] + distance_matrix[n][destination_node])
+            lookahead_dist = distance_matrix[node][best_lookahead] + distance_matrix[best_lookahead][destination_node]
+        else:
+            lookahead_dist = distance_matrix[node][destination_node]
+        dynamic_weight = 0.7 + 0.3 * (1 - (euclidean_to_dest / max_euclidean_distance))
+        return dynamic_weight * current_dist + (1 - dynamic_weight) * lookahead_dist
+
+    if not destination_node in distance_matrix:
+        max_euclidean_distance = max(((n[0] - destination_node[0])**2 + (n[1] - destination_node[1])**2)**0.5 for n in unvisited_nodes)
+    else:
+        max_euclidean_distance = max(distance_matrix[current_node][node] for node in unvisited_nodes)
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

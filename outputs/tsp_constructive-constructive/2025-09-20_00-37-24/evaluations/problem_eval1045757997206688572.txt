@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        # Dynamic weighting: bias toward destination based on proximity and stochasticity
+        proximity_bias = 1.0 / (1.0 + distance_matrix[current_node][destination_node])
+        stochastic_weight = random.random()
+        if stochastic_weight < 0.7 * proximity_bias:  # Higher chance to pick destination if close
+            return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Temperature-based stochasticity: more exploration early, less later
+    temperature = len(unvisited_nodes) / len(distance_matrix)
+    exploration_prob = 0.3 * temperature + 0.1  # Linear decay from 0.4 to 0.1
+
+    if random.random() < exploration_prob:
+        # Explore: pick a random node with probability inversely proportional to its rank
+        weights = [1.0 / (i + 1) for i in range(len(nearest_neighbors))]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+    else:
+        # Exploit: pick from top 3 nearest with weighted probability
+        top_candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        weights = [1.0 / (i + 1) for i in range(len(top_candidates))]
+        next_node = random.choices(top_candidates, weights=weights, k=1)[0]
+
+    return next_node

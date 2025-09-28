@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    preference_matrix = {}
+    exploration_weight = 0.3
+    exploitation_weight = 0.7
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        local_score = (1 / (1 + distance_to_node)) * (distance_to_dest ** 0.5)
+        global_score = (0.5 * (distance_to_node / avg_distance))
+        preference_matrix[node] = local_score + global_score
+
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        if dest_distance < avg_distance * 0.7:
+            preference_matrix[destination_node] += 100
+
+    if random.random() < exploration_weight:
+        next_node = random.choice(unvisited_nodes)
+    else:
+        next_node = max(preference_matrix.items(), key=lambda x: x[1])[0]
+
+    return next_node

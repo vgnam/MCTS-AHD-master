@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    temperature = 0.3  # Controls randomness in selection
+    history_factor = 0.2  # Weights historical traversal frequency
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        # Global centrality: inverse of average distance to remaining nodes
+        centrality_score = 1 / (avg_distance_to_remaining + 1e-6)
+
+        # Historical traversal factor (simulated as inverse of node index for demo)
+        traversal_history = 1 / (node + 1) if node != 0 else 1  # Placeholder for actual history tracking
+
+        # Hybrid scoring with temperature adjustment
+        score = (distance_to_current + distance_to_destination) * (1 - history_factor) + centrality_score * history_factor
+        score *= (1 - temperature) + temperature * traversal_history
+
+        scores.append(score)
+
+    # Probabilistic selection with softmax
+    exp_scores = [math.exp(s) for s in scores]
+    sum_exp = sum(exp_scores)
+    probs = [e / sum_exp for e in exp_scores]
+    next_node = np.random.choice(unvisited_nodes, p=probs)
+
+    return next_node

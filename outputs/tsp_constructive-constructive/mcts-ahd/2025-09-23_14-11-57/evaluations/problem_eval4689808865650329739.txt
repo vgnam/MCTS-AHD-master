@@ -1,0 +1,57 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    exploration_factor = 1 / (1 + np.exp(-0.2 * (remaining_nodes - 5)))
+
+    immediate_weight = exploration_factor
+    future_weight = 1 - exploration_factor
+
+    node_degrees = [sum(1 for d in distance_matrix[node] if d > 0) for node in unvisited_nodes]
+    max_degree = max(node_degrees) if node_degrees else 1
+    degree_centrality = [1 - (d / max_degree) for d in node_degrees]
+
+    betweenness_centrality = []
+    for node in unvisited_nodes:
+        betweenness = 0
+        for u in unvisited_nodes:
+            if u != node:
+                for v in unvisited_nodes:
+                    if v != node and u != v:
+                        shortest_u_v = distance_matrix[u][v]
+                        shortest_u_node_v = distance_matrix[u][node] + distance_matrix[node][v]
+                        betweenness += (shortest_u_node_v <= 1.1 * shortest_u_v)
+        betweenness_centrality.append(betweenness)
+
+    max_betweenness = max(betweenness_centrality) if betweenness_centrality else 1
+    normalized_betweenness = [b / max_betweenness for b in betweenness_centrality]
+
+    centrality_scores = [0.6 * d + 0.4 * b for d, b in zip(degree_centrality, normalized_betweenness)]
+
+    memory = {node: 0 for node in unvisited_nodes}
+    recent_selections = []
+
+    scores = []
+    for i, node in enumerate(unvisited_nodes):
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = 0
+
+        if remaining_nodes > 1:
+            next_nodes = [n for n in unvisited_nodes if n != node]
+            future_potential = sum(distance_matrix[node][n] + distance_matrix[n][destination_node] for n in next_nodes) / len(next_nodes)
+
+        penalty = 0.2 * (1.0 / (immediate_distance + 1e-6)) if immediate_distance < 0.3 else 0
+        memory_factor = 0.1 * memory[node]
+
+        combined_score = immediate_weight * immediate_distance + future_weight * future_potential - penalty + memory_factor + 0.2 * centrality_scores[i]
+        scores.append(combined_score)
+
+        if recent_selections and recent_selections[-1] == node:
+            memory[node] += 0.1
+        recent_selections.append(node)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

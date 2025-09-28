@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    centralities = []
+    proximity_diversities = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        centrality = sum(1 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes if n != node)
+        centralities.append(centrality)
+
+        proximity_diversity = (immediate_distance + future_potential) / (1 + centrality)
+        proximity_diversities.append(proximity_diversity)
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    phase_factor = remaining_nodes / total_nodes
+    centrality_weight = max(0.1, 0.7 * phase_factor)
+    regret_weight = max(0.1, 0.6 * phase_factor)
+    distance_weight = 1.0 - centrality_weight - regret_weight
+    proximity_diversity_weight = max(0.1, 0.4 * phase_factor)
+
+    scores = [
+        centrality_weight * centrality + regret_weight * regret + distance_weight * distance + proximity_diversity_weight * pd
+        for centrality, regret, distance, pd in zip(centralities, regrets, distances, proximity_diversities)
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

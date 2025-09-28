@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_value = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    if remaining_nodes == 0:
+        return destination_node
+
+    weight_factor = 1.0 / (1.0 + np.log1p(remaining_nodes))
+    node_density = {node: sum(1 for n in unvisited_nodes if distance_matrix[node][n] < np.mean(distance_matrix[node])) for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        density_factor = node_density[node] / max(node_density.values()) if max(node_density.values()) > 0 else 1.0
+        decay_factor = np.exp(-0.1 * remaining_nodes)
+
+        value = (0.6 * distance_to_current + 0.4 * (distance_to_destination ** weight_factor)) * (1 + 0.2 * density_factor * decay_factor)
+
+        if value < min_value:
+            min_value = value
+            next_node = node
+
+    return next_node

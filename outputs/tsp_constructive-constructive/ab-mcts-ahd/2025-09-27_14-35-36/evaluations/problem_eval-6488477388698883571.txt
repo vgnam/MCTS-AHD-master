@@ -1,0 +1,33 @@
+importance metric that combines proximity, destination alignment, and node centrality, with a greedy selection that prioritizes high-scoring nodes while occasionally exploring less immediate options to avoid local optima.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    unvisited_count = len(unvisited_nodes)
+    total_unvisited = unvisited_count + 1
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+
+        proximity_factor = 1 / (1 + distance_to_node)
+        alignment_factor = (distance_to_dest / distance_to_node) ** 1.5
+        centrality_factor = sum(distance_matrix[node][n] for n in unvisited_nodes) / (unvisited_count * distance_to_node)
+
+        dynamic_weight = 0.5 if unvisited_count < total_unvisited * 0.3 else 0.7
+        score = (dynamic_weight * proximity_factor) + ((1 - dynamic_weight) * alignment_factor) + (0.2 * centrality_factor)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / unvisited_count
+        if dest_distance < avg_distance * 0.6:
+            next_node = destination_node
+
+    return next_node

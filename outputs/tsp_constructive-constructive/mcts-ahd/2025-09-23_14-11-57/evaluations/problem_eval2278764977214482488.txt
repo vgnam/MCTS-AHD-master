@@ -1,0 +1,57 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    centralities = []
+    exploration_penalties = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = max(0, distance_matrix[current_node][node] - second_best)
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Centrality measure: sum of distances to all other unvisited nodes
+        centrality = sum(distance_matrix[node][n] for n in other_nodes) if other_nodes else 0
+        centralities.append(centrality)
+
+        exploration_penalties.append(0.15 * (1.0 / (immediate_distance**2 + 1e-6)))
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic weights with sigmoid transition
+    exploration_phase = 1.0 - (remaining_nodes / total_nodes)
+    regret_weight = 0.6 * (1.0 - exploration_phase) + 0.3 * exploration_phase
+    distance_weight = 0.4 * exploration_phase + 0.6 * (1.0 - exploration_phase)
+    centrality_weight = 0.1 * exploration_phase + 0.3 * (1.0 - exploration_phase)
+    exploration_factor = 0.5 + 0.4 * exploration_phase
+
+    # Dynamic regret threshold based on exploration phase
+    regret_threshold = 0.5 * (1.0 - exploration_phase)
+
+    scores = []
+    for regret, distance, centrality, penalty in zip(regrets, distances, centralities, exploration_penalties):
+        # Apply regret threshold
+        effective_regret = regret if regret > regret_threshold else 0
+        score = (regret_weight * effective_regret +
+                 distance_weight * distance -
+                 centrality_weight * centrality -
+                 exploration_factor * penalty)
+        scores.append(score)
+
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

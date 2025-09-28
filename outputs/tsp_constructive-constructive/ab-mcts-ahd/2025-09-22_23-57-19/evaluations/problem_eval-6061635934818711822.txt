@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    min_cost = float('inf')
+    max_cost = -float('inf')
+    next_node_min = None
+    next_node_max = None
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost < min_cost:
+            min_cost = cost
+            next_node_min = node
+        if cost > max_cost:
+            max_cost = cost
+            next_node_max = node
+
+    if next_node_min is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        for node in unvisited_nodes:
+            if node == next_node_min:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node_min]
+            if potential_cost < max_cost * 0.25:
+                next_node_min = node
+                break
+
+    return next_node

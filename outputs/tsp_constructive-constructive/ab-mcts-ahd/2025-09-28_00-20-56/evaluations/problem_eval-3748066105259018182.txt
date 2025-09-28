@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [(node, distance_matrix[current_node][node]) for node in unvisited_nodes]
+    distances.sort(key=lambda x: x[1])
+
+    if not distances:
+        return destination_node
+
+    nearest_nodes = [node for node, _ in distances[:3]]
+    avg_nearest_distance = sum(d for _, d in distances[:3]) / len(distances[:3]) if distances[:3] else float('inf')
+
+    dynamic_threshold = 1.2 * avg_nearest_distance
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_node in nearest_nodes or destination_distance <= dynamic_threshold:
+            return destination_node
+
+    return next_node

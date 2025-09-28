@@ -1,0 +1,32 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic bias: preference for unvisited nodes with shorter distances and lower visitation frequency
+    node_scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Simulate visitation frequency (in practice, this would track historical visits)
+        frequency = random.uniform(0.1, 0.5)  # Placeholder for demonstration
+        node_scores[node] = distance * (1 + frequency)  # Higher score means less favorable
+
+    # Sort nodes by score (lower is better)
+    sorted_nodes = sorted(unvisited_nodes, key=lambda node: node_scores[node])
+
+    # Dynamic selection: higher probability for nodes with lower scores
+    selection_probs = [1 / (i + 1) for i in range(len(sorted_nodes))]
+    selection_probs = [p / sum(selection_probs) for p in selection_probs]  # Normalize
+
+    # Occasionally explore distant nodes (10% chance)
+    if random.random() < 0.9:
+        next_node = random.choices(sorted_nodes, weights=selection_probs, k=1)[0]
+    else:
+        # Pick from top 20% most distant nodes to encourage exploration
+        distant_nodes = sorted_nodes[int(0.8 * len(sorted_nodes)):]
+        next_node = random.choice(distant_nodes) if distant_nodes else random.choice(sorted_nodes)
+
+    return next_node

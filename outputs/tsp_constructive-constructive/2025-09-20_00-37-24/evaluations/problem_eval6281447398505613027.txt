@@ -1,0 +1,35 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on distance and potential for future optimization
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Weight is inversely proportional to distance but with stochastic variation
+        weight = 1.0 / (distance + 1e-6)  # Avoid division by zero
+        weights.append(weight)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Introduce probabilistic selection with bias toward higher-weighted nodes
+    if random.random() < 0.8:  # 80% chance of weighted selection
+        next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+    else:  # 20% chance of stochastic exploration
+        # Consider both immediate neighbors and more distant nodes with lower probability
+        if destination_node in unvisited_nodes:
+            candidates = [destination_node] + [node for node in unvisited_nodes if node != destination_node]
+            weights = [1.0] + [0.5 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes if node != destination_node]
+        else:
+            candidates = unvisited_nodes
+            weights = [0.5 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes]
+        total = sum(weights)
+        weights = [w / total for w in weights]
+        next_node = random.choices(candidates, weights=weights, k=1)[0]
+
+    return next_node

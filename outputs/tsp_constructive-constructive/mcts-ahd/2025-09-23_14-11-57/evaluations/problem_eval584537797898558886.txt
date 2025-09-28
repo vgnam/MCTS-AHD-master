@@ -1,0 +1,69 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    coherence_scores = []
+    directional_stabilities = []
+    future_potentials = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = min(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        future_potentials.append(future_potential)
+        distances.append(immediate_distance)
+
+        # Calculate regret
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = max(0, distance_matrix[current_node][node] - second_best)
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Calculate path coherence
+        if len(unvisited_nodes) > 1:
+            avg_distance = sum(distance_matrix[n][m] for n in unvisited_nodes for m in unvisited_nodes if n != m) / (len(unvisited_nodes) * (len(unvisited_nodes) - 1))
+            coherence = (immediate_distance + future_potential) / (1 + avg_distance)
+        else:
+            coherence = 1.0
+        coherence_scores.append(coherence)
+
+        # Calculate directional stability
+        if len(unvisited_nodes) > 2:
+            stability = 0
+            for n1 in unvisited_nodes:
+                for n2 in unvisited_nodes:
+                    if n1 != n2 and n1 != node and n2 != node:
+                        stability += abs(distance_matrix[current_node][n1] - distance_matrix[n1][n2])
+            stability /= (len(unvisited_nodes) * (len(unvisited_nodes) - 1))
+            directional_stabilities.append(stability)
+        else:
+            directional_stabilities.append(0)
+
+    # Dynamic weight adjustment
+    progress = 1 - (len(unvisited_nodes) / len(distance_matrix))
+    regret_weight = max(0.1, 0.8 - 0.6 * progress)
+    distance_weight = 0.4 + 0.4 * progress
+    coherence_weight = min(0.7, 0.2 + 0.5 * progress)
+    stability_weight = min(0.6, 0.1 + 0.5 * progress)
+
+    # Combined scoring with future potential
+    scores = [
+        regret_weight * regret + distance_weight * distance + coherence_weight * coherence + stability_weight * stability
+        for regret, distance, coherence, stability in zip(regrets, distances, coherence_scores, directional_stabilities)
+    ]
+
+    # Adjust scores with future potential
+    adjusted_scores = [
+        score + 0.3 * future_potential / max(future_potentials) if future_potentials else score
+        for score, future_potential in zip(scores, future_potentials)
+    ]
+
+    min_score = min(adjusted_scores)
+    selected_index = adjusted_scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

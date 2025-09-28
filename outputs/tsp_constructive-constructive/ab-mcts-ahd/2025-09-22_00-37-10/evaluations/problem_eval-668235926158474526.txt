@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(unvisited_nodes) + 1
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        # Adaptive lookahead weight
+        lookahead_weight = 0.5 * (1 + (total_nodes - remaining_nodes) / total_nodes)
+
+        # Dynamic proximity clustering prevention
+        proximity_factor = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / remaining_nodes
+        proximity_penalty = 0.5 * (1 + remaining_nodes / total_nodes) * proximity_factor
+
+        # Non-linear reward for node selection
+        reward = (1 / immediate_distance) * (1 + lookahead_weight * (1 / lookahead_distance)) - proximity_penalty
+
+        if reward > best_score:
+            best_score = reward
+            next_node = node
+
+    return next_node

@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    # Dynamic nearest neighbor search
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    min_distance = distance_matrix[current_node][nearest_neighbors[0]]
+    
+    # Check if destination node is a valid choice and is closer than the nearest neighbor
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance <= min_distance:  # Changed to <= to prioritize destination node when equally close
+            return destination_node
+    
+    # Return the nearest neighbor
+    return next_node

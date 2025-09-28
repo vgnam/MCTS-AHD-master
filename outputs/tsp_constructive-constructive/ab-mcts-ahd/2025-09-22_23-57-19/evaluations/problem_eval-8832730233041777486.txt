@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    temperature = len(unvisited_nodes) / len(distance_matrix)
+    candidates = []
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        penalty = 1.0 if node in unvisited_nodes else 1.5
+        adjusted_cost = cost * penalty
+        candidates.append((node, adjusted_cost))
+
+    if not candidates:
+        return unvisited_nodes.pop()
+
+    candidates.sort(key=lambda x: x[1], reverse=True)
+    top_candidate = candidates[0][0]
+
+    if len(candidates) > 1:
+        probs = [math.exp(-(c[1] - candidates[0][1]) / temperature) for c in candidates]
+        total = sum(probs)
+        probs = [p/total for p in probs]
+        top_candidate = random.choices([c[0] for c in candidates], weights=probs, k=1)[0]
+
+    return next_node

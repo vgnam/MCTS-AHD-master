@@ -1,0 +1,16 @@
+defaulting to the destination if no unvisited nodes remain.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visited_history=None, penalty_factor=1.0):
+    if not unvisited_nodes:
+        return destination_node
+
+    if visited_history is None:
+        visited_history = []
+
+    def compute_score(node):
+        distance = distance_matrix[current_node][node]
+        recency_penalty = sum(1 for n in visited_history[-3:] if n == node) * penalty_factor
+        return distance + recency_penalty
+
+    next_node = min(unvisited_nodes, key=lambda node: compute_score(node))
+    return next_node

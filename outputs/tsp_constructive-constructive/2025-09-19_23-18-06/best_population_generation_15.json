@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm uses a greedy approach to select the next node by always choosing the closest unvisited node to the current node, prioritizing minimal incremental distance to minimize the total path length. If no unvisited nodes remain, it returns to the destination node. The function prioritizes `current_node` and `distance_matrix` for decision-making, while `destination_node` is only used as a fallback when all nodes are visited. The structure efficiently leverages Python's `min` and `lambda` for concise implementation.",
+     "thought": "The algorithm design idea is to select the next node as the one closest to the current node from the unvisited nodes, ensuring a greedy approach to minimize the total path length.",
+     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])\n    return next_node",
+     "objective": 7.00437,
+     "other_inf": null
+}

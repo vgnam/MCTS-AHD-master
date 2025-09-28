@@ -1,0 +1,59 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    max_distance = float('-inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance > max_distance:
+            max_distance = distance
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        threshold = max_distance * 0.5
+
+        if destination_distance < threshold:
+            T = 100 / (1 + len(unvisited_nodes))
+            weight_local = 0.7 + (0.3 * (1 - math.exp(-T)))
+            weight_global = 1 - weight_local
+
+            local_cost = distance_matrix[current_node][destination_node]
+            global_cost = 0
+            penalty = 0
+
+            if len(unvisited_nodes) > 1:
+                remaining_nodes = unvisited_nodes - {destination_node}
+                nearest_remaining = min(remaining_nodes, key=lambda x: distance_matrix[destination_node][x])
+                global_cost = distance_matrix[destination_node][nearest_remaining] + distance_matrix[nearest_remaining][current_node]
+                avg_distance = sum(distance_matrix[destination_node][n] for n in remaining_nodes) / len(remaining_nodes)
+                penalty = max(0, avg_distance - distance_matrix[destination_node][nearest_remaining])
+
+            destination_score = weight_local * local_cost + weight_global * global_cost + 0.1 * penalty
+
+            if next_node is not None:
+                local_cost_next = distance_matrix[current_node][next_node]
+                global_cost_next = 0
+                penalty_next = 0
+
+                if len(unvisited_nodes) > 1:
+                    remaining_nodes_next = unvisited_nodes - {next_node}
+                    if destination_node in remaining_nodes_next:
+                        remaining_nodes_next.remove(destination_node)
+                    if remaining_nodes_next:
+                        nearest_remaining_next = min(remaining_nodes_next, key=lambda x: distance_matrix[next_node][x])
+                        global_cost_next = distance_matrix[next_node][nearest_remaining_next] + distance_matrix[nearest_remaining_next][destination_node]
+                        avg_distance_next = sum(distance_matrix[next_node][n] for n in remaining_nodes_next) / len(remaining_nodes_next)
+                        penalty_next = max(0, avg_distance_next - distance_matrix[next_node][nearest_remaining_next])
+                    else:
+                        global_cost_next = distance_matrix[next_node][destination_node]
+
+                next_score = weight_local * local_cost_next + weight_global * global_cost_next + 0.1 * penalty_next
+
+                if destination_score < next_score:
+                    next_node = destination_node
+
+    return next_node

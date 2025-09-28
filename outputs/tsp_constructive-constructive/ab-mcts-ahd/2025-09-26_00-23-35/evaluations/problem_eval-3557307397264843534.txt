@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    total_unvisited = len(unvisited_nodes)
+
+    if not unvisited_nodes:
+        return destination_node
+
+    current_distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_current_distance = sum(current_distances) / total_unvisited
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Dynamic weight based on remaining nodes and current node's position
+        weight = 0.5 + (0.3 * (5 - min(5, total_unvisited)) / 5) + (0.2 * (distance_to_node / avg_current_distance if avg_current_distance > 0 else 0))
+
+        # Penalty for outliers (exponential growth)
+        percentile = sum(1 for d in current_distances if d <= distance_to_node) / total_unvisited
+        penalty = (distance_to_node - avg_distance) ** 2 * (1 - percentile) if distance_to_node > avg_distance else 0
+
+        score = distance_to_node + weight * avg_distance + penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

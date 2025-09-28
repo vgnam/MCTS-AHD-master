@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    base_weight_local = 0.6 * (1 - remaining_ratio)
+    base_weight_centrality = 0.3 + 0.2 * (1 - remaining_ratio)
+    base_weight_coherence = 0.1 + 0.4 * (1 - remaining_ratio)
+
+    # Calculate historical influence (exponentially decaying)
+    history_factor = 0.5 ** (1 - remaining_ratio)
+
+    def calculate_score(node):
+        direct_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+
+        # Dynamic popularity adjustment
+        popularity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < sum(distance_matrix[n][m] for m in range(total_nodes)) / total_nodes)
+
+        # Normalize components
+        max_distance = max(max(row) for row in distance_matrix)
+        max_centrality = 1 / min(sum(distance_matrix[n]) for n in range(total_nodes))
+        max_coherence = max(sum(distance_matrix[n][m] for m in unvisited_nodes if m != n) / len(unvisited_nodes) for n in unvisited_nodes)
+
+        normalized_distance = direct_distance / max_distance
+        normalized_centrality = centrality / max_centrality
+        normalized_coherence = coherence / max_coherence
+
+        # Combine with historical influence
+        score = (base_weight_local * normalized_distance +
+                 base_weight_centrality * normalized_centrality -
+                 base_weight_coherence * normalized_coherence) * (1 - history_factor * popularity / len(unvisited_nodes))
+
+        return score
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+    remaining = len(unvisited_nodes)
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        euclidean_distance = ((distance_matrix[node][0] - distance_matrix[destination_node][0])**2 +
+                             (distance_matrix[node][1] - distance_matrix[destination_node][1])**2)**0.5
+        score = distance + euclidean_distance / remaining
+        if score < min_score:
+            min_score = score
+            next_node = node
+    return next_node

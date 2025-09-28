@@ -1,0 +1,6 @@
+import random
+        selected = random.choices([node for node, _ in candidate_scores], weights=[1/score for _, score in candidate_scores], k=1)[0]
+    else:
+        selected = min(candidate_scores, key=lambda x: x[1])[0]
+
+    return next_node

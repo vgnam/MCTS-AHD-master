@@ -1,0 +1,30 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic bias towards destination node
+    dest_bias = 1.0 if destination_node in unvisited_nodes else 0.0
+    dest_distance = distance_matrix[current_node][destination_node] if dest_bias else float('inf')
+
+    # Calculate probabilities for each unvisited node
+    probabilities = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Apply bias if node is destination
+        bias = dest_bias * (1.0 / (1.0 + math.exp(-0.1 * (dest_distance - distance))))
+        weight = (1.0 - bias) * (1.0 / (distance + 1e-6)) + bias
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    probabilities = [p / total_weight for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

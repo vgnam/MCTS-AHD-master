@@ -1,0 +1,27 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    exploration_factor = (len(unvisited_nodes) / len(distance_matrix)) * (1 + (len(distance_matrix) - len(unvisited_nodes)) / len(distance_matrix))
+    scores = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        destination_proximity = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+        attraction_score = (immediate_distance + 0.6 * destination_proximity + 0.4 * centrality)
+        scores.append((node, attraction_score))
+
+    if not scores:
+        return None
+
+    min_score = min(score for _, score in scores)
+    max_score = max(score for _, score in scores)
+    normalized_scores = [(node, (score - min_score) / (max_score - min_score + 1e-6)) for node, score in scores]
+
+    probabilities = [math.exp(-score / exploration_factor) for _, score in normalized_scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices([node for node, _ in normalized_scores], weights=probabilities, k=1)[0]
+    return next_node

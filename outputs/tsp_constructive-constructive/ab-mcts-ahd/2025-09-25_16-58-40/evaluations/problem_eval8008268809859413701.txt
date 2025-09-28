@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        remaining_nodes = [other for other in unvisited_nodes if other != node]
+        if not remaining_nodes:
+            compactness = 0
+        else:
+            compactness = max(distance_matrix[node][other] for other in remaining_nodes)
+        scores[node] = 0.5 * distance + 0.5 * compactness
+
+    next_node = min(scores, key=scores.get)
+    return next_node

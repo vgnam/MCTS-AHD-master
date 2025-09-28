@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+    temperature = 1.0 - (1.0 - exploration_factor) ** 2  # Decaying temperature
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+            connectivity_score = 1.0 / (1.0 + avg_remaining_dist)
+        else:
+            connectivity_score = 0
+
+        # Novel: Adaptive potential gain with path diversity
+        potential_gain = (distance_matrix[current_node][destination_node] - immediate_dist - dest_dist) / (1 + immediate_dist)
+        diversity_bonus = sum(1.0 / (1.0 + distance_matrix[node][n]) for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+        # Dynamic weights with temperature influence
+        weight_local = 0.7 - 0.5 * exploration_factor
+        weight_connectivity = 0.1 + 0.2 * exploration_factor
+        weight_dest = -0.3 * (1 - exploration_factor) * temperature
+        weight_gain = 0.2 * (1 - exploration_factor) * temperature
+        weight_diversity = 0.1 * exploration_factor
+
+        score = (weight_local * immediate_dist) + (weight_connectivity * connectivity_score) + \
+                (weight_dest * dest_dist) + (weight_gain * potential_gain) + (weight_diversity * diversity_bonus)
+        return score
+
+    # Probabilistic selection based on normalized scores
+    scores = [evaluate_node(node) for node in unvisited_nodes]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - s) / (max_score - min_score + 1e-9) for s in scores]  # Avoid division by zero
+
+    # Softmax selection with temperature
+    exp_scores = [math.exp(s / temperature) for s in normalized_scores]
+    sum_exp = sum(exp_scores)
+    probabilities = [e / sum_exp for e in exp_scores]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

@@ -1,0 +1,13 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    weights = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for n in unvisited_nodes if distance_matrix[node][n] > 0)
+        loop_penalty = 1 + sum(1 for n in unvisited_nodes if distance_matrix[n][node] > 0 and distance_matrix[n][current_node] > 0)
+        weights[node] = distance * (1 / (degree + 1)) * loop_penalty
+
+    next_node = min(unvisited_nodes, key=lambda node: weights[node])
+    return next_node

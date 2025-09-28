@@ -1,0 +1,35 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = (total_nodes - remaining_nodes) / total_nodes
+    temperature = max(0.1, 1.0 - 0.8 * progress)
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        detour_risk = max(0, to_destination - distance_matrix[current_node][destination_node])
+        exploration_weight = 0.6 * (1 - progress)
+        exploitation_weight = 1 - exploration_weight
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        destination_bias = math.exp(-to_destination / (1 + temperature * 10))
+
+        heuristic_value = (exploitation_weight * to_current +
+                          exploration_weight * (0.6 * detour_risk + 0.4 * destination_bias) -
+                          0.3 * centrality)
+
+        return heuristic_value
+
+    weighted_scores = [math.exp(heuristic(node) / temperature) for node in unvisited_nodes]
+    total_score = sum(weighted_scores)
+    probabilities = [score / total_score for score in weighted_scores]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

@@ -1,0 +1,28 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes_factor = len(unvisited_nodes) / len(distance_matrix)
+    scores = []
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        if distance_to_node == 0:
+            score = float('-inf')
+        else:
+            harmonic_mean = 2 / ((1 / distance_to_node) + (1 / distance_to_dest))
+            penalty = 1 / distance_to_node
+            score = harmonic_mean * penalty * (1 / (1 + distance_to_node * remaining_nodes_factor))
+        scores.append(score)
+
+    max_score = max(scores)
+    probabilities = [math.exp(score - max_score) / (distance_matrix[current_node][node] + 1) for node, score in zip(unvisited_nodes, scores)]
+    total_probability = sum(probabilities)
+    normalized_probabilities = [p / total_probability for p in probabilities]
+
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_probabilities, k=1)[0]
+    return next_node

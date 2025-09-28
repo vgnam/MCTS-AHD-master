@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    best_score = float('-inf')
+    next_node = None
+
+    # Calculate node density and path history factors
+    node_density = []
+    path_history = []
+    for node in unvisited_nodes:
+        # Node density: average distance to other unvisited nodes
+        density = sum(distance_matrix[node][other] for other in unvisited_nodes) / total_unvisited
+        node_density.append(density)
+
+        # Path history: average distance from current node to this node and back to destination
+        history = (distance_matrix[current_node][node] + distance_matrix[node][destination_node]) / 2
+        path_history.append(history)
+
+    avg_density = sum(node_density) / total_unvisited if total_unvisited > 0 else 0
+    avg_history = sum(path_history) / total_unvisited if total_unvisited > 0 else 0
+
+    # Dynamic weights based on remaining nodes
+    density_weight = 0.7 - 0.4 * (total_unvisited / len(unvisited_nodes + 1))
+    history_weight = 0.3 + 0.4 * (total_unvisited / len(unvisited_nodes + 1))
+
+    for i, node in enumerate(unvisited_nodes):
+        # Normalized factors
+        normalized_density = node_density[i] / (avg_density + 1e-6)
+        normalized_history = path_history[i] / (avg_history + 1e-6)
+
+        # Combined score with adaptive weights
+        combined_score = (density_weight * normalized_density) - (history_weight * normalized_history)
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,31 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_distance = min(distances)
+    max_distance = max(distances)
+
+    sqrt_factor = math.sqrt(len(unvisited_nodes))
+    weighted_threshold = min_distance + (max_distance - min_distance) * (1.0 / sqrt_factor)
+
+    candidates = []
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost <= weighted_threshold:
+            candidates.append((node, cost))
+
+    if candidates:
+        candidates.sort(key=lambda x: x[1])
+        return candidates[0][0]
+
+    farthest_node = unvisited_nodes[distances.index(max_distance)]
+    return next_node

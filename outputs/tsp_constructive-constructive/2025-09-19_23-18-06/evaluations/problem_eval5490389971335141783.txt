@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_decay = 0.8 ** (1.0 - remaining_nodes / total_nodes)
+    temperature = max(0.1, 1.0 - exploration_decay)
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+
+        connectivity = sum(1 for d in distance_matrix[node] if d > 0)
+        centrality = connectivity / (total_nodes - 1)
+
+        if remaining_nodes > 1:
+            remaining_unvisited = unvisited_nodes - {node}
+            future_distances = [distance_matrix[node][n] for n in remaining_unvisited]
+            avg_future_dist = sum(future_distances) / len(future_distances)
+            min_future_dist = min(future_distances) if future_distances else 0
+            future_potential = (1.0 / (avg_future_dist + 1e-6)) * (0.7 / (min_future_dist + 1e-6))
+
+            exploration_weight = temperature * (1.0 - centrality)
+            exploitation_weight = (1.0 - temperature) * (1.0 / (immediate_dist + 1e-6))
+
+            weighted_score = exploitation_weight + exploration_weight + 0.3 * future_potential
+        else:
+            weighted_score = immediate_dist
+
+        candidates.append((node, weighted_score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

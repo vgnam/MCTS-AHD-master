@@ -1,0 +1,16 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate weighted probabilities using softmax
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    weights = [math.exp(-d / temperature) for d in distances]
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    # Select next node probabilistically
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

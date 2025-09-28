@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Compute centroid and density of unvisited nodes
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        density = len(unvisited_nodes) / (1 + sum(distance_matrix[node][destination_node] for node in unvisited_nodes))
+    else:
+        centroid_x = 0
+        density = 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Dynamic weights based on density and remaining nodes
+        proximity_weight = 1.0 + 0.2 * density
+        alignment_weight = 0.5 * (1 + 0.1 * len(unvisited_nodes))
+        deviation_weight = 0.3 * (1 - 0.1 * len(unvisited_nodes))
+
+        # Novelty factor: penalize nodes with high distance variability
+        distances_to_unvisited = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        novelty_penalty = max(distances_to_unvisited) - min(distances_to_unvisited) if distances_to_unvisited else 0
+
+        # Weighted score with harmonic mean for balance
+        score = (proximity_weight * distance_to_current + alignment_weight * distance_to_dest + deviation_weight * centroid_penalty) / (proximity_weight + alignment_weight + deviation_weight)
+        score += 0.2 * novelty_penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,16 @@
+import random
+            selected = random.choices(
+                [node for node, _ in normalized_scores],
+                weights=[score for _, score in normalized_scores],
+                k=1
+            )[0]
+            next_node = selected
+        else:
+            next_node = max(normalized_scores, key=lambda x: x[1])[0]
+
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        if dest_distance < distance_matrix[current_node][next_node] * 0.7:
+            next_node = destination_node
+
+    return next_node

@@ -1,0 +1,44 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    # {This algorithm uses a weighted probabilistic approach, favoring nodes closer to both the current node and the destination node, while also incorporating a penalty for nodes that would result in sharp turns.}
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on distance to current node and destination node
+    weights = {}
+    for node in unvisited_nodes:
+        dist_current = distance_matrix[current_node][node]
+        dist_destination = distance_matrix[node][destination_node]
+
+        # Turn angle penalty (approximation)
+        turn_penalty = 0
+        if current_node != -1: #First Node
+            # Calculate a simple "turn angle" approximation.  Lower penalty means better angle.
+            # Use cosine similarity as a proxy.  Smaller value means sharper turn.
+            vector_current_node_to_node = (node, distance_matrix[current_node][node])
+            vector_node_to_destination = (destination_node, distance_matrix[node][destination_node])
+
+            # Simplified "cosine similarity" approximation
+            dot_product = distance_matrix[current_node][node] + distance_matrix[node][destination_node]
+            magnitude_product = distance_matrix[current_node][node] * distance_matrix[node][destination_node]
+            if magnitude_product != 0:
+                turn_angle_proxy = dot_product / magnitude_product
+            else:
+                turn_angle_proxy = 0
+
+            turn_penalty = max(0, -turn_angle_proxy*5) # Scale and clip.  Penalty should be non-negative. Higher value indicates worse turn.
+
+        # Combine distances and penalty to create a weight
+        weights[node] = 1 / (dist_current + dist_destination + turn_penalty + 0.0001)  #Adding a small value to avoid division by zero
+
+    # Normalize weights to create a probability distribution
+    total_weight = sum(weights.values())
+    probabilities = {node: weight / total_weight for node, weight in weights.items()}
+
+    # Select next node based on probabilities
+    next_node = random.choices(list(probabilities.keys()), weights=list(probabilities.values()), k=1)[0]
+
+    return next_node

@@ -1,0 +1,48 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = 0
+
+        # Adaptive lookahead depth (up to 3 or half of remaining nodes)
+        lookahead_depth = min(3, remaining_count // 2) if remaining_count > 2 else 1
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            # Lookahead with dynamic depth
+            current = node
+            for _ in range(lookahead_depth):
+                if not remaining_nodes:
+                    break
+                next_candidate = min(remaining_nodes, key=lambda x: distance_matrix[current][x])
+                lookahead_distance += distance_matrix[current][next_candidate]
+                current = next_candidate
+                remaining_nodes -= {next_candidate}
+
+            # Calculate average distance to remaining nodes
+            avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        else:
+            avg_distance = 0
+
+        # Dynamic weights: prioritize immediate distance early, lookahead later
+        weight_immediate = 0.6 if remaining_count > 3 else 0.5
+        weight_lookahead = 0.3 if remaining_count > 3 else 0.4
+        weight_avg = 0.1
+
+        # Hybrid score
+        score = (weight_immediate * immediate_distance +
+                 weight_lookahead * (lookahead_distance / lookahead_depth if lookahead_depth > 0 else 0) +
+                 weight_avg * (immediate_distance - avg_distance))
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

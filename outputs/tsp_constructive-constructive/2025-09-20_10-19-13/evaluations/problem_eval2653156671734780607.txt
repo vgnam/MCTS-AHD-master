@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    random_node = np.random.choice(list(unvisited_nodes))
+
+    weights = [0.7, 0.3]
+    next_node = np.random.choice([nearest_node, random_node], p=weights)
+
+    return next_node

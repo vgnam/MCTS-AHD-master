@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+
+    # Adaptive temperature control
+    temperature = 1.0 - (remaining_nodes / total_nodes) ** 2
+
+    # Calculate normalized scores
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+        destination_distance = distance_matrix[node][destination_node]
+
+        # Combined score with adaptive weights
+        exploitation_score = 1.0 / (1.0 + immediate_distance)
+        exploration_score = 1.0 / (1.0 + future_potential + destination_distance)
+        score = (0.8 * exploitation_score) + (0.2 * exploration_score)
+
+        scores.append(score)
+
+    # Normalize scores and apply softmax with temperature
+    max_score = max(scores) if scores else 0
+    min_score = min(scores) if scores else 0
+    normalized_scores = [(s - min_score) / (max_score - min_score) if max_score != min_score else 1.0 for s in scores]
+
+    # Softmax selection with temperature
+    exp_scores = [math.exp(s / temperature) for s in normalized_scores]
+    sum_exp = sum(exp_scores)
+    probabilities = [e / sum_exp for e in exp_scores]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

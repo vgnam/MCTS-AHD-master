@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    exploration_factor = 1 - (1 / (1 + math.exp(-(remaining_nodes - 5))))
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        lookahead_distance = 0
+        remaining_nodes_after = unvisited_nodes - {node}
+        if remaining_nodes_after:
+            next_candidates = remaining_nodes_after.copy()
+            next_candidate = min(next_candidates, key=lambda x: distance_matrix[node][x])
+            lookahead_distance = distance_matrix[node][next_candidate]
+
+            path_potential = sum(distance_matrix[node][other] for other in remaining_nodes_after) / len(remaining_nodes_after)
+            lookahead_distance = (lookahead_distance + path_potential) / 2
+
+        normalized_immediate = immediate_distance / (sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes))
+        normalized_lookahead = lookahead_distance / (sum(distance_matrix[n][destination_node] for n in remaining_nodes_after) / len(remaining_nodes_after))
+
+        immediate_weight = 0.5 + 0.3 * (1 - exploration_factor)
+        lookahead_weight = 0.5 - 0.3 * (1 - exploration_factor)
+
+        score = immediate_weight * normalized_immediate + lookahead_weight * normalized_lookahead
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

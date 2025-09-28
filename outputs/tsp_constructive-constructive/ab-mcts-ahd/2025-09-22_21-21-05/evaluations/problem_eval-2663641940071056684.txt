@@ -1,0 +1,36 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_unvisited = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (total_unvisited - 1) if total_unvisited > 1 else 0
+
+        # Dynamic weight based on progress (higher early, lower later)
+        progress_weight = 0.6 - 0.4 * (total_unvisited / len(unvisited_nodes)) if total_unvisited > 1 else 0.3
+
+        # Aggressive detour penalty
+        detour_penalty = max(0, (distance_to_current - 1.2 * sum(distance_matrix[current_node][n] for n in unvisited_nodes) / total_unvisited) ** 2)
+
+        # Combined score with inverse distance to encourage closer nodes
+        combined_score = (distance_to_current + distance_to_destination) / (1 + progress_weight * avg_distance_to_remaining) + detour_penalty
+
+        scores.append((node, combined_score))
+
+    # Convert scores to probabilities using softmax
+    max_score = max(score for _, score in scores)
+    exp_scores = [math.exp(score - max_score) for _, score in scores]
+    sum_exp = sum(exp_scores)
+    probabilities = [exp_score / sum_exp for exp_score in exp_scores]
+
+    # Select node based on probability distribution
+    next_node = random.choices([node for node, _ in scores], weights=probabilities, k=1)[0]
+
+    return next_node

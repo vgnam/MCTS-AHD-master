@@ -1,0 +1,22 @@
+importance in later stages, with a novel diversity score calculated as the variance of distances to unvisited nodes to encourage exploration of less dense regions.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    local_weight = 0.7 * (1 - remaining_ratio)
+    global_weight = 1 - local_weight
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        global_distances = [distance_matrix[node][n] for n in unvisited_nodes]
+        mean_global = sum(global_distances) / len(global_distances) if global_distances else 0
+        diversity = (sum((d - mean_global) ** 2 for d in global_distances) / len(global_distances)) if global_distances else 0
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        inverse_global = 1 / (mean_global + 1e-10)
+        return local_weight * local_distance + global_weight * (0.4 * centrality + 0.3 * inverse_global + 0.3 * diversity)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

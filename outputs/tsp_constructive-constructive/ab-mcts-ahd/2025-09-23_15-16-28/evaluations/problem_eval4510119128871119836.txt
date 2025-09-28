@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_weighted_value = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        sum_distance = distance_to_current + distance_to_destination
+        product_distance = distance_to_current * distance_to_destination
+
+        # Calculate logarithmic scaling factor
+        log_scale = 1 + math.log1p(len(unvisited_nodes))
+
+        # Dynamic weight based on distance variance
+        distances = [distance_matrix[current_node][n] for n in unvisited_nodes]
+        distance_variance = np.var(distances) if len(distances) > 1 else 1
+        weight_variance = 1 / (1 + distance_variance)
+
+        # Combined weighting
+        weight_sum = (len(unvisited_nodes) / (len(unvisited_nodes) + log_scale)) * weight_variance
+        weight_product = 1 - weight_sum
+
+        weighted_value = (weight_sum * sum_distance) + (weight_product * product_distance)
+
+        if weighted_value < min_weighted_value:
+            min_weighted_value = weighted_value
+            next_node = node
+
+    return next_node

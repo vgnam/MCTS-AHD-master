@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    max_avg_distance = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        total_distance = 0
+        count = 0
+        for other_node in unvisited_nodes:
+            if node != other_node:
+                total_distance += distance_matrix[node][other_node]
+                count += 1
+        avg_distance = total_distance / count if count > 0 else 0
+
+        if avg_distance > max_avg_distance:
+            max_avg_distance = avg_distance
+            next_node = node
+
+    return next_node

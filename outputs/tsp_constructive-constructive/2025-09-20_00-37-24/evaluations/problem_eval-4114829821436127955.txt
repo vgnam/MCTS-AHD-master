@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate progress towards destination (0 = just started, 1 = almost done)
+    total_nodes = len(unvisited_nodes) + 1
+    progress = (total_nodes - len(unvisited_nodes)) / total_nodes
+
+    # Adjust exploration probability based on progress
+    exploration_prob = 0.1 + 0.8 * (1 - progress)  # More exploration early, less later
+
+    # Determine number of nearest neighbors to consider
+    max_neighbors = min(5, len(unvisited_nodes))
+    num_neighbors = max(1, int(max_neighbors * (1 - progress)))
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if random.random() < exploration_prob:
+        # Explore: pick from a larger set of neighbors
+        candidates = nearest_neighbors[:min(num_neighbors + 2, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Exploit: pick from the top neighbors
+        candidates = nearest_neighbors[:min(num_neighbors, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+
+    return next_node

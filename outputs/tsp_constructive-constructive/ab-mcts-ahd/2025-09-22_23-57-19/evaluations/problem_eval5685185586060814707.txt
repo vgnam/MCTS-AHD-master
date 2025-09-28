@@ -1,0 +1,13 @@
+import random
+    next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+
+    if len(unvisited_nodes) > 2:
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            if potential_cost < sum(distances) * 0.5:
+                next_node = node
+                break
+
+    return next_node

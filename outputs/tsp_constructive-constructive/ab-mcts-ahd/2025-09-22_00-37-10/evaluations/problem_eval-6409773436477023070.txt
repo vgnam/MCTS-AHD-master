@@ -1,0 +1,49 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    candidate_nodes = []
+    min_distance = float('inf')
+
+    # Find nearest neighbors
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            candidate_nodes = [node]
+        elif distance == min_distance:
+            candidate_nodes.append(node)
+
+    # Calculate adaptive scores
+    heuristic_scores = []
+    for node in candidate_nodes:
+        # Immediate distance component (normalized)
+        inv_distance = 1.0 / (distance_matrix[current_node][node] + 1e-6)
+
+        # Long-term potential: combination of direct connections and path savings
+        direct_connections = sum(1.0 / (distance_matrix[node][other] + 1e-6)
+                               for other in unvisited_nodes if other != node)
+        path_savings = sum(distance_matrix[current_node][other] - distance_matrix[node][other]
+                          for other in unvisited_nodes if other != node)
+
+        # Combined score with adaptive weights
+        distance_weight = 0.6 + 0.1 * (len(unvisited_nodes) / len(distance_matrix))
+        heuristic_weight = 0.4 - 0.1 * (len(unvisited_nodes) / len(distance_matrix))
+
+        score = (distance_weight * inv_distance +
+                 heuristic_weight * (0.7 * direct_connections + 0.3 * path_savings))
+
+        heuristic_scores.append(score)
+
+    # Normalize scores with temperature-based smoothing
+    temperature = 0.5 * (1.0 / (1.0 + np.exp(-len(unvisited_nodes)/10)))
+    probabilities = np.exp(np.array(heuristic_scores) / temperature)
+    probabilities = probabilities / probabilities.sum()
+
+    # Select node with weighted random choice
+    next_node = random.choices(candidate_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        # Probabilistically bias towards destination node based on remaining nodes
+        prob_destination = min(1.0, 0.5 + 0.5 * (len(unvisited_nodes) / len(distance_matrix)))
+        if random.random() < prob_destination:
+            return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic stochasticity: chance increases with remaining nodes and decreases with proximity
+    stochasticity = 0.1 + 0.8 * (len(unvisited_nodes) / len(distance_matrix)) * (1.0 / (1.0 + math.exp(-0.5 * (len(nearest_neighbors) - 1))))
+
+    if random.random() < stochasticity:
+        # Weighted random selection: closer nodes have higher probability
+        weights = [1.0 / (1.0 + distance_matrix[current_node][node]) for node in nearest_neighbors]
+        total_weight = sum(weights)
+        normalized_weights = [w / total_weight for w in weights]
+        next_node = random.choices(nearest_neighbors, weights=normalized_weights, k=1)[0]
+    else:
+        # Select from top k nearest, where k decreases as more nodes are visited
+        k = max(1, int(3 * (len(unvisited_nodes) / len(distance_matrix))))
+        candidates = nearest_neighbors[:min(k, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+
+    return next_node

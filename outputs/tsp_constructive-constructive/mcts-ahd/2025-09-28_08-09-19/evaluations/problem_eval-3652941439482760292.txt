@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_score = 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        if len(unvisited_nodes) == 1:
+            avg_distance = 0
+        else:
+            avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+
+        dynamic_weight = 1 / (len(unvisited_nodes) ** 0.5)
+        exploration_factor = (len(unvisited_nodes) / (len(unvisited_nodes) + 1)) ** 2
+        score = (1 - dynamic_weight - exploration_factor) * distance_to_current + dynamic_weight * avg_distance + exploration_factor * (1 / (distance_to_current + 1e-6))
+
+        scores.append((node, score))
+        total_score += score
+
+    if total_score == 0:
+        return unvisited_nodes[0]
+
+    probabilities = [score / total_score for _, score in scores]
+    next_node = random.choices([node for node, _ in scores], weights=probabilities, k=1)[0]
+
+    return next_node

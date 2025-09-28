@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        # Dynamic lookahead horizon based on remaining nodes
+        horizon = max(1, remaining_nodes // 3)
+        lookahead_horizon = sum(distance_matrix[node][neighbor] for neighbor in unvisited_nodes if neighbor != node) / horizon
+
+        # Node density factor (prioritize high-density regions)
+        node_density = sum(1 for neighbor in unvisited_nodes if distance_matrix[node][neighbor] < 1.5 * immediate_distance)
+
+        # Adaptive weight considering both immediate and long-term gains
+        weight = 0.5 * (1.0 - (remaining_nodes / (len(unvisited_nodes) + 1))) + 0.5 * (remaining_nodes / len(unvisited_nodes))
+
+        # Penalty for revisiting nodes to avoid cycles
+        revisit_penalty = 0.3 * sum(distance_matrix[node][other] for other in unvisited_nodes if other == current_node)
+
+        score = immediate_distance - weight * lookahead_horizon + 0.4 * node_density - revisit_penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

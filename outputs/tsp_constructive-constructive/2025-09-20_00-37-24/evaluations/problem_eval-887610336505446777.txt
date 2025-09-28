@@ -1,0 +1,26 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic probability based on remaining unvisited nodes
+    remaining_nodes = len(unvisited_nodes)
+    prob_threshold = max(0.7, 0.9 - 0.01 * remaining_nodes)  # Decreases as unvisited nodes decrease
+
+    if random.random() < prob_threshold:
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Consider average distance to all other nodes for exploration
+        avg_distances = {
+            node: sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+            for node in unvisited_nodes
+        }
+        next_node = min(avg_distances.keys(), key=lambda node: avg_distances[node])
+
+    return next_node

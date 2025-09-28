@@ -1,0 +1,38 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    temperature = 0.5  # Controls exploration vs exploitation
+    penalty_factor = 1.2  # Penalizes revisiting nodes
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate node centrality (average distance to all other nodes)
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+
+        # Combine factors with probabilistic weighting
+        probabilistic_factor = math.exp(-centrality / temperature)
+        score = distance_to_current + probabilistic_factor * distance_to_destination
+
+        # Apply penalty if node was recently visited (simulated here)
+        if node in visited_history and len(visited_history) > 0:
+            score *= penalty_factor
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    # Update visited history (simulated)
+    if 'visited_history' not in select_next_node.__dict__:
+        select_next_node.visited_history = []
+    if next_node is not None:
+        select_next_node.visited_history.append(next_node)
+
+    return next_node

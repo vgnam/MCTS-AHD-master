@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    exploration_factor = 0.1 + 0.9 * (1 - remaining_ratio)
+    exploration_weight = 0.4 * (1 - remaining_ratio)
+    exploitation_weight = 0.4 * remaining_ratio
+    momentum_weight = 0.2
+
+    if not hasattr(select_next_node, 'node_history'):
+        select_next_node.node_history = {node: 0 for node in range(total_nodes)}
+    if not hasattr(select_next_node, 'last_selected'):
+        select_next_node.last_selected = None
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        exploration_bonus = exploration_weight * (1 / (1 + select_next_node.node_history.get(node, 0))) * exploration_factor
+        exploitation_reward = exploitation_weight * (1 / (1 + local_distance))
+        momentum_term = 0 if select_next_node.last_selected is None else momentum_weight * (1 / (1 + distance_matrix[select_next_node.last_selected][node]))
+        variance_penalty = 0.3 * sum((distance_matrix[node][n] - local_distance) ** 2 for n in unvisited_nodes) / len(unvisited_nodes)
+
+        return (0.5 * exploitation_reward +
+                0.3 * centrality -
+                0.2 * coherence +
+                0.5 * exploration_bonus +
+                momentum_term -
+                variance_penalty)
+
+    next_node = max(unvisited_nodes, key=calculate_score)
+    select_next_node.node_history[next_node] = select_next_node.node_history.get(next_node, 0) + 1
+    select_next_node.last_selected = next_node
+    return next_node

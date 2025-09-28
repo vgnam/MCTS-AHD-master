@@ -1,0 +1,14 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, exploration_probability=0.2):
+    if not unvisited_nodes:
+        return destination_node
+
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    
+    if random.random() < exploration_probability:
+        next_node = random.choice(list(unvisited_nodes))
+    else:
+        next_node = nearest_node
+
+    return next_node

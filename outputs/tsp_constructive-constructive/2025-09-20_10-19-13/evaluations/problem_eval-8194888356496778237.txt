@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    if len(unvisited_nodes) > 1:
+        second_nearest_node = min(
+            [node for node in unvisited_nodes if node != nearest_node],
+            key=lambda node: distance_matrix[current_node][node]
+        )
+        if random.random() < 0.7:
+            return nearest_node
+        else:
+            return second_nearest_node
+    else:
+        return next_node

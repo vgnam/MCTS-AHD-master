@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    min_distance = min(distances)
+    max_distance = max(distances)
+    distance_range = max_distance - min_distance
+
+    normalized_distances = [(d - min_distance) / distance_range if distance_range != 0 else 0 for d in distances]
+    weighted_distances = [d * (1 + 0.5 * (1 - norm_d)) for d, norm_d in zip(distances, normalized_distances)]
+
+    max_weighted_cost = -float('inf')
+    next_node = None
+
+    for i, node in enumerate(unvisited_nodes):
+        if weighted_distances[i] > max_weighted_cost:
+            max_weighted_cost = weighted_distances[i]
+            next_node = node
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        threshold = avg_distance * 1.2 + (max_distance - avg_distance) * 0.7
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            cost = distance_matrix[current_node][node]
+            if cost < threshold and cost > avg_distance * 0.8:
+                next_node = node
+                break
+
+    return next_node

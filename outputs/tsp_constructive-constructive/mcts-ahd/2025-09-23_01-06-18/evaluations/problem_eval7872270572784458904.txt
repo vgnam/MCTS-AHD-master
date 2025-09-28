@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_weight = 0.7 * (remaining_nodes / total_nodes) + 0.3
+
+    def calculate_centrality(node):
+        if not unvisited_nodes:
+            return 0
+        total_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        return total_distance / len(unvisited_nodes) if len(unvisited_nodes) > 1 else 0
+
+    def calculate_potential(node):
+        immediate_cost = distance_matrix[current_node][node]
+        detour_potential = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+        farthest_cost = max(distance_matrix[node][n] for n in unvisited_nodes if n != destination_node) if unvisited_nodes else 0
+        centrality = calculate_centrality(node)
+        return (exploration_weight * immediate_cost +
+                (1 - exploration_weight) * detour_potential +
+                0.2 * farthest_cost -
+                0.15 * centrality)
+
+    next_node = min(unvisited_nodes, key=calculate_potential)
+    return next_node

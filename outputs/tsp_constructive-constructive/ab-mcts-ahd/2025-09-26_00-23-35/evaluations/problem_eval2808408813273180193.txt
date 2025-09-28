@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+    progress = 1 - (len(unvisited_nodes) / len(distance_matrix))
+    weight_proximity = 0.7 * (1 - progress ** 2)
+    weight_centrality = 0.3 * (1 + progress ** 2)
+    weight_penalty = 0.1
+
+    node_selection_history = {}
+    for node in distance_matrix:
+        node_selection_history[node] = node_selection_history.get(node, 0)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance_to_dest = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+        centrality_score = avg_distance_to_dest
+        penalty = node_selection_history.get(node, 0) * weight_penalty
+
+        score = -weight_proximity * distance_to_node + weight_centrality * centrality_score - penalty
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    if next_node is not None:
+        node_selection_history[next_node] += 1
+
+    return next_node

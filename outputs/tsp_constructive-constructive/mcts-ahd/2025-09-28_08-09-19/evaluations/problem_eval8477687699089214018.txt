@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = -(distance_to_current + distance_to_destination)
+        else:
+            # Calculate node centrality (inverse of average distance to other nodes)
+            centrality = 1.0 / (sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)) if remaining_nodes > 1 else 0
+
+            # Calculate connectivity (number of nearby nodes)
+            connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * distance_to_current) / remaining_nodes
+
+            # Novel path potential factor: evaluates node's ability to create efficient sub-paths
+            path_potential = sum(1 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+            # Dynamic weights based on remaining nodes and connectivity density
+            progress_factor = 1.0 - (remaining_nodes / len(unvisited_nodes + [current_node]))
+            immediate_weight = 0.4 + 0.3 * progress_factor
+            connectivity_weight = 0.3 + 0.2 * progress_factor
+            centrality_weight = 0.2 - 0.1 * progress_factor
+            path_potential_weight = 0.1 + 0.1 * progress_factor
+
+            # Variable penalty based on node proximity and connectivity density
+            density_penalty = 0.1 * (connectivity - 0.5) if connectivity > 0.5 else 0
+            proximity_penalty = 0.2 * (distance_to_destination / (distance_to_current + 1e-6)) if distance_to_current > 0 else 0
+
+            # Score combines weighted components with penalties
+            score = (immediate_weight * (-distance_to_current) +
+                     connectivity_weight * connectivity +
+                     centrality_weight * centrality +
+                     path_potential_weight * path_potential) - (density_penalty + proximity_penalty)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

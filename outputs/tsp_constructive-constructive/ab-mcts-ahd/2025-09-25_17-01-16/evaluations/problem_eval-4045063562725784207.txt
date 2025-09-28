@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+    num_unvisited = len(unvisited_nodes)
+    weight_current = 1.0 + 0.3 * num_unvisited
+    weight_hub = 0.5 - 0.05 * num_unvisited
+    weight_diversity = 0.2 + 0.1 * num_unvisited
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        # Calculate hub centrality (inverse of average distance to other unvisited nodes)
+        if num_unvisited > 1:
+            hub_score = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (num_unvisited - 1)
+            hub_score = 1.0 / hub_score if hub_score != 0 else float('inf')
+        else:
+            hub_score = 0
+
+        # Calculate path diversity (number of distinct clusters this node connects to)
+        diversity_score = 0
+        if num_unvisited > 2:
+            connected_nodes = [n for n in unvisited_nodes if n != node and distance_matrix[node][n] > 0]
+            clusters = set()
+            for n in connected_nodes:
+                cluster = tuple(sorted([n] + [m for m in connected_nodes if m != n and distance_matrix[n][m] < 0.5 * max(distance_matrix[node][n], distance_matrix[node][m])]))
+                clusters.add(cluster)
+            diversity_score = len(clusters)
+
+        total_score = (weight_current * distance_to_current +
+                       weight_hub * hub_score -
+                       weight_diversity * diversity_score)
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

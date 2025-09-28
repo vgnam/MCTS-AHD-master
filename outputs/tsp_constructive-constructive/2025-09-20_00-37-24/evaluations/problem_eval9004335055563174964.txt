@@ -1,0 +1,38 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate temperature-based stochasticity (increases with fewer unvisited nodes)
+    temperature = 1.0 - (len(unvisited_nodes) / (len(distance_matrix) - 1))
+    exploration_prob = 0.5 * (1 - math.exp(-5 * temperature))
+
+    # Hybrid scoring: distance + centrality (inverse of average distance to other nodes)
+    def node_score(node):
+        distance = distance_matrix[current_node][node]
+        if not unvisited_nodes:
+            return distance
+        avg_distance = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+        centrality = 1 / (avg_distance + 1e-6)  # Avoid division by zero
+        return distance + (0.3 * centrality)
+
+    scored_nodes = [(node, node_score(node)) for node in unvisited_nodes]
+    scored_nodes.sort(key=lambda x: x[1])
+
+    # Select based on temperature-adjusted probability
+    if random.random() < exploration_prob:
+        # Explore: pick from top 5% of nodes
+        top_nodes = min(3, max(1, int(len(scored_nodes) * 0.05)))
+        candidates = [node for node, _ in scored_nodes[:top_nodes]]
+        next_node = random.choice(candidates)
+    else:
+        # Exploit: pick from top 20% of nodes
+        top_nodes = min(5, max(1, int(len(scored_nodes) * 0.2)))
+        candidates = [node for node, _ in scored_nodes[:top_nodes]]
+        next_node = random.choice(candidates)
+
+    return next_node

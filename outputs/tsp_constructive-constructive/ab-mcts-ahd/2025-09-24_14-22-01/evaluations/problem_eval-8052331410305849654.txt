@@ -1,0 +1,44 @@
+importance score based on centrality and remaining nodes, while using a decaying exploration factor to balance exploitation and exploration as the tour progresses.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    exploration_factor = 0.5 * (remaining_nodes / (remaining_nodes + 1)) ** 2
+    decay_factor = 0.8 ** remaining_nodes
+
+    # Precompute centrality scores for all nodes
+    node_degrees = [sum(distance_matrix[node]) for node in range(len(distance_matrix))]
+    max_degree = max(node_degrees) if node_degrees else 1
+    centrality_scores = [degree / max_degree for degree in node_degrees]
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_dist = distance_matrix[current_node][node]
+        potential_dist = distance_matrix[node][destination_node]
+
+        # Calculate angular deviation from straight-line path
+        x1, y1 = current_node, current_node  # Placeholder for actual coordinates
+        x2, y2 = destination_node, destination_node
+        x3, y3 = node, node
+        vec1 = (x2 - x1, y2 - y1)
+        vec2 = (x3 - x1, y3 - y1)
+        dot_product = vec1[0] * vec2[0] + vec1[1] * vec2[1]
+        mag1 = (vec1[0]**2 + vec1[1]**2)**0.5
+        mag2 = (vec2[0]**2 + vec2[1]**2)**0.5
+        angle_dev = 1 - dot_product / (mag1 * mag2 + 1e-10)
+
+        # Combine metrics with dynamic weights
+        importance_score = centrality_scores[node] * (1 - decay_factor)
+        weighted_cost = (immediate_dist + exploration_factor * potential_dist) * (1 + angle_dev) - importance_score
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    return next_node

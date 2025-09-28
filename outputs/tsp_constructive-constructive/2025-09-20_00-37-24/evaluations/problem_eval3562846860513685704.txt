@@ -1,0 +1,32 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic temperature based on remaining unvisited nodes
+    temperature = 1.0 - (1.0 / (1.0 + len(unvisited_nodes)))
+
+    # If destination is unvisited, bias selection towards it
+    if destination_node in unvisited_nodes:
+        # Probability of choosing destination increases as temperature decreases
+        if random.random() < (1.0 - temperature):
+            return destination_node
+
+    # Get nearest neighbors sorted by distance
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Weighted selection: closer nodes have higher probability
+    weights = [math.exp(-distance_matrix[current_node][node] / temperature) for node in nearest_neighbors]
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    # Introduce stochasticity: sometimes pick from top 3 nearest, sometimes weighted random
+    if random.random() < 0.7:  # 70% chance to pick from top 3 nearest
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:  # 30% chance to pick weighted random
+        next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+
+    return next_node

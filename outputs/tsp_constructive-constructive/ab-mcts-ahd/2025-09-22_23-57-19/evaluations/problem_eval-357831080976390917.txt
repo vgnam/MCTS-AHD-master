@@ -1,0 +1,10 @@
+import random
+    next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+
+    # Apply dynamic threshold to ensure some proximity to nearest neighbor
+    threshold = min_dist * (1.0 + 0.5 * temperature)
+    if distance_matrix[current_node][next_node] > threshold:
+        # Fallback to nearest neighbor if selected node is too far
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    return next_node

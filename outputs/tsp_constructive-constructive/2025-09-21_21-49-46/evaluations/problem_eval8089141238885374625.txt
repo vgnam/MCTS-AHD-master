@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    max_score = -float('inf')
+
+    for node in unvisited_nodes:
+        dist_current = distance_matrix[current_node][node]
+        dist_dest = distance_matrix[node][destination_node]
+
+        if dist_current == 0:
+            angular_progress = 1.0
+        else:
+            angular_progress = dist_dest / dist_current
+
+        if len(unvisited_nodes) > 1:
+            avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1)
+            connectivity_score = sum(1 / (distance_matrix[node][other] + 1e-6) for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1)
+        else:
+            avg_dist = 0
+            connectivity_score = 0
+
+        score = 0.5 * angular_progress - 0.3 * dist_current - 0.2 * (avg_dist / (connectivity_score + 1e-6))
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    return next_node

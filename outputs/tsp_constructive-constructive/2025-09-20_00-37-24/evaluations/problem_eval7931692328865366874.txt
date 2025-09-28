@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate novelty score for each unvisited node (inverse of distance + random factor)
+    novelty_scores = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        novelty = (1.0 / (distance + 1e-9)) + random.uniform(0, 0.5)  # Avoid division by zero
+        novelty_scores.append((node, novelty))
+
+    # Sort by novelty score in descending order
+    novelty_scores.sort(key=lambda x: -x[1])
+
+    # Temperature-based selection: higher temperature increases randomness
+    temperature = 0.3  # Controls exploration vs exploitation
+    probabilities = [math.exp(score[1] / temperature) for score in novelty_scores]
+    total = sum(probabilities)
+    probabilities = [p / total for p in probabilities]
+
+    # Select node based on weighted probabilities
+    next_node = random.choices([score[0] for score in novelty_scores], weights=probabilities, k=1)[0]
+
+    return next_node

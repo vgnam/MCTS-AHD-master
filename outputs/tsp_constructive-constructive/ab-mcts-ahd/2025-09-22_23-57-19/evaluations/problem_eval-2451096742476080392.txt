@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Calculate proximity, distance, and connectivity scores
+    proximity_scores = {}
+    distance_scores = {}
+    connectivity_scores = {}
+    for node in unvisited_nodes:
+        proximity_scores[node] = 1 / (1 + distance_matrix[node][destination_node])
+        distance_scores[node] = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 1
+        connectivity_scores[node] = 1 / (1 + avg_distance)
+
+    # Dynamic exploration factor (combining remaining nodes and spatial distribution)
+    exploration_factor = (1.0 / (len(unvisited_nodes) + 1)) * (0.5 + 0.5 * (sum(proximity_scores.values()) / len(proximity_scores) if proximity_scores else 0.5))
+
+    # Normalize scores
+    max_distance = max(distance_scores.values()) if distance_scores else 1
+    max_proximity = max(proximity_scores.values()) if proximity_scores else 1
+    max_connectivity = max(connectivity_scores.values()) if connectivity_scores else 1
+
+    normalized_distance = {node: dist / max_distance if max_distance else 0 for node, dist in distance_scores.items()}
+    normalized_proximity = {node: prox / max_proximity if max_proximity else 0 for node, prox in proximity_scores.items()}
+    normalized_connectivity = {node: conn / max_connectivity if max_connectivity else 0 for node, conn in connectivity_scores.items()}
+
+    # Combine scores with dynamic exploration factor
+    best_score = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        score = (1 - exploration_factor) * normalized_distance[node] + exploration_factor * (0.7 * normalized_proximity[node] + 0.3 * normalized_connectivity[node])
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

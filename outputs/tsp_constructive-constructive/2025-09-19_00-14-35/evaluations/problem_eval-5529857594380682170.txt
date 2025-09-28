@@ -1,0 +1,69 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    # Dynamic neighborhood size with probabilistic component
+    base_size = max(1, int(3 + 2 * (1 - exploration_factor)))
+    neighborhood_size = min(len(unvisited_nodes), int(base_size * (1 + 0.2 * exploration_factor)))
+    candidates = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:neighborhood_size]
+
+    # Evaluate candidates with probabilistic selection
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Connectivity score (normalized variance of distances to remaining nodes)
+        if remaining_nodes > 1:
+            remaining_dists = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            mean_dist = sum(remaining_dists) / (remaining_nodes - 1)
+            variance = sum((d - mean_dist) ** 2 for d in remaining_dists) / (remaining_nodes - 1)
+            max_variance = max(remaining_dists) - min(remaining_dists) if remaining_dists else 1
+            normalized_variance = variance / max_variance if max_variance > 0 else 0
+        else:
+            normalized_variance = 0
+
+        # Dynamic weights with probabilistic adjustment
+        base_weight_dist = 0.3
+        base_weight_connectivity = 0.5
+        base_weight_penalty = 0.2
+
+        # Adaptive weight adjustment
+        weight_dist = base_weight_dist + 0.1 * (1 - exploration_factor)
+        weight_connectivity = base_weight_connectivity - 0.2 * (1 - exploration_factor)
+        weight_penalty = base_weight_penalty + 0.2 * exploration_factor
+
+        # Non-linear scaling for destination penalty
+        penalty_scale = 1 + 0.3 * (1 - exploration_factor)
+        scaled_penalty = dest_dist ** penalty_scale
+
+        # Probabilistic component
+        random_factor = 0.1 * (1 - exploration_factor)
+
+        return (weight_dist * current_dist +
+                weight_connectivity * normalized_variance -
+                weight_penalty * scaled_penalty +
+                random_factor * random.random())
+
+    # Select node with probabilistic consideration
+    scores = [evaluate_node(node) for node in candidates]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(score - min_score) / (max_score - min_score + 1e-9) for score in scores]
+
+    # Probabilistic selection based on normalized scores
+    if exploration_factor > 0.5:
+        # Early stages: favor higher scores (better connectivity)
+        probabilities = [1 - s for s in normalized_scores]
+    else:
+        # Later stages: favor lower scores (better distance)
+        probabilities = [s for s in normalized_scores]
+
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(candidates, weights=probabilities, k=1)[0]
+    return next_node

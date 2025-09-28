@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        remaining_dist = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            best_lookahead = min(remaining_nodes, key=lambda n: distance_matrix[node][n] + distance_matrix[n][destination_node])
+            lookahead_dist = distance_matrix[node][best_lookahead] + distance_matrix[best_lookahead][destination_node]
+        else:
+            lookahead_dist = remaining_dist
+
+        balanced_dist = 0.7 * current_dist + 0.3 * lookahead_dist
+
+        future_cost = sum(distance_matrix[node][neighbor] for neighbor in unvisited_nodes if neighbor != node)
+        future_penalty = future_cost / len(unvisited_nodes) if future_cost != 0 else 0
+
+        score = balanced_dist - 0.2 * future_penalty
+
+        if score < min_distance:
+            min_distance = score
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        direct_dist = distance_matrix[current_node][destination_node]
+        if direct_dist <= min_distance * 1.2:
+            next_node = destination_node
+
+    return next_node

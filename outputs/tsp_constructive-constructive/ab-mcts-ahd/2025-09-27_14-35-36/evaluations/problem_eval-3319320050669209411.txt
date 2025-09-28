@@ -1,0 +1,24 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    dest_distance = distance_matrix[current_node][destination_node]
+    total_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes)
+    threshold = dest_distance / total_distance if total_distance > 0 else 0.6
+
+    scores = {}
+    for node in unvisited_nodes:
+        proximity_score = 1.0 / (1.0 + distance_matrix[current_node][node])
+        random_score = random.random()
+        combined_score = proximity_score * (1 - threshold) + random_score * threshold
+        scores[node] = combined_score
+
+    if destination_node in unvisited_nodes:
+        dest_combined_score = (1.0 / (1.0 + dest_distance)) * (1 - threshold) + random.random() * threshold
+        scores[destination_node] = dest_combined_score
+        return max(scores, key=scores.get)
+    else:
+        return next_node

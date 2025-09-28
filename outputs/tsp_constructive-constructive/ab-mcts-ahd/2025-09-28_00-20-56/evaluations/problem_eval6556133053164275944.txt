@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    heuristic_values = {}
+    min_heuristic = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        remaining_distance = distance_matrix[node][destination_node]
+
+        # Heuristic combines direct distance and remaining distance with a weighting factor
+        heuristic = current_distance + 0.7 * remaining_distance
+
+        # Penalize nodes that are far from the destination if many nodes remain
+        if len(unvisited_nodes) > 3:
+            heuristic += 0.3 * distance_matrix[node][destination_node]
+
+        heuristic_values[node] = heuristic
+
+        if heuristic < min_heuristic:
+            min_heuristic = heuristic
+            next_node = node
+
+    # Dynamic threshold for prioritizing destination based on remaining visits
+    threshold_factor = 0.6 if len(unvisited_nodes) > 2 else 0.85
+    if destination_node in unvisited_nodes:
+        direct_distance = distance_matrix[current_node][destination_node]
+        if direct_distance <= min_heuristic * threshold_factor:
+            next_node = destination_node
+
+    return next_node

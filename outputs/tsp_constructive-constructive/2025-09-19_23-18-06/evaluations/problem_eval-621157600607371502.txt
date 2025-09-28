@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Initialize Q-table if not exists (simplified for this context)
+    if not hasattr(select_next_node, 'Q_table'):
+        select_next_node.Q_table = {}
+
+    # Exploration parameter
+    epsilon = 0.3
+
+    # Get current node's Q-values
+    if current_node not in select_next_node.Q_table:
+        select_next_node.Q_table[current_node] = {node: 0 for node in unvisited_nodes | {destination_node}}
+
+    # Choose action: explore or exploit
+    if random.random() < epsilon and len(unvisited_nodes) > 1:
+        # Exploration: random choice among unvisited
+        next_node = random.choice(list(unvisited_nodes))
+    else:
+        # Exploitation: choose node with highest Q-value
+        next_node = max(unvisited_nodes, key=lambda node: select_next_node.Q_table[current_node][node])
+
+    # Update Q-value (simplified Bellman update)
+    if next_node != destination_node:
+        # Estimate future value (simplified)
+        future_value = max(select_next_node.Q_table[next_node].values()) if next_node in select_next_node.Q_table else 0
+        current_q = select_next_node.Q_table[current_node][next_node]
+        select_next_node.Q_table[current_node][next_node] = current_q + 0.1 * (distance_matrix[current_node][next_node] + 0.9 * future_value - current_q)
+
+    return next_node

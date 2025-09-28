@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_value = -float('inf')
+    total_unvisited = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_current = distance_matrix[current_node][node]
+        distance_destination = distance_matrix[node][destination_node]
+
+        # Non-linear weighting based on remaining nodes and spatial distribution
+        weight_immediate = (total_unvisited / (total_unvisited + 1)) ** 2
+        weight_potential = 1 - weight_immediate
+
+        # Potential reduction in path length
+        potential_reduction = distance_matrix[current_node][destination_node] - distance_current - distance_destination
+
+        # Combined score
+        score = (weight_immediate * (-distance_current)) + (weight_potential * potential_reduction)
+
+        if score > best_value:
+            best_value = score
+            best_node = node
+
+    return next_node

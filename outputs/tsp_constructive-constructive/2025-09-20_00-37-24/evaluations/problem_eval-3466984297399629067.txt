@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic probabilities based on distance and novelty
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    max_dist = max(distances) if max(distances) != min_dist else min_dist + 1
+
+    # Novelty factor: penalize recently visited nodes (simplified)
+    novelty_weights = [1.0 / (1 + 0.1 * (len(unvisited_nodes) - i)) for i in range(len(unvisited_nodes))]
+
+    # Combine distance and novelty into a weighted probability
+    probabilities = []
+    for i, (dist, novelty) in enumerate(zip(distances, novelty_weights)):
+        # Normalize distance contribution (closer nodes have higher weight)
+        dist_weight = (max_dist - dist) / (max_dist - min_dist) if max_dist != min_dist else 1.0
+        # Combine with novelty (higher novelty weight increases probability)
+        combined_weight = dist_weight * novelty
+        probabilities.append(combined_weight)
+
+    # Normalize probabilities
+    total_weight = sum(probabilities)
+    probabilities = [w / total_weight for w in probabilities]
+
+    # Select node based on weighted probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

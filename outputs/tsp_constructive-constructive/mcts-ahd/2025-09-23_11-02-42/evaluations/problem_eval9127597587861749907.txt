@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    scaling_factor = 0.2  # Controls the balance between immediate and long-term gains
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        remaining_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+
+        if remaining_distance == 0:
+            score = distance_to_node
+        else:
+            score = distance_to_node + scaling_factor * remaining_distance
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

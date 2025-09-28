@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+
+    # Dynamic exploration-exploitation balance using sigmoid
+    exploration_weight = 1 / (1 + math.exp(5 * (visited_ratio - 0.5)))
+    exploitation_weight = 1 - exploration_weight
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        distances_to_unvisited = [distance_matrix[node][n] for n in unvisited_nodes]
+        avg_distance = sum(distances_to_unvisited) / len(unvisited_nodes)
+
+        # Entropy-based term to favor balanced connectivity
+        if len(unvisited_nodes) > 1:
+            entropy = -sum((d/avg_distance) * math.log(d/avg_distance) for d in distances_to_unvisited if d > 0)
+        else:
+            entropy = 0
+
+        # Lookahead mechanism: consider potential next steps
+        if len(unvisited_nodes) > 2:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            lookahead_terms = [distance_matrix[node][n] + sum(distance_matrix[n][m] for m in remaining_nodes if m != n)/len(remaining_nodes)
+                              for n in remaining_nodes]
+            lookahead_penalty = 0.2 * min(lookahead_terms) if lookahead_terms else 0
+        else:
+            lookahead_penalty = 0
+
+        exploration_term = exploration_weight * distance_matrix[current_node][node]
+        exploitation_term = exploitation_weight * avg_distance
+        entropy_term = 0.2 * entropy
+        variance_penalty = 0.1 * (max(distances_to_unvisited) - min(distances_to_unvisited))
+
+        return exploration_term + exploitation_term - entropy_term + variance_penalty + lookahead_penalty
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

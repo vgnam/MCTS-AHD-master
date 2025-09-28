@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1.0 - remaining_nodes / total_nodes
+
+    decay_factor = 0.5 ** progress
+    penalty_weight = 0.1 + 0.9 * (1.0 - decay_factor)
+    lookahead_weight = 0.2 * decay_factor
+
+    centrality_scores = []
+    for node in unvisited_nodes:
+        node_centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+        centrality_scores.append(node_centrality)
+    max_centrality = max(centrality_scores) if centrality_scores else 1.0
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_cost = distance_matrix[current_node][node]
+        lookahead_cost = 0.0
+
+        if remaining_nodes > 1:
+            remaining = [n for n in unvisited_nodes if n != node]
+            lookahead_cost = sum(distance_matrix[node][n] for n in remaining) / len(remaining)
+
+        node_centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+        centrality_factor = (node_centrality / max_centrality) if max_centrality else 0.0
+
+        penalty = penalty_weight * immediate_cost * (1.0 + 0.2 * centrality_factor)
+        combined_score = immediate_cost + penalty + lookahead_weight * lookahead_cost * (1.0 - 0.1 * centrality_factor)
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+    return next_node

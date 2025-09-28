@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    scores = []
+    nodes = []
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        # Dynamic temperature-based weight
+        temperature = 1.0 / (1.0 + 0.1 * total_unvisited)
+        exploration_weight = temperature * (distance_to_destination + avg_distance_to_remaining)
+        exploitation_weight = (1 - temperature) * distance_to_current
+
+        combined_score = exploitation_weight + exploration_weight
+        scores.append(combined_score)
+        nodes.append(node)
+
+    # Select node with probability inversely proportional to score (better scores have higher selection chance)
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - s + min_score) for s in scores]  # Invert scores for probability
+    total_normalized = sum(normalized_scores)
+
+    if total_normalized == 0:
+        return random.choice(nodes)
+
+    probabilities = [s / total_normalized for s in normalized_scores]
+    next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+
+    return next_node

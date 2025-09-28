@@ -195,4 +195,32 @@ class MCTS_AHD:
             with open(filename, 'w') as f:
                 json.dump(nodes_set[0], f, indent=5)
 
+            self.print_tree_rewards(mcts)
+
         return nodes_set[0]["code"], filename
+
+    def print_tree_rewards(self, mcts, indent=0):
+
+        def print_node(node, level=0):
+            spaces = "  " * level
+            depth = getattr(node, "depth", level)
+            print(
+                f"{spaces}Node: {node.code[:30] if hasattr(node, 'code') else 'Root'} "
+                f"| Depth: {depth} "
+                f"| Reward: {getattr(node, 'reward', 'N/A'):.2f} "
+                f"| Visits: {getattr(node, 'visits', 0)}"
+            )
+            if hasattr(node, 'children') and node.children:
+                for child in node.children:
+                    print_node(child, level + 1)
+
+        def get_max_depth(node):
+            if not hasattr(node, 'children') or not node.children:
+                return getattr(node, "depth", 0)
+            return max(get_max_depth(child) for child in node.children)
+
+        print("=== MCTS Tree Rewards ===")
+        print_node(mcts.root)
+        max_depth = get_max_depth(mcts.root)
+        print(f"=== Max Depth of Tree: {max_depth} ===")
+        print("========================")

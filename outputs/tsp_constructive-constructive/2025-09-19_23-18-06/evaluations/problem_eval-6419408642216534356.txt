@@ -1,0 +1,38 @@
+importance term that combines degree centrality, closeness centrality, and betweenness centrality, weighted by the dynamic temperature.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+
+    # Dynamic temperature based on remaining nodes (sigmoid function)
+    temperature = 1.0 / (1.0 + math.exp(-(remaining_nodes - total_nodes/2)/5.0))
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+
+        if remaining_nodes > 0:
+            # Calculate node degree (number of connections)
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] < float('inf'))
+
+            # Calculate closeness centrality (average distance to all nodes)
+            closeness_centrality = 1.0 / (sum(distance_matrix[node][n] for n in range(total_nodes)) / total_nodes + 1e-6)
+
+            # Calculate betweenness centrality (simplified approximation)
+            betweenness_centrality = sum(distance_matrix[i][j] for i in range(total_nodes) for j in range(total_nodes)
+                                      if distance_matrix[i][node] + distance_matrix[node][j] == distance_matrix[i][j]) / (total_nodes**2)
+
+            # Dynamic exploration term combining all centrality measures
+            exploration_term = temperature * (node_degree + closeness_centrality + betweenness_centrality)
+        else:
+            exploration_term = 0.0
+
+        # Dynamic weighting between immediate distance and exploration term
+        weighted_score = (1.0 - temperature) * immediate_dist + exploration_term
+        candidates.append((node, weighted_score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

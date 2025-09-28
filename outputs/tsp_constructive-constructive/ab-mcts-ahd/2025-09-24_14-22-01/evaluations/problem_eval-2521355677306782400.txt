@@ -1,0 +1,71 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    base_immediate_weight = 0.35
+    base_potential_weight = 0.35
+    base_centrality_weight = 0.15
+    base_momentum_weight = 0.15
+
+    # Adaptive weight adjustment based on remaining nodes
+    if remaining_nodes > 4:
+        weight_immediate = base_immediate_weight * 1.2
+        weight_potential = base_potential_weight * 0.8
+        weight_centrality = base_centrality_weight * 0.9
+        weight_momentum = base_momentum_weight * 1.3
+    elif remaining_nodes > 2:
+        weight_immediate = base_immediate_weight * 0.8
+        weight_potential = base_potential_weight * 1.2
+        weight_centrality = base_centrality_weight * 1.1
+        weight_momentum = base_momentum_weight * 1.2
+    else:
+        weight_immediate = base_immediate_weight * 0.5
+        weight_potential = base_potential_weight * 1.5
+        weight_centrality = base_centrality_weight * 1.3
+        weight_momentum = base_momentum_weight * 1.1
+
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        # Calculate components
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Enhanced centrality considering both direct and potential connections
+        avg_distance = sum(distance_matrix[node]) / (len(distance_matrix) - 1)
+        potential_avg = sum(distance_matrix[n][destination_node] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+        centrality = 0.7 * avg_distance + 0.3 * potential_avg
+
+        # Path momentum term
+        if remaining_nodes > 2:
+            prev_node = current_node
+            momentum = sum(distance_matrix[prev_node][node] - distance_matrix[prev_node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+        else:
+            momentum = 0
+
+        # Adaptive lookahead based on remaining nodes
+        lookahead_depth = min(3, remaining_nodes - 1)
+        lookahead_nodes = [n for n in unvisited_nodes if n != node and n != destination_node]
+        if lookahead_nodes:
+            sorted_lookahead = sorted(lookahead_nodes, key=lambda n: distance_matrix[node][n])
+            lookahead_cost = sum(distance_matrix[node][n] for n in sorted_lookahead[:lookahead_depth]) / lookahead_depth
+        else:
+            lookahead_cost = 0
+
+        # Combined cost calculation
+        total_cost = (weight_immediate * immediate_distance +
+                      weight_potential * potential_distance +
+                      weight_centrality * centrality +
+                      weight_momentum * momentum +
+                      0.1 * lookahead_cost)
+
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+
+    return next_node

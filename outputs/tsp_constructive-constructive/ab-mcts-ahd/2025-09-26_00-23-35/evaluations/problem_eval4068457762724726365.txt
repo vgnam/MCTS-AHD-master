@@ -1,0 +1,26 @@
+importance, where importance is determined by the node's centrality in the graph (measured by average distance to all other nodes), and the penalty for revisiting is scaled by the node's historical visitation frequency, while the weights for proximity and future efficiency are adjusted based on the ratio of unvisited nodes to total nodes, favoring proximity when many nodes remain and future efficiency when few are left.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    num_unvisited = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    weight_proximity = 0.7 * (0.6 + 0.4 * (num_unvisited / total_nodes))
+    weight_future = 0.3 * (0.4 * (1 - (num_unvisited / total_nodes)))
+    weight_importance = 0.1 * (num_unvisited / total_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, num_unvisited - 1)
+        node_importance = sum(distance_matrix[node][n] for n in range(total_nodes)) / total_nodes
+        revisit_penalty = 0.2 * (1 - (num_unvisited / total_nodes)) if node in unvisited_nodes else 0
+        score = (weight_proximity * distance_to_node +
+                 weight_future * avg_future_distance -
+                 weight_importance * node_importance +
+                 revisit_penalty)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

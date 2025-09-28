@@ -1,0 +1,37 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate "promise" score for each unvisited node: proximity weighted by inverse distance
+    promise_scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance == 0:
+            promise_scores[node] = float('inf')
+        else:
+            promise_scores[node] = 1 / distance
+
+    # Sort nodes by promise score (higher is better)
+    sorted_nodes = sorted(unvisited_nodes, key=lambda node: -promise_scores[node])
+
+    # Dynamic probability: higher for nodes with higher promise scores
+    total_promise = sum(promise_scores.values())
+    if total_promise == 0:
+        # Fallback to uniform random if all promises are zero
+        return random.choice(unvisited_nodes)
+
+    probabilities = [promise_scores[node] / total_promise for node in sorted_nodes]
+
+    # Select node based on promise-weighted random choice
+    next_node = random.choices(sorted_nodes, weights=probabilities, k=1)[0]
+
+    # With 10% probability, pick a random node to ensure exploration
+    if random.random() < 0.1:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

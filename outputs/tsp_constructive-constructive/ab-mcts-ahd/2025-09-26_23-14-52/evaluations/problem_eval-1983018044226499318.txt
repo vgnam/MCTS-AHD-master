@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (total_unvisited / (total_unvisited + 2)))
+    best_score = float('-inf')
+    candidates = []
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_potential = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited
+        centrality = sum(distance_matrix[n][node] for n in unvisited_nodes) / total_unvisited
+        weighted_score = (1 - temperature) * current_distance + temperature * (0.5 * future_potential + 0.5 * centrality)
+
+        if weighted_score > best_score:
+            best_score = weighted_score
+            candidates = [node]
+        elif weighted_score == best_score:
+            candidates.append(node)
+
+    if len(candidates) > 1:
+        diversity_scores = [sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited for node in candidates]
+        next_node = candidates[diversity_scores.index(max(diversity_scores))]
+    else:
+        next_node = candidates[0]
+
+    return next_node

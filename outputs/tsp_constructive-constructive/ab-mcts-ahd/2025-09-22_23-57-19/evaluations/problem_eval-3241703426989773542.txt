@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    distances = [(node, distance_matrix[current_node][node]) for node in unvisited_nodes]
+    closest_node, closest_dist = min(distances, key=lambda x: x[1])
+    farthest_node, farthest_dist = max(distances, key=lambda x: x[1])
+
+    if len(unvisited_nodes) > 1:
+        sorted_nodes = sorted(unvisited_nodes, key=lambda x: distance_matrix[current_node][x])
+        middle_node = sorted_nodes[len(sorted_nodes) // 2]
+
+    # Weighted selection (50% closest, 30% farthest, 20% middle)
+    if len(unvisited_nodes) > 1:
+        weights = [0.5, 0.3, 0.2]
+        candidates = [closest_node, farthest_node, middle_node]
+    else:
+        weights = [1.0]
+        candidates = [closest_node]
+
+    next_node = random.choices(candidates, weights=weights, k=1)[0]
+    return next_node

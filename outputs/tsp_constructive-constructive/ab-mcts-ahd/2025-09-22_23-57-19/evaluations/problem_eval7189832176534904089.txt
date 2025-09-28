@@ -1,0 +1,7 @@
+import random
+        next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+
+    if next_node is None:
+        next_node = unvisited_nodes.pop()
+
+    return next_node

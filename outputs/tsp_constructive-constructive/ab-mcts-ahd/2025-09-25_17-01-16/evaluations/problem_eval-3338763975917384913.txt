@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_weighted_score = float('inf')
+    total_nodes = len(distance_matrix)
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    dynamic_weight = 1.0 - visited_ratio  # Higher weight for early stages, lower for later stages
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        avg_distance_to_unvisited = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+        weighted_score = (distance_to_current * dynamic_weight) + (avg_distance_to_unvisited * (1 - dynamic_weight))
+
+        if weighted_score < min_weighted_score:
+            min_weighted_score = weighted_score
+            next_node = node
+
+    return next_node

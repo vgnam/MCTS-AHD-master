@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    if total_unvisited == 0:
+        return destination_node
+
+    avg_distance_to_dest = sum(distance_matrix[node][destination_node] for node in unvisited_nodes) / total_unvisited
+    max_distance_to_dest = max(distance_matrix[node][destination_node] for node in unvisited_nodes)
+
+    # Calculate centrality of each node (simplified approximation)
+    centrality_scores = {}
+    for node in unvisited_nodes:
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (total_unvisited - 1)
+        centrality_scores[node] = centrality
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weight based on remaining steps and node centrality
+        progress_factor = (len(distance_matrix) - total_unvisited) / len(distance_matrix)
+        centrality_factor = centrality_scores[node] / max(centrality_scores.values()) if centrality_scores else 0
+        weight = 0.5 * (1 - progress_factor) + 0.5 * centrality_factor
+
+        # Penalize long detours more aggressively
+        detour_penalty = 0
+        if distance_to_destination > 1.2 * avg_distance_to_dest:
+            detour_penalty = (distance_to_destination - avg_distance_to_dest) ** 2
+
+        # Normalize distance to destination
+        normalized_distance = distance_to_destination / max_distance_to_dest if max_distance_to_dest > 0 else 0
+
+        # Combined score with adaptive weighting
+        score = (1 - weight) * distance_to_current + weight * normalized_distance + detour_penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

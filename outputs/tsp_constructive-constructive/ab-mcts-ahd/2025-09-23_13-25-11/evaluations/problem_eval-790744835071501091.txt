@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1  # +1 for current_node
+    progress = (total_nodes - len(unvisited_nodes)) / total_nodes  # Fraction of nodes visited
+
+    # Dynamic weights based on progress
+    weight_current = 0.5 + 0.2 * progress  # Increase current distance weight as progress increases
+    weight_destination = 0.3 - 0.1 * progress  # Decrease destination weight as progress increases
+    weight_centroid = 0.2  # Fixed centroid weight
+
+    # Exploration vs. exploitation term
+    exploration_term = (len(unvisited_nodes) / total_nodes) * 0.5  # Encourages exploration early
+
+    def heuristic(node):
+        dist_current = distance_matrix[current_node][node]
+        dist_destination = distance_matrix[node][destination_node]
+
+        # Centroid calculation (simplified; adjust for actual node positions)
+        centroid = sum(unvisited_nodes) / len(unvisited_nodes)
+        centroid_influence = abs(node - centroid)
+
+        # Combine with dynamic weights and exploration term
+        return (weight_current * dist_current +
+                weight_destination * dist_destination +
+                weight_centroid * centroid_influence +
+                exploration_term)
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

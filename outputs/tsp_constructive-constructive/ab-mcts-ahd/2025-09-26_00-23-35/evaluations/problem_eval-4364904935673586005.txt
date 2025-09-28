@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate node degree (simplified as number of connections to unvisited nodes)
+        node_degree = sum(1 for n in unvisited_nodes if distance_matrix[node][n] > 0)
+
+        # Dynamic weights: balance immediate distance, long-term alignment, and node centrality
+        weight_immediate = remaining_nodes / (1 + remaining_nodes)
+        weight_long_term = (total_nodes - remaining_nodes) / total_nodes
+        weight_centrality = node_degree / (total_nodes - 1)
+
+        # Combined score with adaptive weights
+        score = (distance_to_node * weight_immediate +
+                 distance_to_destination * weight_long_term +
+                 (1 - weight_centrality) * distance_to_node)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

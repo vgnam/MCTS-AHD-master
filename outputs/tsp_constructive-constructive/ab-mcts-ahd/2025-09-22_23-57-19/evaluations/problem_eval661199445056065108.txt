@@ -1,0 +1,10 @@
+import random
+    rand_val = random.random()
+    cumulative = 0.0
+
+    for i, node in enumerate(unvisited_nodes):
+        cumulative += normalized_weights[i]
+        if rand_val <= cumulative:
+            return node
+
+    return next_node

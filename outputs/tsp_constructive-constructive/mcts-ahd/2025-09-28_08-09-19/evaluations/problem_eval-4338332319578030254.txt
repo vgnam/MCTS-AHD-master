@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            nearest_neighbors = sorted(unvisited_nodes, key=lambda n: distance_matrix[node][n])[:min(3, remaining_nodes)]
+            avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+            avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+
+            weight_factor = 0.5 + 0.5 * (remaining_nodes / (remaining_nodes + 2))
+            immediate_weight = 0.5 * weight_factor
+            neighbor_weight = 0.3 * (1 - weight_factor)
+            future_weight = 0.2 * (1 - weight_factor)
+
+            penalty_weight = 0.5 * (1.0 - future_weight)
+            penalty = penalty_weight * (distance_to_destination / (1.0 + avg_future_distance)) if avg_future_distance > 0 else 0
+
+            score = immediate_weight * distance_to_current + neighbor_weight * avg_neighbor_distance + future_weight * avg_future_distance - penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

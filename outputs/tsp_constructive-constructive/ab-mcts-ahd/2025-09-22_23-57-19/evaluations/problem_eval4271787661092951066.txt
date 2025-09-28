@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=0.5):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    candidates = []
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        candidates.append((node, cost))
+
+    if not candidates:
+        return unvisited_nodes.pop()
+
+    candidates.sort(key=lambda x: x[1])
+
+    if len(unvisited_nodes) > 2:
+        threshold = candidates[0][1] * (1.2 - temperature * 0.2)
+        viable_candidates = [c for c in candidates if c[1] <= threshold]
+        if viable_candidates:
+            selected = viable_candidates[0][0]
+            return selected
+
+    return next_node

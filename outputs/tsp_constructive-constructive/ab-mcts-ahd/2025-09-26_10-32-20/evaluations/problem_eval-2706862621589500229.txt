@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    # Sigmoid-based weight adjustment
+    def sigmoid(x, k=10):
+        return 1 / (1 + np.exp(-k * (x - 0.5)))
+
+    sigmoid_progress = sigmoid(progress)
+    weight_local = 0.8 * (1 - sigmoid_progress)
+    weight_centrality = 0.2 + 0.6 * sigmoid_progress
+    weight_coherence = 0.2 + 0.4 * sigmoid_progress
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+
+        # Normalize components
+        max_local = max(distance_matrix[current_node][n] for n in unvisited_nodes) if unvisited_nodes else 1
+        max_centrality = 1 / (min(sum(distance_matrix[n][m] for m in range(total_nodes)) for n in unvisited_nodes) + 1e-10) if unvisited_nodes else 1
+        max_coherence = max(sum(distance_matrix[n][m] for m in unvisited_nodes if m != n) / len(unvisited_nodes) for n in unvisited_nodes) if len(unvisited_nodes) > 1 else 1
+
+        norm_local = local_distance / max_local if max_local > 0 else 0
+        norm_centrality = centrality / max_centrality if max_centrality > 0 else 0
+        norm_coherence = coherence / max_coherence if max_coherence > 0 else 0
+
+        return (weight_local * norm_local) + (weight_centrality * norm_centrality) - (weight_coherence * norm_coherence)
+
+    # Probabilistic selection based on scores
+    scores = [calculate_score(node) for node in unvisited_nodes]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - s + 1e-10) / (max_score - min_score + 1e-10) for s in scores]
+
+    # Add small randomness to avoid deterministic behavior
+    random_factor = np.random.uniform(0.9, 1.1, size=len(normalized_scores))
+    adjusted_scores = normalized_scores * random_factor
+    adjusted_scores = adjusted_scores / np.sum(adjusted_scores)
+
+    next_node = np.random.choice(unvisited_nodes, p=adjusted_scores)
+    return next_node

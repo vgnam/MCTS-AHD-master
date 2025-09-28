@@ -1,0 +1,5 @@
+[2025-09-28 00:19:16,363][root][INFO] - Workspace: D:\MCTS-AHD-master\outputs\tsp_constructive-constructive\ab-mcts-ahd\2025-09-28_00-19-16
+[2025-09-28 00:19:16,363][root][INFO] - Project Root: D:\MCTS-AHD-master
+[2025-09-28 00:19:16,363][root][INFO] - Using LLM: mistral/codestral-latest
+[2025-09-28 00:19:16,363][root][INFO] - Using Algorithm: ab-mcts-ahd
+[2025-09-28 00:19:18,696][root][ERROR] - An error occurred during execution!

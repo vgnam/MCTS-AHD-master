@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+
+        # Calculate node influence (sum of inverse distances to all other nodes)
+        influence = sum(1 / (distance_matrix[node][other] + 1e-6) for other in remaining_nodes)
+
+        # Calculate node centrality
+        centrality = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+
+        # Calculate exploration progress
+        exploration_progress = 1 - (len(remaining_nodes) / len(unvisited_nodes))
+
+        # Dynamic weight adjustment: prioritize influence early, centrality later
+        influence_weight = 0.5 * (1 - exploration_progress)
+        centrality_weight = 0.5 * exploration_progress
+
+        # Hybrid score: combines immediate distance, node influence, and centrality
+        score = (0.4 * current_dist +
+                 influence_weight * influence +
+                 centrality_weight * centrality)
+
+        return score
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

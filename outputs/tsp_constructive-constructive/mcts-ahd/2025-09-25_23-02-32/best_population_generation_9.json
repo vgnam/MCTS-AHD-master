@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm selects the next node by prioritizing the destination node if it's unvisited and closer than other nodes; otherwise, it chooses the nearest unvisited node from the current node. The destination node is given higher priority than other nodes, while unvisited nodes are evaluated based on their distance from the current node. The code structure ensures the destination is checked first, followed by a loop through remaining unvisited nodes.",
+     "thought": "The algorithm selects the next node to visit by choosing the unvisited node with the smallest distance from the current node, prioritizing the destination node if it is unvisited and closer than any other node.",
+     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n\n    if destination_node in unvisited_nodes:\n        min_distance = distance_matrix[current_node][destination_node]\n        next_node = destination_node\n    else:\n        min_distance = float('inf')\n        next_node = None\n\n    for node in unvisited_nodes:\n        if node == destination_node:\n            continue\n        distance = distance_matrix[current_node][node]\n        if distance < min_distance:\n            min_distance = distance\n            next_node = node\n\n    return next_node",
+     "objective": 7.00437,
+     "other_inf": null
+}

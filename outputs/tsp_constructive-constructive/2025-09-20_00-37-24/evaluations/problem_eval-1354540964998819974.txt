@@ -1,0 +1,25 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic candidate pool size based on remaining unvisited nodes
+    remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+    candidate_size = max(1, int(math.ceil(3 * remaining_ratio)))
+
+    # Probabilistic selection: higher chance to pick from nearest when many nodes remain
+    if random.random() < remaining_ratio:
+        candidates = nearest_neighbors[:min(candidate_size, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # When few nodes remain, increase randomness
+        random_index = random.randint(0, min(9, len(nearest_neighbors)-1))
+        next_node = nearest_neighbors[random_index]
+
+    return next_node

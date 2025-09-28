@@ -1,0 +1,80 @@
+[2025-09-27 14:01:01,417][root][INFO] - Workspace: D:\MCTS-AHD-master\outputs\tsp_constructive-constructive\ab-mcts-ahd\2025-09-27_14-01-01
+[2025-09-27 14:01:01,418][root][INFO] - Project Root: D:\MCTS-AHD-master
+[2025-09-27 14:01:01,418][root][INFO] - Using LLM: mistral/codestral-latest
+[2025-09-27 14:01:01,418][root][INFO] - Using Algorithm: ab-mcts-ahd
+[2025-09-27 14:01:06,682][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-27 14:01:08,384][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-27 14:01:08,443][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-27 14:01:08,451][root][INFO] - LLM usage: prompt_tokens = 163, completion_tokens = 130
+[2025-09-27 14:01:08,455][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-27 14:01:09,526][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-27 14:01:09,531][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-27 14:01:09,536][root][INFO] - LLM usage: prompt_tokens = 480, completion_tokens = 193
+[2025-09-27 14:01:09,539][root][INFO] - Iteration 0: Running Code -2147238279753926177
+[2025-09-27 14:01:10,295][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-27 14:01:10,380][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-27 14:01:10,381][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-27 14:01:11,761][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-27 14:01:11,763][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-27 14:01:11,765][root][INFO] - LLM usage: prompt_tokens = 871, completion_tokens = 344
+[2025-09-27 14:01:11,766][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-27 14:01:12,851][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-27 14:01:12,856][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-27 14:01:12,862][root][INFO] - LLM usage: prompt_tokens = 1214, completion_tokens = 430
+[2025-09-27 14:01:12,864][root][INFO] - Iteration 0: Running Code -7708816327352520622
+[2025-09-27 14:01:13,575][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-27 14:01:13,682][root][INFO] - Iteration 0, response_id 0: Objective value: 7.99477320543647
+[2025-09-27 14:01:13,756][root][INFO] - Attempt 1 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:16,775][root][INFO] - Attempt 2 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:19,786][root][INFO] - Attempt 3 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:22,792][root][INFO] - Attempt 4 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:25,802][root][INFO] - Attempt 5 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:28,816][root][INFO] - Attempt 6 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:31,830][root][INFO] - Attempt 7 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:34,849][root][INFO] - Attempt 8 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:37,857][root][INFO] - Attempt 9 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:40,866][root][INFO] - Attempt 10 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:43,880][root][INFO] - Attempt 11 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:46,900][root][INFO] - Attempt 12 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:49,905][root][INFO] - Attempt 13 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:52,920][root][INFO] - Attempt 14 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:55,926][root][INFO] - Attempt 15 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:01:58,944][root][INFO] - Attempt 16 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:02:01,961][root][INFO] - Attempt 17 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:02:04,974][root][INFO] - Attempt 18 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:02:07,976][root][INFO] - Attempt 19 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:02:10,984][root][INFO] - Attempt 20 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:02:14,000][root][INFO] - Attempt 21 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:02:17,011][root][INFO] - Attempt 22 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:02:20,026][root][INFO] - Attempt 23 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:02:23,044][root][INFO] - Attempt 24 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+[2025-09-27 14:02:26,055][root][INFO] - Attempt 25 failed with error: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=meta/llama-4-maverick-17b-128e-instruct
+ Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers

@@ -1,0 +1,26 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate centrality scores for unvisited nodes
+    centrality_scores = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node])
+        degree = len([d for d in distance_matrix[node] if d > 0])
+        centrality_scores[node] = degree + (1 / (1 + total_distance))  # Higher for more connections and shorter distances
+
+    # Temperature-based stochasticity (decreases as unvisited nodes decrease)
+    temperature = len(unvisited_nodes) / len(distance_matrix[0])
+    if temperature < 0.1:
+        temperature = 0.1  # Minimum temperature
+
+    # Select node based on weighted probability
+    weights = [math.exp(centrality_scores[node] / temperature) for node in unvisited_nodes]
+    next_node = random.choices(unvisited_nodes, weights=weights, k=1)[0]
+
+    return next_node

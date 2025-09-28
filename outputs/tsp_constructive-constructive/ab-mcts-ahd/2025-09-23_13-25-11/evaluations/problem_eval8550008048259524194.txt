@@ -1,0 +1,13 @@
+import math
+    import random
+
+    scores = {node: evaluate_node(node) for node in unvisited_nodes}
+    min_score = min(scores.values())
+    max_score = max(scores.values())
+    normalized_scores = {node: (score - min_score) / (max_score - min_score + 1e-10) for node, score in scores.items()}
+    probabilities = {node: math.exp(-normalized_scores[node]) for node in normalized_scores}
+    total_prob = sum(probabilities.values())
+    probabilities = {node: prob / total_prob for node, prob in probabilities.items()}
+
+    next_node = random.choices(list(probabilities.keys()), weights=probabilities.values(), k=1)[0]
+    return next_node

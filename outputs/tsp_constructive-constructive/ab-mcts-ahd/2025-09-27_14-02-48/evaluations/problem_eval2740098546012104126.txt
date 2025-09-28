@@ -1,0 +1,37 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=100, iteration=0):
+    if not unvisited_nodes:
+        return destination_node
+    
+    distances = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+    destination_distance = distance_matrix[current_node][destination_node] if destination_node in unvisited_nodes else float('inf')
+    
+    # Calculate connectivity score for each unvisited node
+    connectivity_scores = {node: sum(1 for other_node in unvisited_nodes if distance_matrix[node][other_node] != float('inf') and other_node != node) for node in unvisited_nodes}
+    
+    # Calculate the score for each node based on distance and connectivity
+    scores = {}
+    for node in unvisited_nodes:
+        distance_score = 1 / distances[node]
+        connectivity_score = connectivity_scores[node] / len(unvisited_nodes)
+        score = distance_score * (1 + connectivity_score)
+        if node == destination_node:
+            score *= 1.5
+        scores[node] = score
+    
+    # Apply simulated annealing-inspired mechanism to adjust scores
+    temperature *= 0.99  # Decrease temperature over time
+    adjusted_scores = {node: score / temperature for node, score in scores.items()}
+    max_score = max(adjusted_scores.values())
+    adjusted_scores = {node: math.exp((score - max_score) / temperature) for node, score in adjusted_scores.items()}
+    total_adjusted_score = sum(adjusted_scores.values())
+    probabilities = {node: score / total_adjusted_score for node, score in adjusted_scores.items()}
+    
+    next_node = random.choices(list(probabilities.keys()), weights=probabilities.values(), k=1)[0]
+    
+    if destination_distance < distances[next_node]:
+        next_node = destination_node
+    
+    return next_node

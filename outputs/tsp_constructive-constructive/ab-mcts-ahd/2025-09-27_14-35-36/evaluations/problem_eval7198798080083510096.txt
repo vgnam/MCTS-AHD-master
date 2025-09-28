@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = {}
+    remaining_nodes = len(unvisited_nodes)
+    decay_factor = 1 / (1 + (10 - remaining_nodes) ** 2)  # Decaying influence of proximity
+    
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        score = decay_factor * (1 / (1 + distance_to_node))
+        scores[node] = score
+
+    total_score = sum(scores.values())
+    probabilities = [scores[node] / total_score for node in unvisited_nodes]
+    
+    next_node = random.choices(list(unvisited_nodes), probabilities, k=1)[0]
+    return next_node

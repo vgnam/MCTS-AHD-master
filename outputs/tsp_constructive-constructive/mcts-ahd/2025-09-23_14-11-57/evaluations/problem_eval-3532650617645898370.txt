@@ -1,0 +1,56 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = max(0, distance_matrix[current_node][node] - second_best)
+        else:
+            regret = 0
+        regrets.append(regret)
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    visited_ratio = (total_nodes - remaining_nodes) / total_nodes
+    exploration_factor = 1 - (visited_ratio ** 2)
+
+    weighted_scores = []
+    for regret, distance in zip(regrets, distances):
+        normalized_regret = (regret * (1 + exploration_factor)) / (sum(regrets) + 1e-6) if sum(regrets) > 0 else 0
+        normalized_distance = distance / (sum(distances) + 1e-6) if sum(distances) > 0 else 0
+        weighted_score = (0.5 * normalized_regret + 0.5 * normalized_distance) if remaining_nodes > total_nodes / 2 else (0.3 * normalized_regret + 0.7 * normalized_distance)
+        weighted_scores.append(weighted_score)
+
+    probabilities = [1 / (score + 1e-6) for score in weighted_scores]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    selected_index = np.random.choice(len(unvisited_nodes), p=normalized_probs)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    local_search_nodes = [node for node in unvisited_nodes if node != next_node]
+    if local_search_nodes:
+        local_regrets = []
+        for node in local_search_nodes:
+            other_nodes = [n for n in local_search_nodes if n != node]
+            if other_nodes:
+                second_best = min(distance_matrix[node][n] for n in other_nodes)
+                local_regret = max(0, distance_matrix[node][next_node] - second_best)
+            else:
+                local_regret = 0
+            local_regrets.append(local_regret)
+        if local_regrets and sum(local_regrets) > 0:
+            local_weights = [1 / (regret + 1e-6) for regret in local_regrets]
+            total_local_prob = sum(local_weights)
+            normalized_local_probs = [p / total_local_prob for p in local_weights]
+            local_selected_index = np.random.choice(len(local_search_nodes), p=normalized_local_probs)
+            next_node = local_search_nodes[local_selected_index]
+
+    return next_node

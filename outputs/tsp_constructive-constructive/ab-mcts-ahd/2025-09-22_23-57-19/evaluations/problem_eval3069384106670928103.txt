@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        remaining_nodes = unvisited_nodes - {destination_node}
+        if not remaining_nodes:
+            return destination_node
+
+        avg_distance = sum(distance_matrix[current_node][node] for node in remaining_nodes) / len(remaining_nodes)
+        prob_destination = 0.5 * (destination_distance / avg_distance) ** -1 if avg_distance > 0 else 1.0
+        prob_destination = min(prob_destination, 1.0)
+
+        if prob_destination > 0.5:
+            return destination_node
+
+    exploration_factor = 1.0 / (len(unvisited_nodes) + 1)
+    centrality = {node: sum(distance_matrix[node]) for node in unvisited_nodes}
+    max_centrality = max(centrality.values()) if centrality else 1
+    normalized_centrality = {node: cent / max_centrality if max_centrality else 0 for node, cent in centrality.items()}
+
+    best_score = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_score = (max(distance_matrix[current_node][node], 1) - distance_matrix[current_node][node]) / max(distance_matrix[current_node][node], 1)
+        score = (1 - exploration_factor) * distance_score + exploration_factor * normalized_centrality[node]
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            if potential_cost < distance_matrix[current_node][next_node] * 1.1:
+                next_node = node
+                break
+
+    return next_node

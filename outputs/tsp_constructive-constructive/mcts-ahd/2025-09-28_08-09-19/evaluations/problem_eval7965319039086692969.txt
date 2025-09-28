@@ -1,0 +1,9 @@
+import random
+        r = random.random()
+        cumulative = 0.0
+        for node, weight in candidates:
+            cumulative += weight
+            if r <= cumulative:
+                return node
+
+    return next_node

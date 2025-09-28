@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def heuristic_bonus(node):
+        return 1 / (1 + len(set(unvisited_nodes) - {node}))
+
+    next_node = None
+    best_score = float('-inf')
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        bonus = heuristic_bonus(node)
+        score = -distance + bonus
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        dest_bonus = heuristic_bonus(destination_node)
+        dest_score = -dest_distance + dest_bonus
+        if dest_score > best_score:
+            next_node = destination_node
+
+    return next_node

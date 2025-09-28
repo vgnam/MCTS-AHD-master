@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def novelty_factor(node, current, distance_matrix, unvisited):
+        if len(unvisited) <= 2:
+            return 0.0
+        avg_dist = sum(distance_matrix[current][n] for n in unvisited) / len(unvisited)
+        if avg_dist == 0:
+            return 0.0
+        return (distance_matrix[current][node] - avg_dist) / avg_dist
+
+    exploration_rate = min(0.5, 0.1 * len(unvisited_nodes))
+    candidates = []
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        novelty = novelty_factor(node, current_node, distance_matrix, unvisited_nodes)
+        score = (1 - exploration_rate) * distance + exploration_rate * novelty
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

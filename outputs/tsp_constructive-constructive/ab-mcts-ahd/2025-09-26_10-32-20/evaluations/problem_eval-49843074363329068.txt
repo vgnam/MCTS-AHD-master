@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Dynamic weight adjustment based on tour progress
+    progress = 1 - (len(unvisited_nodes) / len(distance_matrix))
+    local_weight = 0.6 - 0.4 * progress
+    global_weight = 0.3 + 0.5 * progress
+    centrality_weight = 0.7 - 0.2 * progress
+
+    # Track recently visited nodes
+    recently_visited = set()
+    if len(distance_matrix) > 5:
+        recently_visited = {node for node in range(len(distance_matrix)) if node not in unvisited_nodes and node != current_node}
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        global_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(len(distance_matrix))) + 1e-10)
+        recency_penalty = 0.2 if node in recently_visited else 0
+        return (local_weight * local_distance +
+                global_weight * global_distance +
+                centrality_weight * centrality +
+                recency_penalty)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

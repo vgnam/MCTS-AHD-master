@@ -1,0 +1,49 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    temperature = 100
+    cooling_rate = 0.9
+    
+    scores = {}
+    max_score = float('-inf')
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        if distance_to_current == 0:
+            continue
+        direction_vector = (distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]) / (distance_matrix[current_node][destination_node] + 1e-6)
+        score = (1 / distance_to_current) * (1 + direction_vector)
+        scores[node] = score
+        if score > max_score:
+            max_score = score
+    
+    if destination_node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][destination_node]
+        if distance_to_current != 0:
+            score = (1 / distance_to_current) * 2
+            scores[destination_node] = score
+            if score > max_score:
+                max_score = score
+    
+    while temperature > 1:
+        scores_list = list(scores.items())
+        scores_list.sort(key=lambda x: x[1], reverse=True)
+        top_node = scores_list[0][0]
+        if random.random() < (temperature / 100) ** 2:
+            next_node = random.choice(list(unvisited_nodes))
+        else:
+            next_node = top_node
+        
+        if next_node not in unvisited_nodes:
+            temperature *= cooling_rate
+            continue
+        
+        if next_node == destination_node or random.random() < math.exp((scores[top_node] - scores[next_node]) / (temperature + 1)):
+            return next_node
+        
+        temperature *= cooling_rate
+    
+    return next_node

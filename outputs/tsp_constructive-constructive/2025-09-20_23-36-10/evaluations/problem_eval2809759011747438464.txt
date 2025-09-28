@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    max_score = -float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+        if distance == 0:
+            continue
+
+        # Original ratio (progress toward destination)
+        ratio = destination_distance / distance
+
+        # Novel attraction factor (inverse of distance to current node)
+        attraction = 1 / distance if distance != 0 else float('inf')
+
+        # Dynamic weight based on remaining unvisited nodes
+        weight = 1 / len(unvisited_nodes) if unvisited_nodes else 1
+
+        # Combined score with dynamic weighting
+        score = (1 - weight) * ratio + weight * attraction
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    return next_node

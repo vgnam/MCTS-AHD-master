@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1.0 - remaining_nodes / total_nodes
+
+    # Adaptive weights based on progress
+    immediate_weight = 0.7 - 0.4 * progress
+    global_weight = 0.3 + 0.4 * progress
+    neighbor_weight = 0.2 + 0.3 * progress
+
+    best_node = None
+    best_score = float('inf')
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        global_estimate = distance_matrix[node][destination_node]
+
+        # Nearest-neighbor potential
+        if remaining_nodes > 1:
+            remaining = [n for n in unvisited_nodes if n != node]
+            nearest_neighbor_dist = min(distance_matrix[node][n] for n in remaining)
+        else:
+            nearest_neighbor_dist = 0
+
+        # Heuristic for path efficiency
+        heuristic = sum(min(distance_matrix[node][n], distance_matrix[n][node]) for n in unvisited_nodes if n != node)
+
+        # Penalty for nodes too close to current
+        penalty = 0.2 * (1.0 / (immediate_distance + 1e-6)) if immediate_distance < 0.3 else 0
+
+        # Combined score
+        score = (immediate_weight * immediate_distance +
+                 global_weight * global_estimate +
+                 neighbor_weight * nearest_neighbor_dist +
+                 0.2 * heuristic) - penalty
+
+        if score < best_score:
+            best_score = score
+            best_node = node
+
+    return next_node

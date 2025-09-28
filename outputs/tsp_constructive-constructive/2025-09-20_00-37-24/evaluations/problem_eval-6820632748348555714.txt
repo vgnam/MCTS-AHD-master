@@ -1,0 +1,38 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic bias towards destination: the closer we are, the more likely we are to prioritize it
+    dest_distance = distance_matrix[current_node][destination_node] if destination_node in distance_matrix[current_node] else float('inf')
+    max_distance = max(distance_matrix[current_node].values()) if distance_matrix[current_node] else float('inf')
+    dest_bias = 1.0 - (dest_distance / (max_distance + 1e-6))  # Normalized bias
+
+    # Decaying stochasticity: as we progress, reduce randomness
+    progress = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+    stochasticity = 0.9 * (1 - progress)  # Decreases from 0.9 to 0
+
+    if random.random() < stochasticity:
+        # Weighted selection: bias towards nearest nodes but allow some randomness
+        weights = [1.0 / (1 + i) for i in range(len(nearest_neighbors))]
+        if destination_node in nearest_neighbors:
+            dest_index = nearest_neighbors.index(destination_node)
+            weights[dest_index] *= (1 + dest_bias)  # Boost destination's weight
+
+        # Normalize weights
+        total_weight = sum(weights)
+        normalized_weights = [w / total_weight for w in weights]
+
+        next_node = random.choices(nearest_neighbors, weights=normalized_weights, k=1)[0]
+    else:
+        # Fall back to nearest neighbor
+        next_node = nearest_neighbors[0]
+
+    return next_node

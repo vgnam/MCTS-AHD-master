@@ -1,0 +1,28 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Adaptive probabilistic selection: higher chance to pick from nearest when fewer nodes remain
+    remaining_nodes = len(unvisited_nodes)
+    max_candidates = min(3, len(nearest_neighbors))
+    prob_threshold = 0.9 * (1 - math.exp(-remaining_nodes / 10))  # Decreases as remaining nodes decrease
+
+    if random.random() < prob_threshold:
+        candidates = nearest_neighbors[:max_candidates]
+        next_node = random.choice(candidates)
+    else:
+        # When fewer nodes remain, increase the chance of selecting a farther node
+        farness_factor = 1 / (remaining_nodes + 1)
+        adjusted_probs = [farness_factor * (i + 1) for i in range(len(nearest_neighbors))]
+        total = sum(adjusted_probs)
+        normalized_probs = [p / total for p in adjusted_probs]
+        next_node = random.choices(nearest_neighbors, weights=normalized_probs, k=1)[0]
+
+    return next_node

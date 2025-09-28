@@ -1,0 +1,52 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    max_distance = max(max(row) for row in distance_matrix)
+    temperature = 1.0 / (1.0 + math.sqrt(len(unvisited_nodes)))  # Dynamic temperature scaling
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if distance_to_destination == 0:
+            return node
+
+        ratio = distance_to_current / distance_to_destination
+        normalized_ratio = ratio / max_distance
+        score = normalized_ratio * (distance_to_current + distance_to_destination)
+        scores.append((node, score))
+
+    if not scores:
+        return random.choice(unvisited_nodes)
+
+    # Temperature-based probabilistic selection
+    min_score = min(score for _, score in scores)
+    max_score = max(score for _, score in scores)
+    score_range = max_score - min_score if max_score != min_score else 1.0
+
+    probabilities = []
+    for node, score in scores:
+        normalized_score = (score - min_score) / score_range
+        adjusted_score = normalized_score * (1.0 - temperature) + temperature
+        probabilities.append((node, 1.0 / (1.0 + adjusted_score)))
+
+    # Normalize probabilities
+    total_prob = sum(prob for _, prob in probabilities)
+    probabilities = [(node, prob / total_prob) for node, prob in probabilities]
+
+    # Select node based on probabilities
+    rand_val = random.random()
+    cumulative_prob = 0.0
+    for node, prob in probabilities:
+        cumulative_prob += prob
+        if rand_val <= cumulative_prob:
+            return node
+
+    return next_node

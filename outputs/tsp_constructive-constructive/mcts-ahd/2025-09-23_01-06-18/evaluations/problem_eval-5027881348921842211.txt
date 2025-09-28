@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes if total_nodes > 0 else 0.0
+
+    max_distance = max(max(row) for row in distance_matrix)
+    avg_unvisited_distance = sum(distance_matrix[current_node][i] for i in unvisited_nodes) / remaining_nodes if unvisited_nodes else 0
+
+    exploration_factor = 0.2 + 0.6 * (1 - progress_ratio) ** 2
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node] / max_distance
+        detour_cost = (distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]) / max_distance
+
+        detour_scaling = (remaining_nodes / total_nodes) ** 2 * (1 - progress_ratio)
+        adjusted_detour = detour_cost * detour_scaling
+
+        revisit_penalty = 0.0
+        if node != destination_node and node in unvisited_nodes:
+            node_degree = sum(1 for d in distance_matrix[node] if d < avg_unvisited_distance)
+            revisit_penalty = 0.1 * (1 - progress_ratio) * (node_degree / total_nodes)
+
+        time_decay = 0.5 ** progress_ratio
+        normalized_cost = (exploration_factor * immediate_cost + (1 - exploration_factor) * adjusted_detour) * time_decay
+
+        return normalized_cost + revisit_penalty
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

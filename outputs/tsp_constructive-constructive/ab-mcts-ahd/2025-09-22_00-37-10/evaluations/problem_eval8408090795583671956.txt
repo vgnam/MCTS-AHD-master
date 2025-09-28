@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        # Fixed weight (no dynamic adjustment)
+        weight = 0.7
+
+        # Constant bias factor (no decrease)
+        bias_factor = 0.8
+
+        # No revisit penalty
+        penalty = 0
+
+        # Linear decay factor (instead of quadratic)
+        decay_factor = remaining_nodes / total_nodes
+
+        # Combined score: immediate distance dominates with fixed weight
+        score = immediate_distance - decay_factor * (weight * lookahead_distance * bias_factor) + penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

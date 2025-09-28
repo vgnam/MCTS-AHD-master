@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    temperature = 1.0 - (1.0 - remaining_ratio) ** 2
+    local_weight = 0.5 + 0.5 * (1 - temperature)
+    global_weight = 1 - local_weight
+    revisit_penalty = 0.2 * (1 - temperature)
+    novelty_weight = 0.3 * temperature
+
+    def centrality(node):
+        return 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+
+    def revisit_count(node):
+        return sum(1 for n in range(total_nodes) if distance_matrix[current_node][n] == distance_matrix[node][n])
+
+    def novelty_score(node):
+        return sum(abs(distance_matrix[current_node][node] - distance_matrix[n][node]) for n in range(total_nodes)) / total_nodes
+
+    hybrid_score = lambda node: (
+        local_weight * distance_matrix[current_node][node] +
+        global_weight * centrality(node) +
+        revisit_penalty * revisit_count(node) +
+        novelty_weight * novelty_score(node)
+    )
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

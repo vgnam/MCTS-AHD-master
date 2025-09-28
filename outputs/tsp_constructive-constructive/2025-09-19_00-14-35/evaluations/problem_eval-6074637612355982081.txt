@@ -1,0 +1,25 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = np.exp(-0.5 * len(unvisited_nodes))  # Exponential cooling
+    centrality = {node: np.mean(distance_matrix[node]) for node in unvisited_nodes}  # Node centrality
+    candidate_scores = []
+
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+        normalized_centrality = centrality[node] / max(centrality.values()) if centrality else 0
+        score = (current_dist * 0.5) + (dest_dist * 0.3) + (normalized_centrality * 0.2) + (temperature * random.uniform(0, 1))
+        candidate_scores.append((node, score))
+
+    # Probabilistic selection with Boltzmann distribution
+    scores = [score for _, score in candidate_scores]
+    probabilities = np.exp(-np.array(scores) / temperature)
+    probabilities /= probabilities.sum()
+    next_node = random.choices([node for node, _ in candidate_scores], weights=probabilities, k=1)[0]
+
+    return next_node

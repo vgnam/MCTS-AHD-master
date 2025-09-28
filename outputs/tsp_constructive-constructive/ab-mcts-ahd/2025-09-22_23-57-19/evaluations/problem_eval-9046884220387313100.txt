@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        candidates.append((node, cost))
+
+    if not candidates:
+        return unvisited_nodes.pop()
+
+    candidates.sort(key=lambda x: x[1])
+    nearest_node, nearest_cost = candidates[0]
+
+    if len(unvisited_nodes) <= 2:
+        return nearest_node
+
+    probabilities = []
+    total_weight = 0.0
+    for node, cost in candidates:
+        weight = 1.0 / (cost + 1e-6)
+        probabilities.append(weight)
+        total_weight += weight
+
+    probabilities = [w / total_weight for w in probabilities]
+
+    threshold = 1.0 - (len(unvisited_nodes) / (len(unvisited_nodes) + len(candidates))) * 0.5
+    selected_node = nearest_node
+
+    for i in range(len(candidates)):
+        if probabilities[i] >= threshold:
+            selected_node = candidates[i][0]
+            break
+
+    return next_node

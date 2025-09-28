@@ -1,0 +1,25 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate dynamic exploration probability using sigmoid function
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    baseline = 1.5 * avg_distance
+    current_path_length = sum(distance_matrix[current_node][node] for node in unvisited_nodes if node in nearest_neighbors[:3])
+    exploration_prob = 1 / (1 + math.exp(-(current_path_length - baseline)))
+
+    # Choose next node based on dynamic probability
+    if random.random() < exploration_prob:
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

@@ -1,0 +1,32 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+
+        # Calculate future potential (minimum distance to remaining nodes)
+        min_future_dist = min(distance_matrix[node][other] for other in remaining_nodes)
+
+        # Dynamic temperature parameter (decreases as tour progresses)
+        temperature = 1.0 - (1.0 - 0.1) * (len(remaining_nodes) / len(unvisited_nodes))
+
+        # Penalty for revisiting nodes early in the tour
+        revisit_penalty = 0.2 if len(remaining_nodes) > 0.5 * len(unvisited_nodes) else 0
+
+        # Combine components with temperature scaling
+        score = current_dist + (temperature * min_future_dist) - revisit_penalty
+
+        # Add probabilistic element
+        random_factor = random.uniform(0.9, 1.1)
+        return score * random_factor
+
+    # Select node with minimum score (but allow some randomness)
+    next_node = min(unvisited_nodes, key=lambda x: evaluate_node(x) + random.uniform(-0.1, 0.1))
+    return next_node

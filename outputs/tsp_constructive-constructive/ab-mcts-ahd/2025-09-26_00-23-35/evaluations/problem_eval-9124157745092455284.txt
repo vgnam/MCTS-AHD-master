@@ -1,0 +1,17 @@
+importance with temperature
+
+        detour_cost = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+        weight_detour = 0.2 / (1 + temperature * 0.05)  # Decrease detour cost impact with temperature
+
+        score = distance_to_node + weight_centrality * avg_distance + weight_detour * detour_cost
+        scores.append((node, score))
+
+    # Probabilistic selection based on scores and temperature
+    if scores:
+        min_score = min(score for _, score in scores)
+        exp_scores = [math.exp((min_score - score) / temperature) for _, score in scores]
+        total = sum(exp_scores)
+        probs = [exp_score / total for exp_score in exp_scores]
+        next_node = random.choices([node for node, _ in scores], weights=probs, k=1)[0]
+
+    return next_node

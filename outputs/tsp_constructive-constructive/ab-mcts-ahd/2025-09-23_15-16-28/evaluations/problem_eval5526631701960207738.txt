@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_heuristic = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = 1 - (remaining_nodes / total_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Adaptive centrality calculation considering both unvisited and visited nodes
+        unvisited_centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes) - 1)
+        visited_centrality = sum(distance_matrix[node][other] for other in distance_matrix if other not in unvisited_nodes and other != node) / max(1, total_nodes - len(unvisited_nodes) - 1)
+        centrality = 0.7 * unvisited_centrality + 0.3 * visited_centrality
+
+        # Dynamic weight adjustment with path progress consideration
+        base_weight_current = 0.4 - 0.2 * progress_ratio
+        base_weight_destination = 0.3 + 0.2 * progress_ratio
+        weight_current = max(0.2, min(0.6, base_weight_current))
+        weight_destination = max(0.2, min(0.6, base_weight_destination))
+        weight_centrality = 0.4
+
+        # Local search component
+        local_search_factor = 1.0
+        if remaining_nodes > total_nodes / 2:
+            local_search_factor = 1.2  # More local focus in early stage
+        else:
+            local_search_factor = 0.8  # More global focus in later stage
+
+        # Combine with dynamic weights
+        heuristic = (weight_current * distance_to_current + weight_destination * distance_to_destination + weight_centrality * centrality) * local_search_factor
+
+        if heuristic < min_heuristic:
+            min_heuristic = heuristic
+            next_node = node
+
+    return next_node

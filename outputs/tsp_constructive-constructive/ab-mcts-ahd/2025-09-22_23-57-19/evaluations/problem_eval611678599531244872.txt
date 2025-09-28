@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    min_cost = float('inf')
+    next_node = None
+    candidates = []
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+        candidates.append((node, cost))
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    threshold_factor = 1.0 + (0.2 * (len(unvisited_nodes) / len(distance_matrix)))
+    threshold = min_cost * threshold_factor
+
+    filtered_candidates = [node for node, cost in candidates if cost <= threshold]
+
+    if len(filtered_candidates) > 1:
+        probabilities = [1.0 / (cost + 1e-6) for _, cost in candidates if cost <= threshold]
+        total_prob = sum(probabilities)
+        probabilities = [p / total_prob for p in probabilities]
+        next_node = np.random.choice(filtered_candidates, p=probabilities)
+
+    return next_node

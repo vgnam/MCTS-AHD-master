@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    local_weight = 0.7 + 0.3 * (1 - remaining_ratio)
+    global_weight = 1 - local_weight
+
+    def node_degree(node):
+        return sum(1 for n in range(total_nodes) if distance_matrix[node][n] < float('inf'))
+
+    def path_diversity(node):
+        if not unvisited_nodes:
+            return 0
+        return sum(distance_matrix[node][n] for n in unvisited_nodes) / (node_degree(node) + 1e-10)
+
+    def memory_factor(node):
+        if not hasattr(select_next_node, 'visited_history'):
+            select_next_node.visited_history = set()
+        return 1.0 if node not in select_next_node.visited_history else 0.1
+
+    hybrid_score = lambda node: (
+        local_weight * (0.6 * distance_matrix[current_node][node] + 0.4 * (1 - memory_factor(node))) +
+        global_weight * (0.3 * path_diversity(node) + 0.5 * (1 / (node_degree(node) + 1e-10)) + 0.2 * (1 / (sum(distance_matrix[node][n] for n in unvisited_nodes) + 1e-10)))
+    )
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    if hasattr(select_next_node, 'visited_history'):
+        select_next_node.visited_history.add(next_node)
+    return next_node

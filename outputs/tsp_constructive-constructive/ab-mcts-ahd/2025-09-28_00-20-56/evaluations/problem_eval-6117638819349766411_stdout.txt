@@ -1,0 +1,12 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 25, in select_next_node
+    visited_nodes = [n for n in distance_matrix if n not in unvisited_nodes and n != current_node]
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 25, in <listcomp>
+    visited_nodes = [n for n in distance_matrix if n not in unvisited_nodes and n != current_node]
+TypeError: unhashable type: 'numpy.ndarray'

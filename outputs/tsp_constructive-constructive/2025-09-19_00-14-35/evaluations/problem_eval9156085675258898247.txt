@@ -1,0 +1,7 @@
+import choices
+        weights = [max(0, 1 - s) for _, s in scores]
+        if sum(weights) == 0:
+            weights = [1 for _ in weights]
+        next_node = choices([n for n, _ in scores], weights=weights, k=1)[0]
+
+    return next_node

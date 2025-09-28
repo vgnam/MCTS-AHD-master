@@ -1,0 +1,5 @@
+import random
+    selected_idx = random.choices(range(len(candidates)), weights=normalized_scores, k=1)[0]
+    best_node = candidates[selected_idx][0]
+
+    return next_node

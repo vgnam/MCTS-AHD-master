@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 / (1.0 + remaining_nodes)  # Decreases as more nodes are visited
+    curvature_penalty = 1.0 + (0.5 * temperature)  # Penalizes sharp turns
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Normalize distances
+        max_distance = max(distance_to_current, distance_to_destination, 1.0)
+        normalized_current = distance_to_current / max_distance
+        normalized_destination = distance_to_destination / max_distance
+
+        # Hybrid score with curvature penalty
+        score = (normalized_current * (normalized_destination ** (0.5 + temperature))) * curvature_penalty
+        scores.append((node, score))
+
+    # Apply probabilistic selection with temperature
+    if temperature > 0.5:
+        # Early stages: explore more
+        probabilities = [1.0 / (score + 1e-6) for _, score in scores]
+    else:
+        # Later stages: exploit better options
+        probabilities = [1.0 / (score ** 2 + 1e-6) for _, score in scores]
+
+    # Normalize probabilities
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = random.choices([node for node, _ in scores], weights=probabilities, k=1)[0]
+
+    return next_node

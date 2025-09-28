@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    alpha = 0.6  # Proximity weight
+    beta = 0.3   # Destination alignment weight
+    gamma = 0.1  # Centrality weight
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+
+        # Proximity component (favors closer nodes)
+        proximity_score = alpha * (1 / (1 + distance_to_node))
+
+        # Destination alignment component (favors nodes that reduce total distance)
+        alignment_score = beta * (distance_to_dest / (distance_to_node + distance_to_dest))
+
+        # Centrality component (favors nodes connected to many unvisited nodes)
+        centrality_score = gamma * (sum(1 for n in unvisited_nodes if n != node and distance_matrix[node][n] < float('inf')) / remaining_nodes)
+
+        # Dynamic adjustment based on novelty (position in remaining path)
+        novelty_factor = (remaining_nodes / (remaining_nodes + distance_to_node)) ** 1.5
+        total_score = (proximity_score + alignment_score + centrality_score) * novelty_factor
+
+        if total_score > best_score:
+            best_score = total_score
+            next_node = node
+
+    # Special case: prioritize destination if it's the last node or provides significant savings
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        if remaining_nodes == 1 or dest_distance < distance_matrix[current_node][next_node] * 0.6:
+            next_node = destination_node
+
+    return next_node

@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            neighbor_distances = [distance_matrix[node][n] for n in remaining_nodes]
+            avg_distance = sum(neighbor_distances) / len(neighbor_distances)
+            variance = sum((d - avg_distance) ** 2 for d in neighbor_distances) / len(neighbor_distances)
+            entropy = variance ** 0.5
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+            normalized_connectivity = connectivity / (len(remaining_nodes) * 0.3)
+        else:
+            avg_distance = 0
+            entropy = 0
+            connectivity = 0
+            normalized_connectivity = 0
+
+        immediate_weight = 0.5 * (1 - visited_ratio ** 2)
+        entropy_weight = 0.3 * (1 - visited_ratio)
+        connectivity_weight = 0.2 * (1 - visited_ratio)
+
+        score = immediate_weight * immediate_distance + entropy_weight * entropy + connectivity_weight * normalized_connectivity
+        candidates.append((node, score))
+
+    if candidates:
+        nodes, scores = zip(*candidates)
+        probabilities = [1 / (score + 1e-6) for score in scores]
+        total_prob = sum(probabilities)
+        normalized_probs = [p / total_prob for p in probabilities]
+        next_node = random.choices(nodes, weights=normalized_probs, k=1)[0]
+
+    return next_node

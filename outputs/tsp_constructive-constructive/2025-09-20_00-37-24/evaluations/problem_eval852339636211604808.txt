@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        # Dynamic bias towards destination based on remaining nodes
+        destination_bias = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+        if random.random() < destination_bias:
+            return destination_node
+
+    # Temperature decreases as more nodes are visited
+    temperature = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+
+    # Calculate selection probabilities based on distance and visit frequency
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist, max_dist = min(distances), max(distances)
+
+    # Normalize distances and apply temperature
+    normalized_distances = [(max_dist - d) / (max_dist - min_dist) for d in distances]
+    probabilities = [math.exp(nd / temperature) for nd in normalized_distances]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

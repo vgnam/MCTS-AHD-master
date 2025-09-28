@@ -1,0 +1,30 @@
+importance in the graph structure.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    total_unvisited = len(unvisited_nodes)
+    progress_factor = 1.0 - (total_unvisited / (total_unvisited + 1))  # Normalized progress
+
+    # Calculate node centrality (average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][other] for other in unvisited_nodes) / total_unvisited
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        normalized_distance = (distance_to_current + distance_to_destination) / 2
+        weighted_distance = (1 - progress_factor) * distance_to_current + progress_factor * normalized_distance
+
+        # Combine weighted distance with centrality (higher centrality reduces score)
+        score = weighted_distance - 0.3 * centrality[node]
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

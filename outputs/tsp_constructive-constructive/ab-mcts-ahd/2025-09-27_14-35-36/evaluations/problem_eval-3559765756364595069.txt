@@ -1,0 +1,11 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Sort unvisited nodes by distance and introduce random bias
+    sorted_nodes = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    bias = min(len(sorted_nodes) - 1, max(0, int(len(sorted_nodes) * 0.2)))
+    next_node = random.choice(sorted_nodes[:bias + 1])
+    return next_node

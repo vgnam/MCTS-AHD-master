@@ -1,0 +1,28 @@
+importance based on their centrality in the remaining graph, while also applying a penalty for nodes that create long detours to the destination.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_score(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Centrality score: higher for nodes connected to many unvisited nodes
+        centrality = sum(1 for other in unvisited_nodes if other != node and distance_matrix[node][other] > 0)
+
+        # Dynamic lookahead: estimate future path impact
+        future_impact = 0
+        for other in unvisited_nodes:
+            if other != node:
+                future_impact += (distance_matrix[node][other] + distance_matrix[other][destination_node]) * (1.0 / (1.0 + distance_matrix[node][other]))
+
+        # Penalize nodes that create long detours
+        detour_penalty = max(0, (current_dist + dest_dist) - 1.5 * distance_matrix[current_node][destination_node])
+
+        # Combine factors with dynamic weights
+        total_score = (0.4 * current_dist + 0.3 * dest_dist + 0.2 * centrality + 0.1 * future_impact) + detour_penalty
+        return total_score
+
+    next_node = min(unvisited_nodes, key=lambda node: calculate_score(node))
+    return next_node

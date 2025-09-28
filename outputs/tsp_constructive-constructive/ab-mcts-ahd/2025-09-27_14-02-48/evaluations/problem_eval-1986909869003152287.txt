@@ -1,0 +1,50 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    # Initialize temperature and cooling rate
+    temperature = 100
+    cooling_rate = 0.95
+    
+    # Dynamic nearest neighbor search with variable neighborhood size
+    k = min(len(unvisited_nodes), int(temperature / 10) + 1)
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:k]
+    nearest_neighbor = nearest_neighbors[0]
+    min_distance = distance_matrix[current_node][nearest_neighbor]
+    
+    # Check if destination node is a valid choice
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+    else:
+        destination_distance = float('inf')
+    
+    # Simulated annealing with novel acceptance probability
+    while temperature > 1:
+        if random.random() < temperature / 100:
+            # Choose a random node from the dynamic nearest neighbors
+            next_node = random.choice(nearest_neighbors)
+        else:
+            # Choose between nearest neighbor and destination node
+            if destination_distance < min_distance:
+                next_node = destination_node
+            else:
+                next_node = nearest_neighbor
+        
+        # Check if the chosen node is valid
+        if next_node not in unvisited_nodes:
+            temperature *= cooling_rate
+            continue
+        
+        # Novel acceptance probability with penalty term
+        penalty_term = (temperature / 100) * (len(unvisited_nodes) / len(distance_matrix))
+        acceptance_prob = math.exp((min_distance - distance_matrix[current_node][next_node]) / temperature - penalty_term)
+        if next_node == destination_node or random.random() < acceptance_prob:
+            return next_node
+        
+        temperature *= cooling_rate
+    
+    # Return the nearest neighbor if the temperature is too low
+    return next_node

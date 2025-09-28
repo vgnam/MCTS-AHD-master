@@ -1,0 +1,9 @@
+import random
+        weights = [1.0 / (1.0 + c[1]) for c in candidates]
+        total = sum(weights)
+        probs = [w / total for w in weights]
+        selected = random.choices([c[0] for c in candidates], weights=probs, k=1)[0]
+    else:
+        selected = candidates[0][0]
+
+    return next_node

@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+
+    # Precompute node centralities (average distance to all other nodes)
+    centralities = {}
+    for node in unvisited_nodes:
+        centralities[node] = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / len(unvisited_nodes)
+
+    # Path momentum: direction vector from previous steps (simplified for this example)
+    recent_path = []  # In practice, this would track the last few nodes visited
+    momentum_vector = (0, 0)  # Placeholder for actual momentum calculation
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        hub_score = centralities[node]
+
+        # Dynamic weight based on node centrality and remaining path length
+        centrality_weight = 0.2 * (1 - (hub_score / max(centralities.values())))
+
+        # Path momentum alignment (simplified)
+        momentum_score = 0  # Placeholder for actual momentum calculation
+
+        # Robust outlier detection using median absolute deviation
+        distances = [distance_matrix[current_node][other] for other in unvisited_nodes]
+        median = sorted(distances)[len(distances)//2]
+        mad = sum(abs(d - median) for d in distances) / len(distances)
+        outlier_penalty = 0 if mad == 0 else abs(distance_to_current - median) / mad
+
+        # Node density factor (inverse of local node count)
+        density_factor = 1 / (1 + len(unvisited_nodes))
+
+        total_score = (0.4 * distance_to_current +
+                        0.3 * distance_to_destination +
+                        0.2 * hub_score +
+                        0.1 * momentum_score) * (1 + centrality_weight) + 0.1 * outlier_penalty * density_factor
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

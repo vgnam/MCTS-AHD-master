@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    #{This algorithm selects the next node by considering a weighted combination of distance from the current node and the 'detour factor' reflecting how much longer the path becomes by including that node.}
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate distances to each unvisited node
+    distances = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+
+    # Calculate detour factor for each unvisited node
+    detour_factors = {node: (distance_matrix[current_node][node] + distance_matrix[node][destination_node]) / distance_matrix[current_node][destination_node] for node in unvisited_nodes}
+
+    # Weighted combination of distance and detour factor (adjust weight as needed)
+    weights = {node: distances[node] + 0.5 * detour_factors[node] for node in unvisited_nodes}
+
+    # Select the node with the minimum weighted value
+    next_node = min(weights, key=weights.get)
+
+    return next_node

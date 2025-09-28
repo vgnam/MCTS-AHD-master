@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate candidate pool size based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    candidate_pool_size = min(3, remaining_nodes)
+
+    # Temperature-based randomness (decreases as nodes are visited)
+    temperature = max(0.1, 1.0 - (1.0 / remaining_nodes))
+
+    # Calculate destination bias (stronger when destination is nearby)
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / remaining_nodes
+        dest_bias = max(0, 1 - (dest_distance / (avg_distance * 2)))
+
+    # Select candidates with dynamic weighting
+    candidates = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:candidate_pool_size]
+
+    # Weighted selection with destination bias
+    weights = []
+    for node in candidates:
+        base_weight = 1.0 / (distance_matrix[current_node][node] + 1e-6)
+        if node == destination_node and destination_node in unvisited_nodes:
+            weighted_weight = base_weight * (1 + dest_bias)
+        else:
+            weighted_weight = base_weight
+        weights.append(weighted_weight)
+
+    # Apply temperature to weights
+    adjusted_weights = [w ** (1/temperature) for w in weights]
+
+    # Normalize weights
+    total = sum(adjusted_weights)
+    if total == 0:
+        normalized_weights = [1.0 / len(adjusted_weights)] * len(adjusted_weights)
+    else:
+        normalized_weights = [w/total for w in adjusted_weights]
+
+    # Select node based on weights
+    next_node = random.choices(candidates, weights=normalized_weights, k=1)[0]
+
+    return next_node

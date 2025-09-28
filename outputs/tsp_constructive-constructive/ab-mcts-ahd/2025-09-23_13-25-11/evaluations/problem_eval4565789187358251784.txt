@@ -1,0 +1,35 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        min_future_dist = min(distance_matrix[node][other] for other in remaining_nodes)
+        density_factor = 1 / len(remaining_nodes)
+        dest_proximity = distance_matrix[node][destination_node]
+
+        temperature = 1.0 / (1.0 + math.exp(-(0.5 * density_factor + 0.5 * (1 - dest_proximity / max(distance_matrix[node])))))
+
+        weighted_dist = (0.6 + 0.4 * density_factor) * current_dist + (0.4 - 0.4 * density_factor) * (current_dist - min_future_dist)
+        return weighted_dist * temperature
+
+    nodes_with_scores = [(node, evaluate_node(node)) for node in unvisited_nodes]
+    scores = [score for _, score in nodes_with_scores]
+    min_score = min(scores)
+    max_score = max(scores)
+
+    normalized_scores = [(node, (score - min_score) / (max_score - min_score + 1e-10)) for node, score in nodes_with_scores]
+    probabilities = [1 - normalized_score for _, normalized_score in normalized_scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices([node for node, _ in normalized_scores], weights=probabilities, k=1)[0]
+    return next_node

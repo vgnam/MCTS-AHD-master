@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        # Calculate immediate distance to current node
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Calculate potential distance to destination
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Calculate centrality score (inverse of average distance to all other nodes)
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality = 1 / (total_distance / (len(unvisited_nodes) - 1)) if len(unvisited_nodes) > 1 else 1.0
+
+        # Combine scores with dynamic weights
+        weight_immediate = 0.6  # Higher weight for immediate distance
+        weight_potential = 0.3  # Moderate weight for potential distance
+        weight_centrality = 0.1  # Lower weight for centrality
+
+        score = (
+            -immediate_distance * weight_immediate +
+            -potential_distance * weight_potential +
+            centrality * weight_centrality
+        )
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

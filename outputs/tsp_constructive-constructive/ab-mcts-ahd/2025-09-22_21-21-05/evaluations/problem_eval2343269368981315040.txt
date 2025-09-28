@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    decay_factor = 1 - (1 / (1 + math.exp(-(remaining_nodes - 5))))  # Sigmoid decay from 1 to 0.5
+    best_score = float('inf')
+    next_node = None
+    scores = []
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        combined_score = distance_to_current + decay_factor * distance_to_destination
+        scores.append((node, combined_score))
+
+    # Introduce probabilistic selection to avoid local optima
+    if scores:
+        nodes, node_scores = zip(*scores)
+        min_score = min(node_scores)
+        adjusted_scores = [math.exp(-(score - min_score)) for score in node_scores]  # Boltzmann selection
+        total = sum(adjusted_scores)
+        r = random.random() * total
+        cumulative = 0
+        for i, (node, score) in enumerate(scores):
+            cumulative += adjusted_scores[i]
+            if r <= cumulative:
+                next_node = node
+                break
+
+    return next_node

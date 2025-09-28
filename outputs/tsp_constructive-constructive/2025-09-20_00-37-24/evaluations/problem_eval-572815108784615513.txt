@@ -1,0 +1,24 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate a weighted score for each unvisited node
+    scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Weighted score: inverse distance (exploitation) + randomness (exploration)
+        score = (1 / distance) + (random.random() * 0.5)
+        scores[node] = score
+
+    # Select the node with the highest score
+    next_node = max(scores, key=scores.get)
+
+    # Occasionally override with a random node to ensure exploration
+    if random.random() < 0.1:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

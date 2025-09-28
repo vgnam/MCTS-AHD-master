@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes) + 1  # +1 for current node
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        normalized_degree = degree / (len(distance_matrix) - 1)  # Normalize degree
+
+        # Dynamic weight based on remaining nodes
+        distance_weight = 1.0 - (0.5 * (remaining_nodes / len(distance_matrix)))
+        degree_weight = 0.5 + (0.5 * (remaining_nodes / len(distance_matrix)))
+
+        # Distance penalty term
+        distance_penalty = distance * (1 + (0.2 * (distance_matrix[node][destination_node] / max(distance_matrix[node]))))
+
+        # Score equation
+        score = -distance_penalty + degree_weight * (1 - normalized_degree) + (0.1 * (1 / distance_matrix[node][destination_node]))
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,24 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=0.5):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate probabilities using Boltzmann distribution
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    max_dist = max(distances)
+
+    # Normalize distances to [0, 1] range
+    normalized = [(d - min_dist) / (max_dist - min_dist + 1e-10) for d in distances]
+
+    # Apply Boltzmann distribution with temperature
+    exp_values = [math.exp(-n / temperature) for n in normalized]
+    total = sum(exp_values)
+    probabilities = [e / total for e in exp_values]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

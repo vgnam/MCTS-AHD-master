@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_progress = 1 - (remaining_nodes / total_nodes)
+
+    # Calculate node centrality (average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Adaptive weight scaling
+        weight_local = 0.5 + 0.3 * exploration_progress
+        weight_connectivity = 0.3 - 0.1 * exploration_progress
+        weight_dest = -0.2 - 0.1 * exploration_progress
+        weight_flow = 0.1 * exploration_progress
+
+        # Flow disruption penalty
+        if remaining_nodes > 1:
+            max_neighbor_dist = max(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+            flow_disruption = (max_neighbor_dist - current_dist) * weight_flow
+        else:
+            flow_disruption = 0
+
+        # Centrality adjustment
+        centrality_factor = 1 + (centrality[node] / (sum(centrality.values()) + 1e-6))
+
+        # Hybrid scoring
+        score = (weight_local * current_dist) + \
+                (weight_connectivity * (1 / (1 + centrality[node]))) + \
+                (weight_dest * dest_dist) + \
+                flow_disruption
+
+        scores.append((node, score))
+
+    next_node = min(scores, key=lambda x: x[1])[0]
+    return next_node

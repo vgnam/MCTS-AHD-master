@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+    total_unvisited = len(unvisited_nodes)
+
+    # Calculate current node's centrality (average distance to unvisited nodes)
+    current_centrality = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / total_unvisited
+
+    # Dynamic weight factor combining problem size and centrality
+    weight_factor = 1.0 - (total_unvisited / (total_unvisited + 1)) ** 2
+    centrality_factor = 0.5 + 0.5 * (current_centrality / max(distance_matrix[current_node][node] for node in unvisited_nodes))
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Node centrality for tie-breaking
+        node_centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (total_unvisited - 1)
+
+        # Combined score with centrality influence
+        combined_score = (current_distance + weight_factor * future_distance) / (1 + future_distance)
+        centrality_score = 1.0 / (1 + node_centrality)
+        normalized_score = (1 - centrality_factor) * combined_score + centrality_factor * centrality_score
+
+        if normalized_score > best_score:
+            best_score = normalized_score
+            next_node = node
+        elif normalized_score == best_score:
+            if node_centrality < sum(distance_matrix[next_node][n] for n in unvisited_nodes if n != next_node) / (total_unvisited - 1):
+                next_node = node
+
+    return next_node

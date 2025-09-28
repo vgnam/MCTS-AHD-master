@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    ratio = remaining_nodes / total_nodes if total_nodes > 0 else 0
+    weight_to_destination = 0.7 * (1 - ratio) ** 2
+
+    node_scores = {}
+    max_distance = max(max(row) for row in distance_matrix)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        base_score = distance_to_current + weight_to_destination * distance_to_destination
+
+        if distance_matrix[node][current_node] > 0:
+            base_score += 0.3 * (max_distance - distance_matrix[node][current_node])
+
+        centrality_bonus = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        base_score -= 0.15 * centrality_bonus / (remaining_nodes - 1 if remaining_nodes > 1 else 1)
+
+        node_scores[node] = base_score
+
+    if not node_scores:
+        return destination_node
+
+    min_score = min(node_scores.values())
+    max_score = max(node_scores.values())
+    score_range = max_score - min_score if max_score > min_score else 1
+
+    normalized_scores = {node: (max_score - score) / score_range for node, score in node_scores.items()}
+    total_weight = sum(normalized_scores.values())
+
+    if total_weight == 0:
+        return unvisited_nodes[0]
+
+    probabilities = {node: score / total_weight for node, score in normalized_scores.items()}
+    next_node = random.choices(
+        list(probabilities.keys()),
+        weights=list(probabilities.values()),
+        k=1
+    )[0]
+
+    return next_node

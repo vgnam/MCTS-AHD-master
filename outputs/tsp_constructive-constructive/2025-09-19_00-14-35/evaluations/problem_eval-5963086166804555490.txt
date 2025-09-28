@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    # Calculate average distance to unvisited nodes
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / remaining_nodes
+
+    # Node density factor (higher when more nodes are close)
+    node_density = sum(1 for node in unvisited_nodes if distance_matrix[current_node][node] <= avg_distance) / remaining_nodes
+
+    # Dynamic proximity threshold to avoid local optima
+    proximity_threshold = 0.7 * avg_distance + 0.3 * distance_matrix[current_node][destination_node]
+
+    next_node = min(unvisited_nodes, key=lambda node:
+        (0.5 * distance_matrix[current_node][node] +
+         0.3 * distance_matrix[node][destination_node] +
+         0.2 * (1.0 / (1.0 + exploration_factor)) -
+         0.2 * node_density * (distance_matrix[current_node][node] > proximity_threshold)))
+
+    return next_node

@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    weight_factor = 1 / (1 + math.exp(-(remaining_nodes - 5)))  # Sigmoid adjustment
+    immediate_weight = 0.9 - 0.6 * weight_factor
+    lookahead_weight = 0.3 + 0.6 * weight_factor
+
+    best_node = None
+    best_score = float('inf')
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Adaptive lookahead: prioritize nodes that lead to clusters or reduce overall variance
+        lookahead_scores = []
+        for next_node in unvisited_nodes:
+            if next_node != node:
+                lookahead_scores.append(distance_matrix[node][next_node])
+        if lookahead_scores:
+            avg_lookahead = sum(lookahead_scores) / len(lookahead_scores)
+            std_lookahead = (sum((x - avg_lookahead) ** 2 for x in lookahead_scores) / len(lookahead_scores)) ** 0.5
+            normalized_lookahead = avg_lookahead - 0.5 * std_lookahead  # Penalize high variance
+        else:
+            normalized_lookahead = 0
+
+        score = immediate_weight * immediate_distance + lookahead_weight * normalized_lookahead
+
+        if score < best_score:
+            best_score = score
+            best_node = node
+
+    return next_node

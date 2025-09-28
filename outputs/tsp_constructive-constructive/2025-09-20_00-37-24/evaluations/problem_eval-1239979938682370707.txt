@@ -1,0 +1,16 @@
+import random
+    candidate_node = random.choice(list(unvisited_nodes))
+
+    # Find the nearest neighbor
+    min_distance = float('inf')
+    nearest_node = None
+    for node in unvisited_nodes:
+        if distance_matrix[current_node][node] < min_distance:
+            min_distance = distance_matrix[current_node][node]
+            nearest_node = node
+
+    # Choose between candidate and nearest neighbor
+    if distance_matrix[current_node][candidate_node] <= distance_matrix[current_node][nearest_node]:
+        return candidate_node
+    else:
+        return next_node

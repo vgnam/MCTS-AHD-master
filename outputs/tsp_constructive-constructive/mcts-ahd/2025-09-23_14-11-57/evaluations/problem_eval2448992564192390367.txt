@@ -1,0 +1,35 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    exploration_bias = max(0.2, 0.7 * (remaining_nodes / len(distance_matrix)))
+    exploitation_bias = 1.0 - exploration_bias
+
+    # Dynamic temperature for probabilistic selection
+    temperature = 1.0 - (0.8 * (1.0 - remaining_nodes / len(distance_matrix)))
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        global_potential = distance_matrix[node][destination_node]
+
+        # Novelty: Adaptive exploration-exploitation tradeoff with probabilistic weighting
+        exploration_score = (1.0 / (immediate_distance + 1e-6)) ** (1.0 + exploration_bias)
+        exploitation_score = (1.0 / (global_potential + 1e-6)) ** (1.0 + exploitation_bias)
+
+        # Combine scores with temperature-based probabilistic selection
+        combined_score = (exploration_score * exploitation_score) ** (1.0 / temperature)
+        scores.append(combined_score)
+
+    # Select node with probabilistic weighting
+    if temperature > 0.5:
+        selected_index = random.choices(range(len(scores)), weights=scores, k=1)[0]
+    else:
+        selected_index = scores.index(max(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

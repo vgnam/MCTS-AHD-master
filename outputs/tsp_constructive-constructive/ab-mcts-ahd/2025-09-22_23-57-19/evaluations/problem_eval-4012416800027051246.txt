@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    candidates = []
+    costs = []
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        candidates.append(node)
+        costs.append(cost)
+
+    if not candidates:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        for i, node in enumerate(candidates):
+            if node == destination_node:
+                continue
+            potential_cost = costs[i] + distance_matrix[node][destination_node]
+            costs[i] = potential_cost
+
+    weights = [1.0 / (1.0 + cost) for cost in costs]
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    next_node = np.random.choice(candidates, p=probabilities)
+
+    return next_node

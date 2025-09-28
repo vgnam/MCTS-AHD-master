@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+    distance_to_destination = distance_matrix[current_node][destination_node]
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest_from_node = distance_matrix[node][destination_node]
+
+        # Fixed weight favoring destination proximity
+        weight = 0.7
+
+        # Penalize nodes that are too far from current
+        penalty = max(0, distance_to_current - 1.2 * distance_to_destination)
+        score = weight * distance_to_dest_from_node + (1 - weight) * distance_to_current + penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

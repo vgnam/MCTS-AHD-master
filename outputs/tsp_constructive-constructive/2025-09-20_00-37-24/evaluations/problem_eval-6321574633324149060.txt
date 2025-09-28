@@ -1,0 +1,37 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        # Calculate bias probability based on distance to destination
+        distance_to_dest = distance_matrix[current_node][destination_node]
+        max_distance = max(distance_matrix[current_node][node] for node in unvisited_nodes)
+        bias_prob = 0.7 + 0.3 * (1 - distance_to_dest / max_distance) if max_distance > 0 else 0.7
+
+        if random.random() < bias_prob:
+            return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic selection probability based on current tour length
+    tour_length = sum(distance_matrix[current_node][node] for node in unvisited_nodes)
+    avg_distance = tour_length / len(unvisited_nodes) if unvisited_nodes else 0
+    current_distance = distance_matrix[current_node][nearest_neighbors[0]]
+
+    if current_distance > 1.2 * avg_distance:  # If nearest is significantly longer
+        selection_prob = 0.5  # Higher chance to explore
+    else:
+        selection_prob = 0.8  # Prefer nearest
+
+    if random.random() < selection_prob:
+        candidates = nearest_neighbors[:min(4, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Explore with inverse distance weighting
+        weights = [1 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes]
+        next_node = random.choices(unvisited_nodes, weights=weights, k=1)[0]
+
+    return next_node

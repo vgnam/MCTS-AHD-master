@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate adaptive selection pressure
+    remaining_nodes = len(unvisited_nodes)
+    selection_pressure = 1 - (1 / (1 + math.exp(-(remaining_nodes - 5))))  # Sigmoid function centered at 5 nodes
+
+    # Calculate exploration rate (inverse of selection pressure)
+    exploration_rate = 1 - selection_pressure
+
+    # Get nearest neighbors
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic candidate selection
+    if random.random() < exploration_rate:
+        # Exploration phase: more randomness as exploration rate increases
+        candidates = nearest_neighbors[:min(max(2, int(len(nearest_neighbors) * exploration_rate)), len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Exploitation phase: more focused selection
+        top_k = max(1, int(len(nearest_neighbors) * selection_pressure))
+        candidates = nearest_neighbors[:min(top_k, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+
+    return next_node

@@ -1,0 +1,24 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Adaptive stochasticity: higher temperature increases randomness
+    selection_prob = 1.0 / (1.0 + math.exp(-temperature))
+    if random.random() < selection_prob:
+        # Weighted random selection based on inverse distance
+        weights = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in nearest_neighbors]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+    else:
+        # Select from top 3 nearest with decreasing probability as temperature decreases
+        top_k = max(1, min(3, len(nearest_neighbors), int(3 * (1.0 - temperature))))
+        candidates = nearest_neighbors[:top_k]
+        next_node = random.choice(candidates)
+
+    return next_node

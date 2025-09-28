@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    exploration_factor = 1 / (1 + math.exp(-0.5 * (num_unvisited - 5)))  # Sigmoid exploration factor
+
+    # Calculate centrality: average distance to all other nodes
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (num_unvisited - 1)
+
+    # Hybrid score with centrality and path smoothness penalty
+    def hybrid_score(node):
+        local_cost = distance_matrix[current_node][node]
+        global_cost = distance_matrix[node][destination_node]
+        path_smoothness_penalty = (local_cost + distance_matrix[current_node][node]) ** 2
+        centrality_bonus = 1 / (1 + centrality[node])  # Higher centrality = lower penalty
+
+        return (0.5 + exploration_factor * 0.3) * local_cost + \
+               (0.3 - exploration_factor * 0.1) * global_cost + \
+               exploration_factor * path_smoothness_penalty - \
+               centrality_bonus
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

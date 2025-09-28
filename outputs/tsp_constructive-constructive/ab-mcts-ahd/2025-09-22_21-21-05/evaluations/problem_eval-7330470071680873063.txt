@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    exploration_weight = 1.0 / (num_unvisited + 1)  # Decreases as unvisited nodes decrease
+    exploitation_weight = 1.0 - exploration_weight
+
+    # Dynamic penalty based on path smoothness
+    current_to_dest = distance_matrix[current_node][destination_node]
+    smoothness_penalty = 0.0
+
+    for node in unvisited_nodes:
+        if distance_matrix[current_node][node] > 2.0 * current_to_dest:
+            smoothness_penalty += 0.2 * distance_matrix[current_node][node]
+
+    # Calculate scores with probabilistic selection
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Balance exploration and exploitation
+        combined_score = (exploitation_weight * distance_to_current +
+                         exploration_weight * distance_to_destination +
+                         smoothness_penalty)
+
+        scores.append((node, combined_score))
+
+    # Select node probabilistically to escape local optima
+    total_score = sum(score for _, score in scores)
+    if total_score == 0:
+        return unvisited_nodes[0]
+
+    probabilities = [(score / total_score) for _, score in scores]
+    next_node = np.random.choice([node for node, _ in scores], p=probabilities)
+
+    return next_node

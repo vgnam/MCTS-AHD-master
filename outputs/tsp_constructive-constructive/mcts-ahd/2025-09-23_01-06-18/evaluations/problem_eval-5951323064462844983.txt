@@ -1,0 +1,38 @@
+importance" metric based on degree centrality and average distances to remaining nodes.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    unvisited_count = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (unvisited_count / total_nodes))
+
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / unvisited_count
+        if avg_distance == 0:
+            return destination_node
+        threshold = 1.0 + (1.0 - (unvisited_count / total_nodes))
+        if remaining_distance / avg_distance <= threshold:
+            return destination_node
+
+    def calculate_importance(node):
+        degree = sum(1 for n in distance_matrix[node] if n != 0 and n != float('inf'))
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / unvisited_count
+        return degree * avg_dist
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        long_term_potential = calculate_importance(node)
+        return immediate_cost * (1.0 - temperature) + long_term_potential * temperature
+
+    if temperature > 0.5:
+        probabilities = [math.exp(-heuristic(node) / temperature) for node in unvisited_nodes]
+        total_prob = sum(probabilities)
+        probabilities = [p / total_prob for p in probabilities]
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    else:
+        next_node = min(unvisited_nodes, key=heuristic)
+
+    return next_node

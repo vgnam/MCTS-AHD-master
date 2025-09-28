@@ -1,0 +1,23 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    mean_dist = np.mean(distances)
+    variance = np.var(distances)
+    threshold = mean_dist - variance * 0.5
+
+    candidates = [node for node, dist in zip(unvisited_nodes, distances) if dist <= threshold]
+
+    if not candidates:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    else:
+        ranked_nodes = sorted(candidates, key=lambda node: distance_matrix[current_node][node])
+        probabilities = [1.0 / (i + 1) for i in range(len(ranked_nodes))]
+        probabilities = [p / sum(probabilities) for p in probabilities]
+        next_node = random.choices(ranked_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

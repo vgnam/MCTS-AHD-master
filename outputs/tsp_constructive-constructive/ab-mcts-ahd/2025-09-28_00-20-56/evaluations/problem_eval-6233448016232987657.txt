@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_score(node):
+        current_distance = distance_matrix[current_node][node]
+        remaining_distance = distance_matrix[node][destination_node]
+        detour_penalty = sum(
+            max(0, distance_matrix[current_node][node] + distance_matrix[node][other_node] - distance_matrix[current_node][other_node])
+            for other_node in unvisited_nodes if other_node != node
+        )
+        return current_distance + remaining_distance + detour_penalty
+
+    min_total_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        total_distance = calculate_score(node)
+        if total_distance < min_total_distance:
+            min_total_distance = total_distance
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        direct_distance = distance_matrix[current_node][destination_node]
+        if direct_distance <= min_total_distance * 0.8:
+            next_node = destination_node
+
+    return next_node

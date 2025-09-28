@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def reward(node):
+        immediate_cost = distance_matrix[current_node][node]
+        avg_future_cost = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes) - 1)
+        return -(immediate_cost + avg_future_cost)  # Negative for minimization
+
+    next_node = max(unvisited_nodes, key=reward)
+    return next_node

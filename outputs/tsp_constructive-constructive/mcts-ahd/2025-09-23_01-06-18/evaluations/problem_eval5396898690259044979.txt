@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_distance == 0:
+            return destination_node
+        threshold = 0.8 + 0.2 * (len(unvisited_nodes) / len(distance_matrix))
+        if remaining_distance / avg_distance <= threshold:
+            return destination_node
+
+    def connectivity_score(node):
+        direct_connectivity = distance_matrix[current_node][node]
+        indirect_connectivity = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+        return (0.6 * direct_connectivity + 0.4 * indirect_connectivity)
+
+    def destination_potential(node):
+        direct_to_dest = distance_matrix[node][destination_node]
+        avg_to_dest = sum(distance_matrix[other][destination_node] for other in unvisited_nodes) / len(unvisited_nodes)
+        return direct_to_dest / (avg_to_dest + 1e-6)
+
+    def regret_score(node):
+        current_distance = distance_matrix[current_node][node]
+        max_regret = max(distance_matrix[current_node][other] - current_distance for other in unvisited_nodes) if unvisited_nodes else 0
+        return max_regret * (1.0 - (len(unvisited_nodes) / len(distance_matrix)))
+
+    def diversity_score(node):
+        unique_connections = len(set(distance_matrix[node][other] for other in unvisited_nodes))
+        return unique_connections / (len(unvisited_nodes) + 1e-6)
+
+    candidate_scores = []
+    for node in unvisited_nodes:
+        conn = connectivity_score(node)
+        dest = destination_potential(node)
+        regret = regret_score(node)
+        div = diversity_score(node)
+
+        progress_weight = 0.3 + 0.7 * (1.0 - (len(unvisited_nodes) / len(distance_matrix)))
+        score = (progress_weight * conn + (1 - progress_weight) * dest +
+                 0.4 * regret - 0.2 * div)
+        candidate_scores.append((node, score))
+
+    next_node = min(candidate_scores, key=lambda x: x[1])[0]
+    return next_node

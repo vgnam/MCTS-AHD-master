@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+    exploitation_weight = 1 / (1 + math.exp(-10 * (remaining_ratio - 0.5)))
+
+    def weighted_score(node):
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        if distance_to_node == 0:
+            return float('-inf')
+
+        revisit_penalty = 1 + (1 - remaining_ratio) * 2
+        exploration_score = (distance_to_node + distance_to_dest) * exploitation_weight
+        exploitation_score = 1 / (distance_to_node + distance_to_dest)
+
+        combined_score = (exploration_score * (1 - exploitation_weight) +
+                          exploitation_score * exploitation_weight) / revisit_penalty
+        return combined_score
+
+    next_node = max(unvisited_nodes, key=lambda node: weighted_score(node))
+    return next_node

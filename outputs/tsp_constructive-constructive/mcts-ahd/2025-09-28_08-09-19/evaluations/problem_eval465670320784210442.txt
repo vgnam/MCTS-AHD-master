@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    exploration_factor = 1.0 - (remaining_count / (remaining_count + 1)) * 0.6
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        lookahead_depth = min(2, remaining_count // 3) if remaining_count > 1 else 1
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth]
+            avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+            node_centrality = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+        else:
+            avg_neighbor_distance = 0
+            node_centrality = 0
+
+        immediate_weight = 0.5 + 0.2 * exploration_factor
+        lookahead_weight = 0.3 * (1.0 - exploration_factor)
+        centrality_weight = 0.2 * (1.0 - lookahead_weight)
+
+        score = immediate_weight * immediate_distance + lookahead_weight * avg_neighbor_distance - centrality_weight * node_centrality
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

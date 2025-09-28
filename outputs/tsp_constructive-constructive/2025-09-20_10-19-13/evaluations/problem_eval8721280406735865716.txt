@@ -1,0 +1,15 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    weights = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+        weight = 0.6 * current_dist + 0.4 * avg_dist + 0.1 * random.random()
+        weights.append(weight)
+
+    next_node = unvisited_nodes[weights.index(min(weights))]
+    return next_node

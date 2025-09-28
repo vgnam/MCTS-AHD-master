@@ -1,0 +1,4 @@
+import random
+    candidates = sorted(unvisited_nodes, key=heuristic)[:max(2, len(unvisited_nodes) // 3)]
+    next_node = random.choice(candidates) if candidates else destination_node
+    return next_node

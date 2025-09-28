@@ -1,0 +1,9 @@
+import random
+            next_node = random.choices(weighted_nodes, weights=normalized_probs, k=1)[0]
+
+            if distance_matrix[current_node][next_node] > avg_distance * 1.5:
+                next_node = nearest_node
+
+            return next_node
+
+    return next_node

@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    global_weight = 1 / (1 + math.exp(-(remaining_count - total_nodes/2)))  # Sigmoid-based dynamic weight
+    local_weight = 1 - global_weight
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        max_future_dist = max(distance_matrix[node][other] for other in remaining_nodes)
+        proximity_penalty = 0.1 * current_dist if current_dist < min(distance_matrix[current_node][n] for n in unvisited_nodes) else 0
+
+        return local_weight * current_dist + global_weight * max_future_dist - proximity_penalty
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

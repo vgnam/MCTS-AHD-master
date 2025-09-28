@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    # Adaptive weight scaling
+    base_weight_local = 0.6 - 0.4 * progress
+    base_weight_centrality = 0.3 + 0.4 * progress
+    base_weight_coherence = 0.1 + 0.6 * progress
+
+    # Temporal coherence tracking
+    coherence_history = [sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+                        for node in unvisited_nodes]
+    avg_coherence = sum(coherence_history) / len(coherence_history) if coherence_history else 0
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+
+        # Dynamic weight adjustment
+        weight_local = base_weight_local * (1 + 0.2 * (local_distance / (sum(distance_matrix[current_node]) / total_nodes)))
+        weight_centrality = base_weight_centrality * (1 - 0.2 * (coherence / (avg_coherence + 1e-10)))
+        weight_coherence = base_weight_coherence * (1 + 0.1 * progress)
+
+        return (weight_local * local_distance) + (weight_centrality * centrality) - (weight_coherence * coherence)
+
+    # Probabilistic selection based on scores
+    scores = [calculate_score(node) for node in unvisited_nodes]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - score) / (max_score - min_score + 1e-10) for score in scores]
+
+    if sum(normalized_scores) > 0:
+        next_node = random.choices(unvisited_nodes, weights=normalized_scores, k=1)[0]
+    else:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    return next_node

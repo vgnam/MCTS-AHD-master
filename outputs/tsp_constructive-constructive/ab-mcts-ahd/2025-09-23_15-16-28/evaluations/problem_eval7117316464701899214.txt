@@ -1,0 +1,12 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    weighted_scores = {}
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        weighted_scores[node] = 0.7 * current_distance + 0.3 * avg_future_distance
+
+    next_node = min(weighted_scores, key=weighted_scores.get)
+    return next_node

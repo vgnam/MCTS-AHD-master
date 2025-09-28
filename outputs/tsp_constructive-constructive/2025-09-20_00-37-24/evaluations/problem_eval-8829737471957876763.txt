@@ -1,0 +1,29 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate inverse distance weights and node degrees
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    inv_distances = [1 / (d + 1e-6) for d in distances]  # Avoid division by zero
+    degrees = [sum(1 for dist in distance_matrix[node] if dist > 0) for node in unvisited_nodes]
+
+    # Compute dynamic probabilities: higher inverse distance and lower degree are preferred
+    probabilities = [inv_dist * (1 / (deg + 1)) for inv_dist, deg in zip(inv_distances, degrees)]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    # 90% chance to pick from top 3 weighted nodes, 10% chance to pick randomly
+    if random.random() < 0.9:
+        # Select from top 3 weighted nodes
+        weighted_indices = np.argsort(probabilities)[-3:][::-1]
+        selected_index = random.choice(weighted_indices)
+    else:
+        # Random selection with normalized probabilities
+        selected_index = np.random.choice(len(unvisited_nodes), p=normalized_probs)
+
+    return next_node

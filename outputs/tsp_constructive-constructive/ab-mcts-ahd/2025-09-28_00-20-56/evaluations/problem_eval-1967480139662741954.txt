@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, iteration=0, temp_factor=1.0):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            farthest_node = max(remaining_nodes, key=lambda n: distance_matrix[node][n])
+            nearest_node = min(remaining_nodes, key=lambda n: distance_matrix[node][n])
+            lookahead_dist = distance_matrix[node][farthest_node] + distance_matrix[farthest_node][destination_node]
+            adjusted_lookahead_dist = lookahead_dist * (1.0 / (1.0 + (distance_matrix[node][nearest_node] / lookahead_dist)))
+        else:
+            adjusted_lookahead_dist = distance_matrix[node][destination_node]
+        return current_dist + 0.5 * adjusted_lookahead_dist
+
+    scores = {node: evaluate_node(node) for node in unvisited_nodes}
+    min_score = min(scores.values())
+    max_score = max(scores.values())
+
+    # Normalize scores and apply temperature-based softmax
+    temp = temp_factor * (0.9 ** iteration)
+    exp_scores = {node: math.exp(-(score - min_score) / (max_score - min_score + 1e-6) / temp) for node, score in scores.items()}
+    total_exp = sum(exp_scores.values())
+    probs = {node: exp_score / total_exp for node, exp_score in exp_scores.items()}
+
+    # Select node based on probabilities
+    next_node = random.choices(list(probs.keys()), weights=probs.values(), k=1)[0]
+    return next_node

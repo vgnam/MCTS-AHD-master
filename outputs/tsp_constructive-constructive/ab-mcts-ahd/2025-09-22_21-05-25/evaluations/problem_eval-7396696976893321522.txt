@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    nearest_dist = distance_matrix[current_node][nearest_node]
+    farthest_dist = distance_matrix[current_node][farthest_node]
+
+    avg_dist = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - len(unvisited_nodes) / (len(unvisited_nodes) + 10))
+
+    prob_nearest = 0.5 * (1 + math.tanh((avg_dist - nearest_dist) / (avg_dist * temperature)))
+    prob_farthest = 0.5 * (1 + math.tanh((farthest_dist - avg_dist) / (avg_dist * temperature)))
+    prob_random = 1.0 - prob_nearest - prob_farthest
+
+    rand_val = random.random()
+    if rand_val < prob_nearest:
+        next_node = nearest_node
+    elif rand_val < prob_nearest + prob_farthest:
+        next_node = farthest_node
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    min_cost = min(distances)
+    remaining_nodes = len(unvisited_nodes)
+
+    # Dynamic thresholds based on remaining nodes and progress
+    min_threshold = min_cost * (1.5 - 0.2 * (remaining_nodes / len(distance_matrix)))
+    avg_threshold = avg_distance * (1.3 - 0.1 * (remaining_nodes / len(distance_matrix)))
+
+    candidates = []
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost <= min_cost or cost <= min_threshold or cost <= avg_threshold:
+            candidates.append((node, cost))
+
+    if not candidates:
+        return unvisited_nodes.pop()
+
+    # Probabilistic selection weighted by inverse cost
+    total_weight = sum(1 / cost for _, cost in candidates)
+    r = random.random() * total_weight
+    cumulative_weight = 0
+    for node, cost in candidates:
+        cumulative_weight += 1 / cost
+        if r <= cumulative_weight:
+            return node
+
+    return next_node

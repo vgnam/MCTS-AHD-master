@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        avg_distance_to_unvisited = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_nodes
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weight adjustment with non-linear scaling
+        weight = 0.3 + (0.7 * (remaining_nodes / (remaining_nodes + 2)) ** 2)
+
+        # Proximity penalty: discourage nodes too close to destination early
+        proximity_penalty = 0 if remaining_nodes < 3 else (1 / (distance_to_destination + 1e-6))
+
+        total_score = (distance_to_current + (weight * avg_distance_to_unvisited)) + (0.3 * distance_to_destination) - (0.1 * proximity_penalty)
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

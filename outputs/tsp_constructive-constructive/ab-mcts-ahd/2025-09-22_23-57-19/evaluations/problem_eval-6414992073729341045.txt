@@ -1,0 +1,9 @@
+import random
+    rand_val = random.random()
+    cumulative_prob = 0.0
+    for node, prob in probabilities:
+        cumulative_prob += prob
+        if rand_val <= cumulative_prob:
+            return node
+
+    return next_node

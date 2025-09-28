@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    def calculate_pheromone(node):
+        distance = distance_matrix[current_node][node]
+        return (1.0 / (1.0 + distance)) ** 2
+
+    def calculate_centrality(node):
+        if not unvisited_nodes:
+            return 0.0
+        total_distance = sum(distance_matrix[node][n] for n in unvisited_nodes)
+        return total_distance / len(unvisited_nodes)
+
+    def heuristic(node):
+        pheromone = calculate_pheromone(node)
+        local_distance = distance_matrix[current_node][node]
+        centrality = calculate_centrality(node)
+        progress_factor = (len(unvisited_nodes) / len(distance_matrix)) ** 2
+        return (local_distance + centrality) * (1.0 - progress_factor) + (1.0 / pheromone) * progress_factor
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

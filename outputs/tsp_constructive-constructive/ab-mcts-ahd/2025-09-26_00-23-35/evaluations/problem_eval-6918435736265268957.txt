@@ -1,0 +1,44 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+
+    if not unvisited_nodes:
+        return None
+
+    total_unvisited = len(unvisited_nodes)
+    max_nodes = len(distance_matrix)
+
+    # Temperature-based cooling schedule for dynamic exploration-exploitation
+    temperature = max(0.1, math.exp(-0.1 * (max_nodes - total_unvisited)))
+    exploration_weight = 1.0 / (1.0 + math.exp(-temperature * (total_unvisited - max_nodes/2)))
+
+    # Local search bias: connectivity and average distance to nearby unvisited nodes
+    connectivity = {}
+    avg_local_distance = {}
+    for node in unvisited_nodes:
+        connectivity[node] = sum(1 for n in unvisited_nodes if distance_matrix[node][n] > 0)
+        nearby_nodes = [n for n in unvisited_nodes if distance_matrix[node][n] < max(distance_matrix[node]) * 0.5]
+        avg_local_distance[node] = sum(distance_matrix[node][n] for n in nearby_nodes) / max(1, len(nearby_nodes))
+
+    # Normalize metrics
+    max_connectivity = max(connectivity.values()) if connectivity else 1
+    min_avg_distance = min(avg_local_distance.values()) if avg_local_distance else 1
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+
+        # Normalized connectivity and distance metrics
+        norm_connectivity = connectivity[node] / max_connectivity if max_connectivity > 0 else 0
+        norm_distance = (min_avg_distance / (avg_local_distance[node] + 1e-6)) if min_avg_distance > 0 else 0
+
+        # Combined score with temperature-based weighting
+        score = (exploration_weight * (-distance_to_node) +
+                 (1 - exploration_weight) * (0.7 * norm_connectivity + 0.3 * norm_distance))
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

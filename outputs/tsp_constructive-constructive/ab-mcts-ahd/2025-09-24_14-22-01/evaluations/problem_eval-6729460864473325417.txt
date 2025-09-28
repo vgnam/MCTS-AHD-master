@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_cost = float('inf')
+    next_node = None
+    total_nodes = len(distance_matrix)
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes if node != destination_node) / len(unvisited_nodes) if unvisited_nodes else 0
+
+    # Cluster nodes based on distance thresholds
+    clusters = {}
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        cluster_key = tuple(sorted([n for n in unvisited_nodes if distance_matrix[node][n] <= 1.5 * avg_distance and n != destination_node]))
+        clusters.setdefault(cluster_key, []).append(node)
+
+    # Calculate cluster centrality and proximity
+    cluster_centrality = {cluster: sum(distance_matrix[node][n] for node in cluster_nodes for n in cluster_nodes) / (len(cluster_nodes) ** 2) for cluster, cluster_nodes in clusters.items()}
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Find the cluster containing the current node
+        node_cluster = next((cluster for cluster, nodes in clusters.items() if node in nodes), None)
+        if not node_cluster:
+            continue
+
+        # Cluster-aware centrality and proximity
+        cluster_size = len(node_cluster)
+        cluster_proximity = sum(distance_matrix[node][n] for n in node_cluster) / cluster_size if cluster_size > 0 else 0
+        cluster_penalty = 1.0 + 0.4 * (cluster_centrality[node_cluster] / (avg_distance + 1e-6)) * (1.0 - cluster_proximity / (2 * avg_distance))
+
+        # Weighted cost with cluster-aware adjustments
+        distance_ratio = immediate_distance / avg_distance if avg_distance > 0 else 1.0
+        weighted_cost = immediate_distance + (0.5 * distance_ratio + 0.5 * (potential_distance / (cluster_proximity + 1e-6))) * potential_distance
+        weighted_cost *= cluster_penalty
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    return next_node

@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Compute centroid and density metrics
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        density_factor = len(unvisited_nodes) / sum(sum(distance_matrix[node]) for node in unvisited_nodes)
+    else:
+        centroid_x = 0
+        density_factor = 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Angular deviation component (cosine of angle between vectors)
+        vec_to_node = (distance_matrix[current_node][node], distance_matrix[node][destination_node])
+        vec_to_dest = (distance_matrix[current_node][destination_node], 0)
+        dot_product = vec_to_node[0] * vec_to_dest[0] + vec_to_node[1] * vec_to_dest[1]
+        mag_product = (vec_to_node[0]**2 + vec_to_node[1]**2)**0.5 * (vec_to_dest[0]**2 + vec_to_dest[1]**2)**0.5
+        angular_deviation = 1 - (dot_product / mag_product) if mag_product != 0 else 0
+
+        # Dynamic weights based on remaining path characteristics
+        remaining_path_weight = 0.7 if len(unvisited_nodes) > 5 else 0.3
+        density_weight = 0.5 * density_factor
+
+        # Weighted score with adaptive components
+        score = (distance_to_current +
+                remaining_path_weight * distance_to_dest +
+                0.4 * centroid_penalty +
+                0.3 * angular_deviation +
+                density_weight * distance_to_current)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

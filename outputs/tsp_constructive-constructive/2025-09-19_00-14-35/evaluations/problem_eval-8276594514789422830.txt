@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    # Stage 1: Filter candidates based on immediate distance
+    candidates = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    candidate_size = max(1, min(4, len(candidates)))
+    top_candidates = candidates[:candidate_size]
+
+    # Stage 2: Evaluate candidates using weighted criteria
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Connectivity score (average distance to remaining nodes)
+        if remaining_nodes > 1:
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+        else:
+            avg_remaining_dist = 0
+
+        # Dynamic weights with stronger penalty
+        weight_dist = 0.7
+        weight_connectivity = 0.2 + 0.1 * (1 - exploration_factor)
+        weight_penalty = 0.1 + 0.2 * (1 - exploration_factor)
+
+        return (weight_dist * current_dist +
+                weight_connectivity * avg_remaining_dist -
+                weight_penalty * dest_dist)
+
+    next_node = min(top_candidates, key=lambda node: evaluate_node(node))
+
+    # Local search refinement: check if swapping with a nearby node improves the solution
+    if remaining_nodes > 2:
+        for candidate in top_candidates:
+            if candidate != next_node:
+                # Calculate potential improvement
+                original_cost = distance_matrix[current_node][next_node] + distance_matrix[next_node][destination_node]
+                swapped_cost = distance_matrix[current_node][candidate] + distance_matrix[candidate][destination_node]
+                if swapped_cost < original_cost:
+                    next_node = candidate
+                    break
+
+    return next_node

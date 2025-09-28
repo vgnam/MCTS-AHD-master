@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    exploration_factor = 0.7 ** (10 - len(unvisited_nodes))
+    candidates = []
+    remaining_count = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        next_distance = distance_matrix[current_node][node]
+
+        if remaining_count > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            min_distance = min(distance_matrix[node][n] for n in remaining_nodes)
+            max_distance = max(distance_matrix[node][n] for n in remaining_nodes)
+            detour_cost = (max_distance - min_distance) * (remaining_count / (remaining_count + 1)) * exploration_factor
+
+            weight_dist = 0.4 + 0.4 * exploration_factor
+            weight_detour = 0.6 - 0.4 * exploration_factor
+            total_distance = weight_dist * next_distance + weight_detour * detour_cost
+        else:
+            total_distance = next_distance
+
+        candidates.append((node, total_distance))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

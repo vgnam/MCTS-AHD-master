@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate nearest neighbors and their distances
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+
+    # Calculate temperature based on unvisited node density
+    temperature = 1.0 / (1.0 + math.exp(-len(unvisited_nodes) / 10.0))
+
+    # Hybrid selection: weighted probability based on distance and temperature
+    probabilities = []
+    for i, dist in enumerate(distances):
+        # Higher probability for closer nodes, adjusted by temperature
+        prob = math.exp(-dist) * (1.0 - temperature) + (temperature / len(distances))
+        probabilities.append(prob)
+
+    # Normalize probabilities
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    # Select next node based on weighted probability
+    next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+
+    return next_node

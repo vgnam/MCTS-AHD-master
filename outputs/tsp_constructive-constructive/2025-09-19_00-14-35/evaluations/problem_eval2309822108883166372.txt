@@ -1,0 +1,55 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    # Stage 1: Filter candidates based on immediate distance and novelty
+    candidates = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    candidate_size = max(1, min(3, len(candidates)))
+    top_candidates = candidates[:candidate_size]
+
+    # Calculate novelty score (reward unique connectivity patterns)
+    def novelty_score(node):
+        if remaining_nodes <= 1:
+            return 0
+        unique_connections = sum(1 for n in unvisited_nodes if n != node and distance_matrix[node][n] > sum(distance_matrix[node][m] for m in unvisited_nodes if m != node) / (remaining_nodes - 1))
+        return unique_connections / (remaining_nodes - 1)
+
+    # Stage 2: Evaluate candidates with adaptive weights
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Connectivity score (average distance to remaining nodes)
+        if remaining_nodes > 1:
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+        else:
+            avg_remaining_dist = 0
+
+        # Dynamic weights based on exploration and novelty
+        weight_dist = 0.4 + 0.15 * exploration_factor
+        weight_connectivity = 0.3 + 0.2 * (1 - exploration_factor)
+        weight_penalty = 0.1 + 0.15 * (1 - exploration_factor)
+        weight_novelty = 0.1 + 0.2 * exploration_factor
+
+        novelty = novelty_score(node)
+        return (weight_dist * current_dist +
+                weight_connectivity * avg_remaining_dist -
+                weight_penalty * dest_dist +
+                weight_novelty * novelty)
+
+    # Probabilistic selection based on evaluation scores
+    scores = [evaluate_node(node) for node in top_candidates]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - score) / (max_score - min_score + 1e-6) for score in scores]  # Higher score -> better
+
+    # Adjust probabilities with exploration factor
+    prob_sum = sum(normalized_scores)
+    probabilities = [score / prob_sum for score in normalized_scores]
+    next_node = np.random.choice(top_candidates, p=probabilities)
+
+    return next_node

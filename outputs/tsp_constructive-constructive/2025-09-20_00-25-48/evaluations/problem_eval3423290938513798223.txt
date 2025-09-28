@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Phase 1: Cluster nodes into regions based on proximity
+    clusters = {}
+    for node in unvisited_nodes:
+        cluster_key = tuple(sorted([current_node, node]))
+        if cluster_key not in clusters:
+            clusters[cluster_key] = []
+        clusters[cluster_key].append(node)
+
+    # Phase 2: Select the best node within the current region
+    min_total_cost = float('inf')
+    next_node = None
+    for cluster_key, nodes in clusters.items():
+        centroid = sum(nodes) / len(nodes)
+        for node in nodes:
+            current_cost = distance_matrix[current_node][node]
+            centroid_cost = distance_matrix[node][int(centroid)] if int(centroid) in distance_matrix[node] else 0
+            total_cost = current_cost + centroid_cost
+            if total_cost < min_total_cost:
+                min_total_cost = total_cost
+                next_node = node
+
+    return next_node

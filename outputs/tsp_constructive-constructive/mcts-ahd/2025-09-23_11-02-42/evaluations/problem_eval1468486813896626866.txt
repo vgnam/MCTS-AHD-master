@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    scores = []
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if distance_to_destination == 0:
+            score = distance_to_node
+        else:
+            direct_distance = distance_matrix[current_node][destination_node]
+            proximity_factor = 0.5 * (1.0 - (remaining_nodes / len(unvisited_nodes)))
+            exploration_factor = 0.5 * (1.0 - (remaining_nodes / len(unvisited_nodes))) ** 2
+            score = (proximity_factor * distance_to_node) + (proximity_factor * distance_to_destination) - (exploration_factor * direct_distance)
+
+        scores.append((node, score))
+
+    if not scores:
+        return None
+
+    min_score = min(score[1] for score in scores)
+    max_score = max(score[1] for score in scores)
+    normalized_scores = [(node, (score - min_score) / (max_score - min_score + 1e-6)) for node, score in scores]
+
+    total = sum(score for _, score in normalized_scores)
+    if total == 0:
+        return scores[0][0]
+
+    probabilities = [score / total for _, score in normalized_scores]
+    next_node = np.random.choice([node for node, _ in normalized_scores], p=probabilities)
+
+    return next_node

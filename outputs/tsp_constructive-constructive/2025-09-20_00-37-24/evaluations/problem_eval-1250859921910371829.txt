@@ -1,0 +1,28 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Adjust selection based on distance to destination
+    dest_distance = distance_matrix[current_node][destination_node]
+    if dest_distance < sum(distance_matrix[current_node][node] for node in nearest_neighbors[:3]) / 3:
+        # If destination is closer than average of top 3, prioritize it more
+        if random.random() < 0.7:
+            candidates = nearest_neighbors[:min(2, len(nearest_neighbors))]
+            next_node = random.choice(candidates)
+        else:
+            next_node = random.choice(nearest_neighbors)
+    else:
+        # Otherwise, follow stochastic nearest-neighbor
+        if random.random() < 0.9:
+            candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+            next_node = random.choice(candidates)
+        else:
+            next_node = random.choice(nearest_neighbors)
+
+    return next_node

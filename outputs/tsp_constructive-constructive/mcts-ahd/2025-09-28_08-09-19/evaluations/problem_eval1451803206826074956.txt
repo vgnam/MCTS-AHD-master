@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    lookahead_depth = min(4, max(2, remaining_count // 3))
+
+    avg_total_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / remaining_count
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        avg_remaining_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes) if remaining_nodes else 0
+        edge_density = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.1 * avg_remaining_distance) / len(remaining_nodes) if remaining_nodes else 0
+
+        connectivity_score = (edge_density ** 2) * (1.0 + (remaining_count / total_nodes) * 0.4)
+        deviation_factor = (abs(immediate_distance - avg_total_distance) / (avg_total_distance + 1e-6)) ** 0.5
+        progress_factor = (remaining_count / total_nodes) ** 1.5
+
+        score = (0.35 * (1 / (immediate_distance + 1e-6)) + 0.45 * connectivity_score - 0.2 * deviation_factor * progress_factor)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

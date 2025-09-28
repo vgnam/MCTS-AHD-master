@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        if len(unvisited_nodes) == 1:
+            avg_distance = 0
+        else:
+            avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        # Dynamic exploration decay based on progress
+        progress = 1 - (len(unvisited_nodes) / (len(unvisited_nodes) + len(distance_matrix) - 1))
+        exploration_decay = 0.5 * (1 - progress)  # Decay exploration as tour progresses
+
+        # Novel penalty: punishes both very long and very short edges
+        if distance_to_current > 2 * avg_distance:
+            penalty = 0.7 * distance_to_current
+        elif distance_to_current < 0.5 * avg_distance:
+            penalty = 0.3 * distance_to_current
+        else:
+            penalty = 0
+
+        # Reinforcement learning-inspired score
+        score = (1 - exploration_decay) * distance_to_current + exploration_decay * avg_distance + penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

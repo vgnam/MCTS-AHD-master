@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = 1 - (remaining_nodes / total_nodes)
+    selection_pressure = 0.4 + 0.6 * progress_factor
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node]
+
+        # Calculate global potential as average of distances to remaining nodes
+        global_potential = sum(distance_matrix[node][n] for n in unvisited_nodes) / remaining_nodes if remaining_nodes > 0 else 0
+
+        # Novelty term: reward nodes that connect to distant clusters
+        cluster_distances = [distance_matrix[node][n] for n in unvisited_nodes]
+        novelty = max(cluster_distances) - sum(cluster_distances) / len(cluster_distances) if cluster_distances else 0
+
+        # Modified regret: consider top 3 alternatives
+        sorted_costs = sorted([distance_matrix[current_node][n] for n in unvisited_nodes])
+        regret_term = sum(sorted_costs[:min(3, len(sorted_costs))]) - local_cost if unvisited_nodes else 0
+
+        # Dynamic diversity bonus based on progress
+        diversity_bonus = (sum(distance_matrix[node][n] for n in unvisited_nodes) / remaining_nodes) * (1 - progress_factor)
+
+        # Weighted score with adjusted coefficients
+        weighted_score = (0.4 * local_cost + 0.3 * regret_term) * (1 - progress_factor) + \
+                         (0.2 * global_potential + 0.1 * novelty - 0.2 * diversity_bonus) * progress_factor
+        return weighted_score
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

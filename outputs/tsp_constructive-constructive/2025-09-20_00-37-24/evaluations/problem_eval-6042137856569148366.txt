@@ -1,0 +1,30 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on distance and visit frequency
+    weights = []
+    total_weight = 0.0
+    visit_counts = {node: 0 for node in unvisited_nodes}  # Placeholder for frequency tracking
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        frequency = visit_counts[node] + 1  # Avoid division by zero
+        weight = (1.0 / distance) * (1.0 / frequency)  # Combine inverse distance and inverse frequency
+        weights.append(weight)
+        total_weight += weight
+
+    # Normalize weights to probabilities
+    probabilities = [w / total_weight for w in weights]
+
+    # Select node based on probabilities with a small chance for random exploration
+    if random.random() < 0.95:  # 95% chance to pick based on probabilities
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    else:  # 5% chance to pick a random node
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

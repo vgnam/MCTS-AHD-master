@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if len(unvisited_nodes) == 1:
+        return next(iter(unvisited_nodes))
+
+    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    base_threshold = 0.8 * distance_matrix[current_node][next_node]
+    destination_penalty = (remaining_nodes / total_nodes) * distance_matrix[current_node][destination_node]
+    adjusted_threshold = base_threshold - (0.2 * destination_penalty)
+
+    if destination_node in unvisited_nodes and distance_matrix[current_node][destination_node] < adjusted_threshold:
+        return destination_node
+    return next_node

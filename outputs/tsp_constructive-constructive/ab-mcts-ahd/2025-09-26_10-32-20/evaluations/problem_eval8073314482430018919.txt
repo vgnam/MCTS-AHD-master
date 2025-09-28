@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 / (remaining_nodes + 1)  # Controls exploration/exploitation trade-off
+
+    def cost_function(node):
+        local_dist = distance_matrix[current_node][node]
+        global_dist = distance_matrix[node][destination_node]
+        detour_penalty = (local_dist + global_dist - distance_matrix[current_node][destination_node]) * (1.0 / (remaining_nodes + 1))
+        return local_dist + global_dist + detour_penalty
+
+    costs = [cost_function(node) for node in unvisited_nodes]
+    softmax_weights = np.exp(-np.array(costs) / temperature)
+    softmax_weights /= softmax_weights.sum()
+    next_node = np.random.choice(unvisited_nodes, p=softmax_weights)
+
+    return next_node

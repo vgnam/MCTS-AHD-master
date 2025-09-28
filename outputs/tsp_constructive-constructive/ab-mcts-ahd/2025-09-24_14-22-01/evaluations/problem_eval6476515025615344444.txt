@@ -1,0 +1,33 @@
+import math
+    import random
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes) - 1
+    total_nodes = len(distance_matrix)
+    temperature = max(0.1, 1.0 - (remaining_nodes / total_nodes) ** 1.5)
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Centrality measure: average distance to all other nodes
+        centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+
+        # Probabilistic selection with temperature
+        if random.random() < temperature:
+            # Exploration phase: prioritize potential distance and centrality
+            weighted_cost = (0.4 * potential_distance + 0.6 * centrality)
+        else:
+            # Exploitation phase: prioritize immediate distance and centrality
+            weighted_cost = (0.6 * immediate_distance + 0.4 * centrality)
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+    return next_node

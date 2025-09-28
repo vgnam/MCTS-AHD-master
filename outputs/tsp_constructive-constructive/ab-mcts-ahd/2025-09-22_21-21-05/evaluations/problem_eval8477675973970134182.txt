@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    avg_distance_to_remaining = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / remaining_nodes
+
+    # Dynamic weight factor: prioritizes immediate distance when few nodes remain, balances with anticipatory factor
+    weight_factor = 1.0 / (1.0 + (remaining_nodes ** 0.5))  # Non-linear decay to emphasize long-term connectivity
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Anticipatory factor: penalizes nodes that disconnect the path or increase average future distance
+        anticipatory_factor = (distance_to_current + distance_to_destination) / avg_distance_to_remaining
+
+        # Combined score: immediate distance + weighted anticipatory factor
+        combined_score = distance_to_current + weight_factor * anticipatory_factor * distance_to_destination
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

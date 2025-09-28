@@ -1,0 +1,14 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    exploration_factor = 0.1  # Small factor to allow some exploration
+    probabilities = [(1 / (d + 1)) * (1 + exploration_factor) for d in distances]
+    total_probability = sum(probabilities)
+    normalized_probabilities = [p / total_probability for p in probabilities]
+
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_probabilities, k=1)[0]
+    return next_node

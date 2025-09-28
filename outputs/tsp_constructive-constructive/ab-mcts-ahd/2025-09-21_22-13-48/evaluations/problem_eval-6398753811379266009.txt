@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    decay_factor = 0.5 ** (1 / remaining_nodes)  # Exponential decay based on remaining nodes
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_savings = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+        score = immediate_distance - decay_factor * future_savings  # Dynamic weighting
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

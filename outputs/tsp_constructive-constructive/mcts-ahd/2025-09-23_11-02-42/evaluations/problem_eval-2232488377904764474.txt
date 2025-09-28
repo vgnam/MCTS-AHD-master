@@ -1,0 +1,35 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    scores = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if distance_to_destination == 0:
+            score = distance_to_node
+        else:
+            centrality = sum(1 for d in distance_matrix[node] if d < distance_to_node)
+            avg_distance = sum(distance_matrix[node]) / len(distance_matrix[node])
+            penalty = (centrality / (avg_distance + 1e-6)) * (len(unvisited_nodes) / (len(unvisited_nodes) + 2))
+            score = distance_to_node * (1 + penalty)
+
+        weight = math.exp(-score)
+        scores.append((node, weight))
+        total_weight += weight
+
+    if not scores:
+        return None
+
+    rand_val = random.uniform(0, total_weight)
+    cumulative_weight = 0.0
+
+    for node, weight in scores:
+        cumulative_weight += weight
+        if rand_val <= cumulative_weight:
+            return node
+
+    return next_node

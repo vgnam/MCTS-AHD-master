@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    decay_factor = max(0.1, 1.0 - (total_unvisited / (total_unvisited + 1)))  # Ensures decay_factor >= 0.1
+
+    best_node = None
+    best_score = float('inf')
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Look-ahead: evaluate the best possible next node after 'node'
+        best_lookahead_distance = float('inf')
+        for next_node in unvisited_nodes:
+            if next_node != node:
+                lookahead_distance = distance_matrix[node][next_node]
+                if lookahead_distance < best_lookahead_distance:
+                    best_lookahead_distance = lookahead_distance
+
+        # Dynamic weighted score: balance immediate distance and lookahead efficiency with decay
+        score = (1.0 - decay_factor) * immediate_distance + decay_factor * best_lookahead_distance
+
+        if score < best_score:
+            best_score = score
+            best_node = node
+
+    return next_node

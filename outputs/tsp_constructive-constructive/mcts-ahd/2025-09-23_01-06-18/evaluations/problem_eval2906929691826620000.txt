@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - remaining_nodes / total_nodes
+    temperature = 0.7 - 0.4 * progress
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        regret = immediate_cost - min(distance_matrix[current_node][n] for n in unvisited_nodes)
+        hub_score = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * min(distance_matrix[node][m] for m in unvisited_nodes if m != n)) if remaining_nodes > 1 else 0
+        local_diversity = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        predictive_length = sum(sorted(distance_matrix[node][n] for n in unvisited_nodes)[:min(3, remaining_nodes)])
+        momentum = 1 / (1 + distance_matrix[current_node][node] * 0.1)
+
+        weighted_score = (0.35 - 0.25 * progress) * immediate_cost + (0.3 + 0.4 * progress) * regret + (0.15 * progress) * hub_score + (0.1 * (1 - progress)) * predictive_length - 0.2 * local_diversity + 0.1 * momentum
+        return weighted_score * temperature
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

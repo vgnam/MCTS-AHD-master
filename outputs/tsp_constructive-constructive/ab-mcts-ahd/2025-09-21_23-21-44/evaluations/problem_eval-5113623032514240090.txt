@@ -1,0 +1,31 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    exploration_weight = 1 / (1 + math.exp(-(remaining_nodes - 5)))  # Sigmoid adjustment
+    exploitation_weight = 1 - exploration_weight
+
+    min_weighted_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        centrality = sum(d for d in distance_matrix[node] if d > 0)
+
+        # Dynamic weighting based on remaining nodes
+        weighted_score = (exploitation_weight * 0.7 * current_distance +
+                          exploration_weight * 0.3 * (centrality / (degree + 1)))
+
+        # Penalty for high centrality revisits
+        if degree > 5:
+            weighted_score *= 1.2
+
+        if weighted_score < min_weighted_score:
+            min_weighted_score = weighted_score
+            next_node = node
+
+    return next_node

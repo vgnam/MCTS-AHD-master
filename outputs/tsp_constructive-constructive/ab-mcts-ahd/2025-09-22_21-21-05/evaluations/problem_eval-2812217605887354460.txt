@@ -1,0 +1,55 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    # Dynamic weights based on progress
+    w_distance = 0.5 + 0.5 * progress
+    w_destination = 0.5 - 0.4 * progress
+    w_centrality = 0.1 + 0.3 * progress
+
+    best_score = float('-inf')
+    candidates = []
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate node centrality (average distance to other nodes)
+        centrality = sum(distance_matrix[node]) / total_nodes
+
+        # Score combines multiple criteria with dynamic weights
+        score = (w_distance * distance_to_current +
+                 w_destination * distance_to_destination +
+                 w_centrality * centrality)
+
+        # Apply penalties for nodes too close to destination early
+        if progress < 0.5:
+            penalty = 0.3 * (1 - (distance_to_destination / max(distance_matrix[node])))
+            score += penalty
+
+        # Track candidates with probabilistic selection based on entropy
+        if score > best_score:
+            best_score = score
+            candidates = [node]
+        elif score == best_score:
+            candidates.append(node)
+
+    # Entropy-based probabilistic selection
+    if len(candidates) > 1:
+        # Calculate entropy of candidate scores
+        scores = [best_score - score for score in [best_score - score for node in candidates]]
+        entropy = sum(s * math.log(s + 1e-10) for s in scores) / len(candidates)
+        selection_prob = math.exp(entropy) / (math.exp(entropy) + 1)
+
+        if random.random() < selection_prob:
+            next_node = random.choice(candidates)
+        else:
+            next_node = candidates[0]
+    else:
+        next_node = candidates[0]
+
+    return next_node

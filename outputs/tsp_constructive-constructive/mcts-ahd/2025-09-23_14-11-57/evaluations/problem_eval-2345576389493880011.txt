@@ -1,0 +1,5 @@
+import random
+    selected_index = random.choices(range(len(nodes)), weights=normalized_scores, k=1)[0]
+    next_node = nodes[selected_index]
+
+    return next_node

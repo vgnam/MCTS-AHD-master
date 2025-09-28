@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def weighted_min_max_distance(node):
+        local_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return local_dist
+        max_dist = max(distance_matrix[node][n] for n in remaining_nodes)
+        weight = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+        return weight * local_dist + (1 - weight) * max_dist
+
+    if len(unvisited_nodes) % 2 == 1:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    else:
+        next_node = min(unvisited_nodes, key=weighted_min_max_distance)
+
+    return next_node

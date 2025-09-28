@@ -1,0 +1,12 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:10: RuntimeWarning: divide by zero encountered in scalar divide
+  weight = 0.5 + 0.5 * (estimated_distance_to_destination / max(distance_matrix[node][node] for node in unvisited_nodes))
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:13: RuntimeWarning: invalid value encountered in scalar add
+  total_score = weight * distance_to_current + (1 - weight) * estimated_distance_to_destination
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 52, in eval_heuristic
+    raise KeyError(f"Node {next_node} is already visited.")
+KeyError: 'Node None is already visited.'

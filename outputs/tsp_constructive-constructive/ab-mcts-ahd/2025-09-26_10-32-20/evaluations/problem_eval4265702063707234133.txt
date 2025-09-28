@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining_nodes = len(unvisited_nodes)
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+        # Calculate centrality-based weight (higher for nodes with more connections to unvisited nodes)
+        centrality = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < float('inf')) / remaining_nodes
+        weight = 1.0 / (remaining_nodes + 1) * (1 + centrality)  # Dynamic weight adjusted by centrality
+        # Prefer nodes that reduce the maximum remaining distance
+        max_remaining_distance = max(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        return distance_matrix[current_node][node] + weight * max_remaining_distance
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

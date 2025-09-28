@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    exploration_rate = 0.1 * (0.8 ** num_unvisited)
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        min_future_dist = min(distance_matrix[node][other] for other in remaining_nodes)
+        max_future_dist = max(distance_matrix[node][other] for other in remaining_nodes)
+
+        weight_current = 0.5 * (0.9 ** num_unvisited)
+        weight_avg = 0.3 * (1 - (0.9 ** num_unvisited))
+        weight_min = 0.15 * (1 - (0.9 ** num_unvisited))
+        weight_max = 0.05 * (0.9 ** num_unvisited)
+
+        score = (weight_current * current_dist +
+                 weight_avg * avg_future_dist +
+                 weight_min * min_future_dist +
+                 weight_max * max_future_dist)
+
+        return score
+
+    candidates = list(unvisited_nodes)
+    scores = [evaluate_node(node) for node in candidates]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - score) / (max_score - min_score + 1e-10) for score in scores]
+
+    if random.random() < exploration_rate:
+        next_node = random.choice(candidates)
+    else:
+        next_node = candidates[normalized_scores.index(max(normalized_scores))]
+
+    return next_node

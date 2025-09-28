@@ -1,0 +1,39 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate potential improvement for each unvisited node
+    improvements = []
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        # Estimate improvement as inverse of distance (higher for shorter distances)
+        improvement = 1.0 / (current_distance + 1e-6)  # Avoid division by zero
+        improvements.append((node, improvement))
+
+    # Sort by improvement and get top candidates
+    improvements.sort(key=lambda x: -x[1])
+    top_candidates = [node for node, _ in improvements[:min(3, len(improvements))]]
+
+    # Dynamic probability: higher chance to exploit better improvements, but some exploration
+    exploitation_prob = 0.8 if len(unvisited_nodes) > 3 else 0.5  # More exploration when few nodes left
+
+    if random.random() < exploitation_prob:
+        next_node = random.choice(top_candidates)
+    else:
+        # Weighted random selection based on improvement
+        weights = [imp for _, imp in improvements]
+        total = sum(weights)
+        r = random.uniform(0, total)
+        cumulative = 0
+        for node, weight in zip(unvisited_nodes, weights):
+            cumulative += weight
+            if r <= cumulative:
+                next_node = node
+                break
+
+    return next_node

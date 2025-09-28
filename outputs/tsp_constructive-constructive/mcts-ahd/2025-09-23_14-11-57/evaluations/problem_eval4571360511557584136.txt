@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Initialize reinforcement scores (simplified for this example)
+    reinforcement_scores = {node: 1.0 for node in unvisited_nodes}
+
+    # Exploration rate decreases as progress increases
+    exploration_rate = 0.3 * (len(unvisited_nodes) / len(distance_matrix))
+
+    # Select node with probability based on reinforcement and exploration
+    if random.random() < exploration_rate:
+        # Explore: choose a random node
+        next_node = random.choice(list(unvisited_nodes))
+    else:
+        # Exploit: choose based on reinforcement scores
+        scores = []
+        for node in unvisited_nodes:
+            immediate_distance = distance_matrix[current_node][node]
+            # Combine immediate distance with reinforcement (inverse to prioritize better nodes)
+            score = immediate_distance / reinforcement_scores[node]
+            scores.append(score)
+
+        next_node = list(unvisited_nodes)[scores.index(min(scores))]
+
+    return next_node

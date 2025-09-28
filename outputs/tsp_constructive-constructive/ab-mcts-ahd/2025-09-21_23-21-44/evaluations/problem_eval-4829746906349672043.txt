@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    min_weighted_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        if remaining_nodes > 2:
+            future_distances = sorted([distance_matrix[node][n] for n in unvisited_nodes if n != node])
+            future_distance = (future_distances[0] + future_distances[1]) / 2
+            variability_penalty = sum(abs(d - future_distance) for d in future_distances) / len(future_distances)
+        else:
+            future_distance = distance_matrix[node][unvisited_nodes[0]] if remaining_nodes == 2 else 0
+            variability_penalty = 0
+        weighted_score = 0.6 * current_distance + 0.4 * (future_distance + 0.1 * variability_penalty)
+        if weighted_score < min_weighted_score:
+            min_weighted_score = weighted_score
+            next_node = node
+    return next_node

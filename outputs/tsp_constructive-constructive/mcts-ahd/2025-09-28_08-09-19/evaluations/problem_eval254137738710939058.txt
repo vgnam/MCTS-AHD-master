@@ -1,0 +1,57 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    # Calculate node density and path history factors
+    avg_distance_all = sum(sum(row) for row in distance_matrix) / (len(distance_matrix) ** 2)
+    node_density = sum(1 for row in distance_matrix if any(d < 0.5 * avg_distance_all for d in row)) / len(distance_matrix)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+            node_centrality = avg_distance
+        else:
+            avg_distance = 0
+            connectivity = 0
+            node_centrality = 0
+
+        # Adaptive weight scaling
+        density_weight = 0.3 * (1 - node_density)
+        immediate_weight = 0.4 + 0.2 * visited_ratio + density_weight
+        centrality_weight = 0.3 * (0.5 + 0.4 * visited_ratio)
+        connectivity_weight = 0.2 * (0.5 + 0.3 * visited_ratio)
+
+        # Memory-based penalty for revisits
+        revisit_penalty = 1.0
+        if node in unvisited_nodes and remaining_count > 3:
+            revisit_penalty = 1.2 * (1 - visited_ratio)
+
+        # Dynamic lookahead based on node density
+        lookahead_depth = min(3, max(1, int(remaining_count * (0.5 + 0.3 * node_density))))
+        nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth] if remaining_nodes else []
+        avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+        # Hybrid scoring with adaptive weights
+        score = immediate_weight * immediate_distance + \
+                centrality_weight * (node_centrality * connectivity_weight) + \
+                connectivity_weight * connectivity
+
+        # Dynamic penalty for detours
+        penalty = 1 + (0.5 * avg_neighbor_distance / (immediate_distance + 1e-6)) * (1 - visited_ratio)
+        score *= penalty * revisit_penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

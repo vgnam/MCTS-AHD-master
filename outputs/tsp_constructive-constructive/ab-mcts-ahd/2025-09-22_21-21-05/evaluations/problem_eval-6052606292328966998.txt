@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_distance = min(distances)
+    max_distance = max(distances)
+    mean_distance = sum(distances) / len(distances)
+    variance = sum((d - mean_distance) ** 2 for d in distances) / len(distances)
+    std_dev = variance ** 0.5
+    threshold = mean_distance - std_dev
+
+    avg_distances = []
+    for node in unvisited_nodes:
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+        avg_distances.append(avg_dist)
+
+    avg_avg_distance = sum(avg_distances) / len(unvisited_nodes) if unvisited_nodes else 0
+
+    next_node = None
+    best_score = float('inf')
+
+    for i, node in enumerate(unvisited_nodes):
+        distance = distance_matrix[current_node][node]
+        centrality_factor = 1.0 - (avg_distances[i] / (avg_avg_distance + 1e-6))
+        bonus = 0
+        if distance < threshold:
+            bonus = threshold - distance
+        score = distance - bonus + 0.3 * centrality_factor
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance < threshold:
+            next_node = destination_node
+
+    return next_node

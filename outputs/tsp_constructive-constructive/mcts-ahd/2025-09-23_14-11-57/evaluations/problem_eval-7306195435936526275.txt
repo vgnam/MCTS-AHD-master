@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_progress = 1.0 - (remaining_nodes / len(distance_matrix))
+
+    # Calculate probabilities based on immediate and future distances
+    probabilities = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Weight future distance more as progress increases
+        weight_factor = 0.5 + 0.5 * total_progress
+        combined_distance = immediate_distance + weight_factor * future_distance
+
+        # Probability inversely proportional to combined distance
+        weight = 1.0 / (combined_distance + 1e-6)  # Avoid division by zero
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    probabilities = [p / total_weight for p in probabilities]
+
+    # Select node based on probabilities
+    selected_node = random.choices(list(unvisited_nodes), weights=probabilities, k=1)[0]
+
+    return next_node

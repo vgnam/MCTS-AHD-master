@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        dest_distance = distance_matrix[node][destination_node]
+        bias_factor = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+
+        # Lookahead to evaluate the next step
+        remaining_unvisited = unvisited_nodes - {node}
+        if remaining_unvisited:
+            next_next_node = None
+            min_next_distance = float('inf')
+            for next_node_candidate in remaining_unvisited:
+                next_distance = distance_matrix[node][next_node_candidate]
+                if next_distance < min_next_distance:
+                    min_next_distance = next_distance
+                    next_next_node = next_node_candidate
+            lookahead_distance = min_next_distance
+        else:
+            lookahead_distance = 0
+
+        score = -current_distance + bias_factor * dest_distance - 0.1 * lookahead_distance
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    exploration_weight = 0.4
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate node centrality as inverse of average distance to all other nodes
+    node_centrality = {}
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        avg_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (remaining_nodes - 1)
+        node_centrality[node] = 1 / avg_distance if avg_distance > 0 else 0
+
+    # Track recently visited nodes to penalize revisits
+    memory_penalty = {}
+    for node in unvisited_nodes:
+        memory_penalty[node] = 0.1 if node in unvisited_nodes and node != destination_node else 0
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        centrality_bonus = node_centrality.get(node, 0)
+        dynamic_exploration = exploration_weight * (remaining_nodes / (remaining_nodes + 1)) * centrality_bonus
+        weighted_cost = (1 - exploration_weight) * (immediate_distance + 0.5 * potential_distance) - 0.2 * memory_penalty[node] + dynamic_exploration
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+    return next_node

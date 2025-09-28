@@ -1,0 +1,10 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    nearest_neighbor = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if distance_matrix[current_node][nearest_neighbor] + distance_matrix[nearest_neighbor][destination_node] < distance_matrix[current_node][destination_node]:
+        return nearest_neighbor
+    else:
+        return next_node

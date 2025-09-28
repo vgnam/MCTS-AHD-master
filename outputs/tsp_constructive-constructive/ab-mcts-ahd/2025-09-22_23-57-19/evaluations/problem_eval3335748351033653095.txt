@@ -1,0 +1,7 @@
+import random
+    if random.random() < 0.1:  # 10% chance to select a random node
+        return random.choice(unvisited_nodes)
+
+    # Weighted random selection
+    selected_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

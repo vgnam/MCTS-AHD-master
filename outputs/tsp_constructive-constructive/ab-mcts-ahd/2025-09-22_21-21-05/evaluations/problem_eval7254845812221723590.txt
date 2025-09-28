@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    weight = 1.0 - (0.8 / (1.0 + remaining_nodes))
+
+    min_weighted_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic penalty based on both distance and neighborhood
+        penalty = 0.0
+        for neighbor in unvisited_nodes:
+            if neighbor != node:
+                neighbor_distance = distance_matrix[node][neighbor]
+                if neighbor_distance < distance_to_current * 1.5:
+                    penalty += 0.3 * (1.0 - (neighbor_distance / distance_to_current))
+
+        # Lookahead: evaluate potential path to destination
+        lookahead_penalty = 0.0
+        if remaining_nodes > 2:
+            for intermediate in unvisited_nodes:
+                if intermediate != node:
+                    lookahead_penalty += distance_matrix[node][intermediate] * 0.1
+
+        weighted_score = (distance_to_current * (1 - weight)) + (distance_to_destination * weight) + penalty + lookahead_penalty
+
+        if weighted_score < min_weighted_score:
+            min_weighted_score = weighted_score
+            next_node = node
+
+    return next_node

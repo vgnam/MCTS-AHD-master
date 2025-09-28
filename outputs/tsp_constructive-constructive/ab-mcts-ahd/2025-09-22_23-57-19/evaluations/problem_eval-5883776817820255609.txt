@@ -1,0 +1,28 @@
+defaults to the nearest node if no suitable candidates are found.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    min_cost = min(distances)
+    next_node = unvisited_nodes[distances.index(min_cost)]
+
+    if len(unvisited_nodes) > 2:
+        exploration_factor = 1.1 if len(unvisited_nodes) > 3 else 1.2
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            cost = distance_matrix[current_node][node]
+            if cost < avg_distance * exploration_factor and cost < min_cost * 1.2:
+                next_node = node
+                break
+
+    return next_node

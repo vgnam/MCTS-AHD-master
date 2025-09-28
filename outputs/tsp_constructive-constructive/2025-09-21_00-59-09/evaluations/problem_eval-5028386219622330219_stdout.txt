@@ -1,0 +1,10 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:38: RuntimeWarning: invalid value encountered in scalar divide
+  norm_centroid = centroid_penalty / max(centroid_penalty for n in unvisited_nodes)
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 52, in eval_heuristic
+    raise KeyError(f"Node {next_node} is already visited.")
+KeyError: 'Node None is already visited.'

@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress = (total_nodes - remaining_nodes) / total_nodes if total_nodes > 0 else 0.0
+    temperature = 1.0 - progress
+
+    def node_score(node):
+        direct_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) <= 1:
+            return direct_dist
+
+        remaining = unvisited_nodes - {node}
+        avg_dist = sum(distance_matrix[node][n] for n in remaining) / len(remaining)
+        connectivity = len(remaining) / (avg_dist + 1e-6)
+        total_score = direct_dist + 0.5 * avg_dist - 0.3 * connectivity
+        return total_score
+
+    candidates = []
+    for node in unvisited_nodes:
+        score = node_score(node)
+        prob = math.exp(-score / (temperature + 1e-6))
+        candidates.append((node, prob))
+
+    if candidates:
+        nodes, probs = zip(*candidates)
+        next_node = random.choices(nodes, weights=probs, k=1)[0]
+        return next_node
+    else:
+        return next_node

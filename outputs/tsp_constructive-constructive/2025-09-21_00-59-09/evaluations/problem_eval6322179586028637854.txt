@@ -1,0 +1,53 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Compute centroid of unvisited nodes
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    else:
+        centroid_x = 0
+
+    # Dynamic weight adjustment based on remaining path length
+    remaining_nodes = len(unvisited_nodes)
+    if remaining_nodes > 0:
+        dynamic_weight_current = 1.0 / (1.0 + 0.1 * remaining_nodes)
+        dynamic_weight_dest = 0.5 * (1.0 - dynamic_weight_current)
+        dynamic_weight_centroid = 0.3 * (1.0 - dynamic_weight_current)
+    else:
+        dynamic_weight_current = 1.0
+        dynamic_weight_dest = 0.5
+        dynamic_weight_centroid = 0.3
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Novel score function: inverse distance ratios and exponential penalty
+        if distance_to_current > 0:
+            current_ratio = 1.0 / distance_to_current
+        else:
+            current_ratio = float('inf')
+
+        if distance_to_dest > 0:
+            dest_ratio = 1.0 / distance_to_dest
+        else:
+            dest_ratio = float('inf')
+
+        # Exponential penalty for centroid deviation
+        exp_penalty = math.exp(centroid_penalty / 10.0)
+
+        # Combined dynamic weighted score
+        score = (dynamic_weight_current * current_ratio +
+                 dynamic_weight_dest * dest_ratio -
+                 dynamic_weight_centroid * exp_penalty)
+
+        if score > min_score:  # Higher score is better in this formulation
+            min_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,49 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate centroid of unvisited nodes
+    unvisited_indices = [node for node in unvisited_nodes]
+    centroid = np.mean([np.array([i, j]) for i, j in enumerate(unvisited_indices)], axis=0)
+
+    # Calculate exploration factor for each node
+    exploration_factors = []
+    for node in unvisited_nodes:
+        node_pos = np.array([node, node])  # Simplified position for distance calculation
+        distance_to_centroid = np.linalg.norm(node_pos - centroid)
+        exploration_factors.append(distance_to_centroid)
+
+    # Normalize exploration factors
+    max_exploration = max(exploration_factors) if exploration_factors else 1.0
+    normalized_exploration = [f / max_exploration for f in exploration_factors]
+
+    # Temperature-based stochasticity (decreases over time)
+    temperature = len(unvisited_nodes) / len(distance_matrix[0])
+    stochasticity = max(0.1, temperature)
+
+    # Combine distance and exploration factor with stochasticity
+    weights = []
+    for i, node in enumerate(unvisited_nodes):
+        distance_weight = 1 / (1 + distance_matrix[current_node][node])
+        exploration_weight = normalized_exploration[i]
+        combined_weight = (0.7 * distance_weight) + (0.3 * exploration_weight)
+        weights.append(combined_weight)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Select node based on weighted probability
+    if random.random() < stochasticity:
+        next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+    else:
+        # Fallback to nearest neighbor when stochasticity is low
+        nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+        next_node = nearest_neighbors[0]
+
+    return next_node

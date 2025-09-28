@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_priority = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    weight_factor = 1 / (1 + remaining_nodes ** 0.5)  # Decaying weight factor
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Centrality heuristic: average distance to all unvisited nodes
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_nodes
+
+        # Priority combines immediate distance, long-term savings, and centrality
+        priority = (distance_to_current +
+                    weight_factor * (distance_to_destination + centrality))
+
+        if priority < min_priority:
+            min_priority = priority
+            next_node = node
+
+    return next_node

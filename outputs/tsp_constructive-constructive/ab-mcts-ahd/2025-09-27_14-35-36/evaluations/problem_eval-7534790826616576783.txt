@@ -1,0 +1,14 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = len(unvisited_nodes) / len(distance_matrix)
+    penalties = [1.0 - (1.0 / (1.0 + math.exp(-distance_matrix[current_node][node] / temperature))) for node in unvisited_nodes]
+    weights = [math.exp(-distance_matrix[current_node][node] / temperature) * penalty for node, penalty in zip(unvisited_nodes, penalties)]
+    total_weight = sum(weights)
+    normalized_weights = [weight / total_weight for weight in weights]
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_weights, k=1)[0]
+    return next_node

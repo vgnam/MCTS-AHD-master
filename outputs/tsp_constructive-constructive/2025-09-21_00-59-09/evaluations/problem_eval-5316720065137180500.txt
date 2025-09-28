@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Compute average distance of recent nodes (simplified as last 3 nodes)
+    recent_nodes = unvisited_nodes[-3:] if len(unvisited_nodes) >= 3 else unvisited_nodes
+    if recent_nodes:
+        avg_recent = sum(distance_matrix[current_node][node] for node in recent_nodes) / len(recent_nodes)
+    else:
+        avg_recent = 0
+
+    # Compute total remaining path length estimate (simplified as sum of distances to destination)
+    total_remaining = sum(distance_matrix[node][destination_node] for node in unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        recent_penalty = abs(distance_to_current - avg_recent)
+        total_penalty = total_remaining / (len(unvisited_nodes) + 1)  # Normalize by remaining nodes
+
+        # Weighted score: prioritize proximity to current node, penalize deviation from recent nodes, and total path length
+        score = distance_to_current + 0.7 * recent_penalty + 0.2 * total_penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

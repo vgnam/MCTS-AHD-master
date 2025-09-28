@@ -1,0 +1,24 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic probabilities based on distance and visit counts
+    distances = np.array([distance_matrix[current_node][node] for node in unvisited_nodes])
+    visit_counts = np.array([1 if node == destination_node else random.uniform(0.1, 0.5) for node in unvisited_nodes])
+    probabilities = (1 / distances) * (1 / visit_counts)
+    probabilities /= probabilities.sum()  # Normalize to form a probability distribution
+
+    # Introduce stochasticity: sometimes pick a node that's not the absolute nearest
+    if random.random() < 0.8:  # 80% chance to pick from top 3 nearest
+        top_indices = np.argsort(probabilities)[-3:][::-1]
+        candidates = [unvisited_nodes[i] for i in top_indices]
+        next_node = random.choice(candidates)
+    else:  # 20% chance to pick a random node
+        next_node = random.choices(unvisited_nodes, weights=probabilities)[0]
+
+    return next_node

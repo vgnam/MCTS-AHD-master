@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            # Calculate node centrality (inverse of average distance to other nodes)
+            centrality = 1.0 / (sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)) if remaining_nodes > 1 else 0
+
+            # Calculate future connectivity (number of nearby nodes)
+            connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.5 * distance_to_current) / remaining_nodes
+
+            # Dynamic weights based on remaining nodes
+            weight_factor = 0.4 + 0.6 * (remaining_nodes / (remaining_nodes + 3))
+            immediate_weight = 0.5 * weight_factor
+            centrality_weight = 0.3 * (1 - weight_factor)
+            connectivity_weight = 0.2 * (1 - weight_factor)
+
+            # Penalty for nodes that are too close to destination
+            penalty_weight = 0.3 * (1.0 - connectivity_weight)
+            penalty = penalty_weight * (distance_to_destination / (1.0 + distance_to_current)) if distance_to_current > 0 else 0
+
+            # Score combines weighted components with penalty
+            score = (immediate_weight * distance_to_current +
+                     centrality_weight * centrality +
+                     connectivity_weight * connectivity) - penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

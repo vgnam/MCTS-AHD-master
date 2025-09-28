@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if len(unvisited_nodes) == 1:
+        return next(iter(unvisited_nodes))
+
+    weights = []
+    for node in unvisited_nodes:
+        dist = distance_matrix[current_node][node]
+        if dist == 0:
+            weights.append(1.0)
+        else:
+            weights.append(1.0 / dist)
+
+    total_weight = sum(weights)
+    if total_weight == 0:
+        return random.choice(unvisited_nodes)
+
+    normalized_weights = [w / total_weight for w in weights]
+
+    dynamic_factor = 1.0 / (1.0 + len(unvisited_nodes))
+    adjusted_weights = [w ** dynamic_factor for w in normalized_weights]
+
+    total_adjusted = sum(adjusted_weights)
+    adjusted_weights = [w / total_adjusted for w in adjusted_weights]
+
+    next_node = random.choices(unvisited_nodes, weights=adjusted_weights, k=1)[0]
+    return next_node

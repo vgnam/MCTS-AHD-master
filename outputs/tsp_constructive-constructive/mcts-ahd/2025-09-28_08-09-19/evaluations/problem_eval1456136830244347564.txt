@@ -1,0 +1,60 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    # Calculate centrality scores for all nodes
+    centrality_scores = {}
+    for node in unvisited_nodes:
+        centrality = sum(1 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes - {node})
+        centrality_scores[node] = centrality
+
+    # Normalize centrality scores
+    max_centrality = max(centrality_scores.values()) if centrality_scores else 1.0
+    normalized_centrality = {k: v / max_centrality for k, v in centrality_scores.items()}
+
+    # Calculate path history influence
+    path_history_factor = 0.5 * (1 - visited_ratio) ** 2
+
+    # Dynamic weight adjustment
+    immediate_weight = 0.4 + 0.3 * visited_ratio
+    centrality_weight = 0.3 * (1 - visited_ratio) + 0.2 * path_history_factor
+    stability_weight = 0.3 - 0.1 * visited_ratio
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Calculate stability metric (variance of neighbor distances)
+        neighbors = unvisited_nodes - {node}
+        if neighbors:
+            neighbor_distances = [distance_matrix[node][n] for n in neighbors]
+            mean_distance = sum(neighbor_distances) / len(neighbor_distances)
+            variance = sum((d - mean_distance) ** 2 for d in neighbor_distances) / len(neighbor_distances)
+            stability_penalty = 1 + (variance ** 0.5) * 0.2
+        else:
+            stability_penalty = 1.0
+
+        # Calculate centrality contribution
+        centrality_contribution = normalized_centrality.get(node, 0.0)
+
+        # Calculate score with dynamic weights
+        score = (immediate_weight * (1 / (immediate_distance + 1e-6)) +
+                 centrality_weight * centrality_contribution -
+                 stability_weight * stability_penalty)
+
+        # Add probabilistic element
+        random_factor = random.uniform(0.9, 1.1)
+        score *= random_factor
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

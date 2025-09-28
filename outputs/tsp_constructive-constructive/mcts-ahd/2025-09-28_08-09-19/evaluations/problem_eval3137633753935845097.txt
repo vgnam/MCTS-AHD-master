@@ -1,0 +1,32 @@
+importance and incorporates a novel "path potential" metric to anticipate long-term path efficiency, while maintaining deviation penalties for balance.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    lookahead_depth = min(4, max(2, remaining_count // 3))
+
+    avg_local_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / remaining_count
+    global_connectivity = sum(1 if distance_matrix[node][n] < 1.1 * avg_local_distance else 0
+                           for node in unvisited_nodes for n in unvisited_nodes if node != n) / (remaining_count * (remaining_count - 1)) if remaining_count > 1 else 0
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        local_connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_local_distance)
+        path_potential = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes) if remaining_nodes else 0
+
+        connectivity_score = (local_connectivity / remaining_count) * (1.0 + global_connectivity * 0.5)
+        deviation_factor = abs(immediate_distance - avg_local_distance) * (1.0 - (remaining_count / len(unvisited_nodes)) * 0.3)
+
+        weight = 0.4 * (immediate_distance / (path_potential + 1e-6)) + 0.3 * connectivity_score - 0.3 * deviation_factor
+
+        if weight < min_score:
+            min_score = weight
+            next_node = node
+
+    return next_node

@@ -1,0 +1,13 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    decay_factor = 2.0  # Decay factor to reduce the influence of very close nodes
+    probabilities = [(1 / (distance + 1e-10)) ** (1/decay_factor) for distance in distances]  # Avoid division by zero
+    normalized_probabilities = [p / sum(probabilities) for p in probabilities]
+
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_probabilities, k=1)[0]
+    return next_node

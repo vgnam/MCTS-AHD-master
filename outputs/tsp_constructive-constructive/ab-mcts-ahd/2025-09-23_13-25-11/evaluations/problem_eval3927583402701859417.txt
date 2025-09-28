@@ -1,0 +1,12 @@
+import random
+    candidates = list(unvisited_nodes)
+    scores = [evaluate_node(node) for node in candidates]
+    min_score = min(scores)
+    max_score = max(scores)
+
+    # Normalize scores to probabilities (higher scores get lower probabilities)
+    probabilities = [(max_score - score + 1e-6) / (max_score - min_score + 1e-6) for score in scores]
+    probabilities = [p / sum(probabilities) for p in probabilities]
+
+    next_node = random.choices(candidates, weights=probabilities, k=1)[0]
+    return next_node

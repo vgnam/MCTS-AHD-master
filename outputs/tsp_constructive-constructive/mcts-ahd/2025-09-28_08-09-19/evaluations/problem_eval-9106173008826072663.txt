@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic priority weights with historical tracking
+    priority_weights = {node: 1.0 for node in unvisited_nodes}
+    exploration_factor = 0.6 * (remaining_nodes / total_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+        destination_distance = distance_matrix[node][destination_node]
+
+        # Aggressive reinforcement learning-inspired priority update
+        priority_weights[node] *= (1 - exploration_factor) * (1.0 / (1.0 + immediate_distance)) ** 2 + exploration_factor * (1.0 / (1.0 + destination_distance)) ** 0.5
+
+        # Dynamic exploration-exploitation balance with historical adjustment
+        exploitation_score = priority_weights[node] * (1.0 / (1.0 + immediate_distance))
+        exploration_score = (1.0 / (1.0 + future_potential)) * (remaining_nodes / total_nodes) * 1.2
+
+        # Hybrid score with adjusted weights
+        score = (0.6 * exploitation_score) + (0.4 * exploration_score)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

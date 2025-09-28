@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Phase 1: Dynamic Regret-Based Selection
+    regret_scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = max(0, immediate_distance - second_best)
+        else:
+            regret = 0
+        regret_scores.append(regret)
+
+    # Phase 2: Path Connectivity Metric
+    connectivity_scores = []
+    for node in unvisited_nodes:
+        connectivity = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        connectivity_scores.append(connectivity if connectivity > 0 else float('inf'))
+
+    # Phase 3: Distance-Aware Heuristic
+    distance_scores = [distance_matrix[current_node][node] for node in unvisited_nodes]
+
+    # Adaptive Weighting Based on Problem Progress
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = remaining_nodes / total_nodes
+
+    # Combine Scores with Dynamic Weights
+    combined_scores = [
+        (0.3 + 0.7 * progress_ratio) * regret +
+        (0.5 - 0.4 * progress_ratio) * (1 / connectivity) +
+        (0.2 + 0.8 * (1 - progress_ratio)) * distance
+        for regret, connectivity, distance in zip(regret_scores, connectivity_scores, distance_scores)
+    ]
+
+    selected_index = combined_scores.index(min(combined_scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    avg_distance = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / remaining_nodes
+    max_total_distance = max(sum(row) for row in distance_matrix)
+    entropy_factor = 1 - (avg_distance / max_total_distance) if max_total_distance != 0 else 1
+
+    entropy_threshold = 0.5 * (1 - entropy_factor) + 0.5 * (remaining_nodes / total_nodes)
+
+    if len(distance_matrix) > 1:
+        prev_node = current_node - 1 if current_node > 0 else len(distance_matrix) - 1
+        path_momentum = -distance_matrix[prev_node][current_node] / max_total_distance
+        momentum_scale = 1 + 0.5 * path_momentum
+    else:
+        momentum_scale = 1
+
+    weight_local = 0.4 * entropy_factor + 0.3 * (remaining_nodes / total_nodes) + 0.2 * momentum_scale
+    weight_global = 0.5 * (1 - entropy_factor) + 0.2 * (remaining_nodes / total_nodes) + 0.3 * momentum_scale
+    weight_coherence = 0.3 * (1 - entropy_factor) + 0.4 * (remaining_nodes / total_nodes) + 0.1 * momentum_scale
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        global_distance = distance_matrix[node][destination_node]
+        coherence_penalty = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1 if remaining_nodes > 1 else 1)
+
+        local_term = weight_local * (local_distance / (1 + entropy_factor)) * (1 - 0.3 * momentum_scale)
+        global_term = weight_global * (global_distance / (1 + entropy_factor)) * (1 + 0.5 * momentum_scale)
+        coherence_term = weight_coherence * (coherence_penalty / (1 + entropy_factor)) * (1 + 0.4 * momentum_scale)
+
+        if entropy_factor > entropy_threshold:
+            return local_term + 0.7 * global_term - 0.5 * coherence_term
+        else:
+            return 0.5 * local_term + global_term - 0.3 * coherence_term
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

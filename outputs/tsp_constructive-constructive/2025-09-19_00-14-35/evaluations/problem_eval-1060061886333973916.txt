@@ -1,0 +1,3 @@
+import random
+    next_node = random.choices([s[0] for s in candidate_scores], weights=probs, k=1)[0]
+    return next_node

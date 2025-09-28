@@ -1,0 +1,16 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, exploration_factor=0.3):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    inverse_distances = np.array(distances) ** -1
+    uniform_weights = np.ones_like(inverse_distances)
+
+    combined_weights = (1 - exploration_factor) * inverse_distances + exploration_factor * uniform_weights
+    combined_weights /= combined_weights.sum()
+
+    next_node = random.choices(list(unvisited_nodes), weights=combined_weights, k=1)[0]
+    return next_node

@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Compute centroid of unvisited nodes
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    else:
+        centroid_x = 0
+
+    # Dynamic weight for centroid penalty based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    centroid_weight = 0.3 * (1 / (1 + math.exp(-(remaining_nodes - 5))))  # Sigmoid adjustment
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Look-ahead: evaluate potential next steps for better long-term decisions
+        if len(unvisited_nodes) > 1:
+            remaining = [n for n in unvisited_nodes if n != node]
+            next_next_node = min(remaining, key=lambda n: distance_matrix[node][n] + distance_matrix[n][destination_node])
+            lookahead_penalty = distance_matrix[node][next_next_node] + distance_matrix[next_next_node][destination_node]
+        else:
+            lookahead_penalty = 0
+
+        # Weighted score with dynamic adjustments
+        score = distance_to_current + 0.5 * distance_to_dest + centroid_weight * centroid_penalty + 0.2 * lookahead_penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

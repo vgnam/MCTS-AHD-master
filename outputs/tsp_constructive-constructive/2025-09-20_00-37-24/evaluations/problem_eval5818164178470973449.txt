@@ -1,0 +1,22 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic temperature-based stochasticity
+    temperature = 1.0 / (1.0 + math.exp(-0.1 * len(unvisited_nodes)))  # Decays as more nodes are visited
+    threshold = 0.9 * temperature  # Higher temperature -> more randomness
+
+    if random.random() < threshold:
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

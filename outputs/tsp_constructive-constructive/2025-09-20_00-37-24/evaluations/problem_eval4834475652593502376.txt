@@ -1,0 +1,23 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    normalized_distances = [min_dist / (dist + 1e-10) for dist in distances]  # Avoid division by zero
+
+    # Create a probability distribution based on inverse distance
+    prob_dist = np.array(normalized_distances) / sum(normalized_distances)
+
+    # Occasionally pick a random node (10% chance)
+    if random.random() < 0.9:
+        next_node = np.random.choice(unvisited_nodes, p=prob_dist)
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

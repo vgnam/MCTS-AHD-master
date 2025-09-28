@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate median distance from current node to unvisited nodes
+    distances = sorted([distance_matrix[current_node][node] for node in unvisited_nodes])
+    median_distance = distances[remaining_nodes // 2] if remaining_nodes > 0 else 0
+
+    # Fixed proximity threshold based on median
+    proximity_threshold = median_distance * 1.2
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        # Calculate local connectivity: nodes within proximity threshold
+        local_connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] <= proximity_threshold)
+
+        # Calculate maximum remaining distance to other unvisited nodes
+        remaining_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        max_remaining_distance = max(remaining_distances) if remaining_nodes > 1 else 0
+
+        # Fixed connectivity weight
+        connectivity_weight = 1.0 + (local_connectivity / remaining_nodes) * 0.5 if remaining_nodes > 0 else 1.0
+
+        # Proximity component: prioritize nodes within threshold
+        proximity_score = distance_to_current if distance_to_current <= proximity_threshold else 1.5 * distance_to_current
+
+        # Global efficiency penalty: minimize maximum remaining distance
+        efficiency_penalty = 1.0 + 0.4 * (max_remaining_distance / (median_distance + 1e-6))
+
+        # Combined score: balances proximity, connectivity, and global efficiency
+        score = proximity_score * connectivity_weight * efficiency_penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

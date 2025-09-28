@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    current_to_dest = distance_matrix[current_node][destination_node]
+    max_weight = 1.0
+    min_weight = 0.3
+    weight_factor = max(min_weight, min_weight + (1 - (current_to_dest / (sum(sum(row) for row in distance_matrix) / (len(distance_matrix)**2)))) * (max_weight - min_weight))
+
+    def weighted_distance(node):
+        current_to_next = distance_matrix[current_node][node]
+        next_to_dest = distance_matrix[node][destination_node]
+        penalty = 1.0 if current_to_next > (current_to_dest * 0.7) else 1.0
+        return (current_to_next + weight_factor * next_to_dest) * penalty
+
+    next_node = min(unvisited_nodes, key=weighted_distance)
+    return next_node

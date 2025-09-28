@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_weighted_distance = float('inf')
+    total_unvisited = len(unvisited_nodes)
+    weight = 0.5 * (1 + (total_unvisited / (total_unvisited + 1)))  # Base dynamic weight
+
+    # Calculate centrality of current node as average distance to all other nodes
+    centrality = sum(distance_matrix[current_node]) / len(distance_matrix[current_node])
+
+    # Adjust weight based on centrality (more central nodes favor global progress)
+    weight = weight * (0.5 + 0.5 * (1 - centrality / max(sum(distance_matrix[i]) / len(distance_matrix[i]) for i in range(len(distance_matrix)))))
+
+    # Penalty for recently visited nodes (simulated with a simple history mechanism)
+    visited_history = {node: 1 for node in unvisited_nodes}
+    if hasattr(select_next_node, 'last_visited'):
+        visited_history[select_next_node.last_visited] = 0.7  # Penalize recent visits
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        estimated_distance_to_destination = distance_matrix[node][destination_node]
+        weighted_distance = weight * distance_to_current + (1 - weight) * estimated_distance_to_destination
+
+        # Apply history penalty
+        weighted_distance *= visited_history[node]
+
+        if weighted_distance < min_weighted_distance:
+            min_weighted_distance = weighted_distance
+            next_node = node
+
+    # Store last visited node for next iteration
+    select_next_node.last_visited = next_node
+
+    return next_node

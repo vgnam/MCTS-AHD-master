@@ -1,0 +1,33 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = (total_nodes - remaining_nodes) / total_nodes
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        detour_risk = max(0, to_destination - distance_matrix[current_node][destination_node])
+
+        # Dynamic weights
+        exploration_weight = 0.4 * (1 - progress) + 0.1 * random.random()
+        exploitation_weight = 1 - exploration_weight
+        detour_weight = 0.6 * (1 - progress) + 0.2 * random.random()
+        centrality_penalty = 0.3 * (1 - progress)
+
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        destination_bias = 1 / (1 + to_destination)
+
+        return (exploitation_weight * to_current +
+                exploration_weight * (detour_weight * detour_risk + 0.4 * destination_bias) -
+                centrality_penalty * centrality)
+
+    # Select top 3 candidates and choose randomly to introduce diversity
+    candidates = sorted(unvisited_nodes, key=heuristic)[:3]
+    return next_node

@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        # Dynamic weighting: prioritize nodes closer to current node, but also consider destination influence
+        current_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+
+        # Novel scoring function: balances proximity and destination influence with tunable weights
+        score = current_distance + 0.3 * destination_distance
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+        elif score == best_score:
+            # Tiebreaker: choose node with smaller current distance
+            if current_distance < distance_matrix[current_node][next_node]:
+                next_node = node
+
+    return next_node

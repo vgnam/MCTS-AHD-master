@@ -1,0 +1,25 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    threshold = 1.5 * distance_matrix[current_node][destination_node]
+    candidates = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= threshold]
+
+    if not candidates:
+        candidates = unvisited_nodes
+
+    weights = []
+    for node in candidates:
+        dist_current = distance_matrix[current_node][node]
+        dist_dest = distance_matrix[node][destination_node]
+        weight = math.sqrt(dist_current) / (dist_current + dist_dest)
+        weights.append(weight)
+
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    next_node = random.choices(candidates, weights=normalized_weights, k=1)[0]
+    return next_node

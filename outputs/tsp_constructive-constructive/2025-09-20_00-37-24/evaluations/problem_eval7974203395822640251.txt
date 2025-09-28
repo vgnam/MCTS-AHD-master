@@ -1,0 +1,36 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate temperature based on remaining unvisited nodes (higher when few nodes left)
+    temperature = max(0.1, 1.0 * len(unvisited_nodes) / len(distance_matrix))
+
+    # If destination is still unvisited, bias selection towards it based on temperature
+    if destination_node in unvisited_nodes:
+        destination_prob = 0.7 * temperature
+        if random.random() < destination_prob:
+            return destination_node
+
+    # Calculate weights: inverse distance with stochasticity
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance == 0:
+            weight = 1.0  # avoid division by zero
+        else:
+            weight = 1.0 / distance
+            # Add stochastic variation based on temperature
+            weight *= (1.0 + temperature * random.uniform(-0.5, 0.5))
+        weights.append(weight)
+
+    # Normalize weights and select probabilistically
+    total_weight = sum(weights)
+    if total_weight == 0:
+        return random.choice(unvisited_nodes)
+    probabilities = [w / total_weight for w in weights]
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

@@ -1,0 +1,35 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+    exploration_weight = 1 - remaining_ratio  # More exploration as fewer nodes remain
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+
+    if not distances:
+        return random.choice(unvisited_nodes)
+
+    min_dist, max_dist = min(distances), max(distances)
+    dist_range = max_dist - min_dist if max_dist != min_dist else 1
+
+    # Calculate weights: closer nodes have higher probability, with exploration bias
+    weights = [
+        (1 - (dist - min_dist) / dist_range) ** 2 * (1 - exploration_weight) + exploration_weight * random.random()
+        for dist in distances
+    ]
+
+    # Normalize weights
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Select node based on weighted probability
+    next_node = random.choices(nearest_neighbors, weights=normalized_weights, k=1)[0]
+    return next_node

@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    exploration_weight = min(0.7, 0.3 + 0.4 * (total_unvisited / len(distance_matrix)))
+    exploitation_weight = 1 - exploration_weight
+
+    nearest_node = None
+    min_distance = float('inf')
+    total_inverse_distance = 0.0
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            nearest_node = node
+        total_inverse_distance += 1.0 / distance
+
+    probabilistic_nodes = []
+    for node in unvisited_nodes:
+        probability = (1.0 / distance_matrix[current_node][node]) / total_inverse_distance
+        probabilistic_nodes.append((node, probability))
+
+    if random.random() < exploitation_weight:
+        return nearest_node
+    else:
+        selected_node = random.choices(
+            [node for node, _ in probabilistic_nodes],
+            weights=[prob for _, prob in probabilistic_nodes],
+            k=1
+        )[0]
+        return next_node

@@ -1,0 +1,36 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate node density (inverse of average distance to neighbors)
+    node_density = {}
+    for node in unvisited_nodes:
+        neighbors = [n for n in unvisited_nodes if n != node]
+        if neighbors:
+            avg_dist = sum(distance_matrix[node][n] for n in neighbors) / len(neighbors)
+            node_density[node] = 1 / avg_dist if avg_dist != 0 else float('inf')
+        else:
+            node_density[node] = 0
+
+    # Weighted selection: higher density nodes are more likely to be chosen
+    weights = [node_density[node] for node in unvisited_nodes]
+    total_weight = sum(weights)
+    if total_weight > 0:
+        normalized_weights = [w / total_weight for w in weights]
+        candidates = random.choices(unvisited_nodes, weights=normalized_weights, k=min(3, len(unvisited_nodes)))
+    else:
+        candidates = random.sample(unvisited_nodes, min(3, len(unvisited_nodes)))
+
+    # Adaptive stochasticity: higher exploration when more nodes remain
+    exploration_rate = 0.1 + (0.8 * len(unvisited_nodes) / len(distance_matrix))
+    if random.random() < exploration_rate:
+        next_node = random.choice(candidates)
+    else:
+        next_node = min(candidates, key=lambda node: distance_matrix[current_node][node])
+
+    return next_node

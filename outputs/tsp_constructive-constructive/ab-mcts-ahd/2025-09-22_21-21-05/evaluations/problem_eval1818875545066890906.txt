@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    candidates = []
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+        candidates.append((node, distance))
+
+    if destination_node in unvisited_nodes:
+        avg_distance = sum(d for (_, d) in candidates) / len(candidates)
+        destination_distance = distance_matrix[current_node][destination_node]
+        bias_range = 0.3 * avg_distance
+        if abs(destination_distance - avg_distance) <= bias_range:
+            probability = min(1.0, 0.7 * (avg_distance / (destination_distance + 1e-10)))
+            if random.random() < probability:
+                next_node = destination_node
+
+    return next_node

@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    total_unvisited = len(unvisited_nodes)
+    progress_factor = 1 - (total_unvisited / len(distance_matrix))  # Normalized progress (0 to 1)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if distance_to_destination == 0:
+            score = distance_to_node
+        else:
+            detour_ratio = distance_matrix[current_node][destination_node] / distance_to_destination
+            dynamic_weight = 0.5 * (1 - progress_factor)  # Weight decreases as progress increases
+            penalty = distance_to_node * (1 + dynamic_weight * (detour_ratio - 1))
+            score = penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    if num_unvisited == 1:
+        return unvisited_nodes.pop()
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        weight_future = 0.6 - 0.2 * (num_unvisited / len(distance_matrix))
+        weight_current = 1 - weight_future
+
+        # Penalize revisiting nodes to avoid cycles
+        if node in distance_matrix[current_node] and distance_matrix[current_node][node] == 0:
+            return float('inf')
+
+        return weight_current * current_dist + weight_future * avg_future_dist
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

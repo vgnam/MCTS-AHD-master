@@ -1,0 +1,19 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # If destination is unvisited, prioritize it with high probability
+    if destination_node in unvisited_nodes:
+        if random.random() < 0.7:  # 70% chance to pick destination if unvisited
+            return destination_node
+
+    # Calculate weights based on inverse distance with small random perturbation
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    weights = [1.0 / (d + 1e-6) + 0.1 * random.random() for d in distances]  # Avoid division by zero and add noise
+
+    # Select node based on weighted probability
+    next_node = random.choices(unvisited_nodes, weights=weights, k=1)[0]
+    return next_node

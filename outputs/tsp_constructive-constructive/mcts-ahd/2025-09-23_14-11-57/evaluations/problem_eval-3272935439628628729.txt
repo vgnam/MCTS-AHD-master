@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1.0 - remaining_nodes / len(distance_matrix)
+
+    decay_factor = 0.5 ** progress
+    exploration_weight = 0.1 + 0.9 * (1.0 - decay_factor)
+    potential_weight = 0.2 * decay_factor
+
+    neighborhood_size = min(3, remaining_nodes)
+    scores = []
+
+    for node in unvisited_nodes:
+        immediate_cost = distance_matrix[current_node][node]
+
+        # Calculate future potential: combination of direct connections and indirect paths
+        potential = 0.0
+        if remaining_nodes > 1:
+            neighbors = sorted(unvisited_nodes, key=lambda x: distance_matrix[node][x])[:neighborhood_size]
+            potential = sum(distance_matrix[node][n] for n in neighbors) / len(neighbors)
+
+            # Add indirect connections for better path anticipation
+            indirect_potential = 0.0
+            for neighbor in neighbors:
+                if neighbor != node:
+                    indirect_potential += sum(distance_matrix[neighbor][n] for n in unvisited_nodes if n != neighbor) / (remaining_nodes - 1)
+            potential += 0.3 * indirect_potential
+
+        # Dynamic selection pressure based on neighborhood diversity
+        diversity = len(set(distance_matrix[node])) / len(distance_matrix[node])
+        pressure = 1.0 + 0.5 * (1.0 - diversity)
+
+        combined_score = immediate_cost + exploration_weight * immediate_cost + potential_weight * potential
+        combined_score *= pressure
+        scores.append(combined_score)
+
+    # Probabilistic selection based on rank
+    ranked_scores = sorted(range(len(scores)), key=lambda i: scores[i])
+    probabilities = [0.5 ** i for i in range(len(ranked_scores))]
+    probabilities = [p / sum(probabilities) for p in probabilities]
+
+    selected_index = np.random.choice(ranked_scores, p=probabilities)
+    next_node = list(unvisited_nodes)[selected_index]
+    return next_node

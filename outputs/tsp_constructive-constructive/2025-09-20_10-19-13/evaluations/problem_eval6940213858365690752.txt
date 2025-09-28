@@ -1,0 +1,17 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate weights as inverse distances
+    weights = [1.0 / distance_matrix[current_node][node] for node in unvisited_nodes]
+    total_weight = sum(weights)
+
+    # Normalize weights to probabilities
+    probabilities = [w / total_weight for w in weights]
+
+    # Select next node based on weighted probability
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

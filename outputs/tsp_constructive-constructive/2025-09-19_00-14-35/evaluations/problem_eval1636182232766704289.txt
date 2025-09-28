@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    temperature = 1.0 - (remaining_nodes / total_nodes) ** 2
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            remaining_dists = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            harmonic_mean = len(remaining_dists) / sum(1.0 / d for d in remaining_dists) if any(remaining_dists) else 0
+            connectivity_score = 1.0 / (1.0 + harmonic_mean)
+        else:
+            connectivity_score = 0
+
+        weight_local = 0.4 + 0.3 * (1 - temperature)
+        weight_connectivity = 0.3 + 0.2 * temperature
+        weight_dest = -0.2 if temperature < 0.5 else 0.1
+
+        score = (weight_local * current_dist) + (weight_connectivity * connectivity_score) + (weight_dest * dest_dist)
+        scores.append((node, score))
+
+    if temperature > 0.7:
+        probabilities = [math.exp(-s[1] / temperature) for s in scores]
+        total_prob = sum(probabilities)
+        probabilities = [p / total_prob for p in probabilities]
+        next_node = random.choices([s[0] for s in scores], weights=probabilities)[0]
+    else:
+        next_node = min(scores, key=lambda x: x[1])[0]
+
+    return next_node

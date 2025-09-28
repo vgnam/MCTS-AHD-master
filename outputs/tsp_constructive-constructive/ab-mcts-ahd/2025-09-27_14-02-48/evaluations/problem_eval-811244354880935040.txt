@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    max_distance = float('-inf')
+    min_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance > max_distance:
+            max_distance = distance
+        if distance < min_distance:
+            min_distance = distance
+
+    threshold = (max_distance + min_distance) * 0.5
+    candidate_nodes = []
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance <= threshold:
+            candidate_nodes.append(node)
+
+    if not candidate_nodes:
+        for node in unvisited_nodes:
+            distance = distance_matrix[current_node][node]
+            if distance <= max_distance:
+                candidate_nodes.append(node)
+
+    if destination_node in candidate_nodes:
+        return destination_node
+
+    if candidate_nodes:
+        next_node = min(candidate_nodes, key=lambda node: distance_matrix[current_node][node])
+    else:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance < distance_matrix[current_node][next_node]:
+            next_node = destination_node
+
+    return next_node

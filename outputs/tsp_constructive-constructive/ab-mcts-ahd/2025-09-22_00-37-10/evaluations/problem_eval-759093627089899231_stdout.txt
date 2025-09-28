@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of nodes closer to the destination. The bias factor increases as more nodes are visited, shifting the focus more toward global optimization. The score is computed as `-current_distance + bias_factor * dest_distance`, but with the bias factor now increasing linearly with the number of unvisited nodes.}
+                                                                                                                                                                                                                                                                                                                            ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of nodes closer to the destination. The bias factor increases as more nodes are visited, shifting the focus more toward global optimization. The score is computed as `-current_distance + bias_factor * dest_distance`, but with the bias factor now increasing linearly with the number of unvisited nodes.}
+                                                                                                                                                                                                                                                                                                                            ^
+SyntaxError: unmatched '}'

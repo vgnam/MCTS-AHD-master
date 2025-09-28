@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 1.0 / (1.0 + len(unvisited_nodes))
+    exploration_factor = temperature * (hash(current_node) % 10)
+
+    candidate_scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Adaptive weight adjustment
+        weight_current = 0.6 - 0.3 * temperature
+        weight_dest = 0.7 + 0.3 * temperature
+
+        # Node-specific attractiveness (simulated via hash)
+        attractiveness = (hash(node) % 20) * (1 - temperature)
+
+        # Revisit penalty with temperature scaling
+        revisit_penalty = (hash(node) % 10) * temperature ** 2
+
+        score = (current_dist * weight_current) + (dest_dist * weight_dest) + exploration_factor - attractiveness + revisit_penalty
+        candidate_scores.append((node, score))
+
+    next_node = min(candidate_scores, key=lambda x: x[1])[0]
+    return next_node

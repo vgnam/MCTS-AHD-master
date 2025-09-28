@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Dynamic weighting factor (e.g., based on remaining nodes or iteration count)
+    weight_factor = 0.7 if len(unvisited_nodes) > 2 else 0.3
+
+    # Secondary heuristic: angle-based or randomness
+    def combined_score(node):
+        distance = distance_matrix[current_node][node]
+        randomness = 0.1  # Random factor to introduce variability
+        return (weight_factor * distance) + (randomness * distance)
+
+    next_node = min(unvisited_nodes, key=combined_score)
+    return next_node

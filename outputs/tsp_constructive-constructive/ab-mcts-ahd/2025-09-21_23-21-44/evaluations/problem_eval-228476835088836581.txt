@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    weight_proximity = 0.7 if remaining_nodes > num_nodes / 2 else 0.5
+    weight_destination = 0.3 if remaining_nodes > num_nodes / 2 else 0.5
+    weight_centrality = 0.2 * (1 - remaining_nodes / num_nodes)
+    weight_diversity = 0.1 * remaining_nodes / num_nodes
+
+    min_score = float('inf')
+    next_node = None
+    best_lookahead = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_from_node = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node]) / (num_nodes - 1)
+
+        lookahead_nodes = [n for n in unvisited_nodes if n != node]
+        lookahead_score = sum(distance_matrix[node][n] for n in lookahead_nodes) if lookahead_nodes else 0
+
+        score = (weight_proximity * distance_to_node +
+                 weight_destination * distance_from_node +
+                 weight_centrality * centrality +
+                 weight_diversity * lookahead_score)
+
+        if score < min_score or (score == min_score and lookahead_score < best_lookahead):
+            min_score = score
+            next_node = node
+            best_lookahead = lookahead_score
+
+    if next_node is None and unvisited_nodes:
+        next_node = max(unvisited_nodes, key=lambda x: sum(distance_matrix[x]))
+
+    return next_node

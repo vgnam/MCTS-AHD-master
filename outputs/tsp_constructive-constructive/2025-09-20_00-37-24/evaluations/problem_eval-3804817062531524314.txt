@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic probabilities based on distance and historical performance
+    probabilities = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Inverse distance as a base weight (shorter distances get higher weight)
+        base_weight = 1.0 / (1.0 + distance)
+
+        # Simulate historical performance (random for simplicity, but could be replaced with actual history)
+        historical_performance = random.uniform(0.5, 1.5)
+
+        # Combined weight
+        weight = base_weight * historical_performance
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    if total_weight > 0:
+        probabilities = [w / total_weight for w in probabilities]
+    else:
+        probabilities = [1.0 / len(unvisited_nodes)] * len(unvisited_nodes)
+
+    # Select node based on dynamic probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

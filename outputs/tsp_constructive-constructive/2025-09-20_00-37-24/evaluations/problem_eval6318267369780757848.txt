@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate temperature based on remaining nodes (lower as we progress)
+    temperature = len(unvisited_nodes) / len(distance_matrix)
+
+    # If destination is unvisited and close enough, prioritize it
+    if destination_node in unvisited_nodes:
+        distance_to_dest = distance_matrix[current_node][destination_node]
+        nearest_neighbor_dist = min(distance_matrix[current_node][node] for node in unvisited_nodes)
+        if distance_to_dest <= nearest_neighbor_dist * (1 + temperature * 0.5):
+            return destination_node
+
+    # Sort unvisited nodes by distance
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic candidate pool size based on temperature
+    candidate_size = max(1, int(3 * (1 - temperature * 0.7)))
+    candidates = nearest_neighbors[:min(candidate_size, len(nearest_neighbors))]
+
+    # Probability of selecting random node decreases with temperature
+    if random.random() < (0.9 * temperature):
+        next_node = random.choice(candidates)
+    else:
+        # Random selection weighted by inverse distance
+        weights = [1 / (distance_matrix[current_node][node] + 1e-6) for node in nearest_neighbors]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+
+    return next_node

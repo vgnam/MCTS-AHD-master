@@ -1,0 +1,43 @@
+import math
+    import random
+
+    if not unvisited_nodes:
+        return None
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Adaptive weights
+    alpha = 0.6 * (remaining_nodes / total_nodes)  # Decreases as more nodes are visited
+    beta = 0.4 * (1 - remaining_nodes / total_nodes)  # Increases as more nodes are visited
+
+    # Calculate centrality for each node
+    centrality_scores = {}
+    for node in unvisited_nodes:
+        centrality = 0.0
+        for other_node in unvisited_nodes:
+            if other_node != node:
+                centrality += distance_matrix[node][other_node]
+        centrality_scores[node] = centrality / max(1, remaining_nodes - 1)
+
+    # Calculate scores and apply softmax for probabilistic selection
+    scores = []
+    nodes_list = list(unvisited_nodes)
+    for node in nodes_list:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+        centrality = centrality_scores[node]
+
+        # Score combines immediate distance, lookahead distance, and centrality with adaptive weights
+        score = (immediate_distance + alpha * lookahead_distance) / (1 + beta * centrality)
+        scores.append(score)
+
+    # Convert scores to probabilities using softmax
+    exp_scores = [math.exp(-s) for s in scores]  # Lower scores are better
+    total_exp = sum(exp_scores)
+    probabilities = [e / total_exp for e in exp_scores]
+
+    # Select node based on probabilities
+    next_node = random.choices(nodes_list, weights=probabilities, k=1)[0]
+
+    return next_node

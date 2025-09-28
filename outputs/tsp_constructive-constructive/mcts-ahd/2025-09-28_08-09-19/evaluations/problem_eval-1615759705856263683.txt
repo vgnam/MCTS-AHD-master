@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    lookahead_depth = min(4, max(2, remaining_count // 2))
+    exploration_rate = 0.3 * (remaining_count / len(unvisited_nodes))
+
+    avg_total_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / remaining_count
+    normalized_matrix = {node: {n: (distance_matrix[node][n] - avg_total_distance) / (avg_total_distance + 1e-6) for n in unvisited_nodes} for node in unvisited_nodes}
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            candidates.append((node, immediate_distance))
+            continue
+
+        avg_remaining_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+        connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_remaining_distance)
+        connectivity_factor = 1.0 + (connectivity / remaining_count) * 0.6
+
+        deviation_penalty = abs(immediate_distance - avg_total_distance) * (1.0 + (remaining_count / len(unvisited_nodes)) * 0.4)
+
+        novelty_factor = sum(normalized_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+
+        reward = 0.3 * (immediate_distance - avg_remaining_distance) + 0.3 * (immediate_distance * connectivity_factor) + 0.2 * deviation_penalty - 0.2 * novelty_factor
+        candidates.append((node, reward))
+
+    if remaining_count > 1 and np.random.rand() < exploration_rate:
+        candidates = sorted(candidates, key=lambda x: x[1], reverse=True)
+        top_k = max(1, len(candidates) // 3)
+        selected = np.random.choice([c[0] for c in candidates[:top_k]])
+    else:
+        selected = min(candidates, key=lambda x: x[1])[0]
+
+    return next_node

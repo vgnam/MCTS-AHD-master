@@ -1,0 +1,9 @@
+import random
+        weights = [1.0 / evaluate_node(node) for node in candidates]
+        total_weight = sum(weights)
+        normalized_weights = [w / total_weight for w in weights]
+        next_node = random.choices(candidates, weights=normalized_weights, k=1)[0]
+    else:
+        next_node = min(candidates, key=lambda node: evaluate_node(node))
+
+    return next_node

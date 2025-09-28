@@ -1,0 +1,34 @@
+importance scoring with dynamic weights, where node importance is calculated as a combination of immediate distance, centrality, and a novel "future potential" metric that estimates the node's contribution to reducing total path length, while maintaining the original penalty mechanism for nodes too close to the destination.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            centrality = 1.0 / (sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)) if remaining_nodes > 1 else 0
+            future_potential = sum(1.0 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+            weight_factor = 0.3 + 0.7 * (remaining_nodes / (remaining_nodes + 4))
+            immediate_weight = 0.4 * weight_factor
+            centrality_weight = 0.3 * (1 - weight_factor)
+            future_weight = 0.3 * (1 - weight_factor)
+            penalty_weight = 0.2 * (1.0 - centrality_weight)
+
+            penalty = penalty_weight * (distance_to_destination / (1.0 + distance_to_current)) if distance_to_current > 0 else 0
+            score = (immediate_weight * distance_to_current + centrality_weight * centrality + future_weight * future_potential) - penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

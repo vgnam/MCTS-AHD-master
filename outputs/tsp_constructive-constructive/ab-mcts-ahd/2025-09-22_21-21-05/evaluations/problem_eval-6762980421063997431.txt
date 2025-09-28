@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        destination_distance = distance_matrix[current_node][destination_node]
+        exploration_phase = len(unvisited_nodes) / len(distance_matrix)
+        dynamic_threshold = 1 / (1 + math.exp(-5 * (exploration_phase - 0.7)))
+        bias = 1 - (destination_distance / (avg_distance + 1e-10))
+        exploration_bonus = 1 - (exploration_phase ** 2)
+
+        if random.random() < (bias * (1 - exploration_bonus) + exploration_bonus * dynamic_threshold):
+            return destination_node
+
+    candidates = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        accessibility = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < distance)
+        novelty = 1 / (1 + accessibility)
+        candidates.append((node, distance, novelty))
+
+    candidates.sort(key=lambda x: (x[1], -x[2]))
+    selected = random.choices(
+        candidates,
+        weights=[math.exp(-x[1] * 0.1 + x[2]) for x in candidates],
+        k=1
+    )[0][0]
+
+    return next_node

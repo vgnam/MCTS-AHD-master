@@ -1,0 +1,12 @@
+importance later
+
+        # Penalty for nodes too close to destination early in tour
+        penalty = 0.0 if tour_progress < 0.5 else 0.2 * distance_to_destination
+
+        score = distance_to_node + weight_destination * distance_to_destination + weight_centrality * avg_distance + penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

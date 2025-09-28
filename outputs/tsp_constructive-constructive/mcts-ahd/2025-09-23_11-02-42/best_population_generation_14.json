@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm selects the next node by minimizing the ratio of the distance from the current node to the candidate node and the distance from the candidate node to the destination. This balances immediate proximity (distance_to_node) and long-term efficiency (distance_to_destination), prioritizing nodes that are both close to the current position and closer to the destination. The function iterates through unvisited nodes, computes the ratio, and selects the node with the smallest ratio.",
+     "thought": "This algorithm selects the next node by considering the ratio of the distance to the current node and the distance to the destination, favoring nodes that are closer to the current position while also being closer to the destination, thus balancing immediate and long-term efficiency.",
+     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    next_node = None\n    best_ratio = float('inf')\n\n    for node in unvisited_nodes:\n        distance_to_node = distance_matrix[current_node][node]\n        distance_to_destination = distance_matrix[node][destination_node]\n\n        if distance_to_destination == 0:\n            ratio = distance_to_node\n        else:\n            ratio = distance_to_node / distance_to_destination\n\n        if ratio < best_ratio:\n            best_ratio = ratio\n            next_node = node\n\n    return next_node",
+     "objective": 6.89499,
+     "other_inf": null
+}

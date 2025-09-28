@@ -1,0 +1,8 @@
+import random
+            selected_node = random.choices([node for node, _ in candidates], weights=probs)[0]
+
+            potential_cost = distance_matrix[current_node][selected_node] + distance_matrix[selected_node][farthest_node]
+            if potential_cost < max_cost * 1.15:
+                next_node = selected_node
+
+    return next_node

@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    inv_distances = [1.0 / d if d != 0 else float('inf') for d in distances]
+    total_weight = sum(inv_distances)
+
+    if total_weight == 0:
+        return unvisited_nodes[0]
+
+    weights = [w / total_weight for w in inv_distances]
+    next_node = np.random.choice(unvisited_nodes, p=weights)
+
+    return next_node

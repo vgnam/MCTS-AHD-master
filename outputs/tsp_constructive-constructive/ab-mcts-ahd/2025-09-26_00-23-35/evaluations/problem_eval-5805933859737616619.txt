@@ -1,0 +1,36 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    num_unvisited = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic weight adjustment using sigmoid function
+    progress = 1 - (num_unvisited / total_nodes)
+    weight_proximity = 0.4 + 0.6 * (1 / (1 + math.exp(-10 * (progress - 0.5))))
+    weight_future = 1 - weight_proximity
+
+    # Node degree awareness (more connections = higher penalty)
+    node_degrees = [sum(1 for d in distance_matrix[node] if d > 0) for node in unvisited_nodes]
+    avg_degree = sum(node_degrees) / max(1, len(node_degrees))
+
+    # Adaptive randomness based on tour progress
+    randomness = 0.15 * random.random() * (1 - progress)
+
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_node = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, num_unvisited - 1)
+
+        # Degree penalty and proximity bonus
+        degree_penalty = 0.15 * (node_degrees[i] - avg_degree)
+        proximity_bonus = 0.25 * distance_to_node if num_unvisited <= 4 else 0
+
+        score = (weight_proximity * distance_to_node + weight_future * avg_future_distance) * (1 + randomness) + degree_penalty - proximity_bonus
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

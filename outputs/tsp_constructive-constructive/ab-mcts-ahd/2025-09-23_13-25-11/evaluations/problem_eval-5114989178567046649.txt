@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_unvisited = len(unvisited_nodes)
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        exploration_weight = 1 / (1 + total_unvisited)
+        exploitation_weight = 1 - exploration_weight
+        centrality = 1 / (avg_future_dist + 1e-10)
+        connectivity = sum(1 for other in remaining_nodes if distance_matrix[node][other] < avg_future_dist) / len(remaining_nodes)
+        return (current_dist * exploitation_weight + avg_future_dist * exploration_weight) * (centrality + connectivity)
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

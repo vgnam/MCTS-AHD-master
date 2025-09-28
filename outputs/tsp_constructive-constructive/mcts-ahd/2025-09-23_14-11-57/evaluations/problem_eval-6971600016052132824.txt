@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_connectivity = distance_matrix[node][destination_node]
+
+        # Calculate dynamic regret penalty
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret_penalty = (distance_matrix[current_node][node] - second_best) * (sum(distance_matrix[node][n] for n in other_nodes) / len(other_nodes))
+        else:
+            regret_penalty = 0
+
+        # Calculate dynamic connectivity score
+        avg_neighbor_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+        connectivity_score = (immediate_distance + future_connectivity) / (1 + avg_neighbor_distance)
+
+        # Dynamic weights: connectivity dominates later stages
+        remaining_nodes = len(unvisited_nodes)
+        total_nodes = len(distance_matrix)
+        connectivity_weight = 1.5 - 0.5 * (remaining_nodes / total_nodes)
+        distance_weight = 1.0 - connectivity_weight
+        regret_weight = 0.1 * (remaining_nodes / total_nodes)
+
+        # Exponential score transformation for probabilistic selection
+        combined_score = (distance_weight * immediate_distance +
+                          connectivity_weight * connectivity_score +
+                          regret_weight * regret_penalty)
+        scores.append(math.exp(-combined_score))
+
+    # Probabilistic selection based on exponential scores
+    if sum(scores) > 0:
+        probabilities = [score / sum(scores) for score in scores]
+        next_node = random.choices(list(unvisited_nodes), weights=probabilities, k=1)[0]
+    else:
+        next_node = random.choice(list(unvisited_nodes))
+
+    return next_node

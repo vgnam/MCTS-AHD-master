@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    total_distance_to_dest = distance_matrix[current_node][destination_node]
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        deviation = abs(total_distance_to_dest - distance_to_current - distance_to_dest)
+
+        # Dynamic deviation weight based on remaining distance
+        deviation_weight = 0.3 + 0.7 * (distance_to_dest / (total_distance_to_dest + 1e-6))
+
+        # Angle heuristic to measure direction alignment
+        if current_node != destination_node:
+            vec_current = (destination_node - current_node, distance_to_current)
+            vec_next = (destination_node - node, distance_to_dest)
+            angle = abs((vec_current[0] * vec_next[0] + vec_current[1] * vec_next[1]) /
+                        (math.sqrt(vec_current[0]**2 + vec_current[1]**2) *
+                         math.sqrt(vec_next[0]**2 + vec_next[1]**2) + 1e-6))
+            angle_penalty = 1 - angle
+        else:
+            angle_penalty = 0
+
+        score = distance_to_current + distance_to_dest + deviation_weight * deviation + 0.2 * angle_penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

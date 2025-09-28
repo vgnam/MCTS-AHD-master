@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining_nodes = unvisited_nodes - {destination_node}
+    if not remaining_nodes:
+        return destination_node
+
+    # Initialize or update preference matrix (simplified for this example)
+    preference_matrix = {}
+    for node in remaining_nodes:
+        immediate = distance_matrix[current_node][node]
+        potential = distance_matrix[node][destination_node]
+        connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < immediate) / len(remaining_nodes)
+        novelty = 1 / (1 + len(remaining_nodes) - len(unvisited_nodes))  # Encourages exploration
+        preference_matrix[node] = (0.4 * immediate + 0.3 * potential + 0.2 * connectivity + 0.1 * novelty)
+
+    # Select node with highest preference (inverse of cost)
+    next_node = min(preference_matrix, key=lambda x: preference_matrix[x])
+    return next_node

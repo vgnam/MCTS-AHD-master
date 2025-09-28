@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    decay_factor = 0.3
+    max_distance_threshold = 1.5
+    remaining_nodes = len(unvisited_nodes)
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes if node != destination_node) / len(unvisited_nodes) if unvisited_nodes else 0
+    node_degrees = {node: sum(1 for n in unvisited_nodes if distance_matrix[node][n] <= max_distance_threshold) for node in unvisited_nodes}
+    max_degree = max(node_degrees.values()) if node_degrees else 1
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        distance_ratio = immediate_distance / avg_distance if avg_distance > 0 else 1.0
+        weight_factor = 1.0 - (remaining_nodes / (remaining_nodes + 1))
+        centrality_penalty = node_degrees[node] / max_degree if max_degree > 0 else 0
+        adjusted_cost = immediate_distance * (1 - weight_factor) + potential_distance * weight_factor + decay_factor * distance_ratio * potential_distance
+        adjusted_cost += centrality_penalty * immediate_distance
+        if immediate_distance > max_distance_threshold:
+            adjusted_cost *= (1 + (immediate_distance - max_distance_threshold) * 0.1)
+        adjusted_cost *= (1 + decay_factor * (1 - remaining_nodes / (remaining_nodes + 1)))
+        if adjusted_cost < min_cost:
+            min_cost = adjusted_cost
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node

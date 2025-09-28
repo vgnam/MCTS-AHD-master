@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes) - 1
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+    bias_factor = 0.5 * (1 + math.exp(-5 * progress))  # Exponential decay bias
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        dynamic_weight = 0.7 * (1 - progress) ** 2  # Progress-based weight
+        weighted_cost = immediate_distance + dynamic_weight * potential_distance + bias_factor * immediate_distance
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node

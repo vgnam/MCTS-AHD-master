@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        destination_distance = distance_matrix[current_node][destination_node]
+        ratio = destination_distance / (avg_distance + 1e-10)  # Avoid division by zero
+        dynamic_threshold = 0.5 * (1 - ratio)  # Higher ratio reduces threshold
+
+        # Probabilistic selection based on dynamic threshold
+        if ratio < dynamic_threshold:
+            return destination_node
+
+    # Penalize nodes based on their frequency in the current path (simulated here)
+    penalty = {node: 0.1 * (1 / (distance_matrix[current_node][node] + 1e-10)) for node in unvisited_nodes}
+
+    # Select the node with the lowest adjusted distance
+    min_adjusted_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        adjusted_distance = distance_matrix[current_node][node] * (1 + penalty[node])
+        if adjusted_distance < min_adjusted_distance:
+            min_adjusted_distance = adjusted_distance
+            next_node = node
+
+    return next_node

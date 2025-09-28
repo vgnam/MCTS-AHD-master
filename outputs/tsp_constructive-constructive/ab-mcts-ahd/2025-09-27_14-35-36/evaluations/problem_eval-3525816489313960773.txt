@@ -1,0 +1,13 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    exploration_weight = 1 / (1 + num_unvisited)  # Decreases as unvisited nodes decrease
+    distance_weight = 1 - exploration_weight
+
+    next_node = min(unvisited_nodes, key=lambda node: (
+        distance_weight * (distance_matrix[current_node][node] / max(1, max(distance_matrix[current_node]))) +  # Normalized distance
+        exploration_weight * (node % (num_unvisited + 1))  # Dynamic modulo-based exploration
+    ))
+    return next_node

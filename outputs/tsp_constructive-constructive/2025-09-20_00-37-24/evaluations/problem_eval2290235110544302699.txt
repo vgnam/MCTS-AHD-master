@@ -1,0 +1,30 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, iteration=0, max_iterations=100):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate temperature for probabilistic selection
+    temperature = max(0.1, 1.0 - (iteration / max_iterations))
+
+    # Get nearest neighbors
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Probabilistic selection based on temperature
+    probabilities = []
+    for i, node in enumerate(nearest_neighbors):
+        # Exponential decay based on rank and temperature
+        prob = math.exp(-i / temperature)
+        probabilities.append(prob)
+
+    # Normalize probabilities
+    total = sum(probabilities)
+    normalized_probs = [p / total for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = random.choices(nearest_neighbors, weights=normalized_probs, k=1)[0]
+
+    return next_node

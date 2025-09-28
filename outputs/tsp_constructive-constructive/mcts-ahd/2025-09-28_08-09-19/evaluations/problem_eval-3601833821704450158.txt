@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+
+    # Historical and adaptive weights
+    historical_distances = [distance_matrix[current_node][n] for n in unvisited_nodes]
+    avg_historical = sum(historical_distances) / len(historical_distances) if historical_distances else 0
+    weight_connectivity = 0.4 if remaining_count > 5 else 0.2
+    weight_symmetry = 0.3 if remaining_count > 3 else 0.1
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        # Dynamic deviation penalty with adaptive threshold
+        deviation_threshold = avg_historical * (0.9 + 0.2 * (remaining_count / len(distance_matrix)))
+        deviation_penalty = 1.0 + (max(0, immediate_distance - deviation_threshold) / (avg_historical + 1e-6)) * 0.6
+
+        # Enhanced connectivity bonus with local density
+        local_density = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_historical) / remaining_count
+        connectivity_bonus = local_density * (1.0 + 0.1 * (remaining_count - len(remaining_nodes)))
+
+        # Path smoothness metric (novel addition)
+        path_smoothness = 1.0
+        if len(unvisited_nodes) > 2:
+            direction_vectors = [(distance_matrix[current_node][n] - distance_matrix[n][node], distance_matrix[node][n] - distance_matrix[n][destination_node])
+                               for n in remaining_nodes]
+            avg_direction = (sum(d[0] for d in direction_vectors)/len(direction_vectors),
+                            sum(d[1] for d in direction_vectors)/len(direction_vectors))
+            path_smoothness = 1.0 + (abs(avg_direction[0]) + abs(avg_direction[1])) / (2 * avg_historical + 1e-6)
+
+        # Combined score with adaptive weights
+        score = (immediate_distance * deviation_penalty) + \
+                (1.0 - connectivity_bonus) * weight_connectivity + \
+                path_smoothness * 0.2 + \
+                (1.0 / (1.0 + weight_symmetry)) * 0.1
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

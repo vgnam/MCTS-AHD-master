@@ -1,0 +1,8 @@
+import random
+        scores = [s for _, s in candidates]
+        min_score = min(scores)
+        max_score = max(scores)
+        normalized_scores = [(max_score - s + 1e-6) / (max_score - min_score + 1e-6) for s in scores]
+        next_node = random.choices([n for n, _ in candidates], weights=normalized_scores, k=1)[0]
+
+    return next_node

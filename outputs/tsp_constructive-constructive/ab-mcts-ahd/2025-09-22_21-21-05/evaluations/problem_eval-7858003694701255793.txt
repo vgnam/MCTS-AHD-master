@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    total_nodes = len(distance_matrix)
+    remaining_count = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic exploration factor based on remaining nodes' density
+        exploration_factor = (remaining_count / total_nodes) ** 2
+
+        # Local-global balance with non-linear weight
+        weight = 0.3 + 0.4 * (1 - exploration_factor)
+
+        # Penalty for revisiting nodes based on historical deviation
+        penalty = 0.2 * (total_nodes - remaining_count) * (distance_to_destination / max(distance_matrix[node]))
+
+        # Reward for nodes that bridge distant clusters
+        cluster_reward = 0
+        if remaining_count > 2:
+            avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_count - 1)
+            max_distance = max(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+            cluster_reward = 0.1 * (max_distance - avg_distance)
+
+        combined_score = (distance_to_current + distance_to_destination) * (1 + exploration_factor) + weight * (distance_to_current + distance_to_destination) + penalty - cluster_reward
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,39 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    # Calculate weights for probabilistic selection
+    costs = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_cost = min(costs)
+    avg_cost = sum(costs) / len(costs)
+
+    # Dynamic temperature based on remaining nodes
+    temperature = 1.0 - (1.0 / (len(unvisited_nodes) + 1))
+
+    weights = []
+    for cost in costs:
+        # Weight is inversely proportional to cost, with exploration factor
+        exploration_factor = math.exp(-cost / (temperature * avg_cost))
+        weight = (1.0 / (cost + 1e-6)) * exploration_factor
+        weights.append(weight)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    if total_weight == 0:
+        return unvisited_nodes.pop()
+
+    probabilities = [w / total_weight for w in weights]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

@@ -1,0 +1,21 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1  # +1 for the current node
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+    proximity_weight = 0.7 * remaining_ratio + 0.1  # Dynamic weight, higher when more nodes remain
+    destination_weight = 0.3 * (1 - remaining_ratio) + 0.1  # Dynamic weight, higher when fewer nodes remain
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        random_factor = random.uniform(-0.1, 0.1)  # Small random perturbation
+        return (proximity_weight * to_current + destination_weight * to_destination) + random_factor
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

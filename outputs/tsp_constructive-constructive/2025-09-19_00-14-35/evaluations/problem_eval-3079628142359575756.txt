@@ -1,0 +1,49 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Calculate centrality (degree and betweenness)
+        if remaining_nodes > 1:
+            degree = sum(1 for n in unvisited_nodes if n != node and distance_matrix[node][n] < math.inf)
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+            betweenness = sum(1 for n in unvisited_nodes if n != node and distance_matrix[current_node][n] < math.inf)
+            centrality = (degree + betweenness) / (2 * (remaining_nodes - 1))
+        else:
+            centrality = 0
+
+        # Repetition penalty (encourage exploration)
+        repetition_penalty = -math.log(1 + current_dist) if current_dist > 0 else 0
+
+        # Dynamic weights
+        weight_local = 0.6 - 0.5 * exploration_factor
+        weight_centrality = 0.3 + 0.2 * exploration_factor
+        weight_dest = -0.3 if exploration_factor < 0.5 else 0
+        weight_repetition = 0.2
+
+        score = (weight_local * current_dist) + (weight_centrality * centrality) + (weight_dest * dest_dist) + (weight_repetition * repetition_penalty)
+
+        scores.append((node, score))
+
+    # Temperature-based probabilistic selection
+    temperature = 1.0 - exploration_factor
+    if temperature > 0:
+        exp_scores = [math.exp(-s[1] / temperature) for s in scores]
+        total_exp = sum(exp_scores)
+        probs = [e / total_exp for e in exp_scores]
+        next_node = random.choices([s[0] for s in scores], weights=probs, k=1)[0]
+    else:
+        next_node = min(scores, key=lambda x: x[1])[0]
+
+    return next_node

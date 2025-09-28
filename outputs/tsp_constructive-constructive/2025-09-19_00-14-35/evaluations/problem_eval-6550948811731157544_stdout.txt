@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of connectivity and centrality scores as exploration progresses, while reducing local proximity weights, and integrates a "flow disruption penalty" that scales with the ratio of remaining nodes to total nodes, creating a more aggressive optimization strategy as the solution nears completion.}
+                                                                                                                                                                                                                                                                                                                   ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of connectivity and centrality scores as exploration progresses, while reducing local proximity weights, and integrates a "flow disruption penalty" that scales with the ratio of remaining nodes to total nodes, creating a more aggressive optimization strategy as the solution nears completion.}
+                                                                                                                                                                                                                                                                                                                   ^
+SyntaxError: unmatched '}'

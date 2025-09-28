@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of immediate proximity and long-term efficiency based on the current state of the tour, using a decay factor to prioritize local optimization early and global optimization later. It also incorporates a penalty term for nodes that deviate significantly from the average distance to encourage balanced path selection.}
+                                                                                                                                                                                                                                                                                                                                          ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of immediate proximity and long-term efficiency based on the current state of the tour, using a decay factor to prioritize local optimization early and global optimization later. It also incorporates a penalty term for nodes that deviate significantly from the average distance to encourage balanced path selection.}
+                                                                                                                                                                                                                                                                                                                                          ^
+SyntaxError: unmatched '}'

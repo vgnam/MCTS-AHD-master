@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = -float('inf')
+    next_node = None
+    exploration_decay = 0.8
+    centrality_weight = 0.6
+
+    # Precompute node centrality (inverse of average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 1.0
+        centrality[node] = 1.0 / (avg_distance + 1e-6)  # Avoid division by zero
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic exploration factor (decays as more nodes are visited)
+        exploration_factor = exploration_decay ** (len(unvisited_nodes) - 1)
+
+        # Penalty for nodes with high historical costs or low centrality
+        penalty = (distance_to_current + distance_to_destination) * (1.0 - centrality[node])
+
+        # Combined score: prioritize nodes balancing local, global, and centrality factors
+        combined_score = (centrality_weight * centrality[node] +
+                         (1 - centrality_weight) * (1.0 / (distance_to_current + distance_to_destination + 1e-6)) +
+                         exploration_factor * (1.0 / (penalty + 1e-6)))
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

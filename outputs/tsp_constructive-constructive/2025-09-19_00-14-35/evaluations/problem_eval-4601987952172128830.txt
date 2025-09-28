@@ -1,0 +1,56 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    def sigmoid(x):
+        return 1 / (1 + math.exp(-x))
+
+    temperature = 1.0 - 0.5 * (1 - exploration_factor)
+    exploration_weight = sigmoid(5 * (exploration_factor - 0.5))
+    exploitation_weight = 1 - exploration_weight
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            connectivity_score = sum(1.0 / (1.0 + distance_matrix[node][n]) for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+            flow_disruption = max(distance_matrix[node][n] for n in unvisited_nodes if n != node) - current_dist
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] > 0 and n != node)
+            centrality_score = node_degree / (total_nodes - 1)
+            diversity_score = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+        else:
+            connectivity_score = 0
+            flow_disruption = 0
+            centrality_score = 0
+            diversity_score = 0
+
+        weight_local = 0.5 * exploitation_weight + 0.1 * exploration_weight
+        weight_connectivity = 0.3 * exploitation_weight + 0.2 * exploration_weight
+        weight_dest = -0.3 * exploitation_weight + 0.2 * exploration_weight
+        weight_flow = -0.2 * flow_disruption if flow_disruption > 0 else 0
+        weight_centrality = 0.2 * exploitation_weight + 0.1 * exploration_weight
+        weight_diversity = 0.3 * exploration_weight
+
+        score = (weight_local * current_dist) + (weight_connectivity * connectivity_score) + \
+                (weight_flow * flow_disruption) + (weight_dest * dest_dist) + \
+                (weight_centrality * centrality_score) + (weight_diversity * diversity_score)
+
+        scores.append((node, score))
+
+    if temperature > 0:
+        min_score = min(score[1] for score in scores)
+        adjusted_scores = [(node, math.exp((min_score - score) / temperature)) for node, score in scores]
+        total_prob = sum(prob for _, prob in adjusted_scores)
+        normalized_probs = [(node, prob/total_prob) for node, prob in adjusted_scores]
+        next_node = random.choices([node for node, _ in normalized_probs],
+                                 weights=[prob for _, prob in normalized_probs])[0]
+    else:
+        next_node = min(scores, key=lambda x: x[1])[0]
+
+    return next_node

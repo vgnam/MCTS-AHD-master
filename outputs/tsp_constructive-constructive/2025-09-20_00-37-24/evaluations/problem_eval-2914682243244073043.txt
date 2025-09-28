@@ -1,0 +1,27 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic bias towards destination based on remaining path length
+    dest_distance = distance_matrix[current_node][destination_node]
+    remaining_nodes = len(unvisited_nodes)
+    bias_factor = math.exp(-dest_distance / (remaining_nodes + 1))  # Decaying bias
+
+    # Weighted probabilistic selection
+    if random.random() < bias_factor:  # Higher chance to pick destination if close
+        candidates = nearest_neighbors[:min(2, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    elif random.random() < 0.7:  # 70% chance to pick from top 2 nearest
+        candidates = nearest_neighbors[:min(2, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:  # 30% chance to pick a random node
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes and len(unvisited_nodes) > 1:
+        return destination_node
+    distances = []
+    total_inverse_distance = 0.0
+    for node in unvisited_nodes:
+        if node == current_node:
+            continue
+        distance = distance_matrix[current_node][node]
+        inverse_distance = 1.0 / distance if distance > 0 else float('inf')
+        distances.append((node, inverse_distance))
+        total_inverse_distance += inverse_distance
+    if total_inverse_distance == 0:
+        return unvisited_nodes[0] if unvisited_nodes else None
+    probabilities = [inv_dist / total_inverse_distance for (_, inv_dist) in distances]
+    next_node = np.random.choice([node for (node, _) in distances], p=probabilities)
+    return next_node

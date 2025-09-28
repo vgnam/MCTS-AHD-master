@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            remaining_nodes_list = [n for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in remaining_nodes_list) / len(remaining_nodes_list)
+            connectivity_score = 1.0 / (1.0 + avg_remaining_dist)
+            potential_gain = (distance_matrix[current_node][destination_node] - immediate_dist - dest_dist) / (1 + immediate_dist)
+            flow_disruption = max(distance_matrix[node][n] for n in remaining_nodes_list) - immediate_dist
+
+            # Novel mechanism: Probabilistic selection based on normalized scores
+            normalized_score = (1.0 / (1.0 + immediate_dist)) * (0.5 + 0.5 * connectivity_score) * (1.0 + 0.3 * potential_gain)
+            exploration_weight = exploration_factor ** 2
+            final_score = (1 - exploration_weight) * normalized_score + exploration_weight * connectivity_score
+        else:
+            final_score = 1.0 / (1.0 + immediate_dist)
+
+        return final_score
+
+    # Novel selection: Combine min-distance with probabilistic selection
+    if remaining_nodes > 1:
+        min_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+        candidates = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= 1.2 * distance_matrix[current_node][min_node]]
+        if len(candidates) > 1:
+            weights = [evaluate_node(node) for node in candidates]
+            total_weight = sum(weights)
+            probabilities = [w/total_weight for w in weights]
+            next_node = random.choices(candidates, weights=probabilities, k=1)[0]
+        else:
+            next_node = min_node
+    else:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    return next_node

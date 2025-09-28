@@ -1,0 +1,38 @@
+importance to higher heuristic priority as progress continues, ensuring balance between greedy and forward-looking choices while allowing controlled deviation based on immediate cost and combined future cost.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    remaining_nodes = len(unvisited_nodes)
+    weight = 0.5 * (1 - (remaining_nodes / (remaining_nodes + 1)))
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        heuristic = distance_matrix[node][destination_node] if destination_node != node else 0
+        cost = distance + weight * heuristic
+
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+
+    if len(unvisited_nodes) > 2:
+        threshold = min_cost * (1.0 + 0.1 * (remaining_nodes / len(distance_matrix)))
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            cost = distance_matrix[current_node][node]
+            potential_cost = cost + distance_matrix[node][next_node]
+            if cost <= threshold and potential_cost < min_cost * 1.2:
+                next_node = node
+                break
+
+    return next_node

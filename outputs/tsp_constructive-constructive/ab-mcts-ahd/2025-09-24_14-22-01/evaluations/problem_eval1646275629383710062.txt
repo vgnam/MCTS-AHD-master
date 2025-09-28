@@ -1,0 +1,3 @@
+import random
+    selected_index = random.choices(range(len(candidates)), weights=probabilities)[0]
+    return next_node

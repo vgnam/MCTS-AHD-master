@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    unvisited_list = list(unvisited_nodes)
+    costs = [distance_matrix[current_node][node] for node in unvisited_list]
+    avg_cost = sum(costs) / len(costs)
+    max_cost = max(costs)
+
+    if max_cost > avg_cost * 1.1:
+        threshold = avg_cost * 0.9
+        probabilities = [1 / (cost + 1e-6) if cost < threshold else 0.1 / (cost + 1e-6) for cost in costs]
+    else:
+        probabilities = [1 / (cost + 1e-6) for cost in costs]
+
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    next_node = np.random.choice(unvisited_list, p=normalized_probs)
+    return next_node

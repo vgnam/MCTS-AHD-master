@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    # Calculate exploration bonus (average distance to all other unvisited nodes)
+    exploration_bonuses = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        avg_distance = total_distance / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        exploration_bonuses[node] = avg_distance
+
+    max_score = -float('inf')
+    next_node = None
+    temperature = len(unvisited_nodes) / (len(unvisited_nodes) + 1)  # Decreasing temperature
+
+    for node in unvisited_nodes:
+        greedy_score = distance_matrix[current_node][node]
+        exploration_score = exploration_bonuses[node]
+        combined_score = (1 - temperature) * greedy_score + temperature * exploration_score
+
+        if combined_score > max_score:
+            max_score = combined_score
+            next_node = node
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    # Optional local search: consider replacing with a node that reduces total path cost
+    if len(unvisited_nodes) > 2:
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            if potential_cost < max_score * 0.8:  # Slightly more aggressive than original
+                next_node = node
+                break
+
+    return next_node

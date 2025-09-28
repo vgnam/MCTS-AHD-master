@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    def evaluate_path(node, depth=4):
+        if depth == 0 or not unvisited_nodes:
+            return distance_matrix[node][destination_node]
+        remaining_nodes = [n for n in unvisited_nodes if n != node]
+        if not remaining_nodes:
+            return distance_matrix[node][destination_node]
+        next_candidates = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:4]
+        return min(
+            distance_matrix[node][candidate] + evaluate_path(candidate, depth-1)
+            for candidate in next_candidates
+        )
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        future_cost = evaluate_path(node)
+        return 0.4 * immediate_cost + 0.6 * future_cost
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, memory_window=3):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    remaining_ratio = remaining_nodes / total_nodes
+    weight_local = 0.6 + 0.4 * (1 - remaining_ratio)
+    weight_centrality = 0.3 + 0.2 * (1 - remaining_ratio)
+    weight_coherence = 0.1 + 0.4 * (1 - remaining_ratio)
+
+    # Memory-based penalty for recently visited nodes
+    recent_penalty = 0.0
+    if hasattr(select_next_node, 'recently_visited'):
+        recently_visited = select_next_node.recently_visited
+        for node in recently_visited:
+            if node in unvisited_nodes:
+                recent_penalty += 0.1 * (memory_window - recently_visited.index(node))
+    else:
+        select_next_node.recently_visited = []
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        penalty = recent_penalty if node in unvisited_nodes else 0.0
+        return (weight_local * local_distance) + (weight_centrality * centrality) - (weight_coherence * coherence) + penalty
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+
+    # Update recently visited nodes memory
+    if len(select_next_node.recently_visited) >= memory_window:
+        select_next_node.recently_visited.pop(0)
+    select_next_node.recently_visited.append(next_node)
+
+    return next_node

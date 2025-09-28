@@ -1,0 +1,6 @@
+import random
+        next_node = random.choices([node for node, _ in normalized_scores], weights=probabilities, k=1)[0]
+    else:
+        next_node = unvisited_nodes[0] if unvisited_nodes else destination_node
+
+    return next_node

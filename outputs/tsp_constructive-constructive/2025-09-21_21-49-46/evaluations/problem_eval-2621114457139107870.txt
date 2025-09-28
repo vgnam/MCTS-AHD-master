@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    weights = []
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        candidates.append(node)
+        weights.append(1.0 / (distance + 1e-6))  # Avoid division by zero
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        destination_weight = 1.0 / (destination_distance + 1e-6)
+        max_weight = max(weights)
+        if destination_weight > max_weight:
+            return destination_node
+
+    # Normalize weights and apply softmax for probabilistic selection
+    exp_weights = [math.exp(w) for w in weights]
+    sum_exp_weights = sum(exp_weights)
+    probs = [w / sum_exp_weights for w in exp_weights]
+
+    # Select node with probability proportional to its weight
+    next_node = random.choices(candidates, weights=probs, k=1)[0]
+
+    return next_node

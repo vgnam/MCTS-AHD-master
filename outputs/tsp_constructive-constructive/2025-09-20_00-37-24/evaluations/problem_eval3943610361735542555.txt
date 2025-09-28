@@ -1,0 +1,35 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, decay_rate=0.99):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate probabilities based on distance and temperature
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_distance = min(distances)
+    max_distance = max(distances)
+
+    # Normalize distances and apply temperature scaling
+    probabilities = []
+    for d in distances:
+        normalized = (d - min_distance) / (max_distance - min_distance) if max_distance != min_distance else 0.5
+        prob = math.exp(-normalized / temperature)
+        probabilities.append(prob)
+
+    # Normalize probabilities to sum to 1
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    # Occasionally select a random node to maintain diversity
+    if random.random() < 0.1:
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    else:
+        # Select node with highest probability (greedy with some randomness)
+        next_node = unvisited_nodes[probabilities.index(max(probabilities))]
+
+    # Decay temperature for next iteration
+    temperature *= decay_rate
+    return next_node

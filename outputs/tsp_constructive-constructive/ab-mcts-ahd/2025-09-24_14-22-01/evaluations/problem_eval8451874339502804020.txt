@@ -1,0 +1,46 @@
+import math
+    import random
+
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (remaining_nodes / total_nodes) ** 1.5)
+
+    node_probs = []
+    total_cost = 0.0
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            node_probs.append((node, 1.0))
+            total_cost += 1.0
+            continue
+
+        immediate_dist = distance_matrix[current_node][node]
+        potential_dist = distance_matrix[node][destination_node]
+
+        # Calculate centrality as average distance to other unvisited nodes
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 1.0
+
+        # Dynamic weight combining immediate, potential, and centrality
+        dynamic_weight = 0.5 * (1 - (remaining_nodes / total_nodes) ** 2)
+        cost = immediate_dist + dynamic_weight * potential_dist + 0.3 * centrality
+
+        # Apply temperature to create probability distribution
+        prob = math.exp(-cost / temperature)
+        node_probs.append((node, prob))
+        total_cost += prob
+
+    # Normalize probabilities
+    normalized_probs = [(node, prob / total_cost) for node, prob in node_probs]
+
+    # Select node based on probabilities
+    r = random.random()
+    cumulative_prob = 0.0
+    for node, prob in normalized_probs:
+        cumulative_prob += prob
+        if r <= cumulative_prob:
+            return node
+
+    return next_node

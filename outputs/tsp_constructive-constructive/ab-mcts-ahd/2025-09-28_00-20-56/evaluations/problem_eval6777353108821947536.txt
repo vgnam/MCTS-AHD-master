@@ -1,0 +1,56 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        # Immediate distance (70% weight)
+        current_dist = distance_matrix[current_node][node]
+
+        # Dynamic lookahead horizon based on remaining nodes
+        lookahead_depth = min(3, len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 1
+        decay_factor = 0.7 ** (lookahead_depth - 1)  # Prioritize closer lookaheads
+
+        # Variable-depth lookahead
+        if lookahead_depth == 1:
+            lookahead_dist = distance_matrix[node][destination_node]
+        else:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            best_paths = []
+            for depth in range(1, lookahead_depth + 1):
+                if depth == 1:
+                    best_paths.append(min(remaining_nodes, key=lambda n: distance_matrix[node][n] + distance_matrix[n][destination_node]))
+                else:
+                    # More complex multi-step lookahead
+                    best_path = None
+                    min_cost = float('inf')
+                    for n in remaining_nodes:
+                        remaining_after_n = [m for m in remaining_nodes if m != n]
+                        if depth == 2:
+                            if remaining_after_n:
+                                best_next = min(remaining_after_n, key=lambda m: distance_matrix[n][m] + distance_matrix[m][destination_node])
+                                cost = distance_matrix[node][n] + distance_matrix[n][best_next] + distance_matrix[best_next][destination_node]
+                                if cost < min_cost:
+                                    min_cost = cost
+                                    best_path = n
+                        else:
+                            # Placeholder for deeper lookaheads (simplified)
+                            cost = distance_matrix[node][n] + distance_matrix[n][destination_node]
+                            if cost < min_cost:
+                                min_cost = cost
+                                best_path = n
+                    best_paths.append(best_path)
+
+            # Combine lookahead paths with decay
+            lookahead_dist = 0
+            for i, path_node in enumerate(best_paths):
+                if path_node is not None:
+                    if i == 0:
+                        lookahead_dist += distance_matrix[node][path_node] + distance_matrix[path_node][destination_node]
+                    else:
+                        lookahead_dist += decay_factor * (distance_matrix[node][path_node] + distance_matrix[path_node][destination_node])
+
+        # Weighted sum of immediate and lookahead distances
+        return 0.7 * current_dist + 0.3 * lookahead_dist
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    candidates = []
+    for node in unvisited_nodes:
+        candidates.append((node, distance_matrix[current_node][node]))
+
+    candidates.sort(key=lambda x: -x[1])
+
+    threshold = 0.7 + 0.3 * (len(unvisited_nodes) / len(distance_matrix))
+    farthest_node, farthest_dist = candidates[0]
+
+    if len(unvisited_nodes) > 2:
+        for node, dist in candidates[1:]:
+            if dist >= farthest_dist * threshold:
+                if np.random.rand() < 0.3:
+                    return node
+
+    return next_node

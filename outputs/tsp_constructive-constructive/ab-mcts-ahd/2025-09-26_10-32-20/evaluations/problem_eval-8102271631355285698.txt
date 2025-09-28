@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    temperature = 1.0 - 0.5 * (1 - remaining_ratio)  # Decaying temperature
+    local_weight = 0.6 + 0.4 * (1 - remaining_ratio)
+    global_weight = 1 - local_weight
+    revisit_penalty = 0.1 * (1 - remaining_ratio)
+
+    def centrality(node):
+        return 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+
+    def revisit_count(node):
+        return sum(1 for n in range(total_nodes) if distance_matrix[current_node][n] == distance_matrix[node][n])
+
+    def neighbor_penalty(node):
+        return sum(distance_matrix[node][n] for n in range(total_nodes) if n != current_node) / (total_nodes - 1)
+
+    scores = []
+    for node in unvisited_nodes:
+        local_score = distance_matrix[current_node][node]
+        global_score = centrality(node)
+        penalty = revisit_penalty * (revisit_count(node) + neighbor_penalty(node))
+        hybrid_score = (local_weight * local_score + global_weight * global_score) - penalty
+        scores.append(hybrid_score)
+
+    # Softmax selection with temperature
+    exp_scores = [math.exp(score / temperature) for score in scores]
+    sum_exp = sum(exp_scores)
+    probs = [exp / sum_exp for exp in exp_scores]
+    next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+
+    return next_node

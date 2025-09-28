@@ -1,0 +1,6 @@
+import random
+    selection_prob = [prob ** 2 for prob in normalized_scores]
+    selection_prob = [p / sum(selection_prob) for p in selection_prob]
+    next_node = random.choices(unvisited_nodes, weights=selection_prob, k=1)[0]
+
+    return next_node

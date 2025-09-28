@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        if not unvisited_nodes:
+            return destination_node
+
+        cluster_factor = 1.0
+        nearby_nodes = [node for node in unvisited_nodes if distance_matrix[current_node][node] < 2 * remaining_distance]
+        if nearby_nodes:
+            cluster_factor = 0.7 + 0.3 * (len(nearby_nodes) / len(unvisited_nodes))
+
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_distance == 0:
+            return destination_node
+
+        threshold = 0.6 * cluster_factor + 0.4 * (len(unvisited_nodes) / len(distance_matrix))
+        if remaining_distance / avg_distance <= threshold:
+            return destination_node
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+
+        proximity_weight = 2.0 - 1.5 * remaining_ratio
+        predictive_weight = 1.0 - 0.7 * remaining_ratio
+
+        predictive_factor = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / len(unvisited_nodes)
+        regret_term = max(distance_matrix[current_node][other] - to_current for other in unvisited_nodes) if unvisited_nodes else 0
+
+        cluster_penalty = 0.0
+        if len(unvisited_nodes) > 1:
+            avg_cluster_distance = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+            cluster_penalty = 0.2 * (avg_cluster_distance - to_current)
+
+        return (to_current * proximity_weight +
+                predictive_factor * predictive_weight +
+                0.4 * regret_term -
+                cluster_penalty)
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

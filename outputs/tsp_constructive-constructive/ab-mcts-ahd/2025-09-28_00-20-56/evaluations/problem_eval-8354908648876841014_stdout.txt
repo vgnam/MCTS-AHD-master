@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    default but dynamically overrides this choice if the destination node is within a dynamically calculated threshold (1.5 × average distance) plus a fixed penalty (10% of average distance), ensuring a balance between proximity and progress toward the destination.}
+                                                                                                                            ^
+SyntaxError: invalid character '×' (U+00D7)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    default but dynamically overrides this choice if the destination node is within a dynamically calculated threshold (1.5 × average distance) plus a fixed penalty (10% of average distance), ensuring a balance between proximity and progress toward the destination.}
+                                                                                                                            ^
+SyntaxError: invalid character '×' (U+00D7)

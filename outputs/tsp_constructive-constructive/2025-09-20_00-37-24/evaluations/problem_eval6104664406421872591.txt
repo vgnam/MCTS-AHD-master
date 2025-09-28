@@ -1,0 +1,26 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate proximity scores (inverse distance)
+    proximity_scores = [1.0 / distance_matrix[current_node][node] for node in unvisited_nodes]
+
+    # Calculate visit frequency scores (lower frequency = higher score)
+    visit_frequencies = [1.0 / (1 + unvisited_nodes.count(node)) for node in unvisited_nodes]
+
+    # Combine scores with weights (70% proximity, 30% exploration)
+    combined_scores = [0.7 * p + 0.3 * f for p, f in zip(proximity_scores, visit_frequencies)]
+
+    # Normalize scores to probabilities
+    total = sum(combined_scores)
+    probabilities = [score / total for score in combined_scores]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

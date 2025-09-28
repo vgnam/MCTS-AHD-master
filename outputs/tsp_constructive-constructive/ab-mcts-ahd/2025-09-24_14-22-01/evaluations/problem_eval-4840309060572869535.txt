@@ -1,0 +1,24 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    centrality_weight = math.log(remaining_nodes + 1) / remaining_nodes if remaining_nodes > 0 else 0
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        centrality = sum(1 / (distance_matrix[node][other] + 1e-6) for other in unvisited_nodes) / remaining_nodes
+        cost = immediate_distance * (1 + centrality * centrality_weight) + math.log(immediate_distance + 1)
+
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+
+    return next_node

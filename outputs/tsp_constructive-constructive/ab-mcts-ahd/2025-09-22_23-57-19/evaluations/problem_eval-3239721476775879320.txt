@@ -1,0 +1,56 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    std_dev = (sum((d - avg_distance) ** 2 for d in distances) / len(distances)) ** 0.5 if len(distances) > 1 else 0
+
+    temperature = max(0.1, 1.0 / (1.0 + math.exp(-(len(unvisited_nodes) - 15) / 3.0)))
+    momentum = 1.0 / (1.0 + math.exp(-(len(unvisited_nodes) - 8) / 2.0))
+
+    min_cost = float('inf')
+    nearest_node = None
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost < min_cost:
+            min_cost = cost
+            nearest_node = node
+
+    if nearest_node is None:
+        return unvisited_nodes.pop()
+
+    threshold = avg_distance + 1.5 * std_dev + 0.2 * (len(unvisited_nodes) ** 0.5)
+    candidates = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= threshold]
+
+    if not candidates:
+        candidates = [nearest_node]
+
+    if random.random() < temperature:
+        next_node = random.choice(candidates)
+    else:
+        next_node = nearest_node
+
+    if random.random() < momentum and len(unvisited_nodes) > 3:
+        centrality_weights = []
+        for node in candidates:
+            centrality = 0
+            for other in unvisited_nodes:
+                if other != node:
+                    centrality += 1.0 / (1.0 + distance_matrix[node][other])
+            centrality_weights.append(centrality)
+
+        if centrality_weights:
+            next_node = candidates[centrality_weights.index(max(centrality_weights))]
+
+    return next_node

@@ -1,0 +1,55 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    total_nodes = len(unvisited_nodes) + 1
+    progress_ratio = 1 - (len(unvisited_nodes) / total_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) == 1:
+            score = immediate_distance + distance_to_destination
+        else:
+            # Lookahead connectivity
+            lookahead_depth = min(2, len(unvisited_nodes) // 2) if len(unvisited_nodes) > 2 else 1
+            remaining_nodes = unvisited_nodes - {node}
+            lookahead_distance = 0
+
+            if remaining_nodes:
+                current = node
+                for _ in range(lookahead_depth):
+                    if not remaining_nodes:
+                        break
+                    next_candidate = min(remaining_nodes, key=lambda x: distance_matrix[current][x])
+                    lookahead_distance += distance_matrix[current][next_candidate]
+                    current = next_candidate
+                    remaining_nodes -= {next_candidate}
+
+            # Node centrality
+            node_centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+            # Adaptive weights
+            distance_weight = 0.6 + 0.3 * (1 - progress_ratio)
+            lookahead_weight = 0.3 * progress_ratio
+            centrality_weight = 0.4 * (1 - progress_ratio)
+
+            # Non-linear transformations
+            transformed_immediate = immediate_distance ** 0.7
+            transformed_lookahead = (lookahead_distance / lookahead_depth) ** 0.8 if lookahead_depth > 0 else 0
+
+            # Exploration penalty
+            exploration_penalty = 1 + 0.2 * (node_centrality / (immediate_distance + 1e-6)) * progress_ratio
+
+            score = (distance_weight * transformed_immediate +
+                    lookahead_weight * transformed_lookahead +
+                    centrality_weight * node_centrality) * exploration_penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    harmonic_mean = len(distances) / sum(1 / d for d in distances) if any(d != 0 for d in distances) else max(distances)
+
+    min_cost = float('inf')
+    max_cost = float('-inf')
+    next_node = None
+    farthest_node = None
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+        if cost > max_cost:
+            max_cost = cost
+            farthest_node = node
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        exploration_threshold = harmonic_mean * 1.2
+        candidates = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= exploration_threshold]
+
+        if candidates:
+            next_node = max(candidates, key=lambda x: distance_matrix[current_node][x])
+        else:
+            if random.random() < 0.3 and farthest_node is not None:
+                next_node = farthest_node
+            else:
+                next_node = next_node
+
+    return next_node

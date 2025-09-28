@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    temperature = 1.0 / (1.0 + num_unvisited)  # Decreases as nodes are visited
+    cluster_penalty = 0.2 * (num_unvisited / len(distance_matrix))  # Cluster-based penalty factor
+    exploration_weight = 0.3 * (1.0 - num_unvisited / len(distance_matrix))  # Exploration focus
+
+    scores = []
+    for node in unvisited_nodes:
+        # Immediate and long-term distance components
+        immediate_dist = distance_matrix[current_node][node]
+        long_term_dist = distance_matrix[node][destination_node]
+
+        # Dynamic cluster penalty (nodes close to current node get higher penalty)
+        cluster_penalty_factor = 1.0 + cluster_penalty * (1.0 - immediate_dist / max(1, sum(distance_matrix[current_node])))
+
+        # Reinforcement learning-inspired reward
+        reward = -immediate_dist - 0.5 * long_term_dist
+        reward *= cluster_penalty_factor
+
+        scores.append((node, reward))
+
+    # Temperature-based probabilistic selection
+    rewards = [score[1] for score in scores]
+    max_reward = max(rewards)
+    min_reward = min(rewards)
+
+    if max_reward == min_reward:
+        probabilities = [1.0 / len(scores)] * len(scores)
+    else:
+        # Normalize and apply temperature
+        normalized = [(r - min_reward) / (max_reward - min_reward) for r in rewards]
+        probabilities = [np.exp(n / temperature) for n in normalized]
+        sum_prob = sum(probabilities)
+        probabilities = [p / sum_prob for p in probabilities]
+
+    # Weighted random selection
+    next_node = np.random.choice([score[0] for score in scores], p=probabilities)
+
+    return next_node

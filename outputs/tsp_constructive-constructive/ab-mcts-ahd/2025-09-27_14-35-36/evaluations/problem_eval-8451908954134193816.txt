@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    base_alpha = 0.6  # Base proximity weight
+    base_beta = 0.3  # Base destination alignment weight
+    gamma = 0.1      # Detour penalty weight
+
+    # Dynamic weight adjustment based on remaining nodes and distance to destination
+    distance_to_dest = distance_matrix[current_node][destination_node]
+    weight_factor = (1 + (remaining_nodes / (remaining_nodes + 1))) * (1 / (1 + distance_to_dest))
+    alpha = base_alpha * weight_factor
+    beta = base_beta * weight_factor
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_node_to_dest = distance_matrix[node][destination_node]
+        total_trip_distance = distance_to_node + distance_node_to_dest
+
+        # Proximity component (favors closer nodes)
+        proximity_score = alpha * (1 / (1 + distance_to_node))
+
+        # Destination alignment component (favors nodes that reduce total distance)
+        alignment_score = beta * (distance_node_to_dest / total_trip_distance)
+
+        # Detour penalty (avoids nodes that create large detours)
+        detour_penalty = gamma * (distance_to_node / (1 + distance_node_to_dest))
+
+        # Dynamic adjustment based on remaining nodes and current distance
+        adjustment_factor = (remaining_nodes / (remaining_nodes + distance_to_node)) ** 1.5
+        total_score = (proximity_score + alignment_score - detour_penalty) * adjustment_factor
+
+        if total_score > best_score:
+            best_score = total_score
+            next_node = node
+
+    # Special case: prioritize destination if it's the last node or provides significant savings
+    if destination_node in unvisited_nodes:
+        if remaining_nodes == 1 or distance_to_dest < distance_matrix[current_node][next_node] * 0.8:
+            next_node = destination_node
+
+    return next_node

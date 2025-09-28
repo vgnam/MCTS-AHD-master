@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Initialize frequency and penalty tracking (simplified for this example)
+    frequency_penalty = 0.1  # Base penalty for higher frequency
+    revisit_penalty = 1.0   # Large penalty for revisiting nodes
+
+    # Calculate weighted distances
+    def weighted_distance(node):
+        base_distance = distance_matrix[current_node][node]
+        # Simulate frequency penalty (in a real scenario, track node visitation history)
+        freq_penalty = frequency_penalty * (1 if node in unvisited_nodes else revisit_penalty)
+        return base_distance * (1 + freq_penalty)
+
+    next_node = min(unvisited_nodes, key=weighted_distance)
+    return next_node

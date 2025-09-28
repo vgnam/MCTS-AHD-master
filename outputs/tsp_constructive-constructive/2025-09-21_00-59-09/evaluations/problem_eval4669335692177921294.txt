@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+
+    # Compute centroid of unvisited nodes
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    else:
+        centroid_x = 0
+
+    # Dynamic weights based on remaining path length
+    remaining_nodes = len(unvisited_nodes)
+    if remaining_nodes == 1:
+        weight_current = 1.0
+        weight_dest = 0.0
+        weight_centroid = 0.0
+    else:
+        weight_current = 0.7
+        weight_dest = 0.2 * (remaining_nodes / (remaining_nodes + 1))
+        weight_centroid = 0.1 * (1 - remaining_nodes / (remaining_nodes + 2))
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Normalize distances
+        max_distance = max(distance_matrix[current_node][n] for n in unvisited_nodes) if unvisited_nodes else 1
+        norm_distance_to_current = distance_to_current / max_distance if max_distance > 0 else 0
+        norm_distance_to_dest = distance_to_dest / max_distance if max_distance > 0 else 0
+        norm_centroid_penalty = centroid_penalty / max_distance if max_distance > 0 else 0
+
+        # Novel scoring formula
+        score = (weight_current * norm_distance_to_current +
+                 weight_dest * norm_distance_to_dest +
+                 weight_centroid * norm_centroid_penalty)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, cooling_rate=0.95):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    candidates = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if node == destination_node and len(unvisited_nodes) > 1:
+            cost *= 0.5  # Prefer destination if not last node
+        weight = math.exp(-cost / temperature)
+        candidates.append((node, cost, weight))
+        total_weight += weight
+
+    if not candidates:
+        return unvisited_nodes.pop()
+
+    # Select node based on Boltzmann distribution
+    r = random.uniform(0, total_weight)
+    cumulative_weight = 0.0
+    next_node = None
+
+    for node, cost, weight in candidates:
+        cumulative_weight += weight
+        if r <= cumulative_weight:
+            next_node = node
+            break
+
+    if next_node is None:
+        next_node = min(candidates, key=lambda x: x[1])[0]
+
+    # Cool down temperature
+    temperature *= cooling_rate
+
+    return next_node

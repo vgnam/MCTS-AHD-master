@@ -1,0 +1,31 @@
+importance metric derived from the distance matrix's variance and a path diversity term that rewards nodes connecting to unexplored regions.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    temperature = 1 - remaining_ratio
+    local_weight = 0.7 * (1 - temperature) + 0.3 * temperature
+    global_weight = 1 - local_weight
+    diversity_weight = 0.5 * temperature
+
+    def node_importance(node):
+        distances = [distance_matrix[node][n] for n in range(total_nodes)]
+        mean_dist = sum(distances) / total_nodes
+        variance = sum((d - mean_dist) ** 2 for d in distances) / total_nodes
+        return variance
+
+    def path_diversity(node):
+        unexplored = sum(1 for n in unvisited_nodes if distance_matrix[node][n] > 0)
+        return unexplored / (len(unvisited_nodes) + 1e-10)
+
+    hybrid_score = lambda node: (
+        local_weight * distance_matrix[current_node][node] +
+        global_weight * node_importance(node) +
+        diversity_weight * path_diversity(node)
+    )
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

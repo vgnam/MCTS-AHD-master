@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_priority = float('-inf')
+    best_weighted_sum = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        weighted_sum = (0.5 * distance_to_current) + (0.5 * distance_to_destination)
+
+        # Calculate regret: difference between current weighted sum and next-best alternative
+        regret = 0
+        for alt_node in unvisited_nodes:
+            if alt_node != node:
+                alt_sum = (0.5 * distance_matrix[current_node][alt_node]) + (0.5 * distance_matrix[alt_node][destination_node])
+                regret = max(regret, alt_sum - weighted_sum)
+
+        # Lookahead mechanism: estimate the potential reduction in total path length
+        lookahead_reduction = 0
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            for next_candidate in remaining_nodes:
+                lookahead_sum = distance_matrix[node][next_candidate] + distance_matrix[next_candidate][destination_node]
+                lookahead_reduction = max(lookahead_reduction, (distance_to_current + distance_to_destination) - lookahead_sum)
+
+        # Priority combines weighted sum, regret, and lookahead reduction
+        priority = weighted_sum - (0.3 * regret) + (0.2 * lookahead_reduction)
+
+        if priority > best_priority or (priority == best_priority and weighted_sum < best_weighted_sum):
+            best_priority = priority
+            best_weighted_sum = weighted_sum
+            next_node = node
+
+    return next_node

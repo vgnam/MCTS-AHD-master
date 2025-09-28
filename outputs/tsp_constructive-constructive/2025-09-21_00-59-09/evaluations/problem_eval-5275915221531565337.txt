@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+
+    # Dynamic weights based on remaining nodes and current progress
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1.0 - (remaining_nodes / (remaining_nodes + 1))
+
+    # Compute centroid of unvisited nodes
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    else:
+        centroid_x = 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Dynamic weights: prioritize proximity as progress increases, adjust centroid influence
+        weight_current = 1.0 - 0.3 * progress
+        weight_dest = 0.5 + 0.2 * progress
+        weight_centroid = 0.3 - 0.1 * progress
+
+        # Score with dynamic weights and probabilistic factor
+        score = (weight_current * distance_to_current +
+                 weight_dest * distance_to_dest +
+                 weight_centroid * centroid_penalty)
+
+        # Add small randomness to avoid local optima
+        score *= (1.0 + 0.05 * (hash(node) % 10) / 10.0)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

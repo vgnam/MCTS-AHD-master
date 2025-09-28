@@ -1,0 +1,33 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    path_length = sum(distance_matrix[current_node][destination_node] for _ in range(remaining_nodes))
+
+    # Adaptive weights with connectivity consideration
+    connectivity_factor = sum(1 for node in unvisited_nodes if distance_matrix[current_node][node] < 1.5 * min(distance_matrix[current_node])) / remaining_nodes
+    weight_factor = max(0.1, 0.4 * (math.log(remaining_nodes + 1) / math.log(total_nodes + 1)) + 0.3 * connectivity_factor + 0.2 * (path_length / total_nodes))
+
+    # Memory factor to avoid revisits
+    memory_factor = 0.05 if remaining_nodes < total_nodes / 2 else 0.0
+
+    candidates = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        revisit_penalty = 0.1 if node in unvisited_nodes else 0.0
+        combined_score = distance_to_current + weight_factor * distance_to_destination + revisit_penalty - memory_factor
+        candidates.append((node, combined_score))
+
+    # Probabilistic selection based on scores
+    scores = [1 / (score + 1e-6) for _, score in candidates]
+    total_score = sum(scores)
+    probabilities = [score / total_score for score in scores]
+    next_node = random.choices([node for node, _ in candidates], weights=probabilities, k=1)[0]
+
+    return next_node

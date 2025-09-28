@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    max_utility_score = -float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+
+        if remaining_nodes > 1:
+            local_connectivity = min(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+            global_potential = distance_matrix[node][destination_node]
+        else:
+            local_connectivity = 0
+            global_potential = 0
+
+        weight_factor = 1 - (0.1 * (remaining_nodes / len(unvisited_nodes))) if len(unvisited_nodes) > 1 else 1
+        utility_score = (0.5 * current_distance +
+                         0.3 * local_connectivity +
+                         0.2 * global_potential) * weight_factor
+
+        if utility_score > max_utility_score:
+            max_utility_score = utility_score
+            next_node = node
+
+    return next_node

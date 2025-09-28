@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    def angular_diversity(node):
+        if current_node == destination_node:
+            return 0
+        vec1 = (distance_matrix[current_node][node], distance_matrix[node][destination_node])
+        vec2 = (distance_matrix[current_node][destination_node], 0)
+        dot_product = vec1[0] * vec2[0] + vec1[1] * vec2[1]
+        mag1 = (vec1[0]**2 + vec1[1]**2)**0.5
+        mag2 = (vec2[0]**2 + vec2[1]**2)**0.5
+        if mag1 * mag2 == 0:
+            return 0
+        cosine = dot_product / (mag1 * mag2)
+        return 1 - cosine
+    next_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] * (1 + angular_diversity(node)))
+    return next_node

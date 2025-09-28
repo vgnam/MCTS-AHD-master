@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    total_nodes = len(unvisited_nodes) + 1
+    progress = (total_nodes - len(unvisited_nodes)) / total_nodes
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate node density around the candidate node
+        node_density = len([n for n in unvisited_nodes if distance_matrix[node][n] < 1.5 * distance_to_current]) / len(unvisited_nodes)
+
+        # Centrality adjusted by node density
+        centrality = (sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)) * (1 + node_density)
+
+        # Historical path influence (simplified as inverse of distance to current)
+        path_influence = 1 / (1 + distance_to_current)
+
+        # Dynamic weights based on progress and node density
+        immediate_weight = 0.5 + 0.3 * (1 - progress) * (1 - node_density)
+        future_weight = 0.2 + 0.3 * progress * node_density
+        proximity_weight = 0.3 * (1 - progress)
+
+        # Novel scoring function combining multiplicative factors
+        score = (immediate_weight * path_influence +
+                 future_weight * centrality -
+                 proximity_weight * (distance_to_destination / (1 + distance_to_current))) * (1 + 0.2 * progress)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

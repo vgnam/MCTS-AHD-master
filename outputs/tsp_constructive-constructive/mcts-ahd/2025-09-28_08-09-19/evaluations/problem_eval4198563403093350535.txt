@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    exploration_temp = max(0.1, 1.0 - (remaining_count / total_nodes) * 0.9)
+    exploitation_temp = 1.0 - exploration_temp
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_dist = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.1 * avg_dist)
+            centrality = avg_dist
+        else:
+            avg_dist = 0
+            connectivity = 0
+            centrality = 0
+
+        fitness = (immediate_dist * exploitation_temp) + (connectivity * exploration_temp)
+        penalty = 1 + (centrality * (1 - exploitation_temp)) * 0.3
+        adjusted_fitness = fitness * penalty
+
+        scores.append((node, adjusted_fitness))
+
+    if not scores:
+        return destination_node
+
+    min_fitness = min(score for _, score in scores)
+    max_fitness = max(score for _, score in scores)
+
+    if max_fitness == min_fitness:
+        probabilities = [1.0 / len(scores) for _ in scores]
+    else:
+        normalized_scores = [(max_fitness - score) / (max_fitness - min_fitness) for _, score in scores]
+        sum_scores = sum(normalized_scores)
+        probabilities = [score / sum_scores for score in normalized_scores]
+
+    selected_node = np.random.choice([node for node, _ in scores], p=probabilities)
+
+    return next_node

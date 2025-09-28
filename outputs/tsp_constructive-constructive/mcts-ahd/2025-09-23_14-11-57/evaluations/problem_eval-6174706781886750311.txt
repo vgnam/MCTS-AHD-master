@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    global_distances = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = max(0, immediate_distance - second_best)
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        global_distance = distance_matrix[current_node][node] + distance_matrix[node][destination_node]
+        global_distances.append(global_distance)
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    regret_threshold = 0.5 * (remaining_nodes / total_nodes) * (1 + 0.1 * (total_nodes - remaining_nodes))
+
+    weighted_scores = []
+    for i, (distance, regret, global_distance) in enumerate(zip(distances, regrets, global_distances)):
+        normalized_regret = regret / (sum(regrets) + 1e-6) if sum(regrets) > 0 else 0
+        normalized_distance = distance / (sum(distances) + 1e-6) if sum(distances) > 0 else 0
+        normalized_global = global_distance / (sum(global_distances) + 1e-6) if sum(global_distances) > 0 else 0
+        weighted_score = 0.4 * normalized_distance + 0.3 * normalized_regret + 0.3 * normalized_global
+        weighted_scores.append(weighted_score)
+
+    min_score = min(weighted_scores)
+    candidates = [i for i, score in enumerate(weighted_scores) if score <= min_score + regret_threshold]
+
+    if len(candidates) > 1:
+        secondary_regrets = [regrets[i] for i in candidates]
+        selected_index = candidates[secondary_regrets.index(max(secondary_regrets))]
+    else:
+        selected_index = candidates[0]
+
+    next_node = list(unvisited_nodes)[selected_index]
+    return next_node

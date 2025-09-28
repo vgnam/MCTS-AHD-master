@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    dynamic_weight = min(0.5, 1.0 / (1.0 + remaining_nodes))  # Dynamic weight with cap
+    static_weight = 0.3  # Static weight for strategic planning
+    hybrid_weight = dynamic_weight + (1 - dynamic_weight) * static_weight  # Hybrid adjustment
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+        score = immediate_distance - hybrid_weight * lookahead_distance
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

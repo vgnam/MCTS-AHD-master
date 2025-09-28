@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    total_nodes = len(distance_matrix)
+    phase_factor = (total_nodes - len(unvisited_nodes)) / total_nodes
+    exploration_weight = 1 - phase_factor
+    exploitation_weight = phase_factor
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    min_distance = min(distances)
+
+    candidate_scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+        proximity_pressure = (1 - (distance / (max(distances) + 1e-6))) ** 2
+
+        score = (exploration_weight * (distance - min_distance) / (avg_distance - min_distance + 1e-6)) + \
+                (exploitation_weight * (centrality / avg_distance)) + \
+                (0.5 * proximity_pressure)
+
+        candidate_scores[node] = score
+
+    next_node = max(candidate_scores.items(), key=lambda x: x[1])[0]
+
+    if len(unvisited_nodes) > 2 and distance_matrix[current_node][next_node] > avg_distance * 1.2:
+        for node in unvisited_nodes:
+            if node != next_node and distance_matrix[current_node][node] < avg_distance * 0.8:
+                next_node = node
+                break
+
+    return next_node

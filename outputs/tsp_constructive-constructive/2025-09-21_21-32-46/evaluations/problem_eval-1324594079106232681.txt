@@ -1,0 +1,24 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = len(unvisited_nodes) / (len(unvisited_nodes) + 1)  # Dynamic temperature
+    if random.random() < temperature:
+        # Explore: select a node with probability inversely proportional to distance
+        weights = [1 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes]
+        total_weight = sum(weights)
+        probabilities = [w / total_weight for w in weights]
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    else:
+        # Exploit: select the closest node
+        min_distance = float('inf')
+        next_node = None
+        for node in unvisited_nodes:
+            distance = distance_matrix[current_node][node]
+            if distance < min_distance:
+                min_distance = distance
+                next_node = node
+    return next_node

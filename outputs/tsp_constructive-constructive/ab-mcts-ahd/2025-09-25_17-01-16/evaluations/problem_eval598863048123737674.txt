@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    if remaining_nodes == 0:
+        return destination_node
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        # Calculate average future distance with adaptive weight
+        if remaining_nodes > 1:
+            future_nodes = [n for n in unvisited_nodes if n != node]
+            if future_nodes:
+                # Non-linear weight adjustment
+                weight_factor = (remaining_nodes / len(unvisited_nodes)) ** 2
+                weight_immediate = 0.5 + 0.2 * weight_factor
+                weight_future = 0.5 - 0.2 * weight_factor
+
+                # Probabilistic bias for exploration
+                exploration_bias = 0.1 * (1 - (remaining_nodes / len(unvisited_nodes)))
+                future_distances = [distance_matrix[node][n] for n in future_nodes]
+                average_future_distance = (sum(future_distances) / len(future_distances)) * (1 + exploration_bias)
+            else:
+                weight_immediate, weight_future = 0.9, 0.1
+                average_future_distance = 0
+        else:
+            weight_immediate, weight_future = 0.9, 0.1
+            average_future_distance = 0
+
+        # Adaptive penalty based on node centrality
+        if node == destination_node:
+            penalty = 1.0
+        else:
+            # Centrality penalty: higher for nodes with many connections
+            node_centrality = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < sum(distance_matrix[node])/len(unvisited_nodes))
+            penalty = 0.1 * (node_centrality / len(unvisited_nodes))
+
+        weighted_score = (weight_immediate * distance_to_current + weight_future * average_future_distance) * (1 + penalty)
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    unvisited_count = len(unvisited_nodes)
+    total_nodes = unvisited_count + 1
+    progress_ratio = (total_nodes - unvisited_count) / total_nodes
+
+    # Calculate path efficiency (ratio of current path length to minimum possible)
+    current_path_length = 0
+    if len(unvisited_nodes) < total_nodes - 1:
+        current_path_length = sum(distance_matrix[current_node][node] for node in unvisited_nodes)
+
+    min_possible_length = min(distance_matrix[current_node][node] for node in unvisited_nodes) * len(unvisited_nodes)
+    path_efficiency = current_path_length / min_possible_length if min_possible_length > 0 else 1.0
+
+    # Dynamic attractiveness calculation
+    attractiveness = {}
+    for node in unvisited_nodes:
+        base_distance = distance_matrix[current_node][node]
+        lookahead_bonus = 0
+
+        # Lookahead mechanism: consider potential savings if this node is chosen
+        if unvisited_count > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            next_min = min(distance_matrix[node][n] for n in remaining_nodes)
+            lookahead_bonus = (base_distance - next_min) / base_distance if base_distance > 0 else 0
+
+        # Destination bias calculation
+        if node == destination_node:
+            destination_bias = progress_ratio * (1 - path_efficiency)
+            attractiveness[node] = base_distance * (1 - destination_bias)
+        else:
+            attractiveness[node] = base_distance * (1 - lookahead_bonus)
+
+    # Select node with highest attractiveness (lowest effective distance)
+    next_node = min(attractiveness, key=attractiveness.get)
+
+    # Ensure destination is chosen if it offers significant savings
+    if destination_node in unvisited_nodes:
+        destination_attractiveness = attractiveness[destination_node]
+        min_attractiveness = min(attractiveness.values())
+        if destination_attractiveness <= min_attractiveness * 0.85:  # 15% better than best alternative
+            next_node = destination_node
+
+    return next_node

@@ -1,0 +1,16 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scored_nodes = []
+    for node in unvisited_nodes:
+        score = 1 / (distance_matrix[current_node][node] + distance_matrix[node][destination_node])
+        scored_nodes.append((node, score))
+
+    scored_nodes.sort(key=lambda x: x[1], reverse=True)
+    top_nodes = [node for node, score in scored_nodes[:len(scored_nodes)//3]]  # Select top 1/3 nodes
+
+    next_node = random.choice(top_nodes)
+    return next_node

@@ -1,0 +1,40 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    # {This algorithm prioritizes the destination node, and if unavailable, selects the next node by combining distance, pheromone-inspired desirability, and a probabilistic exploration component.}
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+    
+    pheromone_levels = {node: 1.0 for node in unvisited_nodes} 
+
+    def desirability(node):
+        alpha = 1.0  
+        beta = 2.0   
+        return (pheromone_levels[node]**alpha) / (distance_matrix[current_node][node]**beta)
+
+    desirabilities = {node: desirability(node) for node in unvisited_nodes}
+    
+    total_desirability = sum(desirabilities.values())
+    probabilities = {node: desirabilities[node] / total_desirability for node in unvisited_nodes}
+    
+    # Exploration vs Exploitation
+    q = random.random()
+    q0 = 0.9  
+    
+    if q < q0:
+        next_node = max(probabilities, key=probabilities.get)
+    else:
+        # Probabilistic selection
+        cumulative_probability = 0.0
+        r = random.random()
+        for node, probability in probabilities.items():
+            cumulative_probability += probability
+            if r <= cumulative_probability:
+                next_node = node
+                break
+        else:
+            next_node = random.choice(list(unvisited_nodes)) 
+
+    return next_node

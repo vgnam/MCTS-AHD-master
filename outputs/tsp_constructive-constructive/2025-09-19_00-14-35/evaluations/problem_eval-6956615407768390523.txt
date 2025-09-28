@@ -1,0 +1,54 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    # Dynamic clustering based on proximity
+    clusters = []
+    visited_in_clustering = set()
+    for node in unvisited_nodes:
+        if node not in visited_in_clustering:
+            cluster = [node]
+            visited_in_clustering.add(node)
+            for other in unvisited_nodes:
+                if other not in visited_in_clustering and distance_matrix[node][other] < (1.0 + 0.5 * exploration_factor) * (sum(distance_matrix[current_node][n] for n in unvisited_nodes) / remaining_nodes):
+                    cluster.append(other)
+                    visited_in_clustering.add(other)
+            clusters.append(cluster)
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Cluster cohesion score
+        cluster_cohesion = 0
+        for cluster in clusters:
+            if node in cluster and len(cluster) > 1:
+                cluster_cohesion = sum(distance_matrix[node][n] for n in cluster if n != node) / (len(cluster) - 1)
+
+        # Global path efficiency
+        global_efficiency = (sum(distance_matrix[current_node][n] for n in unvisited_nodes) + dest_dist) / (remaining_nodes + 1)
+
+        # Dynamic weights
+        weight_local = 0.4 - 0.2 * exploration_factor
+        weight_cohesion = 0.3 + 0.4 * exploration_factor
+        weight_global = 0.3 - 0.1 * exploration_factor
+        weight_penalty = 1.0 + (dest_dist / (global_efficiency + 1e-6)) * (1 - exploration_factor)
+
+        # Reinforcement for cluster bridges
+        bridge_bonus = 0
+        for cluster in clusters:
+            if node in cluster and len(cluster) > 1:
+                bridge_bonus = max(0, (len(cluster) - 1) * 0.1 * exploration_factor)
+
+        score = (weight_local * current_dist) + (weight_cohesion * cluster_cohesion) + (weight_global * global_efficiency) - bridge_bonus
+        score *= weight_penalty
+
+        scores.append((node, score))
+
+    next_node = min(scores, key=lambda x: x[1])[0]
+    return next_node

@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = (total_nodes - remaining_nodes) / total_nodes if total_nodes > 0 else 0.0
+
+    candidates = []
+    for node in unvisited_nodes:
+        next_distance = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_unvisited = unvisited_nodes - {node}
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_unvisited) / len(remaining_unvisited)
+
+            # Calculate node centrality as the average of all outgoing distances
+            centrality = sum(distance_matrix[node]) / total_nodes
+
+            # Normalize centrality to [0, 1]
+            max_distance = max(max(row) for row in distance_matrix)
+            normalized_centrality = centrality / max_distance if max_distance > 0 else 0.0
+
+            # Weighted distance with centrality influence
+            total_distance = (1 - progress_factor) * next_distance + progress_factor * (next_distance + 0.5 * avg_distance + 0.2 * normalized_centrality)
+        else:
+            total_distance = next_distance
+        candidates.append((node, total_distance))
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

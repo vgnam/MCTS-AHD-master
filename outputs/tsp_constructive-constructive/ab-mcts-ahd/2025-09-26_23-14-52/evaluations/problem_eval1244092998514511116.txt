@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    exploration_factor = 0.5 * (1 - total_unvisited / (total_unvisited + 2))
+    exploitation_factor = 0.5 * (1 + total_unvisited / (total_unvisited + 2))
+    memory_factor = 0.2 * (1 - total_unvisited / (total_unvisited + 1))
+
+    node_scores = {}
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        future_dist = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited
+        potential = current_dist / (future_dist + 1e-6)
+
+        distance_score = (exploitation_factor * current_dist) + (exploration_factor * future_dist)
+        centrality_score = (1 - exploration_factor) * centrality
+        combined_score = (1 - memory_factor) * (distance_score + centrality_score) + memory_factor * potential
+
+        node_scores[node] = combined_score
+
+    if not node_scores:
+        return destination_node
+
+    min_score = min(node_scores.values())
+    candidates = [node for node, score in node_scores.items() if score == min_score]
+
+    if len(candidates) == 1:
+        return candidates[0]
+    else:
+        return next_node

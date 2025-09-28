@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on inverse distance and temperature
+    temperature = len(unvisited_nodes) / (len(distance_matrix) + 1)
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance == 0:
+            weight = 0
+        else:
+            weight = (1 / distance) ** (1 / temperature)
+        weights.append(weight)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    if total_weight == 0:
+        return random.choice(unvisited_nodes)
+    probabilities = [w / total_weight for w in weights]
+
+    # Select node based on weighted probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

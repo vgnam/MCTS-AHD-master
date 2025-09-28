@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 0.5
+    visit_frequencies = {node: 1 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes}
+
+    def score(node):
+        distance = distance_matrix[current_node][node]
+        frequency = visit_frequencies[node]
+        return (1 - temperature) * (1 / (distance + 1e-6)) + temperature * frequency
+
+    next_node = max(unvisited_nodes, key=score)
+    return next_node

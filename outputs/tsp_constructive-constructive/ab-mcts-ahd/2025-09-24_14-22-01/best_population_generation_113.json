@@ -1,0 +1,1 @@
+"def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    min_distance = float('inf')\n    next_node = None\n    for node in unvisited_nodes:\n        distance = distance_matrix[current_node][node]\n        if distance < min_distance:\n            min_distance = distance\n            next_node = node\n    return next_node"

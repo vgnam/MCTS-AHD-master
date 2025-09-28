@@ -1,0 +1,35 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = -float('inf')
+    total_unvisited = len(unvisited_nodes)
+
+    # Dynamic weights (70% proximity early, 30% future efficiency later)
+    weight_proximity = 1.5 * (0.6 + 0.4 * (total_unvisited / (total_unvisited + 1)))
+    weight_centrality = 0.5 * (0.4 * (1 - (total_unvisited / (total_unvisited + 1))))
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, total_unvisited - 1)
+        distances_to_others = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        variance = sum((d - avg_future_distance) ** 2 for d in distances_to_others) / max(1, len(distances_to_others))
+
+        # Penalty for high variance (less central nodes)
+        centrality_penalty = -0.5 * variance
+
+        # Score with dynamic weights and centrality penalty
+        score = -weight_proximity * distance_to_node + weight_centrality * avg_future_distance + centrality_penalty
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # 25% chance to select destination node if not already selected
+    if random.random() < 0.25 and destination_node in unvisited_nodes:
+        next_node = destination_node
+
+    return next_node

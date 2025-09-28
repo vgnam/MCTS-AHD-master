@@ -1,0 +1,7 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        next_node = destination_node
+    else:
+        unvisited_degrees = {node: sum(1 for neighbor in unvisited_nodes if distance_matrix[node][neighbor] > 0) for node in unvisited_nodes}
+        next_node = min(unvisited_nodes, key=lambda node: (distance_matrix[current_node][node] / (unvisited_degrees[node] + 1)) + (distance_matrix[node][destination_node] / (unvisited_degrees[node] + 1)))
+    return next_node

@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    total_unvisited = len(unvisited_nodes)
+    centrality = {}
+    hub_penalty = {}
+
+    # Calculate centrality and hub penalty
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality[node] = total_distance / max(1, len(unvisited_nodes) - 1)
+        hub_penalty[node] = len([n for n in unvisited_nodes if distance_matrix[node][n] < centrality[node] * 0.8])
+
+    # Dynamic exploration-exploitation balance
+    exploration_weight = 0.3 + 0.7 * (total_unvisited / len(distance_matrix))
+    exploitation_weight = 1.0 - exploration_weight
+
+    best_score = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance_to_others = centrality[node]
+
+        # Hybrid score with hub penalty
+        score = (exploration_weight * (-distance_to_node) +
+                 exploitation_weight * (1.0 / (avg_distance_to_others + 1e-6)))
+        score *= (1.0 - hub_penalty[node] * 0.1)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

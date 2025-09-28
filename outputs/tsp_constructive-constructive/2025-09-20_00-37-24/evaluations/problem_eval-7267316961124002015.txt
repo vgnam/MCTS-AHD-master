@@ -1,0 +1,24 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+
+    def desirability(node):
+        return 1.0 / (distance_matrix[current_node][node] ** 2.0)
+
+    desirabilities = {node: desirability(node) for node in candidates}
+    total_desirability = sum(desirabilities.values())
+    probabilities = {node: desirabilities[node] / total_desirability for node in candidates}
+
+    if random.random() < 0.9:
+        next_node = random.choices(list(probabilities.keys()), weights=list(probabilities.values()))[0]
+    else:
+        next_node = random.choice(candidates)
+
+    return next_node

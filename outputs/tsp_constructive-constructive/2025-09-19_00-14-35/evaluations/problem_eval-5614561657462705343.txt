@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+
+        if remaining_nodes > 1:
+            connectivity_score = sum(1.0 / (1.0 + distance_matrix[node][n]) for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+            flow_disruption = max(distance_matrix[node][n] for n in unvisited_nodes if n != node) - current_dist
+            novelty_factor = (connectivity_score * 0.7) - (flow_disruption * 0.3)
+        else:
+            connectivity_score = 0
+            flow_disruption = 0
+            novelty_factor = 0
+
+        weight_local = 0.5 - 0.3 * exploration_factor
+        weight_connectivity = 0.4 + 0.2 * exploration_factor
+        weight_novelty = 0.2 * novelty_factor
+
+        score = (weight_local * current_dist) + (weight_connectivity * connectivity_score) + (weight_novelty * novelty_factor)
+
+        scores.append((node, score))
+
+    next_node = min(scores, key=lambda x: x[1])[0]
+    return next_node

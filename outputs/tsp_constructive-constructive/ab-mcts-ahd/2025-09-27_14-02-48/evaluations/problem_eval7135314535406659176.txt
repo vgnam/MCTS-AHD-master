@@ -1,0 +1,61 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    # Initialize temperature and cooling rate
+    temperature = 100
+    cooling_rate = 0.95
+    
+    # Dynamic k-nearest neighbors based on temperature
+    k = max(3, int(len(unvisited_nodes) * (temperature / 100)))
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:k]
+    
+    # Node visit counts
+    node_visit_counts = {node: random.random() for node in unvisited_nodes}
+    
+    # Find nearest neighbor among all unvisited nodes
+    min_distance = float('inf')
+    nearest_neighbor = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            nearest_neighbor = node
+    
+    # Check if destination node is a valid choice
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+    else:
+        destination_distance = float('inf')
+    
+    # Simulated annealing with novel node selection probability
+    while temperature > 1:
+        # Choose between nearest neighbors or destination node
+        if random.random() < temperature / 100:
+            # Choose a node based on a probability distribution considering distance and visit counts
+            probabilities = [math.exp(-(distance_matrix[current_node][node] + node_visit_counts[node]) / temperature) for node in nearest_neighbors]
+            probabilities = [p / sum(probabilities) for p in probabilities]
+            next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+        else:
+            # Choose between nearest neighbor and destination node
+            if destination_distance < min_distance:
+                next_node = destination_node
+            else:
+                next_node = nearest_neighbor
+        
+        # Check if the chosen node is valid
+        if next_node not in unvisited_nodes:
+            temperature *= cooling_rate ** (1 + random.random())
+            continue
+        
+        # Accept the chosen node with a certain probability
+        if next_node == destination_node or random.random() < math.exp((min_distance - distance_matrix[current_node][next_node]) / temperature):
+            return next_node
+        
+        temperature *= cooling_rate ** (1 + random.random())
+    
+    # Return the nearest neighbor if the temperature is too low
+    return next_node

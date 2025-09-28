@@ -1,0 +1,21 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic bias towards destination based on remaining unvisited nodes
+    bias_prob = 1.0 - (len(unvisited_nodes) / (len(unvisited_nodes) + len(distance_matrix)))
+    if destination_node in unvisited_nodes and random.random() < bias_prob:
+        return destination_node
+
+    # Calculate weighted probabilities for nearest neighbors
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    weights = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in nearest_neighbors]
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    # Select node based on weighted probabilities
+    next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+    return next_node

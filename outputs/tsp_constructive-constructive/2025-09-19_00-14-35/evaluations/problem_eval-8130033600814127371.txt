@@ -1,0 +1,16 @@
+import random
+    def evaluate_node(node):
+        nearest_dist = distance_matrix[current_node][node]
+        farthest_dist = distance_matrix[current_node][node]
+        random_factor = random.uniform(0.8, 1.2)
+        return (weight_nearest * nearest_dist + weight_farthest * farthest_dist) * random_factor
+
+    # Select node with minimal score
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+
+    # Special case: prioritize destination if it's the farthest
+    if farthest_node == destination_node and destination_node in unvisited_nodes:
+        if random.random() < 0.5:  # 50% chance to prioritize destination
+            next_node = destination_node
+
+    return next_node

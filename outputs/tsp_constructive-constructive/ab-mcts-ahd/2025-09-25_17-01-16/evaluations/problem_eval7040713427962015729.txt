@@ -1,0 +1,10 @@
+import math
+    max_score = max(score for _, score in scores)
+    exp_scores = [math.exp(score - max_score) for _, score in scores]
+    sum_exp_scores = sum(exp_scores)
+    probs = [exp_score / sum_exp_scores for exp_score in exp_scores]
+
+    import random
+    selected_node = random.choices([node for node, _ in scores], weights=probs, k=1)[0]
+
+    return next_node

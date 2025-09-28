@@ -1,0 +1,32 @@
+importance later for efficiency. It also incorporates a "node entropy" metric to prioritize nodes with balanced distances to unvisited nodes, further refining the selection process.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic weights with novel exploration and greedy factors
+    exploration_factor = 0.5 * (remaining_nodes / total_nodes)
+    greedy_factor = 1 - exploration_factor
+
+    weight_local = 0.5 * greedy_factor + 0.2 * exploration_factor
+    weight_centrality = 0.3 + 0.2 * exploration_factor
+    weight_global = 0.2 - 0.1 * greedy_factor
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+
+        # Novel node entropy metric
+        unvisited_distances = [distance_matrix[node][n] for n in unvisited_nodes]
+        node_entropy = sum(abs(d - sum(unvisited_distances)/len(unvisited_distances)) for d in unvisited_distances) / len(unvisited_distances)
+
+        global_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        inverse_global = 1 / (global_distance + 1e-10)
+
+        return (weight_local * local_distance) + (weight_centrality * centrality) + (weight_global * inverse_global) - 0.1 * node_entropy
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

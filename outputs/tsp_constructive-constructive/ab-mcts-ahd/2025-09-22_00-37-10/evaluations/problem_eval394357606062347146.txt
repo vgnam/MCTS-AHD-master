@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_distance = float('inf')
+    candidate_nodes = []
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            candidate_nodes = [node]
+        elif distance == min_distance:
+            candidate_nodes.append(node)
+
+    if destination_node in candidate_nodes:
+        exploration_factor = remaining_nodes / (remaining_nodes + 2)
+        avg_future_distance = sum(distance_matrix[destination_node][n] for n in unvisited_nodes if n != destination_node) / max(1, remaining_nodes - 1)
+        destination_score = 0.7 * (-distance_matrix[current_node][destination_node] + exploration_factor * avg_future_distance)
+
+        if len(candidate_nodes) > 1:
+            other_scores = []
+            for node in candidate_nodes:
+                if node != destination_node:
+                    avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, remaining_nodes - 1)
+                    score = -distance_matrix[current_node][node] + exploration_factor * avg_future_distance
+                    other_scores.append(score)
+
+            max_other_score = max(other_scores)
+            weights = [0.7 if node == destination_node else (0.3 * (score / max_other_score)) for node, score in zip(candidate_nodes, [destination_score] + other_scores)]
+            weights = [w / sum(weights) for w in weights]
+            next_node = random.choices(candidate_nodes, weights=weights, k=1)[0]
+        else:
+            next_node = destination_node
+    else:
+        exploration_factor = remaining_nodes / (remaining_nodes + 2)
+        scores = []
+        for node in candidate_nodes:
+            avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, remaining_nodes - 1)
+            score = -distance_matrix[current_node][node] + exploration_factor * avg_future_distance
+            scores.append(score)
+
+        max_score = max(scores)
+        weights = [score / max_score for score in scores]
+        weights = [w / sum(weights) for w in weights]
+        next_node = random.choices(candidate_nodes, weights=weights, k=1)[0]
+
+    return next_node

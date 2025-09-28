@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 2
+    next_node = min(unvisited_nodes, key=lambda node: 0.6 * distance_matrix[current_node][node] + 0.3 * distance_matrix[node][destination_node] + 0.1 * random.random())
+IndentationError: unexpected indent
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 2
+    next_node = min(unvisited_nodes, key=lambda node: 0.6 * distance_matrix[current_node][node] + 0.3 * distance_matrix[node][destination_node] + 0.1 * random.random())
+IndentationError: unexpected indent

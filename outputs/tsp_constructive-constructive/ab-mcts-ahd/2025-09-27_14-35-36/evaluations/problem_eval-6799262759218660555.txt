@@ -1,0 +1,6 @@
+import random
+    if random.random() < 0.3 and len(unvisited_nodes) > 1:
+        candidates = [node for node in unvisited_nodes if node != next_node]
+        next_node = random.choice(candidates)
+
+    return next_node

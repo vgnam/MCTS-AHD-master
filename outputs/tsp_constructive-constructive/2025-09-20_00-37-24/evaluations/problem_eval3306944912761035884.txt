@@ -1,0 +1,24 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, exploration_temp=1.0):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on inverse distance and exploration temperature
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        weight = (1.0 / (distance + 1e-6)) ** (1.0 / exploration_temp)  # Avoid division by zero
+        weights.append(weight)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Select node based on weighted probabilities
+    next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+
+    return next_node

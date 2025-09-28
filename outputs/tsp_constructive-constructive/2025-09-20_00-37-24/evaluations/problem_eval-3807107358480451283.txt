@@ -1,0 +1,24 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate inverse distance weights for weighted random selection
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    weights = [1.0 / (d + 1e-10) for d in distances]  # Avoid division by zero
+
+    # Dynamic probability: higher chance to explore when fewer unvisited nodes remain
+    exploration_prob = 0.1 + 0.8 * (len(unvisited_nodes) / (len(distance_matrix) - 1))
+
+    if random.random() < (1 - exploration_prob):
+        # Weighted random selection (exploit)
+        next_node = random.choices(unvisited_nodes, weights=weights, k=1)[0]
+    else:
+        # Random selection with adjusted probability (explore)
+        next_node = random.choices(unvisited_nodes, weights=[1.0 / len(unvisited_nodes)] * len(unvisited_nodes), k=1)[0]
+
+    return next_node

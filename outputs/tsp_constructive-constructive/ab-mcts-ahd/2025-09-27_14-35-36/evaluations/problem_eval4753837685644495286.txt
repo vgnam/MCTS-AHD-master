@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        visited_neighbors = [n for n in unvisited_nodes if n in distance_matrix[node] and n != node]
+        dynamic_penalty = sum(distance_matrix[node][n] for n in visited_neighbors) * 0.05
+        current_dest_vector = (destination_node[0] - current_node[0], destination_node[1] - current_node[1])
+        node_dest_vector = (destination_node[0] - node[0], destination_node[1] - node[1])
+        dot_product = current_dest_vector[0] * node_dest_vector[0] + current_dest_vector[1] * node_dest_vector[1]
+        magnitude_current_dest = (current_dest_vector[0]**2 + current_dest_vector[1]**2)**0.5
+        magnitude_node_dest = (node_dest_vector[0]**2 + node_dest_vector[1]**2)**0.5
+        cosine_similarity = dot_product / (magnitude_current_dest * magnitude_node_dest) if magnitude_current_dest * magnitude_node_dest != 0 else 0
+        score = (distance_to_dest / (distance_to_node + distance_to_dest)) - dynamic_penalty + cosine_similarity
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        if dest_distance < distance_matrix[current_node][next_node]:
+            next_node = destination_node
+
+    return next_node

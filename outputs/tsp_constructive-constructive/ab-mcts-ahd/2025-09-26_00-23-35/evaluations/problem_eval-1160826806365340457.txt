@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+
+    if not unvisited_nodes:
+        return None
+
+    total_unvisited = len(unvisited_nodes)
+    node_degree = {}
+    centrality = {}
+
+    # Calculate centrality and connectivity (node degree)
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality[node] = total_distance / max(1, len(unvisited_nodes) - 1)
+        node_degree[node] = sum(1 for other in unvisited_nodes if distance_matrix[node][other] < 1.2 * min(distance_matrix[node].values()))
+
+    # Dynamic weight factors based on remaining path length
+    if total_unvisited > 1:
+        proximity_weight = 0.6 + 0.4 * (total_unvisited - 1) / (len(distance_matrix) - 2)
+        centrality_weight = 0.3 * (1.0 - (total_unvisited - 1) / (len(distance_matrix) - 2))
+        connectivity_weight = 0.1
+    else:
+        proximity_weight = 0.2
+        centrality_weight = 0.7
+        connectivity_weight = 0.1
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance_to_dest = centrality.get(node, 0)
+        connectivity_score = node_degree.get(node, 0) / max(1, len(unvisited_nodes))
+
+        # Penalty for revisiting nodes (simulated by distance to current node)
+        revisit_penalty = 1.0 / (1.0 + distance_to_node)
+
+        # Weighted score with hybrid evaluation
+        score = (proximity_weight * (1.0 / (1.0 + distance_to_node)) +
+                 centrality_weight * (1.0 / (1.0 + avg_distance_to_dest)) +
+                 connectivity_weight * connectivity_score) * revisit_penalty
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

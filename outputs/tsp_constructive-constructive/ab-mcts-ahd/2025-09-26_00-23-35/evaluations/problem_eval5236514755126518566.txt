@@ -1,0 +1,57 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('inf')
+    total_unvisited = len(unvisited_nodes)
+
+    # Dynamic weights (60% proximity early, 40% future path potential later)
+    weight_proximity = 0.6 * (0.7 + 0.3 * (total_unvisited / (total_unvisited + 1)))
+    weight_future = 0.4 * (0.3 * (1 - (total_unvisited / (total_unvisited + 1))))
+
+    # Calculate average distance to all unvisited nodes
+    avg_unvisited_distance = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / total_unvisited
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+
+        # Calculate future path potential: nodes that connect to distant clusters
+        distant_nodes = [n for n in unvisited_nodes if distance_matrix[node][n] > 1.5 * avg_unvisited_distance]
+        future_potential = len(distant_nodes) / max(1, total_unvisited - 1)
+
+        # Dynamic outlier threshold (1.8x average distance)
+        outlier_threshold = 1.8 * avg_unvisited_distance
+        penalty = max(0, (distance_to_node - outlier_threshold) * 2)
+
+        # Connectivity bonus (nodes with many connections to unvisited nodes)
+        connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * avg_unvisited_distance)
+
+        # Score with dynamic weights, penalties, and bonuses
+        score = (weight_proximity * distance_to_node +
+                 weight_future * (1 - future_potential) +
+                 penalty -
+                 0.3 * connectivity)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    # 30% chance to select a node with high connectivity to unvisited regions
+    if random.random() < 0.3:
+        connectivity_scores = {}
+        for node in unvisited_nodes:
+            avg_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, total_unvisited - 1)
+            connectivity_scores[node] = len([n for n in unvisited_nodes if distance_matrix[node][n] < 1.3 * avg_dist])
+
+        if connectivity_scores:
+            next_node = max(connectivity_scores.items(), key=lambda x: x[1])[0]
+
+    # 20% chance to select destination node if not already selected
+    if random.random() < 0.2 and destination_node in unvisited_nodes:
+        next_node = destination_node
+
+    return next_node

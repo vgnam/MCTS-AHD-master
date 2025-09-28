@@ -1,0 +1,31 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    scores = []
+    nodes = []
+    for node in unvisited_nodes:
+        local_cost = distance_matrix[current_node][node]
+        global_cost = distance_matrix[node][destination_node]
+        avg_cost = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        score = 0.3 * local_cost + 0.5 * global_cost + 0.2 * avg_cost
+        scores.append(score)
+        nodes.append(node)
+    
+    if destination_node in unvisited_nodes:
+        local_cost = distance_matrix[current_node][destination_node]
+        global_cost = 0
+        avg_cost = sum(distance_matrix[destination_node][n] for n in unvisited_nodes if n != destination_node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        score = 0.3 * local_cost + 0.5 * global_cost + 0.2 * avg_cost
+        scores.append(score)
+        nodes.append(destination_node)
+    
+    min_score = min(scores)
+    max_score = max(scores)
+    probabilities = [(max_score - score) / (max_score - min_score) if max_score != min_score else 1/len(scores) for score in scores]
+    probabilities = [p / sum(probabilities) for p in probabilities]
+    
+    next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+    return next_node

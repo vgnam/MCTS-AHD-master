@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    alpha = 0.6 * (remaining_nodes / total_nodes)  # Decreases as more nodes are visited
+    beta = 0.4 * (1 - remaining_nodes / total_nodes)  # Increases as more nodes are visited
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        # Calculate centrality: average distance to all other unvisited nodes
+        centrality = 0.0
+        for other_node in unvisited_nodes:
+            if other_node != node:
+                centrality += distance_matrix[node][other_node]
+        centrality /= max(1, remaining_nodes - 1)  # Avoid division by zero
+
+        # Exploration potential: max distance to any unvisited node
+        exploration_potential = max(
+            (distance_matrix[node][other] for other in unvisited_nodes if other != node),
+            default=0
+        )
+
+        # Time-decaying centrality factor
+        time_decay = remaining_nodes / total_nodes
+        decayed_centrality = centrality * time_decay
+
+        # Score combines immediate distance, lookahead distance, exploration potential, and decayed centrality
+        score = (
+            (1 - alpha) * (1 / (1 + immediate_distance)) +
+            alpha * (1 / (1 + lookahead_distance)) +
+            beta * exploration_potential -
+            0.2 * decayed_centrality
+        )
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

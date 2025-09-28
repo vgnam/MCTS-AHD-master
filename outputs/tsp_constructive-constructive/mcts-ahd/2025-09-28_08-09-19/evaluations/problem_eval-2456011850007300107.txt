@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic threshold based on moving average of recent distances
+    moving_avg = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+    threshold = moving_avg * (1.0 + 0.1 * (1.0 - remaining_nodes / total_nodes))
+
+    # Time-decaying exploration factor
+    exploration_factor = max(0.1, 0.5 * (1.0 - (remaining_nodes / total_nodes)**2))
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+        destination_distance = distance_matrix[node][destination_node]
+
+        # Hub resistance penalty: penalize nodes with high connectivity to unvisited nodes
+        hub_penalty = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < threshold) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        # Heuristic-based destination proximity adjustment
+        proximity_adjustment = 1.0 / (1.0 + (destination_distance / (sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes))))
+
+        # Score calculation
+        score = (exploration_factor * (1.0 / (1.0 + immediate_distance)) +
+                 (1.0 - exploration_factor) * (future_potential * proximity_adjustment) -
+                 0.3 * hub_penalty * immediate_distance)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,31 @@
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    energy_decay = 0.9 ** remaining_nodes
+    momentum_factor = 0.3 * (1.0 - (remaining_nodes / len(distance_matrix)))
+
+    energy_scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        if remaining_nodes > 2:
+            next_nodes = [n for n in unvisited_nodes if n != node]
+            future_potential = min(distance_matrix[node][n] + distance_matrix[n][destination_node] for n in next_nodes)
+        else:
+            future_potential = distance_matrix[node][destination_node]
+
+        normalized_immediate = immediate_distance / (sum(distance_matrix[current_node]) / len(distance_matrix))
+        normalized_future = future_potential / (sum(distance_matrix[node]) / len(distance_matrix))
+
+        energy = (1.0 - normalized_immediate) * (1.0 - normalized_future) * energy_decay
+        energy_scores.append(energy)
+
+    probabilities = np.array(energy_scores) / np.sum(energy_scores)
+    probabilities = (1 - momentum_factor) * probabilities + momentum_factor * (1.0 / len(unvisited_nodes))
+
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+    return next_node

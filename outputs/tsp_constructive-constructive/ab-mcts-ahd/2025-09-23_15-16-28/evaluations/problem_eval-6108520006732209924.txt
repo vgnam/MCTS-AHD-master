@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        total_distance = distance_to_current + distance_to_destination
+        candidates.append((node, total_distance))
+
+    if len(candidates) == 1:
+        return candidates[0][0]
+
+    candidates.sort(key=lambda x: x[1])
+    top_half = candidates[:len(candidates)//2 + 1]
+    selected = random.choice(top_half)
+    return next_node

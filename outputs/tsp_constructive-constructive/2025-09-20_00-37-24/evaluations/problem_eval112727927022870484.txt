@@ -1,0 +1,35 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Calculate dynamic weights combining distance and historical visitation frequency
+    weights = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Inverse distance as a base weight (closer nodes have higher weight)
+        base_weight = 1.0 / (distance + 1e-6)  # Avoid division by zero
+        # Introduce historical visitation frequency (simulated here as a random factor)
+        visitation_factor = random.uniform(0.5, 1.5)  # Simulate some historical influence
+        weight = base_weight * visitation_factor
+        weights.append(weight)
+        total_weight += weight
+
+    # Normalize weights to form a probability distribution
+    probabilities = [w / total_weight for w in weights]
+
+    # Occasionally (10% chance) select from top 3 nearest to balance exploration
+    if random.random() < 0.9:
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    else:
+        nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+
+    return next_node

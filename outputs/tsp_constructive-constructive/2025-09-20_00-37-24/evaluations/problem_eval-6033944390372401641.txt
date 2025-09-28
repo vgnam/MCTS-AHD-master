@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    # Calculate destination bias: prioritize destination if close
+    dest_distance = distance_matrix[current_node][destination_node] if destination_node in unvisited_nodes else float('inf')
+    max_distance = max(distance_matrix[current_node].values()) if distance_matrix[current_node] else 0
+    bias_factor = 0.3 if dest_distance < max_distance * 0.5 else 0.1
+
+    # Cluster nodes into near and far
+    near_nodes = [node for node in unvisited_nodes if distance_matrix[current_node][node] < max_distance * 0.4]
+    far_nodes = [node for node in unvisited_nodes if node not in near_nodes]
+
+    # Probabilistic selection based on clusters
+    if random.random() < bias_factor and near_nodes:
+        next_node = random.choice(near_nodes)
+    elif far_nodes:
+        next_node = random.choice(far_nodes)
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

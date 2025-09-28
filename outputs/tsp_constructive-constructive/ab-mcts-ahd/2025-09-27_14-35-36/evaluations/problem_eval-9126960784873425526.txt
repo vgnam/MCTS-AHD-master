@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    node_scores = []
+    remaining_nodes_factor = len(unvisited_nodes) / len(distance_matrix)
+    global_efficiency = sum(distance_matrix[i][j] for i in range(len(distance_matrix)) for j in range(len(distance_matrix))) / (len(distance_matrix) ** 2)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+
+        if distance_to_node == 0:
+            score = 0
+        else:
+            proximity_weight = 1 / distance_to_node
+            destination_weight = 1 / (distance_to_dest + 1e-6)
+            efficiency_weight = global_efficiency / (distance_to_node + distance_to_dest)
+            score = (proximity_weight * 0.4 + destination_weight * 0.3 + efficiency_weight * 0.3) * (1 - remaining_nodes_factor)
+
+        node_scores.append((node, score))
+
+    if not node_scores:
+        return destination_node
+
+    nodes, scores = zip(*node_scores)
+    total_score = sum(scores)
+    probabilities = [score / total_score for score in scores]
+    next_node = np.random.choice(nodes, p=probabilities)
+
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        best_alternative = max(unvisited_nodes, key=lambda x: -distance_matrix[current_node][x])
+        if dest_distance < distance_matrix[current_node][best_alternative] * 0.75:
+            next_node = destination_node
+
+    return next_node

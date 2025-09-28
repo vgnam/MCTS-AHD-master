@@ -1,0 +1,53 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 100
+    cooling_rate = 0.99
+
+    # Calculate normalized probabilities for each unvisited node
+    probabilities = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        weight = math.exp(-distance / temperature)
+        if node == destination_node:
+            weight *= 2.0  # Higher bias towards destination
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    if total_weight > 0:
+        probabilities = [p / total_weight for p in probabilities]
+    else:
+        probabilities = [1.0 / len(unvisited_nodes)] * len(unvisited_nodes)
+
+    # Simulated annealing with probabilistic selection
+    while temperature > 1:
+        # Select node based on probabilities
+        next_node = random.choices(list(unvisited_nodes), weights=probabilities, k=1)[0]
+
+        # Check if the chosen node is valid
+        if next_node not in unvisited_nodes:
+            temperature *= cooling_rate
+            continue
+
+        # Accept the chosen node with a certain probability
+        current_distance = distance_matrix[current_node][next_node]
+        if next_node == destination_node or random.random() < math.exp((min(probabilities) - probabilities[unvisited_nodes.index(next_node)]) / temperature):
+            return next_node
+
+        temperature *= cooling_rate
+
+    # Fallback to nearest neighbor if temperature is too low
+    min_distance = float('inf')
+    nearest_neighbor = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            nearest_neighbor = node
+    return next_node

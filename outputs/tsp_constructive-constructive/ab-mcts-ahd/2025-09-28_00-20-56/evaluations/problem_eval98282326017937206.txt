@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    if total_unvisited == 0:
+        return destination_node
+
+    def calculate_score(node):
+        current_distance = distance_matrix[current_node][node]
+        remaining_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weights based on remaining nodes
+        direct_weight = 0.5 * (1 + 0.1 * (1 - total_unvisited / len(distance_matrix)))
+        remaining_weight = 0.3 * (1 + 0.1 * (total_unvisited / len(distance_matrix)))
+        detour_weight = 0.2 * (1 - 0.1 * (total_unvisited / len(distance_matrix)))
+
+        # Detour penalty calculation
+        detour_penalty = sum(max(0, distance_matrix[current_node][node] + distance_matrix[node][other_node] - distance_matrix[current_node][other_node]) for other_node in unvisited_nodes if other_node != node)
+
+        # Proximity bonus (favors closer nodes)
+        proximity_bonus = -0.1 * current_distance
+
+        # Hub penalty (discourages highly connected nodes)
+        hub_penalty = 0.1 * sum(1 for other_node in unvisited_nodes if other_node != node and distance_matrix[node][other_node] < 1.5 * min(distance_matrix[node][other] for other in unvisited_nodes if other != node))
+
+        return (current_distance * direct_weight +
+                remaining_distance * remaining_weight +
+                detour_penalty * detour_weight +
+                proximity_bonus +
+                hub_penalty)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

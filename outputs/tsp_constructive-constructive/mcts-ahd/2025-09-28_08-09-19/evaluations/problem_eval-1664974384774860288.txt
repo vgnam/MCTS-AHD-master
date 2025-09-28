@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(unvisited_nodes) + 1  # Including current node
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            # Calculate node centrality (normalized by total possible connections)
+            centrality = (sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)) ** -1 if remaining_nodes > 1 else 0
+
+            # Calculate connectivity (normalized by potential connections)
+            connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.5 * distance_to_current) / (remaining_nodes - 1)
+
+            # Dynamic weights based on progress (non-linear progression)
+            progress_factor = (1 - remaining_nodes / total_nodes) ** 1.5
+            immediate_weight = 0.4 + 0.3 * (1 - progress_factor)
+            centrality_weight = 0.3 + 0.2 * progress_factor
+            connectivity_weight = 0.3 + 0.2 * progress_factor
+
+            # Proximity pressure (increases as tour progresses)
+            proximity_pressure = 0.5 * (1 - progress_factor) * (distance_to_destination / (1 + distance_to_current))
+
+            # Lookahead component (estimates future path impact)
+            lookahead = sum(min(distance_matrix[node][n], distance_matrix[n][destination_node]) for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+
+            # Score combines all components
+            score = (immediate_weight * distance_to_current +
+                     centrality_weight * centrality +
+                     connectivity_weight * connectivity +
+                     0.2 * lookahead) - proximity_pressure
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

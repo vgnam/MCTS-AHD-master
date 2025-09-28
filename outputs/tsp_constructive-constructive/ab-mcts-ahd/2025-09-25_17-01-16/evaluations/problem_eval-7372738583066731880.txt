@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_distance = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = remaining_nodes + 1
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        estimated_distance_to_destination = distance_matrix[node][destination_node]
+
+        # Non-linear dynamic weighting factor with exponential decay
+        weight = (remaining_nodes / total_nodes) ** 2
+        total_distance = distance_to_current + (weight * estimated_distance_to_destination)
+
+        # Penalty for nodes with higher estimated distance to destination
+        penalty = 0.1 * estimated_distance_to_destination
+        total_distance += penalty
+
+        if total_distance < min_total_distance:
+            min_total_distance = total_distance
+            next_node = node
+
+    return next_node

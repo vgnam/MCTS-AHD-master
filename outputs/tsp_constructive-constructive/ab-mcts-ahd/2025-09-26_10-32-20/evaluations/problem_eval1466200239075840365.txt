@@ -1,0 +1,10 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    temperature = 0.1  # Controls randomness (higher = more exploration)
+    def score(node):
+        distance = distance_matrix[current_node][node]
+        random_factor = np.random.uniform(0, 1)  # Random value in [0,1]
+        return distance * (1 - temperature) + random_factor * temperature
+    next_node = min(unvisited_nodes, key=score)
+    return next_node

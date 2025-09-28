@@ -1,0 +1,35 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate distances and cosine similarities
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_distance = min(distances)
+    candidate_nodes = [node for node, d in zip(unvisited_nodes, distances) if d == min_distance]
+
+    if len(candidate_nodes) == 1:
+        return candidate_nodes[0]
+
+    # Compute dynamic weights combining distance and angle
+    weights = []
+    for node in candidate_nodes:
+        # Distance component
+        dist_weight = 1.0 / (distance_matrix[current_node][node] + 1e-6)
+
+        # Angle component (cosine similarity between vectors)
+        vec_current = np.array(distance_matrix[current_node])
+        vec_node = np.array(distance_matrix[node])
+        angle_weight = np.dot(vec_current, vec_node) / (np.linalg.norm(vec_current) * np.linalg.norm(vec_node) + 1e-6)
+
+        # Combined weight
+        combined_weight = dist_weight * (1 + angle_weight)
+        weights.append(combined_weight)
+
+    # Normalize weights and select
+    weights = [w / sum(weights) for w in weights]
+    next_node = random.choices(candidate_nodes, weights=weights, k=1)[0]
+
+    return next_node

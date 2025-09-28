@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    base_weight = 1.0 - (0.5 / (1.0 + remaining_nodes))
+    exploration_penalty = 0.1 * (1.0 - base_weight)
+
+    min_weighted_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            weighted_distance = distance * base_weight
+        else:
+            weighted_distance = distance * (1 - base_weight) + exploration_penalty
+
+        if weighted_distance < min_weighted_distance:
+            min_weighted_distance = weighted_distance
+            next_node = node
+
+    return next_node

@@ -1,0 +1,16 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 36, in select_next_node
+    energy_levels = [energy_function(node) for node in unvisited_nodes]
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 36, in <listcomp>
+    energy_levels = [energy_function(node) for node in unvisited_nodes]
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 31, in energy_function
+    entropy = -sum((distance_matrix[node][other] / sum(distance_matrix[node])) * np.log(distance_matrix[node][other] / sum(distance_matrix[node]) + 1e-6) for other in unvisited_nodes)
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 31, in <genexpr>
+    entropy = -sum((distance_matrix[node][other] / sum(distance_matrix[node])) * np.log(distance_matrix[node][other] / sum(distance_matrix[node]) + 1e-6) for other in unvisited_nodes)
+NameError: name 'np' is not defined

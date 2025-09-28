@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def total_distance_to_remaining(node):
+        return sum(distance_matrix[node][n] for n in unvisited_nodes - {node})
+
+    def balanced_distance(node):
+        local_dist = distance_matrix[current_node][node]
+        avg_dist = sum(distance_matrix[node][n] for n in unvisited_nodes - {node}) / len(unvisited_nodes - {node})
+        return local_dist + avg_dist
+
+    if len(unvisited_nodes) % 2 == 1:
+        next_node = min(unvisited_nodes, key=total_distance_to_remaining)
+    else:
+        next_node = min(unvisited_nodes, key=balanced_distance)
+
+    return next_node

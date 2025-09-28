@@ -1,0 +1,25 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    scores = {}
+    for node in unvisited_nodes:
+        remaining_nodes = unvisited_nodes - {node}
+        connectivity_score = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes) if remaining_nodes else 0
+        score = (1 / distance_matrix[current_node][node]) + (0.7 / distance_matrix[node][destination_node]) + (0.3 / connectivity_score) if connectivity_score != 0 else float('inf')
+        scores[node] = score
+    
+    if destination_node in unvisited_nodes:
+        remaining_nodes = unvisited_nodes - {destination_node}
+        connectivity_score = sum(distance_matrix[destination_node][n] for n in remaining_nodes) / len(remaining_nodes) if remaining_nodes else 0
+        score = (1 / distance_matrix[current_node][destination_node]) + (0.7 / 0) + (0.3 / connectivity_score) if connectivity_score != 0 else float('inf')
+        scores[destination_node] = score
+    
+    scores = {node: score for node, score in scores.items() if score != float('inf')}
+    total_score = sum(scores.values())
+    probabilities = {node: score / total_score for node, score in scores.items()}
+    next_node = random.choices(list(probabilities.keys()), weights=probabilities.values(), k=1)[0]
+    
+    return next_node

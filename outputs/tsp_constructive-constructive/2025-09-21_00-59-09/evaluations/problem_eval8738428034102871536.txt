@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Prioritize nodes closer to the destination
+        if distance + distance_matrix[node][destination_node] < min_distance:
+            min_distance = distance + distance_matrix[node][destination_node]
+            next_node = node
+
+    return next_node

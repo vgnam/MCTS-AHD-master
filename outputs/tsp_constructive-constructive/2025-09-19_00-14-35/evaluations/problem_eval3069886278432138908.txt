@@ -1,0 +1,45 @@
+importance" metric that considers both distance and connectivity potential.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            remaining_nodes_list = [n for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in remaining_nodes_list) / len(remaining_nodes_list)
+            connectivity_score = 1.0 / (1.0 + avg_remaining_dist)
+            potential_gain = (distance_matrix[current_node][destination_node] - immediate_dist - dest_dist) / (1 + immediate_dist)
+            flow_disruption = max(distance_matrix[node][n] for n in remaining_nodes_list) - immediate_dist
+            node_importance = (connectivity_score * 0.7) + (potential_gain * 0.3) - (flow_disruption * 0.1)
+        else:
+            node_importance = 0
+
+        weight_local = 0.5 - 0.4 * exploration_factor
+        weight_importance = 0.5 + 0.3 * exploration_factor
+
+        score = (weight_local * immediate_dist) + (weight_importance * node_importance)
+        return score
+
+    node_scores = {node: evaluate_node(node) for node in unvisited_nodes}
+    min_score = min(node_scores.values())
+    max_score = max(node_scores.values())
+    normalized_scores = {node: (score - min_score) / (max_score - min_score + 1e-9) for node, score in node_scores.items()}
+
+    if exploration_factor > 0.6:
+        selection_probs = [1 - normalized_scores[node] for node in unvisited_nodes]
+    else:
+        selection_probs = [normalized_scores[node] for node in unvisited_nodes]
+
+    total_prob = sum(selection_probs)
+    selection_probs = [p / total_prob for p in selection_probs]
+
+    next_node = random.choices(unvisited_nodes, weights=selection_probs, k=1)[0]
+    return next_node

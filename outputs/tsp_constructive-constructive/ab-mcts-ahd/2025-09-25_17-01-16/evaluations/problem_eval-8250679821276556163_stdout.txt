@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of reducing the estimated distance to the destination, while the direct distance ensures practical feasibility. The code processes each unvisited node, computes the weighted sum, and selects the node with the smallest value.}
+                                                                                                                                                                                                                                               ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of reducing the estimated distance to the destination, while the direct distance ensures practical feasibility. The code processes each unvisited node, computes the weighted sum, and selects the node with the smallest value.}
+                                                                                                                                                                                                                                               ^
+SyntaxError: unmatched '}'

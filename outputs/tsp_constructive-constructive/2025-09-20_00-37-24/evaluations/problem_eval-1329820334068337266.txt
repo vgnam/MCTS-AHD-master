@@ -1,0 +1,32 @@
+importance" score (calculated as the sum of distances to all other nodes), balancing proximity with global connectivity, while still maintaining stochasticity to avoid local optima.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate importance score for each unvisited node (sum of distances to all other nodes)
+    importance_scores = {}
+    for node in unvisited_nodes:
+        importance_scores[node] = sum(distance_matrix[node])  # Simplified importance metric
+
+    # Combine distance and importance for probabilistic selection
+    weighted_scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        importance = importance_scores[node]
+        weighted_scores[node] = (1.0 / (distance + 1e-6)) * (importance ** 0.5)  # Balance distance and importance
+
+    # Select based on weighted probabilities
+    candidates = list(weighted_scores.keys())
+    probabilities = [weighted_scores[node] for node in candidates]
+    total = sum(probabilities)
+    probabilities = [p / total for p in probabilities]
+
+    if random.random() < 0.8:  # 80% chance to pick based on weights
+        next_node = random.choices(candidates, weights=probabilities, k=1)[0]
+    else:  # 20% chance to pick random node
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

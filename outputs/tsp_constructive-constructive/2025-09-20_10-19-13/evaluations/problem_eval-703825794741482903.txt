@@ -1,0 +1,5 @@
+import random
+    candidates = [(node, distance_matrix[current_node][node]) for node in unvisited_nodes]
+    weighted_candidates = [(node, (1 / (dist + 1e-10)) + random.random() * 0.1) for node, dist in candidates]
+    next_node = max(weighted_candidates, key=lambda x: x[1])[0]
+    return next_node

@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def node_score(node):
+        current_distance = distance_matrix[current_node][node]
+        remaining_unvisited = unvisited_nodes - {node}
+        if not remaining_unvisited:
+            return current_distance
+        next_three = sorted(remaining_unvisited, key=lambda n: distance_matrix[node][n])[:3]
+        sum_next_three = sum(distance_matrix[node][n] for n in next_three)
+        return current_distance + sum_next_three
+
+    next_node = min(unvisited_nodes, key=node_score)
+    return next_node

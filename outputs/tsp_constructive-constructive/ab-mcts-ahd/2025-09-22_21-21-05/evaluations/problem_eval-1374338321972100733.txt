@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Calculate centrality and path potential for each unvisited node
+    centrality_scores = []
+    path_potentials = []
+    for node in unvisited_nodes:
+        # Centrality: average distance to other unvisited nodes
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_nodes
+        centrality_scores.append(avg_dist)
+
+        # Path potential: estimated future cost reduction
+        potential = sum(min(distance_matrix[node][other], distance_matrix[other][destination_node]) for other in unvisited_nodes) / remaining_nodes
+        path_potentials.append(potential)
+
+    avg_centrality = sum(centrality_scores) / remaining_nodes if remaining_nodes > 0 else 0
+    avg_potential = sum(path_potentials) / remaining_nodes if remaining_nodes > 0 else 0
+
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weights based on remaining nodes and path length
+        weight_current = (remaining_nodes / total_nodes) ** 2
+        weight_centrality = (1 - weight_current) * 0.5
+        weight_potential = (1 - weight_current) * 0.5
+
+        weighted_score = (weight_current * distance_to_current) + \
+                         (weight_centrality * centrality_scores[i] / (avg_centrality + 1e-6)) + \
+                         (weight_potential * path_potentials[i] / (avg_potential + 1e-6))
+
+        if weighted_score < min_score:
+            min_score = weighted_score
+            next_node = node
+
+    return next_node

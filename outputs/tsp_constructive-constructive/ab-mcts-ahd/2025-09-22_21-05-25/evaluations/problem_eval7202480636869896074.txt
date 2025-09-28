@@ -1,0 +1,19 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if len(unvisited_nodes) <= 2:
+        return nearest_node
+
+    threshold_factor = 1.5 + (0.5 * len(unvisited_nodes) / len(distance_matrix)) + (0.2 * distance_matrix[current_node][destination_node] / max(distance_matrix[current_node][node] for node in unvisited_nodes))
+
+    if distance_matrix[current_node][farthest_node] > threshold_factor * distance_matrix[current_node][nearest_node]:
+        if random.random() < 0.7:  # 70% chance to choose farthest if threshold is met
+            return farthest_node
+
+    return next_node

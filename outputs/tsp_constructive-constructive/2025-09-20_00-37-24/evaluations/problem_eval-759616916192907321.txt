@@ -1,0 +1,43 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on distance and historical visit frequency
+    visit_frequency = {node: 1.0 for node in unvisited_nodes}  # Placeholder for actual frequency tracking
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        weight = (1.0 / (distance + 1e-6)) * (1.0 / visit_frequency[node])
+        weights.append(weight)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    if total_weight > 0:
+        normalized_weights = [w / total_weight for w in weights]
+    else:
+        normalized_weights = [1.0 / len(unvisited_nodes)] * len(unvisited_nodes)
+
+    # Dynamic selection: 80% chance to pick from top 4 candidates, 15% to pick from middle, 5% random
+    sorted_nodes = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    if random.random() < 0.8:
+        candidates = sorted_nodes[:min(4, len(sorted_nodes))]
+    elif random.random() < 0.95:
+        candidates = sorted_nodes[min(4, len(sorted_nodes)):min(7, len(sorted_nodes))]
+    else:
+        candidates = unvisited_nodes
+
+    # Select based on weighted probabilities
+    candidate_weights = [normalized_weights[unvisited_nodes.index(node)] for node in candidates]
+    total_candidate_weight = sum(candidate_weights)
+    if total_candidate_weight > 0:
+        candidate_weights = [w / total_candidate_weight for w in candidate_weights]
+    else:
+        candidate_weights = [1.0 / len(candidates)] * len(candidates)
+
+    next_node = random.choices(candidates, weights=candidate_weights, k=1)[0]
+    return next_node

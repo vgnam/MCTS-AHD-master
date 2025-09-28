@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    distances = [(node, distance_matrix[current_node][node]) for node in unvisited_nodes]
+    closest_node, closest_dist = min(distances, key=lambda x: x[1])
+    farthest_node, farthest_dist = max(distances, key=lambda x: x[1])
+
+    # Dynamic weight based on remaining nodes and path length
+    remaining_nodes = len(unvisited_nodes)
+    path_length_factor = 1 / (1 + 0.1 * sum(distance_matrix[current_node][node] for node in unvisited_nodes))
+    weight = 1 / (1 + math.exp(-(remaining_nodes - 5) * path_length_factor))
+
+    # Penalize revisiting nodes (if applicable)
+    if destination_node in unvisited_nodes:
+        penalty = 0.2 * distance_matrix[current_node][destination_node]
+    else:
+        penalty = 0
+
+    # Balance between closest and farthest with dynamic weight
+    if farthest_dist - closest_dist > 0:
+        next_node = closest_node if (farthest_dist - closest_dist) * weight < closest_dist - penalty else farthest_node
+    else:
+        next_node = closest_node
+
+    return next_node

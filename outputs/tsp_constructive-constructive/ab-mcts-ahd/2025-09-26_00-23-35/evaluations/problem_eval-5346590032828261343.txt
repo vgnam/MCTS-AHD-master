@@ -1,0 +1,46 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+
+    if not unvisited_nodes:
+        return None
+
+    total_unvisited = len(unvisited_nodes)
+    max_nodes = len(distance_matrix)
+
+    # Dynamic exploration-exploitation trade-off using tanh function
+    exploration_weight = (math.tanh((total_unvisited - max_nodes/2) / (max_nodes/5)) + 1) / 2
+
+    # Centrality calculation (average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes) - 1)
+
+    # Connectivity reward: prioritize nodes with high connectivity to unvisited nodes
+    connectivity_reward = {}
+    for node in unvisited_nodes:
+        connectivity_reward[node] = sum(1 for n in unvisited_nodes if n != node and distance_matrix[node][n] > 0) / max(1, len(unvisited_nodes) - 1)
+
+    # Historical reward (simplified RL-inspired mechanism)
+    historical_reward = {}
+    for node in unvisited_nodes:
+        historical_reward[node] = 1.0 / (1.0 + distance_matrix[current_node][node])  # Inverse distance as reward
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance_to_dest = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Centrality factor for bias adjustment
+        centrality_factor = centrality.get(node, 0) / (centrality.get(destination_node, 1) + 1e-6)
+
+        # Combined score with connectivity and historical rewards
+        score = (exploration_weight * (-distance_to_node + avg_distance_to_dest) +
+                 (1 - exploration_weight) * (centrality_factor * connectivity_reward[node] + historical_reward[node]))
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    def dynamic_weight(node):
+        distance_to_dest = distance_matrix[node][destination_node]
+        max_distance = max(distance_matrix[node]) if distance_matrix[node] else 0
+        normalized = distance_to_dest / max_distance if max_distance else 0
+        sigmoid_weight = 1 / (1 + math.exp(-10 * (normalized - 0.5)))
+        return distance_matrix[current_node][node] + sigmoid_weight * distance_matrix[node][destination_node]
+    next_node = min(unvisited_nodes, key=lambda node: dynamic_weight(node))
+    return next_node

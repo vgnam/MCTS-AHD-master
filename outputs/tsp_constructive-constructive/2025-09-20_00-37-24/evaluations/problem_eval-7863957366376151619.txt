@@ -1,0 +1,31 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    remaining_nodes = len(unvisited_nodes)
+    exploitation_threshold = max(0.5, 0.9 - (0.4 * (remaining_nodes / len(distance_matrix))))
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Distance penalty: penalize nodes that are too close to the current node
+    penalized_neighbors = []
+    for node in nearest_neighbors:
+        penalty = 1.0 - (distance_matrix[current_node][node] / max(distance_matrix[current_node]))
+        penalized_neighbors.append((node, penalty))
+
+    # Sort by penalized distance
+    penalized_neighbors.sort(key=lambda x: x[1], reverse=True)
+
+    if random.random() < exploitation_threshold:
+        candidates = [node for node, _ in penalized_neighbors[:min(3, len(penalized_neighbors))]]
+        next_node = random.choice(candidates)
+    else:
+        # Random selection with bias towards nodes with lower penalties
+        weights = [penalty for _, penalty in penalized_neighbors]
+        next_node = random.choices([node for node, _ in penalized_neighbors], weights=weights, k=1)[0]
+
+    return next_node

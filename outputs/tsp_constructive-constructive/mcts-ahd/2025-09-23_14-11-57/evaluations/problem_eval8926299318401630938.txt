@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1.0 - remaining_nodes / len(distance_matrix)
+
+    penalty_weight = 0.5
+    lookahead_weight = 0.1 + 0.4 * progress
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_cost = distance_matrix[current_node][node]
+        lookahead_cost = 0.0
+
+        if remaining_nodes > 1:
+            remaining = [n for n in unvisited_nodes if n != node]
+            lookahead_cost = sum(distance_matrix[node][n] for n in remaining) / len(remaining)
+
+        penalty = penalty_weight * immediate_cost
+        combined_score = immediate_cost + penalty + lookahead_weight * lookahead_cost
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+    return next_node

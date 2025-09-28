@@ -1,0 +1,72 @@
+[
+     {
+          "algorithm": "The algorithm combines a greedy nearest-neighbor approach with multiplicative weighting to balance proximity to the current node and alignment toward the destination. It prioritizes nodes that are both close to the current node and have a shorter distance to the destination, ensuring efficient path progression. The key design idea is the weighted selection using `distance_matrix[current_node][node] * (1 + 1 / distance_matrix[node][destination_node])`, where proximity to the current node is the primary factor, while the inverse of the distance to the destination acts as a secondary weighting.",
+          "thought": "The new algorithm combines the greedy nearest-neighbor approach of No.2 with the multiplicative weighting of distances inspired by No.1, ensuring efficient path progression while balancing proximity to the current node and alignment toward the destination.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] * (1 + 1 / distance_matrix[node][destination_node]))\n    return next_node",
+          "objective": 6.67121,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by prioritizing the unvisited node with the smallest ratio of its distance from the current node to the sum of its distances from the current node and the destination node. This balances exploration (avoiding long detours) while favoring closer nodes (minimizing total distance). The key design is the ratio-based heuristic, where shorter distances to the current node and shorter combined paths to the destination are prioritized.",
+          "thought": "The new algorithm prioritizes selecting the unvisited node with the smallest ratio of distance to the current node to the sum of distances from the current node to the destination node, encouraging balanced exploration while favoring closer nodes to minimize total travel distance.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] / (distance_matrix[current_node][node] + distance_matrix[node][destination_node]))\n    return next_node",
+          "objective": 6.89499,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm prioritizes selecting the unvisited node closest to the current node (using the distance matrix) to minimize travel distance, with a fallback to the destination node if no unvisited nodes remain. The `current_node` and `unvisited_nodes` are central inputs, while `destination_node` is only used as a fallback. The code efficiently leverages the `min` function with a lambda to find the nearest neighbor, ensuring greedy optimization.",
+          "thought": "The algorithm selects the next node to visit by prioritizing the unvisited node with the shortest distance from the current node, with a fallback to the destination node if no unvisited nodes remain, ensuring the path is constructed efficiently.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])\n    return next_node",
+          "objective": 7.00437,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm combines a greedy nearest-neighbor approach with a global heuristic, prioritizing nodes that are both locally close to the current node and globally aligned toward the destination. It balances immediate proximity (weighted at 1.0) with long-term path efficiency (weighted at 0.2) by minimizing a weighted sum of local and global distances. The code structure iteratively selects the next node by evaluating this weighted combination for all unvisited nodes.",
+          "thought": "The new algorithm combines the greedy nearest-neighbor approach of No.2 with a weighted global heuristic from No.1, favoring nodes that are both locally close and globally aligned toward the destination. It balances immediate proximity with long-term path efficiency by minimizing a weighted sum of local and global distances.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(\n        unvisited_nodes,\n        key=lambda node: (\n            distance_matrix[current_node][node] +\n            0.2 * distance_matrix[node][destination_node]\n        )\n    )\n    return next_node",
+          "objective": 7.25108,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by prioritizing unvisited nodes that are both close to the current node and aligned with the destination, using a weighted distance metric. It multiplies the distance from the current node by a factor (1 + distance to destination), balancing proximity and alignment. If no unvisited nodes remain, it returns the destination node.",
+          "thought": "The new algorithm combines the greedy nearest-neighbor approach of No.2 with the multiplicative distance weighting of No.1, prioritizing nodes that are both close to the current node and aligned with the destination, while falling back to the destination if no unvisited nodes remain.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] * (1 + distance_matrix[node][destination_node]))\n    return next_node",
+          "objective": 7.2688,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm prioritizes selecting the next node by minimizing a weighted sum of the distance from the current node and the sum of the current-to-next and next-to-destination distances. This balances proximity to the current node (lower priority) and potential efficiency toward the destination (higher priority), combining nearest-neighbor and ratio-based considerations. The key design is the multiplicative factor `(distance_matrix[current_node][node] + distance_matrix[node][destination_node])`, which ensures the next node is both close and aligned with the destination path.",
+          "thought": "The new algorithm combines the nearest-neighbor approach of No.2 with the ratio-based balance of No.1, prioritizing nodes that are both close to the current node and likely to lead to the destination efficiently.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] * (distance_matrix[current_node][node] + distance_matrix[node][destination_node]))\n    return next_node",
+          "objective": 7.34711,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm modifies the nearest neighbor approach by combining the direct distance from the current node with a weighted heuristic (0.3\u00d7) favoring nodes closer to the destination, balancing local and global optimization. The `distance_matrix[current_node][node]` prioritizes local proximity, while `0.3 * distance_matrix[node][destination_node]` introduces a global bias toward nodes closer to the destination. The `min` function selects the node minimizing this weighted sum, ensuring a trade-off between immediate and long-term path efficiency.",
+          "thought": "The new algorithm modifies the nearest neighbor approach by introducing a weighted distance metric that combines the direct distance to the current node with a heuristic favoring nodes that are closer to the destination, creating a balance between local and global optimization.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(\n        unvisited_nodes,\n        key=lambda node: (\n            distance_matrix[current_node][node] +\n            0.3 * distance_matrix[node][destination_node]\n        )\n    )\n    return next_node",
+          "objective": 7.37192,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm combines a greedy nearest-neighbor approach with a weighted global heuristic, prioritizing both immediate local distances (from the current node) and long-term global distances (to the destination). It balances these by summing the local distance and 40% of the global distance to the destination, selecting the node that minimizes this weighted sum. The structure ensures that unvisited nodes are evaluated, and the destination is returned if no nodes remain.",
+          "thought": "The new algorithm combines the greedy nearest-neighbor approach of No.2 with a weighted global heuristic from No.1, selecting nodes that minimize a weighted sum of local distance and a fraction (e.g., 0.4) of the distance to the destination, balancing immediate and long-term efficiency.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(\n        unvisited_nodes,\n        key=lambda node: (\n            distance_matrix[current_node][node] +\n            0.4 * distance_matrix[node][destination_node]\n        )\n    )\n    return next_node",
+          "objective": 7.41894,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm combines a greedy nearest-neighbor approach with a limited lookahead strategy, prioritizing nodes that are both close to the current node (immediate distance) and offer good average distances to remaining unvisited nodes (lookahead average, weighted at 0.3). This balances efficiency (avoiding excessive computation) with path optimization by slightly favoring nodes that improve future steps without overcomplicating the selection. The `distance_matrix` provides the base distances, while `unvisited_nodes` and `destination_node` guide the selection toward completing the tour efficiently.",
+          "thought": "The new algorithm combines the greedy nearest-neighbor approach from No.2 with a limited lookahead strategy from No.1, prioritizing nodes that are both close to the current node and offer good average distances to the remaining unvisited nodes, but with a reduced weight (0.3) to avoid excessive computation while improving path optimization.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n\n    def evaluate_node(node):\n        immediate_distance = distance_matrix[current_node][node]\n        remaining_unvisited = unvisited_nodes - {node}\n        if remaining_unvisited:\n            lookahead_avg = sum(distance_matrix[node][other] for other in remaining_unvisited) / len(remaining_unvisited)\n        else:\n            lookahead_avg = distance_matrix[node][destination_node]\n        return immediate_distance + 0.3 * lookahead_avg\n\n    next_node = min(unvisited_nodes, key=evaluate_node)\n    return next_node",
+          "objective": 7.44662,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm balances immediate distance and remaining distance to the destination, prioritizing nodes that are both close to the current node and closer to the destination (with the latter weighted 50%). If no unvisited nodes remain, it defaults to the destination. The key design is the weighted sum (`distance_matrix[current_node][node] + 0.5 * distance_matrix[node][destination_node]`), favoring intermediate nodes that progress toward the destination while maintaining local efficiency.",
+          "thought": "The new algorithm combines the greedy nearest-neighbor approach with a dynamic balance between immediate distance and remaining distance to the destination, inspired by the exploitation-exploration trade-off in No.1. It selects the next node by prioritizing nodes that are both close to the current node and closer to the destination, while falling back to the nearest neighbor if no unvisited nodes remain.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] + 0.5 * distance_matrix[node][destination_node])\n    return next_node",
+          "objective": 7.45266,
+          "other_inf": null
+     }
+]

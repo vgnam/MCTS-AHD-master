@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(unvisited_nodes) + 1
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Dynamic lookahead horizon based on node density
+        horizon_size = max(2, min(5, remaining_nodes // 2))
+        lookahead_candidates = sorted(unvisited_nodes, key=lambda x: distance_matrix[node][x])[:horizon_size]
+        lookahead_distance = sum(distance_matrix[node][neighbor] for neighbor in lookahead_candidates) / horizon_size
+
+        # Weighted lookahead considering both near and far future
+        farthest_future = max(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        weighted_lookahead = 0.7 * lookahead_distance + 0.3 * farthest_future
+
+        # Proximity penalty based on visited nodes' influence
+        proximity_penalty = sum(1 / (distance_matrix[node][other] + 1e-6) for other in unvisited_nodes if other != node)
+
+        # Dynamic weight for lookahead
+        weight = (total_nodes - remaining_nodes) / total_nodes ** 1.5
+
+        score = immediate_distance + weight * weighted_lookahead + 0.5 * proximity_penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

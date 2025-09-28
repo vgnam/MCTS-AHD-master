@@ -1,0 +1,65 @@
+importance.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    centralities = []
+    directional_biases = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+
+        # Calculate regret with dynamic scaling
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = max(0, distance_matrix[current_node][node] - second_best)
+            # Scale regret by node centrality (inverse of average distance to all unvisited nodes)
+            centrality = 1 / (sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes))
+            regret *= centrality
+        else:
+            regret = 0
+            centrality = 1.0
+        regrets.append(regret)
+        centralities.append(centrality)
+
+        # Calculate directional bias: alignment with current tour's average direction
+        if len(unvisited_nodes) > 2:
+            # Compute average direction vector (simplified as average of vectors to unvisited nodes)
+            avg_direction = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+            directional_bias = 1 - abs(immediate_distance - avg_direction) / (immediate_distance + avg_direction)
+        else:
+            directional_bias = 1.0
+        directional_biases.append(directional_bias)
+
+    # Dynamic weight adjustment with adaptive normalization
+    progress = 1 - (len(unvisited_nodes) / len(distance_matrix))
+    regret_weight = max(0.1, 0.8 - 0.6 * progress)
+    distance_weight = 0.4 + 0.6 * progress
+    centrality_weight = min(0.7, 0.2 + 0.5 * progress)
+    directional_weight = min(0.6, 0.2 + 0.4 * progress)
+
+    # Combined scoring with adaptive normalization
+    scores = []
+    for regret, distance, centrality, directional in zip(regrets, distances, centralities, directional_biases):
+        normalized_regret = regret / (sum(regrets) + 1e-6)
+        normalized_distance = distance / (sum(distances) + 1e-6)
+        normalized_centrality = centrality / (sum(centralities) + 1e-6)
+        normalized_directional = directional / (sum(directional_biases) + 1e-6)
+
+        score = (regret_weight * normalized_regret +
+                distance_weight * normalized_distance +
+                centrality_weight * normalized_centrality +
+                directional_weight * normalized_directional)
+        scores.append(score)
+
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

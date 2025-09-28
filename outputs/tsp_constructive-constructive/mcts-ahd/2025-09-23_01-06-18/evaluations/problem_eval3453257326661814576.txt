@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes if total_nodes > 0 else 0.0
+    time_decay = 1 - (progress_ratio ** 2)  # Decays more aggressively as progress increases
+
+    def path_potential(node):
+        # Direct path component (weighted by time_decay)
+        direct_cost = distance_matrix[node][destination_node]
+
+        # Indirect path component (average of nearby nodes' direct costs)
+        nearby_nodes = [n for n in range(len(distance_matrix)) if n != node]
+        indirect_cost = sum(distance_matrix[node][n] + distance_matrix[n][destination_node]
+                           for n in nearby_nodes[:3]) / min(3, len(nearby_nodes)) if nearby_nodes else 0
+
+        return (0.6 * direct_cost + 0.4 * indirect_cost) * time_decay
+
+    def node_centrality(node):
+        # Measures how central the node is in the remaining graph
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        return 1 / (centrality + 1)  # Inverse to prefer more central nodes
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        potential = path_potential(node)
+        centrality = node_centrality(node)
+
+        # Dynamic weights based on progress and centrality
+        weight_immediate = 0.5 + 0.3 * (1 - progress_ratio) + 0.2 * centrality
+        weight_potential = 1 - weight_immediate
+
+        # Penalty for revisiting non-destination nodes
+        penalty = 0.3 if node in unvisited_nodes and node != destination_node else 0.0
+
+        return weight_immediate * immediate_cost + weight_potential * potential + penalty
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

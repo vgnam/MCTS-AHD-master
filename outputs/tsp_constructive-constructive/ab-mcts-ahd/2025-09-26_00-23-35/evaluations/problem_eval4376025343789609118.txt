@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Precompute average and variance of future distances for all unvisited nodes
+    future_distances = []
+    for node in unvisited_nodes:
+        future_distances.extend([distance_matrix[node][n] for n in unvisited_nodes if n != node])
+    avg_future = sum(future_distances) / max(1, len(future_distances))
+    variance_future = sum((d - avg_future) ** 2 for d in future_distances) / max(1, len(future_distances))
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Node-specific future distances
+        node_future_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        avg_node_future = sum(node_future_distances) / max(1, len(node_future_distances))
+
+        # Adaptive weights based on remaining nodes and future variance
+        weight_proximity = 0.6 - 0.2 * (remaining_nodes / len(distance_matrix))
+        weight_future = 0.4 + 0.2 * (remaining_nodes / len(distance_matrix))
+        centrality_penalty = 0.5 * (avg_node_future - avg_future) / max(1, variance_future)
+
+        # Score combines adaptive proximity, weighted future distance, and centrality penalty
+        score = (weight_proximity * distance_to_node +
+                 weight_future * distance_to_destination +
+                 centrality_penalty)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,10 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 6, in select_next_node
+    weight_factor = (remaining_nodes / (remaining_nodes + 1)) * (distance_matrix[current_node][destination_node] / sum(distance_matrix[current_node][node] for node in unvisited_nodes + [destination_node]))
+TypeError: unsupported operand type(s) for +: 'set' and 'list'

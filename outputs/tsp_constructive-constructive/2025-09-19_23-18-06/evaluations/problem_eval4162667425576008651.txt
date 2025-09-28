@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    progress_ratio = 1.0 - (total_unvisited / (total_unvisited + len(distance_matrix)))
+    dynamic_penalty = 0.5 * progress_ratio
+
+    def potential_reduction(node):
+        immediate_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) <= 1:
+            return immediate_dist
+
+        remaining = unvisited_nodes - {node}
+        avg_future_dist = sum(distance_matrix[node][n] for n in remaining) / len(remaining)
+        connectivity_penalty = 1.0 / (sum(1 for d in distance_matrix[node] if d > 0) + 1e-6)
+        detour_penalty = max(distance_matrix[node][n] for n in remaining) / (total_unvisited ** 0.5) * dynamic_penalty
+
+        return immediate_dist + 0.5 * avg_future_dist + 0.3 * connectivity_penalty + 0.2 * detour_penalty
+
+    candidates = []
+    for node in unvisited_nodes:
+        reduction = potential_reduction(node)
+        candidates.append((node, reduction))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

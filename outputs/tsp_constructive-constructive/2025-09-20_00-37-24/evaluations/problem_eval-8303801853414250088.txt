@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate dynamic weight factor
+    remaining_nodes = len(unvisited_nodes)
+    weight_factor = 1.0 / (1.0 + 0.1 * remaining_nodes)  # Decreases as nodes are visited
+
+    # Calculate average distance to unvisited nodes
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / remaining_nodes
+
+    # Determine probabilistic threshold
+    threshold = 0.5 * (1.0 - weight_factor)  # Higher threshold as more nodes remain
+
+    if random.random() < threshold:
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Select a node probabilistically based on inverse distance
+        inverse_distances = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes]
+        total = sum(inverse_distances)
+        probabilities = [d / total for d in inverse_distances]
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

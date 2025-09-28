@@ -1,0 +1,33 @@
+importance.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    best_score = float('inf')
+    next_node = None
+
+    # Calculate centrality of current node (inverse of average distance to all nodes)
+    centrality = 1.0 / (sum(distance_matrix[current_node]) / len(distance_matrix[current_node]))
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Progressive dynamic weight for destination based on unvisited nodes
+        destination_weight = 0.5 * (1 / (1 + 0.1 * total_unvisited))
+
+        # Progressive exploration bonus that increases as unvisited nodes decrease
+        exploration_bonus = 0.3 * centrality * (1 / (1 + 0.5 * total_unvisited))
+
+        # Dynamic centrality weight that adapts to current node's importance
+        centrality_weight = 0.2 * (1 / (1 + 0.2 * total_unvisited))
+
+        combined_score = distance_to_current + destination_weight * distance_to_destination + exploration_bonus + centrality_weight * centrality
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

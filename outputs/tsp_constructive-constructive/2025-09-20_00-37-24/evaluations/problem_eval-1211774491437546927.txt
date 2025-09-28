@@ -1,0 +1,26 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate temperature based on remaining nodes (higher temperature for more nodes)
+    temperature = len(unvisited_nodes) / len(distance_matrix)
+
+    # Get nearest neighbors sorted by distance
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate probabilities using softmax with temperature
+    distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+    max_dist = max(distances) if distances else 0
+    probs = [math.exp(-d / (max_dist * temperature)) for d in distances]
+    total_prob = sum(probs)
+    normalized_probs = [p / total_prob for p in probs]
+
+    # Select node based on probabilities
+    next_node = random.choices(nearest_neighbors, weights=normalized_probs, k=1)[0]
+
+    return next_node

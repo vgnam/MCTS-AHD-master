@@ -1,0 +1,46 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate node centrality (average distance to other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = np.mean(distance_matrix[node])
+
+    # Calculate distance variability (standard deviation of distances)
+    variability = {}
+    for node in unvisited_nodes:
+        variability[node] = np.std(distance_matrix[node])
+
+    # Combine factors: prioritize nodes with lower centrality and higher variability
+    scores = {}
+    for node in unvisited_nodes:
+        # Normalize centrality and variability (higher score is better)
+        norm_centrality = 1 - (centrality[node] - min(centrality.values())) / (max(centrality.values()) - min(centrality.values()) + 1e-10)
+        norm_variability = (variability[node] - min(variability.values())) / (max(variability.values()) - min(variability.values()) + 1e-10)
+        scores[node] = 0.7 * norm_centrality + 0.3 * norm_variability
+
+    # Sort nodes by score (highest first)
+    sorted_nodes = sorted(unvisited_nodes, key=lambda x: -scores[x])
+
+    # Dynamic probability: higher for better-scoring nodes
+    probs = np.exp(np.array([scores[node] for node in sorted_nodes]))
+    probs = probs / probs.sum()
+
+    # Select node based on dynamic probabilities
+    if random.random() < 0.8:  # 80% chance to pick from top 50% of scored nodes
+        candidates = sorted_nodes[:max(1, len(sorted_nodes) // 2)]
+        next_node = random.choices(candidates, weights=probs[:len(candidates)])[0]
+    else:  # 20% chance to pick from remaining nodes
+        remaining = sorted_nodes[len(sorted_nodes) // 2:]
+        if remaining:
+            next_node = random.choices(remaining, weights=probs[len(sorted_nodes) // 2:])[0]
+        else:
+            next_node = random.choice(sorted_nodes)
+
+    return next_node

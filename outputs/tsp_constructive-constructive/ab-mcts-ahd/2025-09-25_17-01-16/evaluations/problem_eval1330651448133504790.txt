@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        estimated_distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate centrality as the average distance to all other nodes
+        centrality = sum(distance_matrix[node]) / len(distance_matrix[node])
+
+        # Dynamic weight based on remaining unvisited nodes (higher weight as fewer nodes remain)
+        remaining_nodes = len(unvisited_nodes)
+        weight = 1 / (1 + math.exp(-(remaining_nodes - len(distance_matrix) / 2)))
+
+        # Combine factors with dynamic weighting
+        total_score = (weight * distance_to_current) + ((1 - weight) * estimated_distance_to_destination) + (0.5 * centrality)
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

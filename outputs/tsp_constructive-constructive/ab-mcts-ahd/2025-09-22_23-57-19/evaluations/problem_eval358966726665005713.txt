@@ -1,0 +1,8 @@
+import random
+    candidates.sort(key=lambda x: x[1])
+    if random.random() < 0.2 and len(candidates) > 1:  # 20% chance to explore
+        selected = random.choice(candidates[1:])[0]
+    else:
+        selected = candidates[0][0]
+
+    return next_node

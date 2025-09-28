@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    exploration_weight = max(0.1, 1.0 - (remaining_nodes / len(distance_matrix)))
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+
+        if remaining_nodes > 1:
+            remaining_unvisited = unvisited_nodes - {node}
+            neighborhood_distances = [distance_matrix[node][n] for n in remaining_unvisited]
+            avg_neighborhood_dist = sum(neighborhood_distances) / len(neighborhood_distances)
+            min_neighborhood_dist = min(neighborhood_distances) if neighborhood_distances else 0
+            max_neighborhood_dist = max(neighborhood_distances) if neighborhood_distances else 1
+
+            connectivity_score = (1.0 / (avg_neighborhood_dist + 1e-6)) * (min_neighborhood_dist / (max_neighborhood_dist + 1e-6))
+            novelty_score = 1.0 - (len(remaining_unvisited) / len(unvisited_nodes))
+
+            dynamic_weight = 1.0 / (1.0 + 1.5 * (remaining_nodes / len(unvisited_nodes)))
+            weighted_score = (1.0 - exploration_weight) * immediate_dist + exploration_weight * (connectivity_score * dynamic_weight + novelty_score)
+        else:
+            weighted_score = immediate_dist
+
+        candidates.append((node, weighted_score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

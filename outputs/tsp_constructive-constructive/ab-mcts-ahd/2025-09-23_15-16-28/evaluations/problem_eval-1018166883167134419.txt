@@ -1,0 +1,12 @@
+importance
+        weight = 0.3 * time_factor + 0.7 * (1 - centrality / max(centrality, 1))
+
+        # Score combines immediate distance, global potential, and node centrality
+        score = (weight * distance_to_current +
+                (1 - weight) * (distance_to_destination + 0.5 * centrality))
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

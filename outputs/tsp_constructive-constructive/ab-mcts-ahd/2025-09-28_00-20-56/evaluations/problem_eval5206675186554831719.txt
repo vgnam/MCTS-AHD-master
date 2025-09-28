@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    visited_history = {node: 1.0 for node in unvisited_nodes}  # Initialize visit history
+    decay_factor = 0.9  # Exponential decay for historical visits
+
+    def evaluate_node(node):
+        # Immediate distance
+        current_dist = distance_matrix[current_node][node]
+
+        # Dynamic lookahead based on remaining steps
+        if len(unvisited_nodes) > 2:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            # Evaluate 3-step paths
+            best_lookahead = None
+            best_score = float('inf')
+            for n1 in remaining_nodes:
+                remaining_after_n1 = [n for n in remaining_nodes if n != n1]
+                for n2 in remaining_after_n1:
+                    score = (distance_matrix[node][n1] +
+                             distance_matrix[n1][n2] +
+                             distance_matrix[n2][destination_node])
+                    if score < best_score:
+                        best_score = score
+                        best_lookahead = score
+            lookahead_dist = best_lookahead if best_lookahead is not None else distance_matrix[node][destination_node]
+        else:
+            lookahead_dist = distance_matrix[node][destination_node]
+
+        # Apply historical penalty
+        historical_penalty = visited_history[node]
+        visited_history[node] *= decay_factor  # Decay historical visits
+
+        # Combine metrics with weights
+        return current_dist + 0.3 * lookahead_dist + 0.2 * historical_penalty
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    visited_history[next_node] = 1.0  # Mark as recently visited
+    return next_node

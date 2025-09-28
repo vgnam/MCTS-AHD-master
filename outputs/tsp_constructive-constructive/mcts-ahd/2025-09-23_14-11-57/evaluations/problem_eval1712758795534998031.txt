@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = (total_nodes - remaining_nodes) / total_nodes
+
+    # Calculate node density and path history scores
+    node_density = [sum(row) / (total_nodes - 1) for row in distance_matrix]
+    path_history = [0] * total_nodes  # Placeholder for memory component (would track visits in actual implementation)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Adaptive weight adjustments
+        distance_weight = (1 - progress_factor) * 0.8 - (0.2 * (node_density[node] / max(node_density)))
+        future_weight = progress_factor * 0.7 + (0.3 * (node_density[node] / max(node_density)))
+
+        # Dynamic exploration factor
+        exploration_factor = (remaining_nodes / total_nodes) * (1 + (path_history[node] * 0.1))
+
+        # Aggressive early penalization
+        early_penalty = (1 - progress_factor) * 0.5 * (future_distance / max(node_density))
+
+        combined_score = (distance_weight * immediate_distance) + \
+                         (future_weight * (1 / (1 + future_distance))) - \
+                         (exploration_factor * (1 / (1 + immediate_distance))) + \
+                         early_penalty
+
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

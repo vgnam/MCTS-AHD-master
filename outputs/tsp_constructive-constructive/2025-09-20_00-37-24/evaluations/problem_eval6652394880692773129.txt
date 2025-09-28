@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    { # This algorithm prioritizes the destination if unvisited, otherwise selects the next node by considering both distance to current node and the minimum distance to any of the other unvisited nodes.}
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    min_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        min_other_distance = float('inf')
+        for other in unvisited_nodes:
+            if other != node:
+                min_other_distance = min(min_other_distance, distance_matrix[node][other])
+        
+        if min_other_distance == float('inf'):
+          min_other_distance = 0
+
+        score = current_distance + min_other_distance
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

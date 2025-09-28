@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    dynamic_threshold = 1.2 * avg_distance
+    if len(unvisited_nodes) > 3:
+        if distance_matrix[current_node][farthest_node] > dynamic_threshold:
+            top_farthest = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node], reverse=True)[:max(1, len(unvisited_nodes) // 3)]
+            next_node = random.choice(top_farthest) if random.random() < 0.3 else nearest_node
+        else:
+            next_node = nearest_node
+    else:
+        next_node = nearest_node
+    return next_node

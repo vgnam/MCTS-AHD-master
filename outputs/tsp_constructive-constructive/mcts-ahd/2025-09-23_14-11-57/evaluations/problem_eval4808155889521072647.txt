@@ -1,0 +1,61 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    clusterings = []
+    centralities = []
+    history_weights = []
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    phase = 1 - (remaining_nodes / total_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        # Calculate regret
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (immediate_distance - second_best) if immediate_distance > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Calculate clustering
+        nearby_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        clustering = 1 / (sum(nearby_distances) / len(nearby_distances)) if nearby_distances else 0
+        clusterings.append(clustering)
+
+        # Calculate centrality (degree of connectivity)
+        centrality = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < (sum(distance_matrix[node]) / total_nodes))
+        centralities.append(centrality)
+
+        # History weight (exponential decay of past visits)
+        history_weight = 0.5 ** (total_nodes - remaining_nodes)
+        history_weights.append(history_weight)
+
+    # Adaptive weights with phase-based modulation
+    regret_weight = 0.4 * (1 - phase**2) + 0.1 * (0.5 ** (remaining_nodes / total_nodes))
+    distance_weight = 0.3 * phase + 0.2 * (remaining_nodes / total_nodes)
+    clustering_weight = 0.2 * phase**2 + 0.1 * (1 - phase)
+    centrality_weight = 0.1 * (1 - phase) + 0.2 * (phase**2)
+
+    # Combine weighted scores with history influence
+    scores = [
+        (regret_weight * regret +
+         distance_weight * distance +
+         clustering_weight * clustering +
+         centrality_weight * centrality) * history_weight
+        for regret, distance, clustering, centrality, history_weight in
+        zip(regrets, distances, clusterings, centralities, history_weights)
+    ]
+
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

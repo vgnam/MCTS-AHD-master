@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_score = float('inf')
+
+    # Dynamic weighting based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    weight_proximity = 0.6 if remaining_nodes > 3 else 0.4
+    weight_efficiency = 1.0 - weight_proximity
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+        total_increase = current_to_node + node_to_dest
+
+        # Local search penalty for nodes too close to current
+        penalty = 0.3 * (1.0 / (current_to_node + 1e-6)) if current_to_node < 0.4 else 0
+
+        # Heuristic for path efficiency (estimates impact on remaining tour)
+        heuristic = sum(min(distance_matrix[node][n], distance_matrix[n][node]) for n in unvisited_nodes if n != node)
+
+        # Combined score with dynamic weights and heuristic
+        score = (weight_proximity * current_to_node +
+                 weight_efficiency * total_increase +
+                 0.3 * heuristic) - penalty
+
+        if score < best_score:
+            best_score = score
+            best_node = node
+
+    return next_node

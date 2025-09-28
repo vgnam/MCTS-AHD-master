@@ -1,0 +1,18 @@
+import random
+    min_cost = float('inf')
+    next_node = None
+    candidates = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        if immediate_distance < min_cost:
+            min_cost = immediate_distance
+            candidates = [node]
+        elif immediate_distance == min_cost:
+            candidates.append(node)
+    if not candidates:
+        next_node = destination_node
+    else:
+        next_node = random.choice(candidates) if random.random() < 0.9 else random.choice(unvisited_nodes - {destination_node})
+    return next_node

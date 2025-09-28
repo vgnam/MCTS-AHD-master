@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    temperature = max(0.1, 1.0 - (total_nodes - remaining_nodes) / total_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            distances_from_node = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            if distances_from_node:
+                q25 = sorted(distances_from_node)[len(distances_from_node)//4]
+                q75 = sorted(distances_from_node)[3*len(distances_from_node)//4]
+                iqr = q75 - q25
+                lower_bound = q25 - 1.5 * iqr
+                upper_bound = q75 + 1.5 * iqr
+                filtered_distances = [d for d in distances_from_node if lower_bound <= d <= upper_bound]
+                avg_distance = sum(filtered_distances) / len(filtered_distances) if filtered_distances else distance_to_current
+
+                penalty = 0
+                for other_node in unvisited_nodes:
+                    if other_node != node:
+                        penalty += 1 / (1 + distance_matrix[node][other_node])
+
+                score = (0.6 * distance_to_current + 0.4 * avg_distance) + 0.1 * penalty
+                score *= (1 + temperature * (random.random() - 0.5))
+            else:
+                score = distance_to_current + distance_to_destination
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

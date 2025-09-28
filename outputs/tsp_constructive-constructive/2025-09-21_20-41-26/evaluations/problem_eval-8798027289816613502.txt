@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        # Probability of selecting the destination node decays as more nodes remain unvisited
+        remaining_nodes = len(unvisited_nodes)
+        prob_destination = 1.0 / (1.0 + (remaining_nodes - 1) * 0.5)
+        if random.random() < prob_destination:
+            return destination_node
+
+    # Find the closest unvisited node with a probability weighted by inverse distance
+    candidates = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        distance = distance_matrix[current_node][node]
+        if distance == 0:
+            weight = float('inf')
+        else:
+            weight = 1.0 / distance
+        candidates.append((node, weight))
+        total_weight += weight
+
+    if not candidates:
+        return destination_node if destination_node in unvisited_nodes else None
+
+    # Select a candidate with probability proportional to its weight
+    rand_val = random.random() * total_weight
+    cumulative_weight = 0.0
+    for node, weight in candidates:
+        cumulative_weight += weight
+        if rand_val <= cumulative_weight:
+            return node
+
+    return next_node

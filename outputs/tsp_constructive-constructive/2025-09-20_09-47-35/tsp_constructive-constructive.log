@@ -1,0 +1,542 @@
+[2025-09-20 09:47:35,263][root][INFO] - Workspace: D:\MCTS-AHD-master\outputs\tsp_constructive-constructive\2025-09-20_09-47-35
+[2025-09-20 09:47:35,263][root][INFO] - Project Root: D:\MCTS-AHD-master
+[2025-09-20 09:47:35,263][root][INFO] - Using LLM: mistral/codestral-latest
+[2025-09-20 09:47:35,263][root][INFO] - Using Algorithm: ab-mcts-ahd
+[2025-09-20 09:47:35,790][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:47:36,995][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:47:37,009][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:37,012][root][INFO] - LLM usage: prompt_tokens = 163, completion_tokens = 122
+[2025-09-20 09:47:37,014][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:47:38,077][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:47:38,078][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:38,079][root][INFO] - LLM usage: prompt_tokens = 472, completion_tokens = 209
+[2025-09-20 09:47:38,080][root][INFO] - Iteration 0: Running Code -928993043482380301
+[2025-09-20 09:47:38,595][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:47:38,632][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-20 09:47:38,633][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:47:39,371][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:47:39,373][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:39,375][root][INFO] - LLM usage: prompt_tokens = 635, completion_tokens = 302
+[2025-09-20 09:47:39,375][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:47:40,561][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:47:40,564][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:40,566][root][INFO] - LLM usage: prompt_tokens = 915, completion_tokens = 404
+[2025-09-20 09:47:40,567][root][INFO] - Iteration 0: Running Code -1461479707426546763
+[2025-09-20 09:47:41,079][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:47:41,117][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-20 09:47:41,118][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:47:41,903][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:47:41,907][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:41,912][root][INFO] - LLM usage: prompt_tokens = 1078, completion_tokens = 496
+[2025-09-20 09:47:41,914][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:47:42,861][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:47:42,864][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:42,866][root][INFO] - LLM usage: prompt_tokens = 1357, completion_tokens = 582
+[2025-09-20 09:47:42,867][root][INFO] - Iteration 0: Running Code -1251995384917379052
+[2025-09-20 09:47:43,518][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:47:43,611][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-20 09:47:43,611][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:47:44,753][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:47:44,754][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:44,756][root][INFO] - LLM usage: prompt_tokens = 1738, completion_tokens = 729
+[2025-09-20 09:47:44,757][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:47:45,853][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:47:45,857][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:45,863][root][INFO] - LLM usage: prompt_tokens = 2069, completion_tokens = 821
+[2025-09-20 09:47:45,865][root][INFO] - Iteration 0: Running Code 6799781648040472226
+[2025-09-20 09:47:46,410][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:47:46,448][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-20 09:47:46,448][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:47:47,382][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:47:47,386][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:47,392][root][INFO] - LLM usage: prompt_tokens = 2450, completion_tokens = 925
+[2025-09-20 09:47:47,394][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:47:48,411][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:47:48,412][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:48,414][root][INFO] - LLM usage: prompt_tokens = 2746, completion_tokens = 1020
+[2025-09-20 09:47:48,415][root][INFO] - Iteration 0: Running Code 1110360125415524630
+[2025-09-20 09:47:48,936][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:47:49,026][root][INFO] - Iteration 0, response_id 0: Objective value: 7.99477320543647
+[2025-09-20 09:47:49,027][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:47:51,085][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:47:51,086][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:51,088][root][INFO] - LLM usage: prompt_tokens = 581, completion_tokens = 171
+[2025-09-20 09:47:51,088][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:47:52,523][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:47:52,524][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:52,526][root][INFO] - LLM usage: prompt_tokens = 951, completion_tokens = 270
+[2025-09-20 09:47:52,527][root][INFO] - Iteration 0: Running Code -6395852330098992376
+[2025-09-20 09:47:53,080][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:47:53,240][root][INFO] - Iteration 0, response_id 0: Objective value: 7.99477320543647
+[2025-09-20 09:47:53,241][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:47:54,988][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:47:54,993][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:55,001][root][INFO] - LLM usage: prompt_tokens = 1532, completion_tokens = 379
+[2025-09-20 09:47:55,002][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:47:56,458][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:47:56,470][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:47:56,475][root][INFO] - LLM usage: prompt_tokens = 1828, completion_tokens = 437
+[2025-09-20 09:47:56,476][root][INFO] - Iteration 0: Running Code 5740956605937166849
+[2025-09-20 09:47:57,036][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:47:57,117][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-20 09:47:57,117][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:00,470][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:00,475][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:00,483][root][INFO] - LLM usage: prompt_tokens = 2392, completion_tokens = 779
+[2025-09-20 09:48:00,485][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:02,247][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:02,248][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:02,251][root][INFO] - LLM usage: prompt_tokens = 2920, completion_tokens = 874
+[2025-09-20 09:48:02,253][root][INFO] - Iteration 0: Running Code 2587559518793928167
+[2025-09-20 09:48:02,808][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:48:02,900][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-20 09:48:02,903][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:05,447][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:05,451][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:05,458][root][INFO] - LLM usage: prompt_tokens = 3484, completion_tokens = 1015
+[2025-09-20 09:48:05,460][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:07,817][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:07,818][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:07,821][root][INFO] - LLM usage: prompt_tokens = 4065, completion_tokens = 1180
+[2025-09-20 09:48:07,822][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:09,238][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:09,242][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:09,247][root][INFO] - LLM usage: prompt_tokens = 4416, completion_tokens = 1251
+[2025-09-20 09:48:09,248][root][INFO] - Iteration 0: Running Code 2541109113781717352
+[2025-09-20 09:48:09,800][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:48:09,842][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-20 09:48:09,843][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:12,593][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:12,594][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:12,596][root][INFO] - LLM usage: prompt_tokens = 4997, completion_tokens = 1508
+[2025-09-20 09:48:12,597][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:14,801][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:14,803][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:14,805][root][INFO] - LLM usage: prompt_tokens = 5441, completion_tokens = 1599
+[2025-09-20 09:48:14,806][root][INFO] - Iteration 0: Running Code 7387269751570778262
+[2025-09-20 09:48:15,384][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:48:15,534][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-20 09:48:15,534][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:17,087][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:17,088][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:17,090][root][INFO] - LLM usage: prompt_tokens = 6022, completion_tokens = 1704
+[2025-09-20 09:48:17,090][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:18,553][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:18,554][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:18,556][root][INFO] - LLM usage: prompt_tokens = 6313, completion_tokens = 1764
+[2025-09-20 09:48:18,557][root][INFO] - Iteration 0: Running Code 7625750195417973213
+[2025-09-20 09:48:19,078][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:48:19,118][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-20 09:48:19,119][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:20,870][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:20,872][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:20,875][root][INFO] - LLM usage: prompt_tokens = 6894, completion_tokens = 1887
+[2025-09-20 09:48:20,876][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:22,226][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:22,230][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:22,237][root][INFO] - LLM usage: prompt_tokens = 7203, completion_tokens = 1962
+[2025-09-20 09:48:22,239][root][INFO] - Iteration 0: Running Code 8298627430786042270
+[2025-09-20 09:48:22,770][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:48:22,813][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-20 09:48:22,813][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:25,984][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:25,987][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:25,989][root][INFO] - LLM usage: prompt_tokens = 7767, completion_tokens = 2341
+[2025-09-20 09:48:25,990][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:26,609][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 429 Too Many Requests"
+[2025-09-20 09:48:26,719][root][INFO] - Attempt 1 failed with error: litellm.RateLimitError: litellm.RateLimitError: VertexAIException - {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15\nPlease retry in 33.44413231s.",
+    "status": "RESOURCE_EXHAUSTED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+        "violations": [
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerMinutePerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "model": "gemini-2.0-flash",
+              "location": "global"
+            },
+            "quotaValue": "15"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Learn more about Gemini API quotas",
+            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.RetryInfo",
+        "retryDelay": "33s"
+      }
+    ]
+  }
+}
+
+[2025-09-20 09:48:29,725][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:30,286][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 429 Too Many Requests"
+[2025-09-20 09:48:30,288][root][INFO] - Attempt 2 failed with error: litellm.RateLimitError: litellm.RateLimitError: VertexAIException - {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15\nPlease retry in 29.756396563s.",
+    "status": "RESOURCE_EXHAUSTED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+        "violations": [
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerMinutePerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "model": "gemini-2.0-flash",
+              "location": "global"
+            },
+            "quotaValue": "15"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Learn more about Gemini API quotas",
+            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.RetryInfo",
+        "retryDelay": "29s"
+      }
+    ]
+  }
+}
+
+[2025-09-20 09:48:33,292][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:34,874][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:34,878][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:34,883][root][INFO] - LLM usage: prompt_tokens = 8333, completion_tokens = 2418
+[2025-09-20 09:48:34,884][root][INFO] - Iteration 0: Running Code 5093141381435325260
+[2025-09-20 09:48:35,533][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:48:35,571][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-20 09:48:35,572][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:36,215][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 429 Too Many Requests"
+[2025-09-20 09:48:36,221][root][INFO] - Attempt 1 failed with error: litellm.RateLimitError: litellm.RateLimitError: VertexAIException - {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15\nPlease retry in 23.838648603s.",
+    "status": "RESOURCE_EXHAUSTED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+        "violations": [
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerMinutePerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-2.0-flash"
+            },
+            "quotaValue": "15"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Learn more about Gemini API quotas",
+            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.RetryInfo",
+        "retryDelay": "23s"
+      }
+    ]
+  }
+}
+
+[2025-09-20 09:48:39,237][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:39,927][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 429 Too Many Requests"
+[2025-09-20 09:48:39,935][root][INFO] - Attempt 2 failed with error: litellm.RateLimitError: litellm.RateLimitError: VertexAIException - {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15\nPlease retry in 20.132144766s.",
+    "status": "RESOURCE_EXHAUSTED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+        "violations": [
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerMinutePerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-2.0-flash"
+            },
+            "quotaValue": "15"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Learn more about Gemini API quotas",
+            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.RetryInfo",
+        "retryDelay": "20s"
+      }
+    ]
+  }
+}
+
+[2025-09-20 09:48:42,938][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:43,451][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 429 Too Many Requests"
+[2025-09-20 09:48:43,452][root][INFO] - Attempt 3 failed with error: litellm.RateLimitError: litellm.RateLimitError: VertexAIException - {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15\nPlease retry in 16.590117007s.",
+    "status": "RESOURCE_EXHAUSTED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+        "violations": [
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerMinutePerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-2.0-flash"
+            },
+            "quotaValue": "15"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Learn more about Gemini API quotas",
+            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.RetryInfo",
+        "retryDelay": "16s"
+      }
+    ]
+  }
+}
+
+[2025-09-20 09:48:46,468][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:47,780][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 429 Too Many Requests"
+[2025-09-20 09:48:47,783][root][INFO] - Attempt 4 failed with error: litellm.RateLimitError: litellm.RateLimitError: VertexAIException - {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15\nPlease retry in 12.270170932s.",
+    "status": "RESOURCE_EXHAUSTED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+        "violations": [
+          {
+            "quotaMetric": "generativelanguage.googleapis.com/generate_content_free_tier_requests",
+            "quotaId": "GenerateRequestsPerMinutePerProjectPerModel-FreeTier",
+            "quotaDimensions": {
+              "location": "global",
+              "model": "gemini-2.0-flash"
+            },
+            "quotaValue": "15"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Learn more about Gemini API quotas",
+            "url": "https://ai.google.dev/gemini-api/docs/rate-limits"
+          }
+        ]
+      },
+      {
+        "@type": "type.googleapis.com/google.rpc.RetryInfo",
+        "retryDelay": "12s"
+      }
+    ]
+  }
+}
+
+[2025-09-20 09:48:50,798][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:53,104][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:53,106][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:53,109][root][INFO] - LLM usage: prompt_tokens = 8880, completion_tokens = 2600
+[2025-09-20 09:48:53,110][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:54,445][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:54,447][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:54,449][root][INFO] - LLM usage: prompt_tokens = 9249, completion_tokens = 2674
+[2025-09-20 09:48:54,450][root][INFO] - Iteration 0: Running Code 3789654898656366821
+[2025-09-20 09:48:55,252][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:48:55,346][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-20 09:48:55,347][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:58,629][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:58,630][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:48:58,633][root][INFO] - LLM usage: prompt_tokens = 9796, completion_tokens = 3030
+[2025-09-20 09:48:58,634][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:48:59,998][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:48:59,999][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:00,001][root][INFO] - LLM usage: prompt_tokens = 10289, completion_tokens = 3104
+[2025-09-20 09:49:00,003][root][INFO] - Iteration 0: Running Code 3520769626878380364
+[2025-09-20 09:49:00,591][root][INFO] - Iteration -1: Code Run -1 execution error!
+[2025-09-20 09:49:00,666][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-20 09:49:00,667][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:49:02,557][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:49:02,560][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:02,564][root][INFO] - LLM usage: prompt_tokens = 10853, completion_tokens = 3248
+[2025-09-20 09:49:02,564][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:49:03,873][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:49:03,874][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:03,876][root][INFO] - LLM usage: prompt_tokens = 11218, completion_tokens = 3311
+[2025-09-20 09:49:03,878][root][INFO] - Iteration 0: Running Code 573071252165166004
+[2025-09-20 09:49:04,485][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:49:04,650][root][INFO] - Iteration 0, response_id 0: Objective value: 32.06482806762624
+[2025-09-20 09:49:04,652][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:49:06,000][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:49:06,002][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:06,005][root][INFO] - LLM usage: prompt_tokens = 3459, completion_tokens = 1182
+[2025-09-20 09:49:06,005][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:49:07,159][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:49:07,161][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:07,163][root][INFO] - LLM usage: prompt_tokens = 3813, completion_tokens = 1291
+[2025-09-20 09:49:07,164][root][INFO] - Iteration 0: Running Code -1261431876314758234
+[2025-09-20 09:49:07,797][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:49:07,922][root][INFO] - Iteration 0, response_id 0: Objective value: 7.99477320543647
+[2025-09-20 09:49:07,923][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:49:09,564][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:49:09,565][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:09,567][root][INFO] - LLM usage: prompt_tokens = 4650, completion_tokens = 1533
+[2025-09-20 09:49:09,568][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:49:10,596][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:49:10,601][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:10,603][root][INFO] - LLM usage: prompt_tokens = 5084, completion_tokens = 1629
+[2025-09-20 09:49:10,604][root][INFO] - Iteration 0: Running Code -5309312131017590230
+[2025-09-20 09:49:11,228][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:49:12,006][root][INFO] - Iteration 0, response_id 0: Objective value: 8.38246197867023
+[2025-09-20 09:49:12,007][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:49:14,252][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:49:14,254][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:14,257][root][INFO] - LLM usage: prompt_tokens = 11876, completion_tokens = 3530
+[2025-09-20 09:49:14,258][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:49:15,623][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:49:15,626][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:15,628][root][INFO] - LLM usage: prompt_tokens = 12252, completion_tokens = 3594
+[2025-09-20 09:49:15,629][root][INFO] - Iteration 0: Running Code 8519614168569003067
+[2025-09-20 09:49:16,338][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:49:16,477][root][INFO] - Iteration 0, response_id 0: Objective value: 31.921542017637023
+[2025-09-20 09:49:16,478][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:49:18,895][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:49:18,898][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:18,901][root][INFO] - LLM usage: prompt_tokens = 12674, completion_tokens = 3820
+[2025-09-20 09:49:18,902][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:49:20,269][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:49:20,271][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:20,273][root][INFO] - LLM usage: prompt_tokens = 13125, completion_tokens = 3901
+[2025-09-20 09:49:20,274][root][INFO] - Iteration 0: Running Code -7628849852941322978
+[2025-09-20 09:49:21,024][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:49:21,199][root][INFO] - Iteration 0, response_id 0: Objective value: 8.021977604591623
+[2025-09-20 09:49:21,200][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:49:23,016][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:49:23,020][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:23,022][root][INFO] - LLM usage: prompt_tokens = 13528, completion_tokens = 4040
+[2025-09-20 09:49:23,022][LiteLLM][INFO] - 
+LiteLLM completion() model= gemini-2.0-flash; provider = gemini
+[2025-09-20 09:49:24,371][httpx][INFO] - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc "HTTP/1.1 200 OK"
+[2025-09-20 09:49:24,373][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:24,375][root][INFO] - LLM usage: prompt_tokens = 13845, completion_tokens = 4110
+[2025-09-20 09:49:24,375][root][INFO] - Iteration 0: Running Code 3842291257833465775
+[2025-09-20 09:49:24,866][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:49:24,960][root][INFO] - Iteration 0, response_id 0: Objective value: 7.99477320543647
+[2025-09-20 09:49:24,963][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:49:26,094][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:49:26,095][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:26,097][root][INFO] - LLM usage: prompt_tokens = 5742, completion_tokens = 1761
+[2025-09-20 09:49:26,098][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:49:27,220][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:49:27,222][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:27,224][root][INFO] - LLM usage: prompt_tokens = 6066, completion_tokens = 1880
+[2025-09-20 09:49:27,225][root][INFO] - Iteration 0: Running Code 6358800173381277008
+[2025-09-20 09:49:27,723][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-20 09:49:27,857][root][INFO] - Iteration 0, response_id 0: Objective value: 7.452660871023785
+[2025-09-20 09:49:27,858][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-20 09:49:29,338][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-20 09:49:29,341][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-20 09:49:29,343][root][INFO] - LLM usage: prompt_tokens = 6488, completion_tokens = 2135
+[2025-09-20 09:49:29,343][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral

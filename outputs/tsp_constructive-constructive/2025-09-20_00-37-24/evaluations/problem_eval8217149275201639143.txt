@@ -1,0 +1,32 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate destination bias probability
+    total_nodes = len(unvisited_nodes) + 1  # +1 for current node
+    dest_bias = 1 / (1 + math.exp(-0.5 * (total_nodes - 5)))  # Sigmoid function
+
+    # Temperature for stochastic selection (decreases as nodes are visited)
+    temperature = max(0.1, 1 - len(unvisited_nodes) / total_nodes)
+
+    if destination_node in unvisited_nodes and random.random() < dest_bias:
+        return destination_node
+
+    # Calculate node weights combining distance and exploration
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        exploration = random.uniform(0, 1) * temperature
+        weight = (1 - exploration) * distance + exploration * (1 / (distance + 1e-6))
+        weights.append(weight)
+
+    # Select node with minimum weight (but with some randomness)
+    if random.random() < 0.7:  # 70% chance to pick minimum weight
+        next_node = unvisited_nodes[weights.index(min(weights))]
+    else:  # 30% chance to pick weighted random selection
+        next_node = random.choices(unvisited_nodes, weights=[1/w for w in weights], k=1)[0]
+
+    return next_node

@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+    remaining_length = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weighting based on remaining path length and proximity
+        weight_proximity = 0.5 + 0.3 * (1 - min(remaining_length, 10) / 10)
+        weight_novelty = 1 - weight_proximity
+
+        # Harmonic mean of distances to balance proximity and detour
+        harmonic_mean = 2 / ((1/distance_to_current) + (1/distance_to_destination))
+
+        # Novelty score: centrality adjusted by distance variability
+        centrality = sum(distance_matrix[node][n] for n in range(total_nodes)) / (total_nodes - 1)
+        variability = max(distance_matrix[node]) - min(distance_matrix[node])
+        novelty = centrality * (1 + variability / max(1, sum(distance_matrix[node])))
+
+        # Combine scores with dynamic weights
+        combined_score = weight_proximity * harmonic_mean - weight_novelty * novelty
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

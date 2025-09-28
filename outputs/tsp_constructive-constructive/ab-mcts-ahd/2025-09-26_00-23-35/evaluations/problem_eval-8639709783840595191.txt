@@ -1,0 +1,36 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    min_distance = float('inf')
+    dest_distance = distance_matrix[current_node][destination_node]
+    candidates = []
+
+    # Calculate centrality for each node (average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality[node] = total_distance / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+
+    # Fixed temperature
+    temperature = 0.3
+
+    # Find nearest neighbor
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    # Adjust bias based on centrality and temperature
+    if next_node != destination_node and len(unvisited_nodes) > 1:
+        bias_factor = (min_distance / (dest_distance + 1e-6)) * (1.0 - temperature)
+        centrality_factor = centrality.get(next_node, 0) / (centrality.get(destination_node, 1) + 1e-6)
+
+        if (bias_factor > 0.5 and centrality_factor < 0.6) or random.random() < temperature:
+            next_node = destination_node if destination_node in unvisited_nodes else next_node
+
+    return next_node

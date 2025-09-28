@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_score = float('inf')
+    total_nodes = len(distance_matrix)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Calculate centrality: average distance to all other nodes
+        centrality = sum(distance_matrix[node][other] for other in range(total_nodes)) / total_nodes
+
+        # Weighted score combining immediate distance and centrality
+        weight = 0.7  # Higher weight for immediate distance
+        score = weight * immediate_distance + (1 - weight) * centrality
+
+        if score < best_score:
+            best_score = score
+            best_node = node
+
+    # Add probabilistic selection to avoid local minima
+    if random.random() < 0.2:  # 20% chance to randomly select a node
+        return random.choice(unvisited_nodes)
+
+    return next_node

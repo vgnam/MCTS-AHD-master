@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_weighted_distance = float('inf')
+    total_unvisited = len(unvisited_nodes)
+    progress_ratio = 1.0 / (1.0 + total_unvisited)
+    weight_factor = 1.0 / (1.0 + math.exp(-10 * (progress_ratio - 0.5)))  # Sigmoid adjustment
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate node centrality (average distance to all nodes)
+        centrality = sum(distance_matrix[node]) / len(distance_matrix[node])
+        normalized_centrality = centrality / max(sum(distance_matrix[i]) / len(distance_matrix[i]) for i in unvisited_nodes)
+
+        # Weighted distance with centrality consideration
+        weighted_distance = (1 - weight_factor) * distance_to_current + weight_factor * distance_to_destination
+        weighted_distance *= (1 + 0.5 * (1 - normalized_centrality))  # Penalize less central nodes
+
+        if weighted_distance < min_weighted_distance:
+            min_weighted_distance = weighted_distance
+            next_node = node
+
+    return next_node

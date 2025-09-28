@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    min_total_score = float('inf')
+    unvisited_count = len(unvisited_nodes)
+
+    # Calculate median node for outlier detection
+    median_node = None
+    if unvisited_count > 1:
+        median_node = sorted(unvisited_nodes, key=lambda x: sum(distance_matrix[x][other] for other in unvisited_nodes))[unvisited_count // 2]
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weight adjustment
+        destination_weight = 0.6 if unvisited_count <= 3 else 0.4
+        current_weight = 0.4 if unvisited_count <= 3 else 0.3
+
+        # Outlier penalty
+        outlier_penalty = 0
+        if median_node:
+            median_distance = distance_matrix[node][median_node]
+            median_avg = sum(distance_matrix[median_node][other] for other in unvisited_nodes) / unvisited_count
+            outlier_penalty = 0.5 * (median_distance - median_avg) if median_distance > 1.2 * median_avg else 0
+
+        total_score = (destination_weight * distance_to_destination +
+                      current_weight * distance_to_current +
+                      outlier_penalty)
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

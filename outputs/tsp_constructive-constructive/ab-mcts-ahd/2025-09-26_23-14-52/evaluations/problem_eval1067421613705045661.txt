@@ -1,0 +1,25 @@
+importance metric that combines local distance, global potential, and node centrality, using a decaying weight factor that prioritizes exploration early and exploitation later, with tie-breaking based on both distance and centrality.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    total_unvisited = len(unvisited_nodes)
+    exploration_weight = max(0.2, 0.8 * (total_unvisited / (total_unvisited + 2)))
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        centrality = sum(1 / (distance_matrix[node][other] + 1e-6) for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        weighted_score = (1.5 * current_distance + 0.4 * future_distance - 0.3 * centrality) * exploration_weight
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+        elif weighted_score == best_score:
+            if (future_distance / (centrality + 1e-6)) < (distance_matrix[next_node][destination_node] / (sum(1 / (distance_matrix[next_node][other] + 1e-6) for other in unvisited_nodes if other != next_node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 1 + 1e-6)):
+                next_node = node
+
+    return next_node

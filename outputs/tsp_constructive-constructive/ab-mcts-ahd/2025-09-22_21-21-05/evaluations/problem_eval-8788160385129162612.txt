@@ -1,0 +1,17 @@
+importance
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        normalized_centrality = centrality / max(1, sum(sum(row) for row in distance_matrix) / (len(distance_matrix) * len(distance_matrix)))
+
+        # Dynamic penalty based on centrality and progress
+        progress = (len(unvisited_nodes) - remaining_nodes + 1) / len(unvisited_nodes)
+        penalty = 0.4 * normalized_centrality * (1 - progress)
+
+        combined_score = (weight_current * distance_to_current) + \
+                         (weight_destination * distance_to_destination) + \
+                         penalty
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

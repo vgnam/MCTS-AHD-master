@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            # Calculate node centrality (inverse of average distance to other nodes)
+            centrality = 1.0 / (sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)) if remaining_nodes > 1 else 0
+
+            # Calculate future connectivity (number of nearby nodes)
+            connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.5 * distance_to_current) / remaining_nodes
+
+            # Calculate average nearest-neighbor distances
+            nearest_neighbors = sorted(unvisited_nodes, key=lambda n: distance_matrix[node][n])[:min(3, remaining_nodes)]
+            avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+            # Calculate average future distances
+            avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+
+            # Dynamic weights based on remaining nodes
+            weight_factor = 0.5 + 0.5 * (remaining_nodes / (remaining_nodes + 2))
+            immediate_weight = 0.4 * weight_factor
+            centrality_weight = 0.3 * (1 - weight_factor)
+            connectivity_weight = 0.2 * (1 - weight_factor)
+            future_weight = 0.1 * (1 - weight_factor)
+
+            # Penalty for nodes too close to destination
+            penalty_weight = 0.4 * (1.0 - future_weight)
+            penalty = penalty_weight * (distance_to_destination / (1.0 + avg_future_distance)) if avg_future_distance > 0 else 0
+
+            # Score combines weighted components with penalty
+            score = (immediate_weight * distance_to_current +
+                     centrality_weight * centrality +
+                     connectivity_weight * connectivity +
+                     future_weight * avg_future_distance) - penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,6 @@
+import random
+        next_node = random.choices([node for node, _ in scores], weights=probabilities, k=1)[0]
+    else:
+        next_node = scores[0][0]
+
+    return next_node

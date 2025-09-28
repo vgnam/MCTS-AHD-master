@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    max_score = -float('inf')
+
+    for node in unvisited_nodes:
+        dist_current = distance_matrix[current_node][node]
+        dist_dest = distance_matrix[node][destination_node]
+
+        if dist_current == 0:
+            angular_progress = 1.0
+        else:
+            angular_progress = dist_dest / dist_current
+
+        normalized_dist = dist_current / max(distance_matrix[current_node][n] for n in unvisited_nodes) if unvisited_nodes else 1.0
+        penalty = 0.2 if dist_dest < 0.5 * distance_matrix[current_node][destination_node] else 0.0
+        bonus = 0.1 if dist_current == min(distance_matrix[current_node][n] for n in unvisited_nodes) else 0.0
+
+        score = 0.5 * angular_progress - 0.3 * normalized_dist - penalty + bonus
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    return next_node

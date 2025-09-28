@@ -1,0 +1,31 @@
+importance and detour costs without dynamic scaling.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 0.4
+    total_nodes = len(distance_matrix)
+    remaining_count = len(unvisited_nodes)
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+
+        if remaining_count > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            locality = 1.0 / (avg_distance + 1e-6)
+
+            closeness_centrality = 1.0 / (sum(distance_matrix[node]) / (total_nodes - 1) + 1e-6)
+            detour_penalty = max(distance_matrix[node][n] for n in remaining_nodes) / (remaining_count ** 0.5)
+
+            exploration_term = temperature * (locality * closeness_centrality + 0.3 * detour_penalty)
+        else:
+            exploration_term = 0.0
+
+        weighted_score = (1.0 - temperature) * immediate_dist + exploration_term
+        candidates.append((node, weighted_score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

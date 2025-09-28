@@ -1,0 +1,8 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, p_farthest=0.7):
+    if not unvisited_nodes:
+        return destination_node
+    farthest_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    if random.random() < p_farthest:
+        return farthest_node
+    else:
+        return next_node

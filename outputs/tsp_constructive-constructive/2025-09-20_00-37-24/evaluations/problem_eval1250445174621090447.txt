@@ -1,0 +1,30 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        # Calculate a bias factor based on proximity and remaining nodes
+        remaining_nodes = len(unvisited_nodes)
+        proximity_bias = 1 / (distance_matrix[current_node][destination_node] + 1)  # +1 to avoid division by zero
+        bias = (proximity_bias * 0.5) + (0.5 / remaining_nodes)  # Balance between proximity and remaining nodes
+
+        if random.random() < bias:
+            return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Weighted selection: closer nodes have higher probability
+    weights = [1 / (distance_matrix[current_node][node] + 1) for node in nearest_neighbors]
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    if random.random() < 0.8:  # 80% chance to pick from top 3 with weights
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        candidate_weights = normalized_weights[:min(3, len(normalized_weights))]
+        next_node = random.choices(candidates, weights=candidate_weights, k=1)[0]
+    else:  # 20% chance to pick a random node with weights
+        next_node = random.choices(nearest_neighbors, weights=normalized_weights, k=1)[0]
+
+    return next_node

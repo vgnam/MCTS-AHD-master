@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    remaining_nodes = len(unvisited_nodes)
+    weight_factor = 0.2  # Fixed lower weight for immediate distance
+    min_cost = float('inf')
+    next_node = None
+    penalty_threshold = 3.0  # Stricter penalty threshold
+    penalty_multiplier = 1.0 + (0.5 * (1 / (remaining_nodes + 1)))  # Dynamic penalty adjustment
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        weighted_cost = immediate_distance + weight_factor * potential_distance
+
+        # Apply stricter penalty with dynamic multiplier
+        if immediate_distance > penalty_threshold * distance_matrix[current_node][destination_node]:
+            weighted_cost *= penalty_multiplier
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+    return next_node

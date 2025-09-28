@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            return node
+        current_distance = distance_matrix[current_node][node]
+        random_factor = random.uniform(0.1, 1.0)
+        weighted_score = current_distance * random_factor
+        candidates.append((node, weighted_score))
+
+    candidates.sort(key=lambda x: x[1])
+    best_node, _ = candidates[0]
+    return next_node

@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate neighborhood density
+    neighborhood_density = len(unvisited_nodes) / len(distance_matrix)
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight based on remaining nodes
+        weight = 0.5 + (1.0 - 0.5) * (1.0 - remaining_nodes / len(unvisited_nodes))
+
+        # Hub potential: weighted by inverse of average distance to other unvisited nodes
+        avg_distance_to_unvisited = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        hub_score = 1.0 / (1.0 + avg_distance_to_unvisited) if avg_distance_to_unvisited > 0 else 0
+
+        # Penalize nodes too close to current node or revisiting path history
+        penalty = 1.0 if current_distance < 0.1 * distance_matrix[current_node][destination_node] else 0.0
+        path_history_penalty = sum(1 for other in unvisited_nodes if distance_matrix[node][other] < current_distance * 0.7) / len(unvisited_nodes)
+
+        # Adaptive weight adjustment based on neighborhood density
+        proximity_weight = 0.4 * (0.8 + 0.2 * neighborhood_density)
+        destination_weight = 0.3 * (0.7 + 0.3 * (1 - neighborhood_density))
+        hub_weight = 0.3 * (0.6 + 0.4 * neighborhood_density)
+
+        # Calculate total score
+        score = (-proximity_weight * current_distance * (1.0 - penalty) +
+                 weight * destination_weight * destination_distance +
+                 hub_weight * hub_score -
+                 0.2 * path_history_penalty)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

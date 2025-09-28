@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 6, in <module>
+    from scipy.spatial import distance_matrix
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\spatial\__init__.py", line 116, in <module>
+    from ._geometric_slerp import geometric_slerp
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\spatial\_geometric_slerp.py", line 9, in <module>
+    from scipy.spatial.distance import euclidean
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\spatial\distance.py", line 121, in <module>
+    from ..special import rel_entr
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\special\__init__.py", line 772, in <module>
+    from . import _ufuncs
+KeyboardInterrupt

@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes if total_nodes > 0 else 0.0
+    exploration_weight = 0.3 * (1 - progress_ratio)  # Decreases as progress increases
+
+    def node_fitness(node):
+        immediate_cost = distance_matrix[current_node][node]
+        direct_cost = distance_matrix[node][destination_node]
+
+        # Long-term cost: average of 3 nearest neighbors' direct costs
+        nearest_neighbors = sorted(range(len(distance_matrix)), key=lambda n: distance_matrix[node][n])[1:4]
+        long_term_cost = sum(distance_matrix[n][destination_node] for n in nearest_neighbors) / min(3, len(nearest_neighbors)) if nearest_neighbors else 0
+
+        # Centrality: inverse of sum of distances to all unvisited nodes
+        centrality = 1 / (sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) + 1)
+
+        # Fitness combines costs with dynamic weights and exploration bonus
+        fitness = (0.5 * immediate_cost + 0.3 * direct_cost + 0.2 * long_term_cost) * (1 + exploration_weight * centrality)
+        return fitness
+
+    # Probabilistic selection: nodes with lower fitness have higher selection probability
+    fitness_scores = [node_fitness(node) for node in unvisited_nodes]
+    min_fitness = min(fitness_scores)
+    max_fitness = max(fitness_scores)
+    normalized_scores = [(max_fitness - score + 1) / (max_fitness - min_fitness + 1) for score in fitness_scores]
+
+    # Penalize revisits (except destination) by lowering selection probability
+    penalty_mask = [0.7 if node != destination_node else 1.0 for node in unvisited_nodes]
+    weighted_scores = [score * penalty for score, penalty in zip(normalized_scores, penalty_mask)]
+
+    # Select node based on weighted probabilities
+    selected_index = weighted_scores.index(max(weighted_scores))
+    return next_node

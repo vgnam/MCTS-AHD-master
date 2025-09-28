@@ -1,0 +1,48 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    time_decay_factor = 0.7
+    exploration_bonus = 0.5
+    temperature = 1.0 - (1.0 / (1.0 + len(unvisited_nodes)))  # Decreases as unvisited nodes decrease
+
+    node_scores = []
+    node_centralities = []
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        # Novel centrality metric: average distance to all remaining nodes (including destination)
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+        node_centralities.append(centrality)
+
+        penalty = max(0, (distance_to_current + distance_to_destination) - 2 * avg_distance_to_remaining)
+        combined_score = (distance_to_current + distance_to_destination) + time_decay_factor * avg_distance_to_remaining - exploration_bonus * penalty
+        node_scores.append(combined_score)
+
+    # Normalize scores and centralities
+    min_score = min(node_scores) if node_scores else 0
+    max_score = max(node_scores) if node_scores else 1
+    normalized_scores = [(s - min_score) / (max_score - min_score + 1e-9) for s in node_scores]
+
+    min_centrality = min(node_centralities) if node_centralities else 0
+    max_centrality = max(node_centralities) if node_centralities else 1
+    normalized_centralities = [(c - min_centrality) / (max_centrality - min_centrality + 1e-9) for c in node_centralities]
+
+    # Combine scores with centrality (weighted by temperature)
+    combined_weights = [
+        (1 - temperature) * ns + temperature * nc
+        for ns, nc in zip(normalized_scores, normalized_centralities)
+    ]
+
+    # Select node probabilistically based on weights
+    total_weight = sum(combined_weights)
+    if total_weight <= 0:
+        return unvisited_nodes[0] if unvisited_nodes else destination_node
+
+    probabilities = [w / total_weight for w in combined_weights]
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+
+    return next_node

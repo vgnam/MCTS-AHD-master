@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    unvisited_count = len(unvisited_nodes)
+    min_distance = min([distance_matrix[current_node][node] for node in unvisited_nodes])
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        straight_path = distance_matrix[current_node][destination_node]
+
+        proximity_weight = 1 / (1 + distance_to_node)
+        novelty_factor = (straight_path - distance_to_dest) / (distance_to_node + 1e-6)
+        angular_deviation = abs(distance_to_dest - (straight_path - distance_to_node)) / (straight_path + 1e-6)
+
+        dynamic_weight = 0.5 + 0.5 * (1 - angular_deviation)
+        score = (proximity_weight * 0.7 * dynamic_weight) + (novelty_factor * 0.3 * (1 - dynamic_weight))
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        if dest_distance < min_distance * 0.5:
+            next_node = destination_node
+
+    return next_node

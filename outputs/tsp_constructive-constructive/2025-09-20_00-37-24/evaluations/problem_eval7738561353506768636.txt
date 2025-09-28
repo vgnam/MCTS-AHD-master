@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visit_counts=None):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    if visit_counts is None:
+        visit_counts = {node: 1 for node in unvisited_nodes}
+
+    # Calculate dynamic probabilities based on inverse distance and visit frequency
+    probabilities = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        freq = visit_counts[node]
+        weight = (1.0 / distance) * math.exp(-0.1 * freq)  # Inverse distance with frequency penalty
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    normalized_probs = [w / total_weight for w in probabilities]
+
+    # Select node based on dynamic probabilities
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+
+    # Update visit counts (optional for external tracking)
+    if visit_counts is not None:
+        visit_counts[next_node] += 1
+
+    return next_node

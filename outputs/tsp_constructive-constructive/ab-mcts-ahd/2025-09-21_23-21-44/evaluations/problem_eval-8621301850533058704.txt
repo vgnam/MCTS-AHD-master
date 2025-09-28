@@ -1,0 +1,34 @@
+importance of average distance and destination distance as the problem size decreases. It also introduces a penalty term based on the node's historical selection frequency to avoid revisiting nodes unnecessarily, creating a more adaptive and globally aware heuristic.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    weight_immediate = max(0.5, 1.7 - 0.1 * total_unvisited)
+    weight_avg = min(0.5, 0.3 + 0.05 * total_unvisited)
+    weight_dest = min(0.3, 0.1 + 0.02 * total_unvisited)
+
+    min_score = float('inf')
+    next_node = None
+    selection_history = {node: 0 for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][other_node] for other_node in unvisited_nodes if other_node != node) / max(1, len(unvisited_nodes) - 1)
+        destination_distance = distance_matrix[node][destination_node]
+        penalty = 0.2 * selection_history[node]
+
+        combined_score = (weight_immediate * immediate_distance +
+                          weight_avg * avg_distance +
+                          weight_dest * destination_distance +
+                          penalty)
+
+        if combined_score < min_score:
+            min_score = combined_score
+            next_node = node
+
+    if next_node is not None:
+        selection_history[next_node] += 1
+
+    return next_node

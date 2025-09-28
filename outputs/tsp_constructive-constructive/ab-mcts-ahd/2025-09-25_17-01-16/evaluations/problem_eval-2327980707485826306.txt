@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_score = float('inf')
+
+    # Calculate dynamic alpha based on remaining nodes' density
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    alpha = 0.5 * (remaining_nodes / total_nodes)  # Higher alpha when fewer nodes remain
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        estimated_distance_to_destination = distance_matrix[node][destination_node]
+
+        if estimated_distance_to_destination == 0:
+            score = float('inf')
+        else:
+            # Calculate node centrality as average distance to other nodes
+            centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+            score = alpha * distance_to_current + (1 - alpha) * estimated_distance_to_destination + 0.2 * centrality
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

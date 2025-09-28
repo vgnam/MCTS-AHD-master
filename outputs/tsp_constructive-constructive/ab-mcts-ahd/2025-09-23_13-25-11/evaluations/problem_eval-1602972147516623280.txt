@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    weight_immediate = 0.7 if remaining_count > 10 else 0.5
+    weight_future = 0.3 if remaining_count > 10 else 0.5
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        total_dist = weight_immediate * current_dist + weight_future * avg_future_dist
+
+        # Introduce a small probabilistic bias to encourage exploration
+        if remaining_count > 5:
+            total_dist *= (1 + 0.1 * (len(unvisited_nodes) - 1) / len(unvisited_nodes))
+
+        return total_dist
+
+    # Rank nodes by evaluation and select with a slight randomness
+    ranked_nodes = sorted(unvisited_nodes, key=evaluate_node)
+    selection_prob = [0.5 ** i for i in range(len(ranked_nodes))]
+    selection_prob = [p / sum(selection_prob) for p in selection_prob]
+    next_node = np.random.choice(ranked_nodes, p=selection_prob)
+
+    return next_node

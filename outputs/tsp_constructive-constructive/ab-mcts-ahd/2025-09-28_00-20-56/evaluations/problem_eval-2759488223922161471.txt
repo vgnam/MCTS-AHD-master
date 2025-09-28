@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate average distance to unvisited nodes
+    total_distance = 0
+    for node in unvisited_nodes:
+        total_distance += distance_matrix[current_node][node]
+    avg_distance = total_distance / len(unvisited_nodes) if unvisited_nodes else float('inf')
+
+    min_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    # Dynamic threshold: prioritize destination if within 1.2 times the average distance
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance <= 1.2 * avg_distance:
+            next_node = destination_node
+
+    return next_node

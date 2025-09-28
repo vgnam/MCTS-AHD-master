@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    node_scores = []
+    num_unvisited = len(unvisited_nodes)
+    exploration_factor = (num_unvisited ** 0.5) / (num_unvisited + 1)  # Dynamic exploration factor
+    penalty_weight = 0.3 * (sum(distance_matrix[0]) / len(distance_matrix))  # Penalty weight based on average distance
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Global factor: average distance to remaining nodes, weighted by exploration factor
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / num_unvisited if num_unvisited else 0
+        global_factor = exploration_factor * avg_distance_to_remaining
+
+        # Penalty for revisiting nodes (avoid loops)
+        penalty = 1.0
+        if distance_to_current < penalty_weight:
+            penalty = 1.5
+
+        # Combined score: local + global + penalty
+        combined_score = (distance_to_current + distance_to_destination) + global_factor + penalty_weight * penalty
+        node_scores.append((node, combined_score))
+
+    # Probabilistic selection: nodes with lower scores have higher probability
+    scores = [score for _, score in node_scores]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - score + 1e-6) for score in scores]  # Invert and add small value to avoid division by zero
+
+    # Select node based on weighted probability
+    total = sum(normalized_scores)
+    probabilities = [score / total for score in normalized_scores]
+    next_node = random.choices([node for node, _ in node_scores], weights=probabilities, k=1)[0]
+
+    return next_node

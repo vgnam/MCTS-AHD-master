@@ -1,0 +1,9 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if len(unvisited_nodes) > 1 and random.random() < 0.2:  # 20% chance to explore non-greedy paths
+        candidates = random.sample(unvisited_nodes, min(3, len(unvisited_nodes)))
+        next_node = min(candidates, key=lambda node: distance_matrix[current_node][node])
+    else:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    return next_node

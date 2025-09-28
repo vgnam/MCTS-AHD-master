@@ -1,0 +1,5 @@
+import random
+        if random.random() < exploration_factor:
+            next_node = random.choice([node for node, _ in candidate_nodes if node != next_node])
+
+    return next_node

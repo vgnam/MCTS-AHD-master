@@ -1,0 +1,8 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    # Example secondary heuristic: node degree (number of connections)
+    node_degree = {node: sum(1 for dist in distance_matrix[node] if dist > 0) for node in unvisited_nodes}
+    # Weighted combination: 70% distance, 30% inverse degree (to prefer less connected nodes)
+    next_node = min(unvisited_nodes, key=lambda node: 0.7 * distance_matrix[current_node][node] + 0.3 * (1 / node_degree[node]))
+    return next_node

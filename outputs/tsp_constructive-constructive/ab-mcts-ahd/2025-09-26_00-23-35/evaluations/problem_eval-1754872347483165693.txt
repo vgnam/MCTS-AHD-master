@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_distance = float('inf')
+    dest_distance = distance_matrix[current_node][destination_node]
+    num_unvisited = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            next_node = node
+            break
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    if next_node != destination_node and len(unvisited_nodes) > 1:
+        bias_factor = dest_distance / (min_distance + 1e-6)
+        if bias_factor > 2.0:
+            next_node = destination_node if destination_node in unvisited_nodes else next_node
+
+    if next_node is not None and len(unvisited_nodes) > 1:
+        avg_distance_to_dest = sum(distance_matrix[next_node][n] for n in unvisited_nodes if n != next_node) / max(1, len(unvisited_nodes) - 1)
+        distances_to_others = [distance_matrix[next_node][n] for n in unvisited_nodes if n != next_node]
+        variance = sum((d - avg_distance_to_dest) ** 2 for d in distances_to_others) / max(1, len(distances_to_others))
+
+        proximity_weight = 1.0 * (1 + (1 - num_unvisited / len(distance_matrix)) * 0.8)
+        centrality_weight = 1.2 * (1 - variance / (avg_distance_to_dest + 1e-6))
+        score = -proximity_weight * distance_matrix[current_node][next_node] + centrality_weight * avg_distance_to_dest
+
+        for node in unvisited_nodes:
+            distance = distance_matrix[current_node][node]
+            avg_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+            dists = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            var = sum((d - avg_dist) ** 2 for d in dists) / max(1, len(dists))
+            prox_weight = 1.0 * (1 + (1 - num_unvisited / len(distance_matrix)) * 0.8)
+            cent_weight = 1.2 * (1 - var / (avg_dist + 1e-6))
+            new_score = -prox_weight * distance + cent_weight * avg_dist
+
+            if new_score > score:
+                score = new_score
+                next_node = node
+
+    return next_node

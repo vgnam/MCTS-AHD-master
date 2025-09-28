@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    # Stage 1: Filter candidates based on immediate distance and centrality
+    def candidate_score(node):
+        dist = distance_matrix[current_node][node]
+        if remaining_nodes > 1:
+            centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+        else:
+            centrality = 0
+        return dist + 0.5 * centrality
+
+    candidates = sorted(unvisited_nodes, key=lambda node: candidate_score(node))
+    candidate_size = max(1, min(4, len(candidates)))
+    top_candidates = candidates[:candidate_size]
+
+    # Stage 2: Evaluate with dynamic weights and novelty factor
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Novelty: distance to farthest unvisited node
+        if remaining_nodes > 1:
+            novelty = max(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        else:
+            novelty = 0
+
+        # Dynamic weights
+        weight_dist = 0.3 + 0.4 * (1 - progress)
+        weight_novelty = 0.2 + 0.3 * progress
+        weight_penalty = 0.1 + 0.2 * progress
+
+        return (weight_dist * current_dist +
+                weight_novelty * novelty -
+                weight_penalty * dest_dist)
+
+    next_node = min(top_candidates, key=lambda node: evaluate_node(node))
+    return next_node

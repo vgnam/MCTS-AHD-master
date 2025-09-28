@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1  # +1 to include current_node if needed
+    remaining_nodes = len(unvisited_nodes)
+    weight_factor = 1 - (remaining_nodes / total_nodes) ** 2
+
+    def density_adjusted_score(node):
+        local_score = distance_matrix[current_node][node]
+        global_score = max(distance_matrix[node][n] for n in unvisited_nodes - {node}) if (unvisited_nodes - {node}) else 0
+        return weight_factor * local_score + (1 - weight_factor) * global_score
+
+    next_node = min(unvisited_nodes, key=density_adjusted_score)
+    return next_node

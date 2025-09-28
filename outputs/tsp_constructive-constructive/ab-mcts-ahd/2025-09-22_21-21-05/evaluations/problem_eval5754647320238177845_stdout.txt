@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    default but adjusts its selection by incorporating the destination's distance, overriding the farthest-node rule if the destination is significantly closer (bias > bias_threshold), where bias_threshold is calculated as 0.7 * (1 + (destination_distance / avg_distance)), making the algorithm favor the destination when it is relatively close compared to the average distance of unvisited nodes.}
+                                                                      ^
+SyntaxError: unterminated string literal (detected at line 1)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    default but adjusts its selection by incorporating the destination's distance, overriding the farthest-node rule if the destination is significantly closer (bias > bias_threshold), where bias_threshold is calculated as 0.7 * (1 + (destination_distance / avg_distance)), making the algorithm favor the destination when it is relatively close compared to the average distance of unvisited nodes.}
+                                                                      ^
+SyntaxError: unterminated string literal (detected at line 1)

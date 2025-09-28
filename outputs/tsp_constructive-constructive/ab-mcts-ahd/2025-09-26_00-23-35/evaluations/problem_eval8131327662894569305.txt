@@ -1,0 +1,52 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic progress factor with decay
+    progress_factor = (1.0 - (remaining_nodes / total_nodes) ** 2)
+    weight_proximity = 1.0 - progress_factor
+    weight_future = progress_factor
+
+    # Historical selection bias (simplified reinforcement learning)
+    selection_bias = {node: 1.0 for node in unvisited_nodes}
+    if hasattr(select_next_node, 'history'):
+        for node in select_next_node.history:
+            if node in unvisited_nodes:
+                selection_bias[node] *= 0.8  # Decay factor for historical nodes
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Diversity-adjusted centrality: sum of squared distances to unvisited nodes
+        diversity = sum((distance_matrix[node][n] ** 2) for n in unvisited_nodes if n != node)
+        centrality = diversity / max(1, (remaining_nodes - 1) ** 2)
+
+        # Future potential with diversity weighting
+        future_potential = distance_to_destination * (remaining_nodes / total_nodes) * (1.0 - centrality)
+
+        # Exploration factor: inversely proportional to historical bias
+        exploration_factor = 0.1 * (1.0 / selection_bias[node])
+
+        # Combined score with dynamic weights
+        score = (weight_proximity * distance_to_node +
+                 weight_future * future_potential -
+                 0.3 * centrality +
+                 exploration_factor)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Update history for next call
+    if not hasattr(select_next_node, 'history'):
+        select_next_node.history = []
+    if next_node is not None:
+        select_next_node.history.append(next_node)
+
+    return next_node

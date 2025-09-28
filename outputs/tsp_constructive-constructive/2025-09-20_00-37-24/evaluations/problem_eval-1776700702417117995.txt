@@ -1,0 +1,32 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate centrality of current node (average distance to all other nodes)
+    total_distance = sum(distance_matrix[current_node])
+    avg_distance = total_distance / len(distance_matrix[current_node])
+
+    # Dynamic selection pool size based on centrality
+    pool_size = max(1, int(len(unvisited_nodes) * (0.5 + 0.5 * (avg_distance / max(total_distance, 1)))))
+
+    # Sort unvisited nodes by distance
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_neighbors = sorted(unvisited_nodes, key=lambda node: -distance_matrix[current_node][node])
+
+    # Dynamic stochasticity: higher probability of random selection as fewer nodes remain
+    random_prob = 0.1 + 0.8 * (1 - len(unvisited_nodes) / len(distance_matrix[current_node]))
+
+    if random.random() < random_prob:
+        # Random selection from dynamic pool
+        candidates = nearest_neighbors[:pool_size]
+        next_node = random.choice(candidates)
+    else:
+        # Combined nearest and farthest selection
+        combined_candidates = nearest_neighbors[:pool_size//2] + farthest_neighbors[:pool_size//2]
+        next_node = random.choice(combined_candidates)
+
+    return next_node

@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        remaining_unvisited = unvisited_nodes - {destination_node}
+
+        if not remaining_unvisited:
+            return destination_node
+
+        avg_distance = sum(distance_matrix[current_node][node] for node in remaining_unvisited) / len(remaining_unvisited)
+        temp = 1.0 / (1.0 + 0.5 * (destination_distance / avg_distance))
+
+        if avg_distance == 0 or destination_distance == 0:
+            return destination_node
+
+        prob_destination = (destination_distance / avg_distance) ** -2 * temp
+        prob_destination = min(prob_destination, 1.0)
+
+        if np.random.random() < prob_destination:
+            return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    distance_weights = []
+
+    for node in unvisited_nodes:
+        dist = distance_matrix[current_node][node]
+        if dist < min_distance:
+            min_distance = dist
+            next_node = node
+        distance_weights.append(dist)
+
+    if distance_weights:
+        normalized_weights = [1.0 / (w + 1e-6) for w in distance_weights]
+        sum_weights = sum(normalized_weights)
+        normalized_weights = [w / sum_weights for w in normalized_weights]
+        selected_idx = np.random.choice(len(unvisited_nodes), p=normalized_weights)
+        next_node = list(unvisited_nodes)[selected_idx]
+
+    return next_node

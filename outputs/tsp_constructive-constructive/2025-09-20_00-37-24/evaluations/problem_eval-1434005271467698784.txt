@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if not nearest_neighbors:
+        return None
+
+    # Calculate probabilities based on inverse distance with temperature adjustment
+    distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+    min_dist = min(distances)
+    max_dist = max(distances)
+
+    if min_dist == max_dist:
+        probs = [1.0 / len(nearest_neighbors)] * len(nearest_neighbors)
+    else:
+        # Normalize distances and apply temperature
+        normalized = [(max_dist - d + 1e-9) / (max_dist - min_dist + 1e-9) for d in distances]
+        probs = [math.exp(n / temperature) for n in normalized]
+        total = sum(probs)
+        probs = [p / total for p in probs]
+
+    # Select node based on calculated probabilities
+    next_node = random.choices(nearest_neighbors, weights=probs, k=1)[0]
+    return next_node

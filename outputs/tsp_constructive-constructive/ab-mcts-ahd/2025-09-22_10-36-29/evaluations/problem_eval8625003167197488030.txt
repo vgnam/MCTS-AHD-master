@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_score = float('inf')
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            return node
+
+        max_insertion_cost = 0
+        for i in range(len(distance_matrix)):
+            if i != current_node and i != node:
+                insertion_cost = distance_matrix[current_node][i] + distance_matrix[i][node] - distance_matrix[current_node][node]
+                if insertion_cost > max_insertion_cost:
+                    max_insertion_cost = insertion_cost
+
+        total_score = current_distance + max_insertion_cost
+
+        if total_score < best_score:
+            best_score = total_score
+            best_node = node
+
+    return next_node

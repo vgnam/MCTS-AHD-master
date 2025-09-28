@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    exploration_penalties = []
+    centralities = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        centrality = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 0.5 * max(distance_matrix[node])) if unvisited_nodes else 0
+        centralities.append(centrality)
+
+        exploration_penalties.append(0.1 * immediate_distance * (1.0 + 0.3 * (1.0 - len(unvisited_nodes) / len(distance_matrix))))
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    regret_weight = 0.3 + 0.2 * (remaining_nodes / total_nodes)
+    distance_weight = 0.7 - 0.2 * (remaining_nodes / total_nodes)
+    exploration_factor = 1.0 + 0.4 * (1.0 - (remaining_nodes / total_nodes))
+
+    scores = [
+        regret_weight * (regret * (1.0 + 0.1 * centrality)) + distance_weight * distance - exploration_factor * penalty
+        for regret, distance, penalty, centrality in zip(regrets, distances, exploration_penalties, centralities)
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

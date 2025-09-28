@@ -1,0 +1,4 @@
+import random
+    next_node = random.choices(candidates, weights=normalized_weights, k=1)[0]
+
+    return next_node

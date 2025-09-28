@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    min_weighted_cost = float('inf')
+    progress = 1 - len(unvisited_nodes) / (len(unvisited_nodes) + 1)  # Normalized progress (0 to 1)
+
+    # Precompute average distances for all nodes
+    node_avg_dist = {}
+    for node in unvisited_nodes:
+        remaining_nodes = [n for n in unvisited_nodes if n != node]
+        if remaining_nodes:
+            avg_dist = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+        else:
+            avg_dist = 0
+        node_avg_dist[node] = avg_dist
+
+    # Dynamic weight with non-linear adjustment
+    dynamic_weight = 1.0 - 0.5 * (progress ** 2)  # Quadratic decrease in weight
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+
+        # Progress-aware penalty with history consideration
+        if progress > 0.5:
+            penalty = sum(distance_matrix[current_node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        else:
+            penalty = 0
+
+        # Future cost estimation with node revisit history
+        future_cost = node_avg_dist[node] * (1 + 0.1 * (1 - progress))  # Decrease weight of future cost as progress increases
+
+        weighted_cost = current_to_node + dynamic_weight * future_cost + penalty
+
+        if weighted_cost < min_weighted_cost:
+            min_weighted_cost = weighted_cost
+            best_node = node
+
+    return next_node

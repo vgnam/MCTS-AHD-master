@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=0.5):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate distances and centrality scores for unvisited nodes
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    centrality_scores = [sum(distance_matrix[node]) for node in unvisited_nodes]
+
+    # Combine distance and centrality into a weighted score
+    scores = [
+        (1 - temperature) * (distance / max(distances)) + temperature * (centrality_scores[i] / max(centrality_scores))
+        for i, distance in enumerate(distances)
+    ]
+
+    # Select node with the lowest score (balanced between distance and centrality)
+    next_node = unvisited_nodes[scores.index(min(scores))]
+    return next_node

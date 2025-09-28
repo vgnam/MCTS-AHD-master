@@ -1,0 +1,39 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_cost = min(distances)
+    avg_distance = sum(distances) / len(distances)
+
+    # Calculate exploration factor that decays with remaining nodes
+    exploration_factor = 0.5 * (1 - math.exp(-0.5 * len(unvisited_nodes) / len(distance_matrix)))
+
+    # Calculate weights for each node
+    weights = []
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        normalized_cost = (cost - min_cost) / (avg_distance - min_cost + 1e-10)
+        # Weight combines cost efficiency and exploration
+        weight = (1 - exploration_factor) * (1 - normalized_cost) + exploration_factor * random.random()
+        weights.append(weight)
+
+    # Select node with highest weight
+    next_node = unvisited_nodes[weights.index(max(weights))]
+
+    # Special handling for destination proximity
+    if destination_node in unvisited_nodes and len(unvisited_nodes) > 2:
+        dest_cost = distance_matrix[current_node][destination_node]
+        if dest_cost < avg_distance * (1.5 + 0.5 * (len(unvisited_nodes) / len(distance_matrix))):
+            next_node = destination_node
+
+    return next_node

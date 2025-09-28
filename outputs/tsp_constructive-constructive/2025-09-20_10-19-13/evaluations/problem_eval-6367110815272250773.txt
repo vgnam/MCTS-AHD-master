@@ -1,0 +1,10 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    node_scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        priority = 1 / (1 + node.get('selection_count', 0))  # Inverse of selection count
+        node_scores[node] = distance * priority  # Weighted sum
+    next_node = min(unvisited_nodes, key=lambda node: node_scores[node])
+    return next_node

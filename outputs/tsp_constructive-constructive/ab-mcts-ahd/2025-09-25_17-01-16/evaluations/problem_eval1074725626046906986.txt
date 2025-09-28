@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    decay_factor = 0.9 ** remaining_nodes  # Exponential decay for centrality weight
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        avg_distance_to_unvisited = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_nodes
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weight adjustment with exponential decay
+        weight = 0.5 * decay_factor + (0.5 * (remaining_nodes / (remaining_nodes + 1)))
+
+        # Normalized scores for better balance
+        normalized_distance_to_current = distance_to_current / max(distance_matrix[current_node].values())
+        normalized_avg_distance = avg_distance_to_unvisited / max(distance_matrix[node].values())
+        normalized_distance_to_destination = distance_to_destination / max(distance_matrix[node].values())
+
+        # Weighted sum with normalized scores
+        total_score = (0.4 * normalized_distance_to_current) + (weight * normalized_avg_distance) + (0.3 * normalized_distance_to_destination)
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

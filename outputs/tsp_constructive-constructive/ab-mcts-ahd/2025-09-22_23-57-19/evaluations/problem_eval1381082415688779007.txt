@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    threshold = max(0.3, 0.8 * remaining_ratio)
+
+    max_cost = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost > max_cost * threshold:
+            max_cost = cost
+            next_node = node
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        best_pair_cost = 0
+        best_pair_node = None
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            pair_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            if pair_cost > best_pair_cost:
+                best_pair_cost = pair_cost
+                best_pair_node = node
+        if best_pair_node and best_pair_cost > max_cost * threshold:
+            next_node = best_pair_node
+
+    return next_node

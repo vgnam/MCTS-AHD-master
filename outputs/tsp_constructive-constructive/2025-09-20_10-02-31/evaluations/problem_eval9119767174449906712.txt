@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def min_max_distance(node):
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return distance_matrix[current_node][node]
+        return max(distance_matrix[node][n] for n in remaining_nodes)
+
+    remaining = len(unvisited_nodes)
+    if remaining == 1:
+        next_node = unvisited_nodes.pop()
+    else:
+        # Dynamic weighting using sigmoid function
+        weight = 1 / (1 + math.exp((remaining - 10) / 2))
+        local_cost = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+        global_cost = min(unvisited_nodes, key=min_max_distance)
+
+        # Combine costs based on dynamic weight
+        combined_cost = {
+            node: (1 - weight) * distance_matrix[current_node][node] +
+                  weight * min_max_distance(node)
+            for node in unvisited_nodes
+        }
+        next_node = min(unvisited_nodes, key=lambda node: combined_cost[node])
+
+    return next_node

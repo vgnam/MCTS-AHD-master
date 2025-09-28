@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    # Calculate heuristic values: combination of distance and node centrality
+    heuristic_values = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Centrality: inverse of average distance to other nodes (simplified)
+        centrality = 1.0 / (sum(distance_matrix[node]) / len(distance_matrix[node]) + 1e-6)
+        heuristic_values[node] = distance * (1.0 - 0.3 * centrality)  # Weighted heuristic
+
+    # Sort by heuristic value
+    sorted_nodes = sorted(unvisited_nodes, key=lambda node: heuristic_values[node])
+
+    # Dynamic bias towards destination node
+    bias_prob = 0.5 + 0.4 * (len(unvisited_nodes) / len(distance_matrix))  # Higher bias when fewer nodes left
+
+    if random.random() < bias_prob and destination_node in sorted_nodes[:3]:
+        return destination_node
+    else:
+        # Select from top 3 or random based on heuristic
+        if random.random() < 0.8:  # 80% chance to pick from top 3 heuristic
+            candidates = sorted_nodes[:min(3, len(sorted_nodes))]
+            return random.choice(candidates)
+        else:  # 20% chance to pick random heuristic
+            return next_node

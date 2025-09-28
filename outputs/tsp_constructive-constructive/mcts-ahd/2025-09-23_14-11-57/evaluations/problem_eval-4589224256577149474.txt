@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_sigmoid = 1 / (1 + math.exp(-0.5 * (remaining_nodes - total_nodes / 2)))
+
+    immediate_weight = 0.6 * exploration_sigmoid
+    regret_weight = 0.3 * (1 - exploration_sigmoid)
+    anticipation_penalty = 0.2 * (1 - remaining_nodes / total_nodes)
+
+    distances = []
+    regrets = []
+    anticipation_scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        local_search = sorted([distance_matrix[node][n] for n in unvisited_nodes if n != node], key=lambda x: x)
+        anticipation = sum(local_search[:min(3, len(local_search))]) if local_search else 0
+        anticipation_scores.append(anticipation)
+
+    combined_scores = [
+        immediate_weight * distance +
+        regret_weight * regret +
+        anticipation_penalty * anticipation
+        for distance, regret, anticipation in zip(distances, regrets, anticipation_scores)
+    ]
+
+    min_score = min(combined_scores)
+    selected_index = combined_scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    k = max(1, min(3, len(unvisited_nodes) // 2))  # Dynamic k based on remaining nodes
+    remaining_weight = min(0.7, 0.3 + 0.1 * len(unvisited_nodes))  # Dynamic weight
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+
+        future_dists = sorted(distance_matrix[node][other] for other in remaining_nodes)
+        avg_k_future = sum(future_dists[:k]) / k if future_dists else 0
+        return (1 - remaining_weight) * current_dist + remaining_weight * avg_k_future
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

@@ -1,0 +1,19 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate probabilities based on distance to current node and destination
+    distances_to_current = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    distances_to_destination = [distance_matrix[node][destination_node] for node in unvisited_nodes]
+
+    # Combine factors: closer to current node and closer to destination have higher probability
+    combined_weights = [(1 / (d_current + 1)) * (1 / (d_dest + 1)) for d_current, d_dest in zip(distances_to_current, distances_to_destination)]
+
+    # Normalize probabilities
+    total_weight = sum(combined_weights)
+    normalized_weights = [w / total_weight for w in combined_weights]
+
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_weights, k=1)[0]
+    return next_node

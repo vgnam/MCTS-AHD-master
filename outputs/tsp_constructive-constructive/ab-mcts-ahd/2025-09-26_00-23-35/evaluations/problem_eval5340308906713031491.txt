@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    total_unvisited = len(unvisited_nodes)
+    hub_attraction = {}
+    visit_counts = {}
+
+    # Calculate hub attraction (connectivity) and initialize visit counts
+    for node in unvisited_nodes:
+        hub_attraction[node] = sum(1 for other in unvisited_nodes if distance_matrix[node][other] > 0)
+        visit_counts[node] = 0
+
+    # Dynamic learning rate based on remaining nodes
+    learning_rate = 0.1 + 0.9 * (1.0 - (total_unvisited / len(distance_matrix)))
+
+    # Reinforcement learning-inspired selection
+    next_node = None
+    best_score = -float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance_to_dest = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Hub attraction factor
+        hub_factor = hub_attraction[node] / (max(hub_attraction.values()) + 1e-6)
+
+        # Visit frequency adjustment
+        visit_factor = visit_counts[node] * learning_rate
+
+        # Combined score with hub attraction and visit frequency
+        score = (-distance_to_node + avg_distance_to_dest) * (1.0 + hub_factor)
+        score -= visit_factor
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Update visit counts for the selected node
+    if next_node is not None:
+        visit_counts[next_node] += 1
+
+    return next_node

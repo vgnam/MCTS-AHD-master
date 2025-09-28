@@ -1,0 +1,12 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 29, in select_next_node
+    next_node = min(unvisited_nodes, key=calculate_score)
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 19, in calculate_score
+    detour_penalty = sum(max(0, current_dist + distance_matrix[node][other_node] - distance_matrix[current_node][other_node]) for other_node in remaining_nodes if other_node != node)
+UnboundLocalError: local variable 'remaining_nodes' referenced before assignment

@@ -1,0 +1,55 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    lookahead_depth = min(5, max(3, remaining_count // 2))
+
+    avg_total_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / remaining_count
+
+    node_scores = {}
+    historical_weights = {node: 1.0 for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        avg_remaining_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes) if remaining_nodes else 0
+
+        connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_remaining_distance)
+        connectivity_factor = 1.0 + (connectivity / remaining_count) * 0.6
+
+        deviation_penalty = abs(immediate_distance - avg_total_distance) * (1.0 + (remaining_count / len(unvisited_nodes)) * 0.4)
+
+        novelty_factor = (sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)) if remaining_nodes else 0
+
+        base_weight = 0.3 * (immediate_distance - avg_remaining_distance) + 0.3 * (immediate_distance * connectivity_factor) + 0.2 * deviation_penalty - 0.1 * novelty_factor
+
+        historical_weight = historical_weights[node]
+        adjusted_weight = base_weight * historical_weight
+
+        node_scores[node] = adjusted_weight
+
+    if not node_scores:
+        return next(iter(unvisited_nodes))
+
+    min_score = min(node_scores.values())
+    max_score = max(node_scores.values())
+    score_range = max_score - min_score if max_score != min_score else 1
+
+    normalized_scores = {node: (node_scores[node] - min_score) / score_range for node in node_scores}
+    total_normalized = sum(normalized_scores.values())
+
+    if total_normalized == 0:
+        return next(iter(unvisited_nodes))
+
+    probabilities = {node: normalized_scores[node] / total_normalized for node in normalized_scores}
+    selected_node = max(probabilities.items(), key=lambda x: x[1])[0]
+
+    for node in unvisited_nodes:
+        if node != selected_node:
+            historical_weights[node] *= 0.95
+        else:
+            historical_weights[node] *= 1.05
+
+    return next_node

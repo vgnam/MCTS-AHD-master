@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_combined_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Calculate current node's centrality (average distance to all nodes)
+    centrality = sum(distance_matrix[current_node]) / total_nodes
+
+    # Calculate remaining nodes' density (average distance between remaining nodes)
+    if remaining_nodes > 1:
+        density = sum(
+            distance_matrix[i][j]
+            for i in unvisited_nodes
+            for j in unvisited_nodes
+            if i != j
+        ) / (remaining_nodes * (remaining_nodes - 1))
+    else:
+        density = 0
+
+    # Dynamic weight factor based on centrality and density
+    weight_factor = max(0.1, 0.5 * (centrality / (density + 1e-6)))
+
+    # Novelty factor to penalize recently visited nodes
+    novelty_factor = 0.2 * (1 - (remaining_nodes / total_nodes))
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Combined score with novelty factor
+        combined_score = distance_to_current + weight_factor * distance_to_destination - novelty_factor * (total_nodes - remaining_nodes)
+
+        if combined_score < min_combined_score:
+            min_combined_score = combined_score
+            next_node = node
+
+    return next_node

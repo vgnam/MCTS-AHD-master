@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    min_combined_cost = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        immediate_cost = distance_matrix[current_node][node]
+        total_cost = 0
+        count = 0
+        for other_node in unvisited_nodes:
+            if other_node != node:
+                total_cost += distance_matrix[node][other_node]
+                count += 1
+        average_cost = total_cost / count if count > 0 else 0
+        combined_cost = immediate_cost + average_cost
+        if combined_cost < min_combined_cost:
+            min_combined_cost = combined_cost
+            next_node = node
+    return next_node

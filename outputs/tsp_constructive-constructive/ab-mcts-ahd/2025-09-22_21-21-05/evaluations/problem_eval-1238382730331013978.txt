@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    unvisited_count = len(unvisited_nodes)
+    total_nodes = unvisited_count + 1
+    progress = (total_nodes - unvisited_count) / total_nodes
+    attractiveness_factor = progress ** 2  # Squared to emphasize destination as progress increases
+
+    min_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        attractiveness = 1.0 if node == destination_node else 0.5
+        attractiveness *= (1 + attractiveness_factor)  # Boost destination attractiveness with progress
+        score = distance * (1 / attractiveness) + (0.1 * random.random())  # Add small randomness
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

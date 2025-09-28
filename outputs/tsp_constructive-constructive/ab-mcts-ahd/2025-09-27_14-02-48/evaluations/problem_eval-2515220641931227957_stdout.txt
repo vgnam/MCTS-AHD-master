@@ -1,0 +1,17 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+[*] Instance 0: 7.673311095057595
+[*] Instance 1: 9.02193304886739
+[*] Instance 2: 9.014294352097817
+[*] Instance 3: 10.255781461642389
+[*] Instance 4: 8.383058075221546
+[*] Instance 5: 8.76712831746479
+[*] Instance 6: 8.89124479443994
+[*] Instance 7: 8.610657947647805
+[*] Instance 8: 7.971890281099993
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 52, in eval_heuristic
+    raise KeyError(f"Node {next_node} is already visited.")
+KeyError: 'Node None is already visited.'

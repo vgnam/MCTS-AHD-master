@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    straight_line_distance = distance_matrix[current_node][destination_node]
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            nearest_neighbors = sorted(unvisited_nodes, key=lambda n: distance_matrix[node][n])[:min(3, remaining_nodes)]
+            avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+            detour_factor = (distance_to_current + distance_to_destination - straight_line_distance) / (straight_line_distance + 1e-6)
+            temp = 1.0 / (1 + 0.5 * (remaining_nodes / (remaining_nodes + 1)))
+
+            weighted_distance = (1 - temp) * distance_to_current + temp * avg_neighbor_distance
+            score = weighted_distance + 0.5 * detour_factor
+
+        scores.append((node, score))
+
+    if scores:
+        node_scores = [s for _, s in scores]
+        min_score, max_score = min(node_scores), max(node_scores)
+        normalized_scores = [(node, (max_score - score) / (max_score - min_score + 1e-6)) for node, score in scores]
+
+        total_weight = sum(w for _, w in normalized_scores)
+        rand_val = random.random() * total_weight
+        cumulative_weight = 0
+
+        for node, weight in normalized_scores:
+            cumulative_weight += weight
+            if rand_val <= cumulative_weight:
+                next_node = node
+                break
+
+    return next_node

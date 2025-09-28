@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    unvisited_count = len(unvisited_nodes)
+    current_to_dest = distance_matrix[current_node][destination_node]
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        proximity_weight = 1 / (1 + distance_to_node)
+        dest_influence = (unvisited_count ** 0.5) / (1 + current_to_dest)
+        score = (proximity_weight * 0.4) + (dest_influence * 0.6)
+
+        if distance_to_node > current_to_dest * 1.2:
+            score *= 0.8
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        if current_to_dest < distance_matrix[current_node][next_node] * 0.6:
+            next_node = destination_node
+
+    return next_node

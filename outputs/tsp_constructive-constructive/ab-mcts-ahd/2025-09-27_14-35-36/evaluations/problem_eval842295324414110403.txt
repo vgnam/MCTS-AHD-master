@@ -1,0 +1,16 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    median_distance = sorted(distances)[len(distances) // 2] if distances else 0
+    weights = [(1 / (distance / median_distance + 1e-6)) ** 2 for distance in distances]
+    perturbation = [random.uniform(0.5, 1.5) for _ in weights]
+    adjusted_weights = [w * p for w, p in zip(weights, perturbation)]
+    total_weight = sum(adjusted_weights)
+    normalized_weights = [w / total_weight for w in adjusted_weights]
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_weights, k=1)[0]
+    return next_node

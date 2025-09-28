@@ -1,0 +1,43 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    total_unvisited = len(unvisited_nodes)
+    temperature = 1.0 - (0.9 * (1 - total_unvisited / (total_unvisited + 1)))
+
+    # Dynamic probability adjustments
+    base_prob = 0.5 * (1 + math.tanh(3 * (total_unvisited / (total_unvisited + 1) - 0.5)))
+    dest_prob = min(0.8, base_prob + 0.2 * (1 - temperature))
+    explore_prob = max(0.2, 0.5 - 0.3 * temperature)
+
+    if destination_node in unvisited_nodes and random.random() < dest_prob:
+        return destination_node
+
+    # Novelty scoring with temperature modulation
+    novelty_scores = {}
+    for node in unvisited_nodes:
+        direct_dist = distance_matrix[current_node][node]
+        if destination_node in unvisited_nodes:
+            detour_dist = distance_matrix[node][destination_node]
+            novelty = direct_dist * (1 + 0.3 * (1 - detour_dist / distance_matrix[current_node][destination_node]))
+            novelty_scores[node] = novelty * (1 + 0.2 * temperature)
+
+    if not novelty_scores:
+        return min(unvisited_nodes, key=lambda x: distance_matrix[current_node][x])
+
+    # Temperature-based selection
+    if random.random() < explore_prob:
+        weighted_nodes = random.choices(
+            list(novelty_scores.keys()),
+            weights=list(novelty_scores.values()),
+            k=1
+        )[0]
+        return weighted_nodes
+
+    # Greedy selection with temperature influence
+    candidates = sorted(unvisited_nodes, key=lambda x: distance_matrix[current_node][x])
+    selection_index = int(len(candidates) * (0.5 + 0.5 * temperature))
+    return next_node

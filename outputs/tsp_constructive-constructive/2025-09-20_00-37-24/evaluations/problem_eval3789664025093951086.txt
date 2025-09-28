@@ -1,0 +1,35 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate distance ranks and probabilities
+    distances = [(node, distance_matrix[current_node][node]) for node in unvisited_nodes]
+    distances.sort(key=lambda x: x[1])
+    ranked_nodes = [node for node, _ in distances]
+
+    # Temperature parameter for stochasticity control (decreases as nodes are visited)
+    temperature = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+
+    # Probability distribution based on distance ranks and temperature
+    probabilities = []
+    for rank, node in enumerate(ranked_nodes):
+        # Probability decreases exponentially with rank (closer nodes are more likely)
+        prob = math.exp(-rank / (temperature + 0.1))
+        probabilities.append(prob)
+
+    # Normalize probabilities
+    total = sum(probabilities)
+    probabilities = [p / total for p in probabilities]
+
+    # Select node based on probabilities
+    if random.random() < 0.9:  # 90% chance to follow probability distribution
+        next_node = random.choices(ranked_nodes, weights=probabilities, k=1)[0]
+    else:  # 10% chance to pick a random node
+        next_node = random.choice(ranked_nodes)
+
+    return next_node

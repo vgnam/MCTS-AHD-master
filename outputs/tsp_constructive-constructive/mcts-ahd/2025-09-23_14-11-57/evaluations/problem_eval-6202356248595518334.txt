@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1.0 - remaining_nodes / total_nodes
+
+    # Adaptive weights based on progress
+    immediate_weight = 0.6 - 0.3 * progress
+    lookahead_weight = 0.4 + 0.3 * progress
+    neighbor_weight = 0.2 + 0.3 * progress
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Best possible subsequent step (lookahead)
+        best_lookahead_distance = float('inf')
+        for next_node in unvisited_nodes:
+            if next_node != node:
+                lookahead_distance = distance_matrix[node][next_node]
+                if lookahead_distance < best_lookahead_distance:
+                    best_lookahead_distance = lookahead_distance
+
+        # Nearest-neighbor potential
+        if remaining_nodes > 1:
+            remaining = [n for n in unvisited_nodes if n != node]
+            nearest_neighbor_dist = min(distance_matrix[node][n] for n in remaining)
+        else:
+            nearest_neighbor_dist = 0
+
+        # Combined score
+        score = (immediate_weight * immediate_distance +
+                 lookahead_weight * best_lookahead_distance +
+                 neighbor_weight * nearest_neighbor_dist)
+        scores.append(score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    current_to_dest = distance_matrix[current_node][destination_node]
+    max_possible_distance = max(max(row) for row in distance_matrix)
+    proximity_factor = 1.0 - (current_to_dest / max_possible_distance)
+
+    def calculate_score(node):
+        immediate_distance = distance_matrix[current_node][node]
+        if not unvisited_nodes:
+            return immediate_distance
+
+        max_distance = max(distance_matrix[node][n] for n in unvisited_nodes)
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        weight_immediate = 1.0 - 0.5 * proximity_factor
+        weight_max = 0.3 + 0.2 * proximity_factor
+        weight_avg = 0.2 - 0.1 * proximity_factor
+
+        return (weight_immediate * immediate_distance +
+                weight_max * max_distance +
+                weight_avg * avg_distance)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

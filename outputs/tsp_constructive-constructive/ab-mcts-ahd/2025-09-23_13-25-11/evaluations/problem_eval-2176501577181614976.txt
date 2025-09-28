@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    if num_unvisited == 1:
+        return unvisited_nodes.pop()
+
+    total_nodes = len(distance_matrix)
+    visited_nodes = set(range(total_nodes)) - unvisited_nodes
+    visited_ratio = len(visited_nodes) / total_nodes
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        # Centrality: average distance to all other nodes
+        centrality = sum(distance_matrix[node]) / total_nodes
+
+        # Diversity: ratio of visited to unvisited connections
+        if visited_nodes:
+            visited_connections = sum(distance_matrix[node][v] for v in visited_nodes) / len(visited_nodes)
+        else:
+            visited_connections = 0
+        unvisited_connections = sum(distance_matrix[node][u] for u in remaining_nodes) / len(remaining_nodes)
+        diversity = visited_connections / (unvisited_connections + 1e-6)  # Avoid division by zero
+
+        # Dynamic weights: centrality dominates early, diversity dominates later
+        weight_centrality = 0.8 * (1 - visited_ratio)
+        weight_diversity = 0.2 * visited_ratio
+        weight_current = 0.6 - 0.2 * (num_unvisited / total_nodes)
+
+        # Non-linear scoring with exponential emphasis on diversity
+        score = (weight_current * current_dist +
+                 weight_centrality * centrality +
+                 weight_diversity * (diversity ** 2))
+
+        return score
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

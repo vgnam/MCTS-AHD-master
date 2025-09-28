@@ -1,0 +1,35 @@
+import numpy as np
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1.0 - (remaining_nodes / total_nodes)
+
+    # Ant colony inspired probabilistic selection
+    pheromone_levels = {}
+    for node in unvisited_nodes:
+        immediate_cost = distance_matrix[current_node][node]
+        future_cost = distance_matrix[node][destination_node] if remaining_nodes == 1 else 0
+        if remaining_nodes > 1:
+            next_nodes = [n for n in unvisited_nodes if n != node]
+            future_cost = np.mean([distance_matrix[node][n] + distance_matrix[n][destination_node] for n in next_nodes])
+
+        # Pheromone calculation (higher for better balance of local/global)
+        pheromone = (0.6 * (1 / immediate_cost) + 0.4 * (1 / (1 + future_cost))) * (1 + progress)
+        pheromone_levels[node] = pheromone
+
+    # Normalize pheromones
+    total_pheromone = sum(pheromone_levels.values())
+    probabilities = [pheromone_levels[node] / total_pheromone for node in unvisited_nodes]
+
+    # Stochastic selection with progress-dependent randomness
+    if random.random() < 0.2 * (1 - progress):
+        next_node = random.choice(list(unvisited_nodes))
+    else:
+        next_node = np.random.choice(list(unvisited_nodes), p=probabilities)
+
+    return next_node

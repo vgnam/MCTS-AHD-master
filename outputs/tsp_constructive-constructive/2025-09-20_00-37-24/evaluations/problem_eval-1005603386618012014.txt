@@ -1,0 +1,30 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Calculate weights for each unvisited node
+    weights = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        # Heuristic: combine distance to current and distance to destination with a bias
+        weight = 0.7 * distance_to_current + 0.3 * distance_to_destination
+        weights.append(weight)
+
+    # Normalize weights to probabilities
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    # Introduce stochasticity: 80% chance to pick based on weights, 20% chance to pick randomly
+    if random.random() < 0.8:
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

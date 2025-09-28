@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def time_decay_weight(current_step, total_steps, initial_weight, final_weight):
+        decay_rate = 1.0 - (current_step / total_steps)
+        return initial_weight * decay_rate + final_weight * (1.0 - decay_rate)
+
+    def graph_laplacian_centrality(node, unvisited, distance_matrix):
+        if len(unvisited) == 1:
+            return 0.0
+        n = len(unvisited)
+        laplacian = [[0]*n for _ in range(n)]
+        for i in range(n):
+            for j in range(n):
+                if i != j:
+                    laplacian[i][j] = -1 / distance_matrix[unvisited[i]][unvisited[j]] if distance_matrix[unvisited[i]][unvisited[j]] > 0 else 0
+            laplacian[i][i] = -sum(laplacian[i])
+        eigenvalues = [abs(sum(laplacian[i][i] for i in range(n)))]  # Simplified eigenvalue approximation
+        return eigenvalues[0] if eigenvalues else 0.0
+
+    def probabilistic_exploration_bonus(node, unvisited, current, current_step, total_steps):
+        if len(unvisited) <= 2 or current_step == 0:
+            return 0.0
+        avg_dist = sum(distance_matrix[current][n] for n in unvisited) / len(unvisited)
+        relative_dist = distance_matrix[current][node] / avg_dist if avg_dist > 0 else 1.0
+        prob = 1.0 - (relative_dist / (relative_dist + 1.0))
+        return prob * (len(unvisited) / total_steps) * (current_step / total_steps)
+
+    total_steps = len(unvisited_nodes) + 1
+    current_step = total_steps - len(unvisited_nodes)
+    candidates = []
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        centrality = graph_laplacian_centrality(node, unvisited_nodes, distance_matrix)
+        weight_dist = time_decay_weight(current_step, total_steps, 0.8, 0.2)
+        weight_cent = time_decay_weight(current_step, total_steps, 0.2, 0.8)
+        bonus = probabilistic_exploration_bonus(node, unvisited_nodes, current_node, current_step, total_steps)
+        score = weight_dist * distance + weight_cent * centrality + 0.3 * bonus
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

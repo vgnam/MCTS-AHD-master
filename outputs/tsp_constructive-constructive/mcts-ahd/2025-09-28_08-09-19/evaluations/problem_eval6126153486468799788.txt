@@ -1,0 +1,53 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    progress_ratio = 1 - (len(unvisited_nodes) / total_nodes)
+    temperature = 1.0 - progress_ratio ** 2  # Decreases non-linearly with progress
+
+    attractiveness_scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) == 1:
+            attractiveness = distance_to_current + distance_to_destination
+        else:
+            # Connectivity metric: average distance to nearby nodes
+            neighbor_count = min(3, len(unvisited_nodes))
+            nearest_neighbors = sorted(unvisited_nodes, key=lambda n: distance_matrix[node][n])[:neighbor_count]
+            avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / neighbor_count if neighbor_count else 0
+
+            # Dynamic weight components
+            distance_weight = 0.6 + 0.4 * (1 - progress_ratio)
+            connectivity_weight = 1 - distance_weight
+
+            # Non-linear transformations
+            transformed_current = distance_to_current ** 0.6
+            transformed_neighbor = avg_neighbor_distance ** 0.9
+
+            # Local search component: temporarily revisit nearby nodes
+            local_search_bonus = 0
+            if progress_ratio > 0.5:
+                nearby_nodes = [n for n in unvisited_nodes if distance_matrix[node][n] < 1.5 * avg_neighbor_distance]
+                if nearby_nodes:
+                    local_search_bonus = -0.2 * len(nearby_nodes)  # Encourages local refinement
+
+            attractiveness = (distance_weight * transformed_current +
+                            connectivity_weight * transformed_neighbor) + local_search_bonus
+
+        attractiveness_scores.append(attractiveness)
+
+    # Probabilistic selection with temperature-based exploration
+    min_score = min(attractiveness_scores)
+    max_score = max(attractiveness_scores)
+    normalized_scores = [(max_score - score) / (max_score - min_score + 1e-6) for score in attractiveness_scores]
+
+    # Softmax with temperature
+    exp_scores = [math.exp(score / (temperature + 1e-6)) for score in normalized_scores]
+    sum_exp = sum(exp_scores)
+    probabilities = [exp / sum_exp for exp in exp_scores]
+
+    selected_index = random.choices(range(len(unvisited_nodes)), weights=probabilities, k=1)[0]
+    return next_node

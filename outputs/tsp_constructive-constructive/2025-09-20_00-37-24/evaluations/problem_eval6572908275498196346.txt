@@ -1,0 +1,28 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate temperature based on remaining nodes (higher temperature when few nodes left)
+    temperature = 1.0 / (1.0 + math.exp(-len(unvisited_nodes) + 5))
+
+    # Calculate proximity bias (stronger bias when more nodes are left)
+    proximity_bias = 1.0 - (0.5 * (1.0 - temperature))
+
+    # Get nearest neighbors
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic selection probability
+    if random.random() < proximity_bias:  # Higher chance to pick from top 3 when proximity_bias is high
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:  # More exploration when proximity_bias is low
+        # Weighted selection: closer nodes have higher probability
+        weights = [math.exp(-i * temperature) for i in range(len(nearest_neighbors))]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+
+    return next_node

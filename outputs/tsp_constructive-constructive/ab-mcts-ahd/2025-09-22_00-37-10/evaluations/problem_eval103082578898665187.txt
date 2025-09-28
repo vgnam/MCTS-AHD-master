@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    total_nodes = len(unvisited_nodes) + 1  # +1 for current_node
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+    dynamic_weight = 0.3 + 0.7 * remaining_ratio  # Weight adjusts between 0.3 and 1.0
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+        revisit_penalty = 0.2 if node == destination_node else 0  # Penalize revisiting destination
+        score = immediate_distance - dynamic_weight * lookahead_distance + revisit_penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

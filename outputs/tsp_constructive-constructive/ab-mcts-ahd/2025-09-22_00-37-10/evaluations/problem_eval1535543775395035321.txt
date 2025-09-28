@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    lookahead_horizon = min(3, max(1, remaining_nodes // 2))  # Dynamic lookahead horizon
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+
+    next_node = None
+    best_score = float('inf')
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        direct_return = distance_matrix[node][destination_node]
+
+        # Probabilistic lookahead: consider nodes closer to destination with higher probability
+        if direct_return < avg_distance * 0.7:
+            lookahead_weight = 0.4  # Higher weight for nodes closer to destination
+        else:
+            lookahead_weight = 0.2  # Lower weight otherwise
+
+        # Decaying weight based on remaining nodes
+        decay_factor = 1.0 / (1.0 + 0.1 * remaining_nodes)
+        adjusted_weight = lookahead_weight * decay_factor
+
+        score = immediate_distance + adjusted_weight * direct_return
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

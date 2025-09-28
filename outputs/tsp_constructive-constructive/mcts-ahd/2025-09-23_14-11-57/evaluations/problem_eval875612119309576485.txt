@@ -1,0 +1,60 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    clusterings = []
+    connection_strengths = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        # Calculate regret
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Calculate look-ahead clustering
+        nearby_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        future_distances = [distance_matrix[node][destination_node]] if destination_node in unvisited_nodes else []
+        all_distances = nearby_distances + future_distances
+        clustering = 1 / (sum(all_distances) / len(all_distances)) if all_distances else 0
+        clusterings.append(clustering)
+
+        # Calculate connection strength
+        total_connection = sum(distance_matrix[node][n] for n in unvisited_nodes)
+        connection_strength = total_connection / len(unvisited_nodes) if unvisited_nodes else 0
+        connection_strengths.append(connection_strength)
+
+    # Adaptive weights based on phase
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    phase = 1 - (remaining_nodes / total_nodes)
+    regret_weight = max(0.1, 0.8 * (1 - phase**2))
+    distance_weight = 0.3 * phase
+    clustering_weight = 0.2 * phase**2 + 0.1 * (1 - phase)
+    connection_weight = 0.2 * phase**3
+
+    # Combine weighted scores
+    scores = [regret_weight * regret + distance_weight * distance + clustering_weight * clustering + connection_weight * connection_strength
+              for regret, distance, clustering, connection_strength in zip(regrets, distances, clusterings, connection_strengths)]
+
+    # Probabilistic selection based on scores
+    min_score = min(scores)
+    max_score = max(scores)
+    if min_score == max_score:
+        selected_index = scores.index(min_score)
+    else:
+        normalized_scores = [(max_score - score) / (max_score - min_score) for score in scores]
+        total = sum(normalized_scores)
+        probabilities = [score / total for score in normalized_scores]
+        selected_index = np.random.choice(len(unvisited_nodes), p=probabilities)
+
+    next_node = list(unvisited_nodes)[selected_index]
+    return next_node

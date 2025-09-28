@@ -1,0 +1,64 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    centrality = {}
+    distance_scores = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node])
+        distance_scores[node] = distance_matrix[current_node][node]
+
+    temperature = 1.0 / (len(unvisited_nodes) + 1)
+    max_distance = max(distance_scores.values()) if distance_scores else 1
+    max_centrality = max(centrality.values()) if centrality else 1
+
+    normalized_distance = {node: (max_distance - dist) / max_distance if max_distance else 0 for node, dist in distance_scores.items()}
+    normalized_centrality = {node: cent / max_centrality if max_centrality else 0 for node, cent in centrality.items()}
+
+    scores = []
+    candidates = []
+    for node in unvisited_nodes:
+        score = (1 - temperature) * normalized_distance[node] + temperature * normalized_centrality[node]
+        scores.append(score)
+        candidates.append(node)
+
+    if not scores:
+        return unvisited_nodes.pop()
+
+    max_score = max(scores)
+    min_score = min(scores)
+    adjusted_scores = [(score - min_score) / (max_score - min_score + 1e-10) for score in scores]
+
+    weights = [1.0] * len(scores)
+    if len(unvisited_nodes) > 2:
+        for i in range(len(scores)):
+            weights[i] = 1.0 + 0.5 * adjusted_scores[i]
+
+    weighted_scores = [weights[i] * scores[i] for i in range(len(scores))]
+
+    next_node = None
+    if len(unvisited_nodes) > 2:
+        for i, node in enumerate(candidates):
+            if weighted_scores[i] > 0.7 * max(weighted_scores):
+                next_node = node
+                break
+
+    if next_node is None:
+        next_node = candidates[weighted_scores.index(max(weighted_scores))]
+
+    if len(unvisited_nodes) > 3:
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            if potential_cost < distance_matrix[current_node][next_node] * 0.9:
+                next_node = node
+                break
+
+    return next_node

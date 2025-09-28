@@ -1,0 +1,6 @@
+import random
+        total_score = sum(score for _, score in scores)
+        probabilities = [score / total_score for _, score in scores]
+        next_node = random.choices([node for node, _ in scores], weights=probabilities, k=1)[0]
+
+    return next_node

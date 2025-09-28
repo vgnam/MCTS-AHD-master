@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+    total_unvisited = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Calculate geometric center of remaining nodes
+    center_x, center_y = 0, 0
+    for node in unvisited_nodes:
+        center_x += node % total_nodes
+        center_y += node // total_nodes
+    center_x /= total_unvisited
+    center_y /= total_unvisited
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Geometric centrality (distance from path center)
+        node_x, node_y = node % total_nodes, node // total_nodes
+        centrality = ((node_x - center_x)**2 + (node_y - center_y)**2)**0.5
+
+        # Angular deviation from direct path
+        direct_vector = (destination_node % total_nodes - current_node % total_nodes,
+                         destination_node // total_nodes - current_node // total_nodes)
+        node_vector = (node_x - current_node % total_nodes, node_y - current_node // total_nodes)
+        dot_product = direct_vector[0]*node_vector[0] + direct_vector[1]*node_vector[1]
+        magnitude_direct = (direct_vector[0]**2 + direct_vector[1]**2)**0.5
+        magnitude_node = (node_vector[0]**2 + node_vector[1]**2)**0.5
+        if magnitude_direct * magnitude_node > 0:
+            angular_deviation = abs(dot_product / (magnitude_direct * magnitude_node))
+        else:
+            angular_deviation = 1.0
+
+        # Adaptive step weighting
+        step_weight = (total_unvisited / (total_nodes - 1))**2
+        weighted_distance = (step_weight * distance_to_current + (1 - step_weight) * distance_to_destination)
+
+        # Hybrid scoring function
+        score = (1 - angular_deviation) * (1 - (weighted_distance / (max(distance_matrix[current_node]) + 1e-6))) - (centrality * (total_unvisited / total_nodes))
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

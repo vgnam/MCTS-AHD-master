@@ -1,0 +1,26 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on inverse distance and a small random factor
+    weights = []
+    for node in unvisited_nodes:
+        dist = distance_matrix[current_node][node]
+        if dist == 0:
+            weights.append(1e6)  # Avoid division by zero
+        else:
+            weights.append((1 / dist) + random.uniform(0, 0.5))  # Add small randomness
+
+    # Normalize weights to form a probability distribution
+    weights = np.array(weights)
+    weights = weights / np.sum(weights)
+
+    # Select node based on weighted probabilities
+    next_node = np.random.choice(unvisited_nodes, p=weights)
+
+    return next_node

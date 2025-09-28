@@ -6,7 +6,7 @@ from problem_adapter import Problem
 from utils.utils import init_client
 
 class AHD:
-    def __init__(self, cfg, root_dir, workdir, client) -> None:
+    def __init__(self, cfg, root_dir, workdir) -> None:
         self.cfg = cfg
         self.root_dir = root_dir
         self.problem = Problem(cfg, root_dir)
@@ -15,13 +15,11 @@ class AHD:
         self.paras.set_paras(method = "mcts_ahd",
                              init_size = self.cfg.init_pop_size,
                              pop_size = self.cfg.pop_size,
-                             llm_model = client,
                              ec_fe_max = self.cfg.max_fe,
                              exp_output_path = f"{workdir}/",
                              exp_debug_mode = False,
                              eva_timeout=cfg.timeout)
-        init_client(self.cfg)
-    
+
     def evolve(self):
         print("- Evolution Start -")
 

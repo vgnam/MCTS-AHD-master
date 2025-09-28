@@ -1,0 +1,9 @@
+import random
+    rand_val = random.random()
+    cumulative_prob = 0.0
+    for i, prob in enumerate(normalized_probabilities):
+        cumulative_prob += prob
+        if rand_val <= cumulative_prob:
+            return unvisited_nodes[i]
+
+    return next_node

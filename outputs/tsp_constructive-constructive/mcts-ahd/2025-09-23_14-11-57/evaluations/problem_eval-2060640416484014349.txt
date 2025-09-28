@@ -1,0 +1,34 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+        total_increase = current_to_node + node_to_dest
+
+        # Adaptive penalty based on distance
+        penalty = 0.1 * (1.0 / (current_to_node + 1e-6)) if current_to_node < 0.3 else 0
+
+        # Dynamic weights based on remaining nodes
+        remaining_nodes = len(unvisited_nodes)
+        proximity_weight = 0.6 if remaining_nodes > 5 else 0.8
+        efficiency_weight = 0.3 if remaining_nodes > 5 else 0.1
+        penalty_weight = 0.1 if remaining_nodes > 5 else 0.1
+
+        # Weighted score
+        score = (proximity_weight * current_to_node +
+                 efficiency_weight * total_increase +
+                 penalty_weight * penalty)
+        scores.append(score)
+
+    # Normalize scores and select probabilistically
+    min_score = min(scores)
+    normalized_scores = [min_score / (s + 1e-6) for s in scores]
+    selected_index = random.choices(range(len(unvisited_nodes)), weights=normalized_scores, k=1)[0]
+    next_node = unvisited_nodes[selected_index]
+
+    return next_node

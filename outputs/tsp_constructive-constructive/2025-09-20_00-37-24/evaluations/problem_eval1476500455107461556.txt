@@ -1,0 +1,37 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate centrality scores (simplified betweenness centrality approximation)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = np.mean(distance_matrix[node])
+
+    # Calculate inverse distance probabilities
+    inv_distances = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes]
+    inv_dist_sum = sum(inv_distances)
+    inv_dist_probs = [d / inv_dist_sum for d in inv_distances]
+
+    # Combine centrality and distance probabilities
+    centrality_values = list(centrality.values())
+    centrality_sum = sum(centrality_values)
+    centrality_probs = [c / centrality_sum for c in centrality_values]
+
+    combined_probs = [0.6 * inv_dist_probs[i] + 0.4 * centrality_probs[i] for i in range(len(unvisited_nodes))]
+
+    # Normalize probabilities
+    total_prob = sum(combined_probs)
+    normalized_probs = [p / total_prob for p in combined_probs]
+
+    # Stochastic selection
+    if random.random() < 0.8:  # 80% chance to use weighted selection
+        next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+    else:  # 20% chance to pick randomly
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

@@ -1,0 +1,38 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic weights based on distance and angle heuristic
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Angle heuristic: prefer nodes that form a sharper turn (more convex)
+        # This is a simplified approximation using dot product
+        if len(unvisited_nodes) > 1:
+            other_nodes = [n for n in unvisited_nodes if n != node]
+            avg_other_node = sum(other_nodes) / len(other_nodes)
+            vec1 = (distance_matrix[current_node][avg_other_node] - distance, avg_other_node - current_node)
+            vec2 = (distance_matrix[current_node][node] - distance, node - current_node)
+            dot_product = vec1[0] * vec2[0] + vec1[1] * vec2[1]
+            magnitude1 = math.sqrt(vec1[0]**2 + vec1[1]**2)
+            magnitude2 = math.sqrt(vec2[0]**2 + vec2[1]**2)
+            angle = math.acos(dot_product / (magnitude1 * magnitude2 + 1e-10)) if magnitude1 * magnitude2 > 0 else 0
+            angle_weight = 1 / (angle + 1e-10)  # Prefer sharper angles
+        else:
+            angle_weight = 1.0
+        # Combine distance and angle weights
+        weight = (1 / (distance + 1e-10)) * angle_weight
+        weights.append(weight)
+
+    # Normalize weights to form a probability distribution
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    # Select node based on weighted probability
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

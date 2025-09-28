@@ -1,0 +1,73 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Initialize metrics
+    distances = []
+    regrets = []
+    opportunity_costs = []
+    adaptive_connectivities = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        # Calculate regret
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = max(0, distance_matrix[current_node][node] - second_best)
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Calculate opportunity cost (novel metric)
+        if len(unvisited_nodes) > 1:
+            opportunity_cost = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+        else:
+            opportunity_cost = 0
+        opportunity_costs.append(opportunity_cost)
+
+        # Calculate adaptive connectivity (novel metric)
+        if len(unvisited_nodes) > 2:
+            connectivity = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+            look_ahead = sum(distance_matrix[n][destination_node] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+            adaptive_connectivity = (connectivity + look_ahead) / 2
+        else:
+            adaptive_connectivity = 0
+        adaptive_connectivities.append(adaptive_connectivity)
+
+    # Phase-based adaptive weights
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    if remaining_nodes > total_nodes * 0.7:  # Exploration phase
+        distance_weight = 0.2
+        regret_weight = 0.5
+        opportunity_weight = 0.2
+        connectivity_weight = 0.1
+    elif remaining_nodes > total_nodes * 0.3:  # Transition phase
+        distance_weight = 0.3
+        regret_weight = 0.3
+        opportunity_weight = 0.2
+        connectivity_weight = 0.2
+    else:  # Exploitation phase
+        distance_weight = 0.4
+        regret_weight = 0.2
+        opportunity_weight = 0.2
+        connectivity_weight = 0.2
+
+    # Combine weighted scores
+    scores = [
+        distance_weight * distance +
+        regret_weight * regret +
+        opportunity_weight * opportunity +
+        connectivity_weight * connectivity
+        for distance, regret, opportunity, connectivity in zip(distances, regrets, opportunity_costs, adaptive_connectivities)
+    ]
+
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

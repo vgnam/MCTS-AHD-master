@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1  # +1 for current_node
+    visited_ratio = 1 - (len(unvisited_nodes) / total_nodes)
+    penalty_factor = 0.5 + 0.4 * visited_ratio  # Adjusts from 0.5 to 0.9 as progress increases
+
+    best_node = None
+    best_score = float('inf')
+    candidates = []
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+
+        # Heuristic for future distances: average distance to nearest unvisited nodes
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            future_distances = [distance_matrix[node][n] for n in remaining_nodes]
+            avg_future_dist = sum(future_distances) / len(future_distances) if future_distances else 0
+        else:
+            avg_future_dist = 0
+
+        revisit_penalty = penalty_factor * current_to_node * len(unvisited_nodes)
+
+        # Score with dynamic weighting
+        score = (0.5 * current_to_node) + (0.3 * avg_future_dist) + (0.2 * revisit_penalty)
+
+        candidates.append((node, score))
+
+    # Probabilistic selection to escape local optima
+    if len(candidates) > 1:
+        candidates.sort(key=lambda x: x[1])
+        top_candidates = candidates[:2]  # Consider top 2 options
+        weights = [0.7, 0.3]  # Higher weight for best option
+        selected = random.choices([x[0] for x in top_candidates], weights=weights, k=1)[0]
+    else:
+        selected = candidates[0][0]
+
+    return next_node

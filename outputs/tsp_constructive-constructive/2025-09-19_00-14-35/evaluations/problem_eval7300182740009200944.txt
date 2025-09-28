@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node not in unvisited_nodes:
+        return min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    closest_distance = distance_matrix[current_node][destination_node]
+    other_distances = [distance_matrix[current_node][node] for node in unvisited_nodes if node != destination_node]
+    min_other_distance = min(other_distances) if other_distances else float('inf')
+
+    if closest_distance <= min_other_distance:
+        return destination_node
+
+    probabilities = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        if node == destination_node:
+            weight = 1.0 / closest_distance
+        else:
+            weight = 1.0 / distance_matrix[current_node][node]
+        probabilities.append(weight)
+        total_weight += weight
+
+    probabilities = [p / total_weight for p in probabilities]
+    selected_node = np.random.choice(unvisited_nodes, p=probabilities)
+    return next_node

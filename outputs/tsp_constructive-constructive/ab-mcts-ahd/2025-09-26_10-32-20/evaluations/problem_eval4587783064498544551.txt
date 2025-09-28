@@ -1,0 +1,23 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate Boltzmann probabilities for each unvisited node
+    max_distance = max(distance_matrix[current_node][node] for node in unvisited_nodes)
+    probabilities = []
+    for node in unvisited_nodes:
+        # Normalize distance to [0, 1] and apply Boltzmann selection
+        normalized_distance = distance_matrix[current_node][node] / max_distance
+        probability = math.exp(normalized_distance / temperature)
+        probabilities.append(probability)
+
+    # Normalize probabilities to sum to 1
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    # Select next node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+    return next_node

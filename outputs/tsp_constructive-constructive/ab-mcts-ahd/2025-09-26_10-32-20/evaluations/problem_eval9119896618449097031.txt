@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    exploitation_weight = 0.6 + 0.4 * (1 - remaining_ratio)
+    exploration_weight = 1 - exploitation_weight
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        global_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        distances_to_unvisited = [distance_matrix[node][n] for n in unvisited_nodes]
+        variance = sum((d - global_distance) ** 2 for d in distances_to_unvisited) / len(unvisited_nodes)
+
+        exploration_term = exploration_weight * global_distance
+        exploitation_term = exploitation_weight * local_distance
+        variance_penalty = 0.3 * variance
+
+        return exploration_term + exploitation_term + variance_penalty
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

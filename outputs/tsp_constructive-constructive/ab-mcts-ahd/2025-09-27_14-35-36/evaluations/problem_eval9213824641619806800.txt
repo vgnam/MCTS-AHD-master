@@ -1,0 +1,28 @@
+import random
+import math
+
+def harmonic_mean(x, y):
+    return 2 / ((1/x) + (1/y))
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if random.random() < 0.3:  # 30% chance to use random selection
+        next_node = random.choice(list(unvisited_nodes))
+    else:  # 70% chance to use harmonic mean of distances with bias
+        candidates = []
+        for node in unvisited_nodes:
+            distance_to_current = distance_matrix[current_node][node]
+            distance_to_destination = distance_matrix[node][destination_node]
+            if distance_to_current == 0 or distance_to_destination == 0:
+                score = float('inf')  # Avoid division by zero in harmonic mean
+            else:
+                score = harmonic_mean(distance_to_current, distance_to_destination)
+            # Slightly favor nodes closer to the destination
+            score -= 0.05 * distance_to_destination
+            candidates.append((node, score))
+
+        next_node = min(candidates, key=lambda x: x[1])[0]
+
+    return next_node

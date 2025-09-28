@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    remaining_ratio = remaining_nodes / total_nodes
+
+    # Adaptive weight scaling with sigmoid function
+    def sigmoid(x, k=10):
+        return 1 / (1 + np.exp(-k * (x - 0.5)))
+
+    weight_local = 0.6 * (1 - sigmoid(remaining_ratio))
+    weight_centrality = 0.3 * sigmoid(remaining_ratio)
+    weight_novelty = 0.1 * (1 - remaining_ratio)
+
+    def calculate_score(node):
+        direct_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+
+        # Novelty factor: reward nodes that bridge distant clusters
+        cluster_distances = [min(distance_matrix[node][n] for n in unvisited_nodes if n != node) for n in range(total_nodes)]
+        novelty = sum(cluster_distances) / (len(cluster_distances) + 1e-10)
+
+        return (weight_local * direct_distance) + (weight_centrality * centrality) + (weight_novelty * novelty)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

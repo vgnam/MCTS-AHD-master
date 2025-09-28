@@ -1,0 +1,47 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Dynamic bias towards destination node as unvisited nodes decrease
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    destination_bias = 1.0 - (remaining_nodes / total_nodes)
+
+    # Temperature parameter decreases with iterations
+    temperature = max(0.1, 0.9 * (remaining_nodes / total_nodes))
+
+    # Calculate penalties for nodes (avoid revisiting)
+    penalties = {node: 0 for node in unvisited_nodes}
+    for node in unvisited_nodes:
+        if node == current_node:
+            penalties[node] += float('inf')  # Avoid revisiting current node
+
+    # Calculate selection probabilities
+    probabilities = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        base_distance = distance_matrix[current_node][node]
+        penalty = penalties[node]
+
+        # Weighted distance with destination bias and penalty
+        if node == destination_node:
+            weighted_distance = base_distance * (1.0 - destination_bias)
+        else:
+            weighted_distance = base_distance * (1.0 + penalty)
+
+        # Apply temperature to smooth probabilities
+        weight = math.exp(-weighted_distance / temperature)
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    probabilities = [p / total_weight for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

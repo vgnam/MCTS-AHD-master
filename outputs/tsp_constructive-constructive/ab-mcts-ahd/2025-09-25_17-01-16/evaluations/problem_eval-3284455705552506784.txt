@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    if remaining_nodes == 0:
+        return destination_node
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        # Calculate variance-based centrality
+        distances_to_unvisited = [distance_matrix[node][other] for other in unvisited_nodes]
+        avg_distance_to_unvisited = sum(distances_to_unvisited) / remaining_nodes
+        variance = sum((d - avg_distance_to_unvisited) ** 2 for d in distances_to_unvisited) / remaining_nodes
+        centrality_score = avg_distance_to_unvisited * (1 + variance / (avg_distance_to_unvisited + 1e-6))
+
+        # Adaptive destination weight
+        destination_weight = 0.3 + (0.7 * (remaining_nodes / (remaining_nodes + 1))) * (1 / (1 + variance))
+
+        # Total score with novel components
+        total_score = (0.5 * distance_to_current) + (0.4 * centrality_score) + (destination_weight * distance_matrix[node][destination_node])
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

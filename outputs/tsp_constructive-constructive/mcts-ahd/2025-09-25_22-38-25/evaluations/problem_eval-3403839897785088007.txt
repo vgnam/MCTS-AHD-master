@@ -1,0 +1,21 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        if random.random() < 0.5:
+            return destination_node
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+    if next_node is not None:
+        if random.random() < 0.4:
+            return next_node
+        elif random.random() < 0.5:
+            nearby_nodes = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= min_distance * 1.5]
+            if nearby_nodes:
+                return random.choice(nearby_nodes)
+    return next_node

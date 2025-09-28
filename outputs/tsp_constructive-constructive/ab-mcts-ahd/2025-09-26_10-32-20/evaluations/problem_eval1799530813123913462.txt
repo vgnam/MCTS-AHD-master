@@ -1,0 +1,8 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining_nodes = len(unvisited_nodes)
+    dynamic_weight = 1.0 - (0.5 ** (1.0 / (1.0 + remaining_nodes)))
+    hybrid_score = lambda node: (1 - dynamic_weight) * distance_matrix[current_node][node] + dynamic_weight * distance_matrix[node][destination_node]
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

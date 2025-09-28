@@ -1,0 +1,12 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:13: RuntimeWarning: invalid value encountered in scalar power
+  distance_penalty = max(0, (current_distance - 1.5 * avg_distance) ** 1.5)
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 25, in select_next_node
+    rand_val = random.random() * total_prob
+NameError: name 'random' is not defined

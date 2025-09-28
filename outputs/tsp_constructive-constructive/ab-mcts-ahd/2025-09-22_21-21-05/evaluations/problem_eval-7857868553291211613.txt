@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    best_score = float('-inf')
+    next_node = None
+
+    # Phase 1: Dynamic trade-off between distance and centrality
+    avg_distances = []
+    for node in unvisited_nodes:
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes) / total_unvisited
+        avg_distances.append(avg_dist)
+
+    avg_avg_distance = sum(avg_distances) / total_unvisited if total_unvisited > 0 else 0
+
+    scores = []
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        weight = 0.5 * (total_unvisited / (total_unvisited + 1))
+        centrality_factor = 1.0 - (avg_distances[i] / (avg_avg_distance + 1e-6))
+        combined_weight = weight * 0.6 + centrality_factor * 0.4
+
+        score = (distance_to_current + combined_weight * distance_to_destination) / (1 + combined_weight)
+        scores.append(score)
+
+    # Phase 2: Tour potential refinement
+    normalized_scores = [(s - min(scores)) / (max(scores) - min(scores) + 1e-6) for s in scores]
+
+    tour_potentials = []
+    for i, node in enumerate(unvisited_nodes):
+        remaining_nodes = [n for n in unvisited_nodes if n != node]
+        if not remaining_nodes:
+            tour_potential = distance_matrix[node][destination_node]
+        else:
+            avg_remaining_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+            tour_potential = 0.7 * avg_remaining_dist + 0.3 * distance_matrix[node][destination_node]
+
+        final_score = 0.6 * (1 - normalized_scores[i]) + 0.4 * tour_potential
+        tour_potentials.append(final_score)
+
+    next_node = unvisited_nodes[tour_potentials.index(max(tour_potentials))]
+    return next_node

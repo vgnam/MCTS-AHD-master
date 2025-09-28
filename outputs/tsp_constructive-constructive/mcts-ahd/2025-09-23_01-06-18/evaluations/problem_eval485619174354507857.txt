@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    def calculate_pheromone(node):
+        distance = distance_matrix[current_node][node]
+        return 1.0 / (1.0 + distance ** 2)
+
+    def calculate_visibility(node):
+        remaining_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        return 1.0 / (1.0 + (sum(remaining_distances) / len(remaining_distances) if remaining_distances else 1.0))
+
+    def heuristic(node):
+        pheromone = calculate_pheromone(node)
+        visibility = calculate_visibility(node)
+        progress = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+        sigmoid = 1.0 / (1.0 + math.exp(-10 * (progress - 0.5)))
+
+        weighted_pheromone = sigmoid * pheromone
+        weighted_visibility = (1.0 - sigmoid) * visibility
+
+        return (weighted_pheromone + weighted_visibility) * distance_matrix[current_node][node]
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

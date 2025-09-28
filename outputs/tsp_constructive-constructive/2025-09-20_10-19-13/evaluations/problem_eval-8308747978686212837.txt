@@ -1,0 +1,8 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=0.5):
+    if not unvisited_nodes:
+        return destination_node
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    random_node = np.random.choice(list(unvisited_nodes))
+    prob_nearest = np.exp(-temperature) / (np.exp(-temperature) + np.exp(temperature))
+    next_node = nearest_node if np.random.random() < prob_nearest else random_node
+    return next_node

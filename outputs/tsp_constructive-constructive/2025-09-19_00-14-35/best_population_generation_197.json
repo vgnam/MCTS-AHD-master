@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm selects the next node by balancing proximity to the current node (60% weight) and distance to the destination (40% weight), prioritizing nearby nodes while slightly favoring those farther from the destination to encourage exploration. The `min` function evaluates nodes using a weighted sum of distances, with `distance_matrix[current_node][node]` (local) weighted higher than `distance_matrix[node][destination_node]` (global). The `destination_node` is returned if no unvisited nodes remain.",
+     "thought": "The new algorithm focuses on balancing local and global optimization by prioritizing nodes with shorter distances to the current node (60% weight) and longer distances to the destination (40% weight), aiming to explore more diverse paths while still favoring proximity to the current node.",
+     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: 0.6 * distance_matrix[current_node][node] - 0.4 * distance_matrix[node][destination_node])\n    return next_node",
+     "objective": 6.51348,
+     "other_inf": null
+}

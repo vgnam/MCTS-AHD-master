@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    exploration_factor = min(0.3 + (1 - len(unvisited_nodes)/len(distance_matrix)) * 0.7, 1.0)
+    candidates = []
+    max_cost = -float('inf')
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost > max_cost:
+            max_cost = cost
+        candidates.append((node, cost))
+
+    if not candidates:
+        return unvisited_nodes.pop()
+
+    candidates.sort(key=lambda x: x[1], reverse=True)
+    best_node, best_cost = candidates[0]
+
+    if len(unvisited_nodes) > 2 and len(candidates) > 1:
+        for i in range(1, min(3, len(candidates))):
+            node, cost = candidates[i]
+            if cost >= best_cost * exploration_factor:
+                potential_savings = 0
+                for other in unvisited_nodes:
+                    if other != node:
+                        savings = (distance_matrix[current_node][best_node] + distance_matrix[best_node][node] +
+                                  distance_matrix[node][other] + distance_matrix[other][current_node]) - (
+                                  distance_matrix[current_node][node] + distance_matrix[node][other] +
+                                  distance_matrix[other][best_node] + distance_matrix[best_node][current_node])
+                        if savings > potential_savings:
+                            potential_savings = savings
+                if potential_savings > 0:
+                    best_node = node
+                    break
+
+    if random.random() < 0.1 and len(unvisited_nodes) > 3:
+        best_node = random.choice([n for n in unvisited_nodes if n != best_node])
+
+    return next_node

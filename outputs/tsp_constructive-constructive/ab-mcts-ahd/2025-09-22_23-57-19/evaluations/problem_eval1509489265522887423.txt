@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    # Calculate average distance to unvisited nodes
+    total_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes)
+    avg_distance = total_distance / len(unvisited_nodes) if unvisited_nodes else float('inf')
+
+    # Dynamic threshold based on average distance
+    threshold = avg_distance * 0.8
+
+    # Probabilistic selection with penalty for revisiting
+    candidates = []
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        penalty = 1.0 + (cost / (avg_distance + 1e-6))  # Avoid division by zero
+        adjusted_cost = cost * penalty
+        candidates.append((node, adjusted_cost))
+
+    # Sort candidates by adjusted cost
+    candidates.sort(key=lambda x: x[1])
+
+    # Select with probability inversely proportional to rank
+    total_weight = sum(1 / (i + 1) for i in range(len(candidates)))
+    rand_val = random.random() * total_weight
+    cumulative = 0
+    for i, (node, cost) in enumerate(candidates):
+        cumulative += 1 / (i + 1)
+        if rand_val <= cumulative:
+            next_node = node
+            break
+
+    # Additional check for destination node
+    if destination_node in unvisited_nodes and distance_matrix[current_node][destination_node] <= threshold:
+        next_node = destination_node
+
+    return next_node

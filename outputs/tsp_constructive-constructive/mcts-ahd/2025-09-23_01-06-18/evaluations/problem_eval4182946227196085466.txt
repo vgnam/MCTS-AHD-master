@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    completion_ratio = 1 - remaining_nodes / total_nodes
+    exploration_weight = 1 - completion_ratio ** 0.5
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        bridge_cost = distance_matrix[node][destination_node]
+        exploitation_term = immediate_cost * (1 - exploration_weight)
+        exploration_term = bridge_cost * exploration_weight
+        completion_factor = math.log(1 + completion_ratio * 10) / math.log(11)
+        return exploitation_term + exploration_term + completion_factor * immediate_cost
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    current_dist_to_dest = distance_matrix[current_node][destination_node]
+    total_unvisited = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        dist_to_node = distance_matrix[current_node][node]
+        dist_to_dest = distance_matrix[node][destination_node]
+
+        # Angular component: favor nodes that lie on the approximate straight-line path
+        angle_weight = 1 - abs(dist_to_node + dist_to_dest - current_dist_to_dest) / (dist_to_node + dist_to_dest + current_dist_to_dest)
+
+        # Distance component: balance with a dynamic weight based on remaining nodes
+        dist_weight = (total_unvisited / (total_unvisited + 1)) * (1 / (1 + dist_to_node))
+
+        # Combined score with probabilistic noise to escape local optima
+        score = dist_weight * angle_weight + 0.1 * (dist_to_dest / (1 + dist_to_dest)) * (0.5 + 0.5 * (hash(node) % 100) / 100)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Direct path check with adaptive threshold
+    if destination_node in unvisited_nodes:
+        direct_threshold = 0.9 if total_unvisited > 2 else 0.7
+        if distance_matrix[current_node][destination_node] < distance_matrix[current_node][next_node] * direct_threshold:
+            next_node = destination_node
+
+    return next_node

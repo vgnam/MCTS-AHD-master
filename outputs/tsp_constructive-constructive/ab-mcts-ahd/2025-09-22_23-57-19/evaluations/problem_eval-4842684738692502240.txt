@@ -1,0 +1,17 @@
+import random
+    rand_val = random.random()
+    cumulative_prob = 0.0
+    for node, prob in probabilities:
+        cumulative_prob += prob
+        if rand_val <= cumulative_prob:
+            next_node = node
+            break
+    else:
+        next_node = probabilities[-1][0]
+
+    if len(unvisited_nodes) > 2 and random.random() < 0.2:
+        diversification_candidates = [node for node in unvisited_nodes if node != next_node]
+        if diversification_candidates:
+            next_node = random.choice(diversification_candidates)
+
+    return next_node

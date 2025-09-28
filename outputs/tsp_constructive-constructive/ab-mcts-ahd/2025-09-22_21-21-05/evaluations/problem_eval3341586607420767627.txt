@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    node_visits = {}  # Track visits to penalize revisits
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        revisit_penalty = node_visits.get(node, 0) * 0.5  # Penalize revisits
+
+        weighted_score = (distance_to_current * 0.6) + (distance_to_destination * 0.3) + revisit_penalty
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+
+        # Update visit count for the next iteration
+        node_visits[node] = node_visits.get(node, 0) + 1
+
+    return next_node

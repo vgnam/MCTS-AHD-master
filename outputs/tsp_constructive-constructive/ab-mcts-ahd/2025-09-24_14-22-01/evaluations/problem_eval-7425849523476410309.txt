@@ -1,0 +1,42 @@
+import math
+    import random
+
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 * (remaining_nodes / total_nodes))  # Decreases over time
+
+    node_scores = []
+    max_score = -float('inf')
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Proximity bias: favors nodes closer to current node
+        proximity_bias = math.exp(-immediate_distance / temperature)
+
+        # Centrality measure: average distance to all other nodes
+        centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+
+        # Combined score with temperature-based weights
+        score = (0.5 * immediate_distance + 0.3 * potential_distance + 0.2 * centrality) * proximity_bias
+        node_scores.append((node, score))
+
+        if score > max_score:
+            max_score = score
+
+    # Normalize scores to probabilities using softmax with temperature
+    exp_scores = [math.exp(score / temperature) for (_, score) in node_scores]
+    sum_exp_scores = sum(exp_scores)
+    probabilities = [exp_score / sum_exp_scores for exp_score in exp_scores]
+
+    # Select node based on probabilities
+    selected_node = random.choices([node for (node, _) in node_scores], weights=probabilities, k=1)[0]
+
+    return next_node

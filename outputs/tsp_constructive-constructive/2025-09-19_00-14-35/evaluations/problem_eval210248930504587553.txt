@@ -1,0 +1,7 @@
+import random
+    if random.random() < 0.1:  # 10% chance to select randomly
+        next_node = random.choice(unvisited_nodes)
+    else:
+        next_node = min(weights, key=lambda x: x[1])[0]
+
+    return next_node

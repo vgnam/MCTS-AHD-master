@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    progress = 1 - remaining_ratio
+
+    local_weight = 0.8 - 0.5 * progress
+    centrality_weight = 0.1 + 0.3 * (0.5 - abs(progress - 0.5))**2
+    coherence_weight = 0.1 + 0.3 * (0.5 - abs(progress - 0.5))**2
+
+    def centrality(node):
+        return 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+
+    def coherence(node):
+        return sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+
+    hybrid_score = lambda node: (
+        local_weight * distance_matrix[current_node][node] +
+        centrality_weight * centrality(node) +
+        coherence_weight * coherence(node)
+    )
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

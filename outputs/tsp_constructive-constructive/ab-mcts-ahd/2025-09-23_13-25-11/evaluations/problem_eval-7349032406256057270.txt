@@ -1,0 +1,22 @@
+importance" factor based on the node's centrality in the remaining unvisited nodes, with weights adjusted by an exponential decay function to ensure smooth transitions from greedy to long-term planning.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+    decay_factor = 0.9 ** (total_nodes - remaining_nodes)
+    weight_current = 0.5 * decay_factor
+    weight_future = 0.4 * decay_factor
+    weight_importance = 0.1 * decay_factor
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if not unvisited_nodes - {node}:
+            return current_dist
+        min_future_dist = min(distance_matrix[node][other] for other in unvisited_nodes - {node})
+        node_importance = sum(distance_matrix[node][other] for other in unvisited_nodes - {node}) / len(unvisited_nodes - {node})
+        return weight_current * current_dist + weight_future * min_future_dist + weight_importance * node_importance
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

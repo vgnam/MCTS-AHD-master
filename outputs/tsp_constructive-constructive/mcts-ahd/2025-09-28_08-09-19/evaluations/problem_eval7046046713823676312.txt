@@ -1,0 +1,57 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    node_scores = []
+    distances = []
+    centralities = []
+    entropies = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+            node_centrality = avg_distance
+            lookahead_depth = min(3, max(1, remaining_count // 3)) if remaining_count > 4 else 2
+            nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth]
+            avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+            distance_variance = sum((distance_matrix[node][n] - avg_neighbor_distance) ** 2 for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+            distance_entropy = np.log(distance_variance + 1e-6) if distance_variance > 0 else 0
+        else:
+            avg_distance = 0
+            connectivity = 0
+            node_centrality = 0
+            avg_neighbor_distance = 0
+            distance_entropy = 0
+
+        distances.append(immediate_distance)
+        centralities.append(node_centrality)
+        entropies.append(distance_entropy)
+
+        connectivity_factor = 1.0 + (connectivity / (remaining_count + 1e-6)) * 0.3
+        immediate_weight = 0.5 - 0.3 * visited_ratio
+        centrality_weight = 0.3 * (0.5 + 0.3 * visited_ratio)
+        entropy_weight = 0.2 * (0.4 + 0.4 * visited_ratio)
+
+        score = immediate_weight * immediate_distance + centrality_weight * node_centrality + entropy_weight * distance_entropy
+        penalty = 1 + (0.4 * avg_neighbor_distance / (immediate_distance + 1e-6)) * (1 - visited_ratio) + (0.2 * distance_entropy / (immediate_distance + 1e-6)) * visited_ratio
+        node_scores.append(score * penalty)
+
+    if not node_scores:
+        return random.choice(list(unvisited_nodes))
+
+    min_score = min(node_scores)
+    max_score = max(node_scores)
+    normalized_scores = [(max_score - score + 1e-6) / (max_score - min_score + 1e-6) for score in node_scores]
+    total_weight = sum(normalized_scores)
+    probabilities = [score / total_weight for score in normalized_scores]
+
+    next_node = random.choices(list(unvisited_nodes), weights=probabilities, k=1)[0]
+    return next_node

@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    current_to_dest = distance_matrix[current_node][destination_node]
+
+    # Calculate variance of distances from candidate to unvisited nodes
+    def calculate_variance(node):
+        distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        if not distances:
+            return 0
+        mean = sum(distances) / len(distances)
+        variance = sum((d - mean) ** 2 for d in distances) / len(distances)
+        return variance
+
+    candidates = []
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+        variance = calculate_variance(node)
+
+        # Dynamic penalty for high variance
+        penalty = 0.4 * variance if remaining_nodes > 5 else 0.2 * variance
+
+        # Detour cost adjusted by remaining path length
+        detour_cost = distance_matrix[node][destination_node] - current_to_dest
+        detour_weight = 0.3 if remaining_nodes > 4 else 0.5
+
+        # Score with dynamic weights and penalty
+        score = distance_to_node + 0.4 * avg_distance + detour_weight * detour_cost + penalty
+        candidates.append((node, score))
+
+    # Probabilistic selection to escape local minima
+    if candidates:
+        candidates.sort(key=lambda x: x[1])
+        if len(candidates) > 1 and remaining_nodes > 3:
+            # Consider top 2 candidates with probability based on score difference
+            top1, top2 = candidates[0], candidates[1]
+            diff = top2[1] - top1[1]
+            if diff > 0:
+                prob = min(0.3, diff / (top1[1] + 1e-6))
+                if random.random() < prob:
+                    next_node = top2[0]
+        if next_node is None:
+            next_node = candidates[0][0]
+
+    return next_node

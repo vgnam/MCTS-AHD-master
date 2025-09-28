@@ -1,0 +1,39 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+
+    # Compute centroid of unvisited nodes
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    else:
+        centroid_x = 0
+
+    # Dynamic weight adjustment based on remaining path length
+    remaining_nodes = len(unvisited_nodes)
+    distance_to_dest_weight = 0.5 * (1 - 0.1 * remaining_nodes)  # Decreases as more nodes are visited
+    centroid_penalty_weight = 0.3 * (1 + 0.1 * remaining_nodes)  # Increases as more nodes are visited
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Weighted score with dynamic adjustments
+        score = distance_to_current + distance_to_dest_weight * distance_to_dest + centroid_penalty_weight * centroid_penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    # Introduce probabilistic selection to occasionally explore detours
+    if random.random() < 0.2:  # 20% chance to explore
+        candidate_nodes = [node for node in unvisited_nodes if distance_matrix[current_node][node] < 1.5 * min_score]
+        if candidate_nodes:
+            next_node = random.choice(candidate_nodes)
+
+    return next_node

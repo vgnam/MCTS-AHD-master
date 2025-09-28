@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    scores = []
+    current_path_length = sum(distance_matrix[current_node][node] for node in unvisited_nodes if node in unvisited_nodes)
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        normalized_distance = distance / (current_path_length + 1e-6)
+        dynamic_weight = 0.5 + 0.3 * (1 - normalized_distance)
+        centrality = sum(distance_matrix[node]) / (sum(degree) + 1e-6)
+        score = -normalized_distance + dynamic_weight * (1 / (degree + 1)) - 0.2 * centrality
+        scores.append(score)
+    probabilities = np.exp(scores) / np.sum(np.exp(scores))
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+    return next_node

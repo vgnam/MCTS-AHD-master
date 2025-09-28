@@ -1,0 +1,38 @@
+importance" score, which integrates connectivity, centrality, and potential path gain, while adaptively adjusting weights based on exploration progress and node centrality to balance local and global optimization.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            remaining_nodes_list = [n for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in remaining_nodes_list) / len(remaining_nodes_list)
+            connectivity_score = 1.0 / (1.0 + avg_remaining_dist)
+            potential_gain = (distance_matrix[current_node][destination_node] - immediate_dist - dest_dist) / (1 + immediate_dist)
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] > 0 and n != node)
+            centrality_score = node_degree / (total_nodes - 1)
+            node_importance = (0.5 * connectivity_score + 0.3 * centrality_score + 0.2 * potential_gain) * (1 + exploration_factor)
+            exploration_bias = 1.0 / (1.0 + (node_degree / total_nodes) * exploration_factor)
+        else:
+            node_importance = 0
+            exploration_bias = 1.0
+
+        weight_local = 0.5 - 0.3 * exploration_factor
+        weight_importance = 0.4 + 0.2 * exploration_factor
+        weight_dest = -0.1 * (1 - exploration_factor)
+        weight_exploration = 0.1 * exploration_factor
+
+        score = (weight_local * immediate_dist) + (weight_importance * node_importance) + \
+                (weight_dest * dest_dist) + (weight_exploration * exploration_bias)
+        return score
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

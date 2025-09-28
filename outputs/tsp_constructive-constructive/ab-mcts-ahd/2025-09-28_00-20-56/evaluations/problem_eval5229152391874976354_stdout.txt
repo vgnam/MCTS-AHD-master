@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    default but dynamically overrides this choice if the destination is within 3.5 times the average distance to unvisited nodes, ensuring a balance between proximity and progress toward the destination. The threshold (3.5 × average distance) acts as a dynamic filter, while the destination node is given higher priority when it meets this condition. The code efficiently combines greedy selection with a heuristic override, leveraging the distance matrix and unvisited nodes set.}
+                                                                                                                                                                                                                               ^
+SyntaxError: invalid character '×' (U+00D7)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    default but dynamically overrides this choice if the destination is within 3.5 times the average distance to unvisited nodes, ensuring a balance between proximity and progress toward the destination. The threshold (3.5 × average distance) acts as a dynamic filter, while the destination node is given higher priority when it meets this condition. The code efficiently combines greedy selection with a heuristic override, leveraging the distance matrix and unvisited nodes set.}
+                                                                                                                                                                                                                               ^
+SyntaxError: invalid character '×' (U+00D7)

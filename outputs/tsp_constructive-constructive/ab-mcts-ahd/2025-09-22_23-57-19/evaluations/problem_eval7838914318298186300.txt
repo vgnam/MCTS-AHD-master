@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    max_score = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Calculate node degree (number of nearby nodes within a threshold)
+        threshold = 0.5 * max(distance_matrix[current_node])  # Dynamic threshold
+        degree = sum(1 for n in unvisited_nodes if distance_matrix[node][n] <= threshold)
+
+        # Score combines distance and inverse degree to avoid clusters
+        score = distance - 0.3 * degree  # Adjust weight to balance exploration
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    return next_node

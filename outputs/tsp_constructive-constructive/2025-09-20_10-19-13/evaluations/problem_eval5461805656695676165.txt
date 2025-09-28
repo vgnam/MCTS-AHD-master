@@ -1,0 +1,13 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def heuristic_score(node):
+        distance = distance_matrix[current_node][node]
+        # Example heuristic: inverse of node degree (simplified for demonstration)
+        node_degree = sum(1 for d in distance_matrix[node] if d > 0)
+        heuristic_factor = 1 / (node_degree + 1)  # Avoid division by zero
+        return distance + 0.5 * heuristic_factor  # Weighted combination
+
+    next_node = min(unvisited_nodes, key=heuristic_score)
+    return next_node

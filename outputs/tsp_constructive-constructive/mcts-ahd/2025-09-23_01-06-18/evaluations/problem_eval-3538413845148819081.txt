@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Cluster nodes based on proximity to current node
+    cluster_threshold = 1.5 * min(distance_matrix[current_node][n] for n in unvisited_nodes)
+    clusters = {}
+    for node in unvisited_nodes:
+        cluster_key = tuple(sorted([n for n in unvisited_nodes if distance_matrix[node][n] <= cluster_threshold]))
+        if cluster_key not in clusters:
+            clusters[cluster_key] = []
+        clusters[cluster_key].append(node)
+
+    # Select the cluster with the highest connectivity to destination
+    cluster_scores = {}
+    for cluster in clusters:
+        if not cluster:
+            continue
+        cluster_nodes = clusters[cluster]
+        cluster_score = sum(distance_matrix[node][destination_node] for node in cluster_nodes) / len(cluster_nodes)
+        cluster_scores[cluster] = cluster_score
+
+    if not cluster_scores:
+        return min(unvisited_nodes, key=lambda n: distance_matrix[current_node][n])
+
+    best_cluster = min(cluster_scores, key=cluster_scores.get)
+    best_cluster_nodes = clusters[best_cluster]
+
+    # Within the best cluster, select the node that optimizes both local and global distance
+    def heuristic(node):
+        local_dist = distance_matrix[current_node][node]
+        global_dist = distance_matrix[node][destination_node]
+        cluster_cohesion = sum(distance_matrix[node][n] for n in best_cluster_nodes if n != node) / (len(best_cluster_nodes) - 1) if len(best_cluster_nodes) > 1 else 0
+        return 0.5 * local_dist + 0.3 * global_dist + 0.2 * cluster_cohesion
+
+    next_node = min(best_cluster_nodes, key=heuristic)
+    return next_node

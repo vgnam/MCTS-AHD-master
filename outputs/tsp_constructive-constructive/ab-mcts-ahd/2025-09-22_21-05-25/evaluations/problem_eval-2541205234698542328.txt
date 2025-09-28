@@ -1,0 +1,12 @@
+defaulting to the nearest node in such cases. The key parameters are the current and destination nodes, unvisited nodes, and distance matrix, with the heuristic's logic embedded in the conditional choice between nearest and farthest nodes.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    if len(unvisited_nodes) > 2:
+        next_node = farthest_node if distance_matrix[current_node][farthest_node] < 0.5 * distance_matrix[current_node][nearest_node] else nearest_node
+    else:
+        next_node = nearest_node
+    return next_node

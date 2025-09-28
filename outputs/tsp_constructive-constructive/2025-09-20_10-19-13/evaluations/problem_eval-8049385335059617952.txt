@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate attractiveness (inverse distance) for each unvisited node
+    attractiveness = {node: 1.0 / (distance_matrix[current_node][node] + 1e-10) for node in unvisited_nodes}
+
+    # Normalize attractiveness to create a probability distribution
+    total_attractiveness = sum(attractiveness.values())
+    probabilities = {node: attractiveness[node] / total_attractiveness for node in unvisited_nodes}
+
+    # Select the node with the highest probability (could be randomized for exploration)
+    next_node = max(probabilities.items(), key=lambda x: x[1])[0]
+
+    return next_node

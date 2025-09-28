@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    immediate_weight = 0.6 if remaining_nodes > 3 else 0.4
+    future_weight = 0.4 if remaining_nodes > 3 else 0.6
+    penalty_factor = 0.2
+
+    node_degrees = [sum(1 for d in distance_matrix[node] if d > 0) for node in unvisited_nodes]
+    max_degree = max(node_degrees) if node_degrees else 1
+    degree_weights = [1 - (d / max_degree) for d in node_degrees]
+
+    scores = []
+    for i, node in enumerate(unvisited_nodes):
+        current_to_node = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes_list = [n for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in remaining_nodes_list) / len(remaining_nodes_list)
+            revisit_penalty = penalty_factor * distance_matrix[current_node][node]
+        else:
+            avg_remaining_dist = 0
+            revisit_penalty = 0
+
+        memory_factor = 0.1 * degree_weights[i]
+        combined_score = immediate_weight * current_to_node + future_weight * (avg_remaining_dist + revisit_penalty) + memory_factor
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

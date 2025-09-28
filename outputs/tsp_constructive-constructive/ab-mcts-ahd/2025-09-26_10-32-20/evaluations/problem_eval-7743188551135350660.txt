@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    sigmoid_weight = 1 / (1 + math.exp(-(remaining_nodes - 5)))  # Sigmoid transition
+    local_weight = sigmoid_weight
+    global_weight = 1 - sigmoid_weight
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        min_distance = min(distance_matrix[node][n] for n in unvisited_nodes)
+        distances = [distance_matrix[node][n] for n in unvisited_nodes]
+        variance_penalty = statistics.pstdev(distances) if len(distances) > 1 else 0
+
+        return (local_weight * distance_matrix[current_node][node] +
+                global_weight * min_distance -
+                0.1 * variance_penalty)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

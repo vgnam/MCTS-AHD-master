@@ -1,0 +1,48 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    num_unvisited = len(unvisited_nodes)
+    exploration_prob = min(0.5, 1.0 / (num_unvisited + 1))  # Dynamic exploration probability
+    penalty_threshold = 0.3 * sum(distance_matrix[0]) / len(distance_matrix)  # Adjusted penalty threshold
+
+    # Calculate current path direction vector (simplified)
+    if current_node != destination_node:
+        current_vector = (distance_matrix[current_node][destination_node], 0)  # Simplified for demonstration
+    else:
+        current_vector = (0, 0)
+
+    candidates = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate novelty score based on angular deviation
+        if current_node != destination_node:
+            node_vector = (distance_matrix[current_node][node], distance_matrix[node][destination_node])
+            dot_product = current_vector[0] * node_vector[0] + current_vector[1] * node_vector[1]
+            magnitude_current = (current_vector[0]**2 + current_vector[1]**2)**0.5
+            magnitude_node = (node_vector[0]**2 + node_vector[1]**2)**0.5
+            if magnitude_current > 0 and magnitude_node > 0:
+                cosine_similarity = dot_product / (magnitude_current * magnitude_node)
+                novelty_score = 1.0 - cosine_similarity  # Higher novelty for more deviation
+            else:
+                novelty_score = 0.0
+        else:
+            novelty_score = 0.0
+
+        # Penalty for nodes too close to current node
+        penalty = 1.5 if distance_to_current < penalty_threshold else 1.0
+
+        combined_score = (distance_to_current + distance_to_destination) * (1 + exploration_prob * novelty_score) * penalty
+        candidates.append((node, combined_score))
+
+    # Probabilistic selection based on scores
+    if candidates:
+        scores = [1.0 / (score + 1e-6) for _, score in candidates]  # Lower score = higher probability
+        total = sum(scores)
+        probabilities = [s / total for s in scores]
+        next_node = random.choices([node for node, _ in candidates], weights=probabilities, k=1)[0]
+
+    return next_node

@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    remaining_nodes = len(unvisited_nodes)
+    if remaining_nodes == 0:
+        return destination_node
+    sigmoid_factor = 1 / (1 + math.exp(-(remaining_nodes - len(distance_matrix)/2)))
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        estimated_return_distance = distance_matrix[node][destination_node]
+        score = immediate_distance + sigmoid_factor * estimated_return_distance
+        candidates.append((node, score))
+    if not candidates:
+        return destination_node
+    candidates.sort(key=lambda x: x[1])
+    best_score = candidates[0][1]
+    filtered_candidates = [c for c in candidates if c[1] <= best_score * 1.1]
+    selected_node, _ = random.choice(filtered_candidates)
+    return next_node

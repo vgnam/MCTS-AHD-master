@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+
+    temperature = 1.0 / len(unvisited_nodes)  # Decreasing temperature for later stages
+    weights = [math.exp(-distance / temperature) for distance in distances]
+
+    # Normalize weights to form a probability distribution
+    total_weight = sum(weights)
+    probabilities = [weight / total_weight for weight in weights]
+
+    # Select node based on probability
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

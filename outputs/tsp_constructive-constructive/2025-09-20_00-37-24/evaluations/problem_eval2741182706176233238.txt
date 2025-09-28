@@ -1,0 +1,39 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    pheromone_levels = {node: 1.0 for node in unvisited_nodes}
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    def desirability(node):
+        alpha = 1.0
+        beta = 2.0
+        return (pheromone_levels[node]**alpha) / (distance_matrix[current_node][node]**beta)
+
+    desirabilities = {node: desirability(node) for node in nearest_neighbors}
+    total_desirability = sum(desirabilities.values())
+    probabilities = {node: desirabilities[node] / total_desirability for node in nearest_neighbors}
+
+    if random.random() < 0.9:
+        top_3 = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        top_3_probabilities = {node: probabilities[node] for node in top_3 if node in probabilities}
+        if top_3_probabilities:
+            next_node = max(top_3_probabilities, key=top_3_probabilities.get)
+        else:
+            next_node = random.choice(top_3)
+    else:
+        cumulative_probability = 0.0
+        r = random.random()
+        for node, probability in probabilities.items():
+            cumulative_probability += probability
+            if r <= cumulative_probability:
+                next_node = node
+                break
+        else:
+            next_node = random.choice(nearest_neighbors)
+
+    return next_node

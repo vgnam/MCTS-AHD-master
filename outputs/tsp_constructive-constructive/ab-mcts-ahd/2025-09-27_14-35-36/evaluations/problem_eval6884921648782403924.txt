@@ -1,0 +1,10 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def cost(node):
+        nearest_next = min(unvisited_nodes - {node}, key=lambda x: distance_matrix[node][x], default=None)
+        return distance_matrix[current_node][node] + (distance_matrix[node][nearest_next] if nearest_next else 0)
+
+    next_node = min(unvisited_nodes, key=cost)
+    return next_node

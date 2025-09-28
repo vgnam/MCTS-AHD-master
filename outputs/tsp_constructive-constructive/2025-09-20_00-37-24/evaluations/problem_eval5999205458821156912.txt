@@ -1,0 +1,25 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate inverse distance weights for probabilistic selection
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    weights = [math.exp(-(d - min_dist) / (min_dist + 1e-6)) for d in distances]  # Exponential decay
+
+    # Normalize weights
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    # 90% chance to pick based on weights, 10% chance to pick uniformly at random
+    if random.random() < 0.9:
+        next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

@@ -1,0 +1,16 @@
+important as the tour progresses
+
+        # Total cost
+        total_cost = (weight_immediate * immediate_distance +
+                      weight_potential * potential_distance +
+                      weight_centrality * centrality -
+                      0.3 * risk_factor)  # Penalize high risk
+
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+
+    return next_node

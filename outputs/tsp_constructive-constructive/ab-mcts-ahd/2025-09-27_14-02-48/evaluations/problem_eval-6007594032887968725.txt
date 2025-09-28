@@ -1,0 +1,56 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    temperature = 100
+    cooling_rate = 0.9
+    min_distance = float('inf')
+    nearest_neighbor = None
+    
+    # Calculate desirability score for each unvisited node
+    desirability_scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        desirability_scores[node] = 1 / (1 + distance)
+        if distance < min_distance:
+            min_distance = distance
+            nearest_neighbor = node
+    
+    # Adjust desirability scores based on destination node
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        desirability_scores[destination_node] += 1 / (1 + destination_distance)
+    
+    # Normalize desirability scores
+    max_score = max(desirability_scores.values())
+    for node in desirability_scores:
+        desirability_scores[node] /= max_score
+    
+    while temperature > 1:
+        # Choose between nearest neighbor and a random node based on temperature and desirability scores
+        if random.random() < (temperature / 100) ** 2:
+            scores = [desirability_scores[node] for node in unvisited_nodes]
+            scores = [score / sum(scores) for score in scores]
+            next_node = random.choices(list(unvisited_nodes), weights=scores, k=1)[0]
+        else:
+            next_node = max(unvisited_nodes, key=lambda node: desirability_scores[node])
+        
+        if next_node not in unvisited_nodes:
+            temperature *= cooling_rate
+            continue
+        
+        # Adjust cooling rate based on solution quality
+        if distance_matrix[current_node][next_node] < min_distance:
+            cooling_rate = 0.95
+        else:
+            cooling_rate = 0.9
+        
+        if next_node == destination_node or random.random() < math.exp((min_distance - distance_matrix[current_node][next_node]) / (temperature + 1)):
+            return next_node
+        
+        temperature *= cooling_rate
+    
+    return next_node

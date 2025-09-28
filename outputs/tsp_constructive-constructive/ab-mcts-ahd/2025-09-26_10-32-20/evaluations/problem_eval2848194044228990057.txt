@@ -1,0 +1,61 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    phase = 1 - remaining_ratio
+
+    # Adaptive steepness parameter
+    k = 5 + 15 * (1 - phase)  # Increases as we progress
+
+    # Piecewise linear phase transition
+    if phase < 0.3:
+        local_weight = 1.0
+        global_weight = 0.0
+    elif phase < 0.7:
+        local_weight = 1 - (phase - 0.3) / 0.4
+        global_weight = 1 - local_weight
+    else:
+        local_weight = 0.0
+        global_weight = 1.0
+
+    # Enhanced look-ahead: k-nearest neighbors average
+    def look_ahead(node):
+        k = min(3, len(unvisited_nodes)) if unvisited_nodes else 1
+        neighbors = sorted(unvisited_nodes, key=lambda n: distance_matrix[node][n])[:k]
+        return sum(distance_matrix[node][n] for n in neighbors) / k if neighbors else 0
+
+    # Betweenness centrality approximation
+    def centrality(node):
+        betweenness = 0
+        for i in range(total_nodes):
+            for j in range(total_nodes):
+                if i != j and i != node and j != node:
+                    shortest = distance_matrix[i][j]
+                    via_node = distance_matrix[i][node] + distance_matrix[node][j]
+                    if via_node < shortest:
+                        betweenness += (shortest - via_node) / shortest
+        return betweenness / (total_nodes * (total_nodes - 1)) if total_nodes > 1 else 0
+
+    # Calculate scores for all unvisited nodes
+    scores = {}
+    for node in unvisited_nodes:
+        local_score = distance_matrix[current_node][node]
+        global_score = 0.6 * centrality(node) + 0.4 * look_ahead(node)
+        scores[node] = local_weight * local_score + global_weight * global_score
+
+    # Probabilistic selection with exponential probability
+    if scores:
+        sorted_nodes = sorted(unvisited_nodes, key=lambda n: scores[n])
+        probabilities = [math.exp(-i) for i in range(len(sorted_nodes))]
+        total_prob = sum(probabilities)
+        probabilities = [p/total_prob for p in probabilities]
+        next_node = random.choices(sorted_nodes, weights=probabilities, k=1)[0]
+    else:
+        next_node = min(unvisited_nodes, key=lambda n: distance_matrix[current_node][n])
+
+    return next_node

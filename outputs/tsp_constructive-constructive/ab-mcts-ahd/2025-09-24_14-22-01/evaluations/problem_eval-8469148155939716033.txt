@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = set(unvisited_nodes) | {current_node, destination_node}
+    num_remaining = len(remaining_nodes)
+
+    # Dynamic weights based on remaining nodes
+    alpha = min(0.8, 0.3 + 0.5 * (num_remaining / len(distance_matrix)))
+    beta = 1 - alpha
+
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Exploration factor: diversity of connections to remaining nodes
+        exploration = sum(distance_matrix[node][n] for n in remaining_nodes) / num_remaining
+
+        # Risk factor: worst-case path length to destination via this node
+        risk = max(distance_matrix[node][n] + distance_matrix[n][destination_node] for n in remaining_nodes)
+
+        # Novel cost function with dynamic weights
+        weighted_cost = (alpha * immediate_distance +
+                        beta * exploration +
+                        0.1 * risk)  # Lower weight for risk
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    return next_node

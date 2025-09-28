@@ -1,0 +1,8 @@
+import random
+    if len(unvisited_nodes) > 2:
+        candidates = sorted(unvisited_nodes, key=lambda n: evaluate_node(n))[:3]
+        next_node = random.choice(candidates)
+    else:
+        next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+
+    return next_node

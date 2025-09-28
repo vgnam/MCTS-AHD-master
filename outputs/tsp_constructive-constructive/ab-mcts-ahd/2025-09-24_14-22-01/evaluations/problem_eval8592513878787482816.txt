@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    # Dynamic weights based on remaining nodes
+    if remaining_nodes > 3:
+        weight_immediate = 0.5
+        weight_potential = 0.3
+        weight_centrality = 0.1
+        weight_proximity = 0.1  # Novel factor
+    else:
+        weight_immediate = 0.2
+        weight_potential = 0.5
+        weight_centrality = 0.2
+        weight_proximity = 0.1
+
+    # Novel "tour completion factor" for destination prioritization
+    tour_completion_factor = 1 - (remaining_nodes / len(distance_matrix))
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node]) / (len(distance_matrix) - 1)
+
+        # Novel "proximity pressure" equation
+        proximity_pressure = (sum(distance_matrix[node]) / len(distance_matrix)) / (immediate_distance + 1)
+
+        total_cost = (
+            weight_immediate * immediate_distance +
+            weight_potential * potential_distance +
+            weight_centrality * centrality +
+            weight_proximity * proximity_pressure
+        )
+
+        # Incorporate tour completion factor
+        if remaining_nodes <= 2:
+            total_cost *= (1 - 0.5 * tour_completion_factor)
+
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+
+    if next_node is None or remaining_nodes <= 1:
+        next_node = destination_node
+
+    return next_node

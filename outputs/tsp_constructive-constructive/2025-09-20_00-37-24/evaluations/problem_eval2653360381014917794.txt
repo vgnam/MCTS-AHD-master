@@ -1,0 +1,33 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate node centrality (inverse of average distance to other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        distances = [distance_matrix[node][other] for other in unvisited_nodes if other != node]
+        centrality[node] = 1.0 / (np.mean(distances) + 1e-6)  # Avoid division by zero
+
+    # Dynamic bias towards destination based on remaining unvisited nodes
+    bias_factor = len(unvisited_nodes) / (len(distance_matrix) + 1e-6)
+    destination_bias = bias_factor if destination_node in unvisited_nodes else 0
+
+    # Combine distance and centrality with destination bias
+    scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        centrality_score = centrality[node]
+        is_destination = 1.0 if node == destination_node else 0.0
+        scores[node] = (0.6 * distance + 0.3 * centrality_score + 0.1 * is_destination) * (1 - destination_bias)
+
+    # Probabilistic selection based on scores
+    candidates = sorted(unvisited_nodes, key=lambda x: scores[x])
+    if random.random() < 0.7:  # 70% chance to pick from top 2 candidates
+        next_node = random.choice(candidates[:min(2, len(candidates))])
+    else:  # 30% chance to pick from middle candidates
+        next_node = random.choice(candidates[min(2, len(candidates)):])
+
+    return next_node

@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance scoring by combining immediate costs with both local and global lookahead costs, using a time-varying weight scheme that adapts to the tour's progress, while incorporating a novel penalty mechanism based on node centrality and historical visitation patterns to balance exploration and exploitation more effectively.}
+                                                                                                                                                          ^
+SyntaxError: unterminated string literal (detected at line 1)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance scoring by combining immediate costs with both local and global lookahead costs, using a time-varying weight scheme that adapts to the tour's progress, while incorporating a novel penalty mechanism based on node centrality and historical visitation patterns to balance exploration and exploitation more effectively.}
+                                                                                                                                                          ^
+SyntaxError: unterminated string literal (detected at line 1)

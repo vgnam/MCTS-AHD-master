@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    alpha = 0.6  # Weight for distance to current node
+    beta = 0.4   # Weight for estimated distance to destination
+    base_penalty = 1.2  # Base penalty for revisiting nodes
+
+    # Track visit counts (simplified; in practice, use a dictionary)
+    visit_counts = {node: 0 for node in unvisited_nodes}
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        estimated_total_distance = distance_to_node + distance_matrix[node][destination_node]
+
+        # Dynamic penalty: scales with visit count
+        penalty_factor = base_penalty * (1 + visit_counts[node])
+        score = alpha * distance_to_node + beta * estimated_total_distance * penalty_factor
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    # Update visit count for the selected node
+    if next_node in visit_counts:
+        visit_counts[next_node] += 1
+
+    return next_node

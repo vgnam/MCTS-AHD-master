@@ -1,0 +1,36 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate adaptive probabilities based on inverse distance and dynamic exploration factor
+    exploration_factor = max(0.1, 0.9 - (1.0 / (len(unvisited_nodes) + 1)))  # Decreases as nodes are visited
+    probabilities = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance == 0:
+            weight = 1.0  # Avoid division by zero for same node (unlikely in TSP)
+        else:
+            weight = 1.0 / distance  # Inverse distance weighting
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    normalized_probs = [p / total_weight for p in probabilities]
+
+    # Apply dynamic exploration factor
+    final_probs = []
+    for prob in normalized_probs:
+        final_prob = (1 - exploration_factor) * prob + exploration_factor / len(unvisited_nodes)
+        final_probs.append(final_prob)
+
+    # Select node based on weighted probabilities
+    next_node = random.choices(unvisited_nodes, weights=final_probs, k=1)[0]
+
+    return next_node

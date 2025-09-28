@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    base_weight_local = 0.7 * (0.9 ** progress)
+    base_weight_centrality = 0.2 + 0.6 * (0.5 - abs(progress - 0.5)) ** 2
+    base_weight_coherence = 0.1 * (0.8 ** (1 - progress))
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+
+        centrality_factor = sum(distance_matrix[node][n] for n in range(total_nodes))
+        scaled_centrality = 1 / (centrality_factor + 1e-10) if centrality_factor > 0 else 0
+
+        coherence_factor = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        coherence_estimate = coherence_factor / len(unvisited_nodes) if unvisited_nodes else 0
+
+        dynamic_weight_local = base_weight_local * (1 + 0.3 * (1 - progress))
+        dynamic_weight_centrality = base_weight_centrality * (1 + 0.5 * progress)
+        dynamic_weight_coherence = base_weight_coherence * (1 + 0.2 * (1 - progress))
+
+        return (dynamic_weight_local * local_distance +
+                dynamic_weight_centrality * scaled_centrality -
+                dynamic_weight_coherence * coherence_estimate)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

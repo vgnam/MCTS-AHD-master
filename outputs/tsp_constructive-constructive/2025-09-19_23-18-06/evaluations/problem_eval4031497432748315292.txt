@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    for node in unvisited_nodes:
+        direct_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            degree = sum(1 for d in distance_matrix[node] if d > 0)
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            locality = 1.0 / (avg_distance + 1e-6)
+            dynamic_weight = 1.0 / (1.0 + 1.5 * (len(remaining_nodes) / len(unvisited_nodes)))
+            penalty = 0.5 * avg_distance / max(distance_matrix[current_node]) if max(distance_matrix[current_node]) > 0 else 0
+            centrality_bonus = degree / len(distance_matrix) if len(distance_matrix) > 0 else 0
+            score = 0.5 * direct_dist + 0.3 * degree + 0.2 * locality * dynamic_weight - penalty + centrality_bonus
+        else:
+            score = direct_dist
+        candidates.append((node, score))
+
+    scores = [score for _, score in candidates]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - score + 1e-6) / (max_score - min_score + 1e-6) for score in scores]
+    total = sum(normalized_scores)
+    probabilities = [s / total for s in normalized_scores]
+    next_node = random.choices([node for node, _ in candidates], weights=probabilities, k=1)[0]
+
+    return next_node

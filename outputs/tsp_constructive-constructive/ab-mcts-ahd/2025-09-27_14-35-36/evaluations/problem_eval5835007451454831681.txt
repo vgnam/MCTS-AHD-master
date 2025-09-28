@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    total_nodes = len(distance_matrix)
+    remaining_nodes_factor = len(unvisited_nodes) / total_nodes
+
+    # Calculate centrality of each node (average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][other] for other in distance_matrix) / total_nodes
+
+    # Calculate average distance to unvisited nodes from current node
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+
+        if distance_to_node == 0:
+            score = float('-inf')
+        else:
+            # Novelty: Detour potential measure
+            detour_potential = (distance_to_node + distance_to_dest) / distance_matrix[current_node][destination_node]
+
+            # Novelty: Centrality-adjusted penalty
+            centrality_penalty = 1 / (1 + centrality[node] * remaining_nodes_factor)
+
+            # Novelty: Probabilistic selection factor
+            prob_factor = (1 - remaining_nodes_factor) * 0.5 + 0.5
+
+            # Combined score with new components
+            score = (distance_to_node * prob_factor) + (distance_to_dest * (1 - prob_factor))
+            score *= (1 / detour_potential) * centrality_penalty
+            score -= (avg_distance / distance_to_node) * (1 + remaining_nodes_factor)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Special consideration for destination with probabilistic threshold
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        threshold = 0.9 - (0.1 * remaining_nodes_factor)
+        if dest_distance < distance_matrix[current_node][next_node] * threshold:
+            next_node = destination_node
+
+    return next_node

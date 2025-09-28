@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    momentum_scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+
+        # Dynamic regret with adaptive scaling
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = max(0, (distance_matrix[current_node][node] - second_best) * (1 + len(unvisited_nodes)/len(distance_matrix)))
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Path momentum: considers recent direction changes
+        if len(unvisited_nodes) > 2:
+            last_two_nodes = list(unvisited_nodes)[:2]
+            momentum = (immediate_distance + distance_matrix[node][last_two_nodes[0]]) / (1 + distance_matrix[last_two_nodes[0]][last_two_nodes[1]])
+        else:
+            momentum = 1.0
+        momentum_scores.append(momentum)
+
+    # Adaptive weight normalization
+    progress = 1 - (len(unvisited_nodes) / len(distance_matrix))
+    regret_weight = max(0.1, 0.8 - 0.6 * progress)
+    distance_weight = 0.4 + 0.6 * progress
+    momentum_weight = min(0.7, 0.2 + 0.5 * progress)
+    total_weight = regret_weight + distance_weight + momentum_weight
+    regret_weight /= total_weight
+    distance_weight /= total_weight
+    momentum_weight /= total_weight
+
+    # Combined scoring with momentum
+    scores = [
+        regret_weight * regret + distance_weight * distance + momentum_weight * momentum
+        for regret, distance, momentum in zip(regrets, distances, momentum_scores)
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

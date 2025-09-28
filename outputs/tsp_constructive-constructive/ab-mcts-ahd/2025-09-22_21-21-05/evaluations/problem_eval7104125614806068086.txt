@@ -1,0 +1,35 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    path_length = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / remaining_nodes if remaining_nodes else 0
+
+    # Adaptive weight factor combining path progress and node density
+    progress_factor = min(1.0, 0.5 * (1 - remaining_nodes / total_nodes) + 0.3 * (path_length / total_nodes))
+    density_factor = math.log(remaining_nodes + 1) / math.log(total_nodes + 1) if total_nodes > 1 else 0
+    weight_factor = max(0.1, 0.4 * progress_factor + 0.6 * density_factor)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Centrality score based on average distances to all nodes
+        centrality = sum(distance_matrix[node][n] for n in range(total_nodes)) / total_nodes
+
+        # Penalty for revisiting nodes and centrality adjustment
+        revisit_penalty = 0.2 if node in unvisited_nodes else 0.0
+        centrality_adjustment = 0.3 * (1 / (centrality + 1))
+
+        combined_score = (1 - weight_factor) * distance_to_current - weight_factor * distance_to_destination - revisit_penalty + centrality_adjustment
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

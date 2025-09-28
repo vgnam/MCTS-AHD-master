@@ -1,0 +1,30 @@
+importance based on remaining nodes, using a weighted sum of distances and centrality, with higher weights for centrality when fewer nodes remain.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    centrality_weight = 1.0 - (remaining_nodes / len(distance_matrix)) ** 2
+
+    # Calculate centrality measure
+    total_centrality = 0
+    for node in unvisited_nodes:
+        total_centrality += sum(distance_matrix[node][other] for other in unvisited_nodes)
+
+    avg_centrality = total_centrality / (remaining_nodes ** 2) if remaining_nodes > 0 else 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        node_centrality = sum(distance_matrix[node][other] for other in unvisited_nodes)
+        centrality_factor = (avg_centrality - node_centrality) / (avg_centrality + 1e-6)
+        combined_score = 0.6 * distance_to_current + 0.3 * distance_to_destination + centrality_weight * centrality_factor
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

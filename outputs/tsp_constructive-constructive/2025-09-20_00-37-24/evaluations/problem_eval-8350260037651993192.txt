@@ -1,0 +1,29 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    {This algorithm prioritizes the destination node if unvisited; otherwise, it uses a hybrid approach combining nearest neighbor selection with a weighted probability based on distance, favoring closer nodes more strongly while still allowing for occasional exploration.}
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    distances = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+    
+    # Calculate weights based on inverse distance (closer nodes get higher weights)
+    total_distance = sum(distances.values())
+    if total_distance == 0:
+        weights = [1/len(unvisited_nodes)] * len(unvisited_nodes)
+    else:
+         weights = [(total_distance - distances[node]) / ((len(unvisited_nodes)-1) * total_distance) for node in unvisited_nodes]
+
+    # Normalize weights to ensure they sum to 1
+    sum_weights = sum(weights)
+    if sum_weights > 0:
+      normalized_weights = [w / sum_weights for w in weights]
+    else:
+      normalized_weights = [1/len(unvisited_nodes)] * len(unvisited_nodes)
+
+    # Select next node based on weighted probability
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_weights, k=1)[0]
+
+    return next_node

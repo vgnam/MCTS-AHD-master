@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    defined as the average distance to all other nodes, to balance exploration and exploitation more effectively. The algorithm adjusts weights dynamically based on the remaining nodes and centrality to prioritize nodes that are both close and well-connected early on, transitioning to a more strategic focus as the tour progresses.}
+                                                                                                                                                                                                                                                                                                                                            ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    defined as the average distance to all other nodes, to balance exploration and exploitation more effectively. The algorithm adjusts weights dynamically based on the remaining nodes and centrality to prioritize nodes that are both close and well-connected early on, transitioning to a more strategic focus as the tour progresses.}
+                                                                                                                                                                                                                                                                                                                                            ^
+SyntaxError: unmatched '}'

@@ -1,0 +1,35 @@
+import heappop, heappush
+
+    mst = set()
+    edges = []
+    visited = set()
+
+    # Start with any node in unvisited_nodes
+    start_node = next(iter(unvisited_nodes))
+    visited.add(start_node)
+
+    while len(visited) < len(unvisited_nodes):
+        for node in visited:
+            for neighbor in unvisited_nodes:
+                if neighbor not in visited:
+                    heappush(edges, (distance_matrix[node][neighbor], node, neighbor))
+
+        while edges:
+            distance, u, v = heappop(edges)
+            if v not in visited:
+                visited.add(v)
+                mst.add((u, v))
+                break
+
+    # Find the node in MST with the smallest distance to current_node
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    if next_node is None:
+        return destination_node
+    return next_node

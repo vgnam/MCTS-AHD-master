@@ -1,42 +1,43 @@
 def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
     next_node = None
-    best_combined_score = float('inf')
-
-    # Compute the central node of unvisited nodes
-    center_node = min(unvisited_nodes, key=lambda x: sum(distance_matrix[node][x] for node in unvisited_nodes))
-
-    # Dynamic weights based on the number of remaining nodes
-    num_unvisited = len(unvisited_nodes)
-    immediate_weight = 0.7 if num_unvisited > 3 else 0.5
-    future_weight = 0.3 if num_unvisited > 3 else 0.5
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    exploration_factor = 1.0 - (remaining_count / total_nodes) * 0.5
+    visited_ratio = 1 - (remaining_count / total_nodes)
 
     for node in unvisited_nodes:
         immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
 
-        # Estimate future distance to remaining nodes including return trip
-        future_distance = 0
-        temp_node = node
-        remaining_nodes = unvisited_nodes.copy()
-        remaining_nodes.remove(temp_node)
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = avg_distance
+        else:
+            avg_distance = 0
+            node_centrality = 0
 
-        while remaining_nodes:
-            next_temp_node = min(remaining_nodes, key=lambda x: distance_matrix[temp_node][x])
-            future_distance += distance_matrix[temp_node][next_temp_node]
-            temp_node = next_temp_node
-            remaining_nodes.remove(next_temp_node)
+        connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.3 * avg_distance)
+        connectivity_factor = 1.0 + (connectivity / (total_nodes - 1)) * 0.4
 
-        return_distance = distance_matrix[temp_node][destination_node]
-        future_distance += return_distance
+        lookahead_depth = min(4, remaining_count // 2) if remaining_count > 2 else 1
+        nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth] if remaining_nodes else []
+        avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
 
-        # Central node proximity factor with penalty for distance from center
-        distance_from_center_penalty = max(0, distance_matrix[node][center_node] - 1)
+        immediate_weight = 0.6 - 0.15 * exploration_factor
+        lookahead_weight = 0.35 * (1.0 - exploration_factor)
+        centrality_weight = 0.6 * (1.0 - lookahead_weight)
+        penalty_weight = 0.4 * (1 - visited_ratio)
 
-        # Combined score
-        combined_score = (immediate_distance * immediate_weight) + (
-                    future_distance * future_weight) + distance_from_center_penalty
+        score = immediate_weight * immediate_distance + lookahead_weight * (immediate_distance - avg_distance) - centrality_weight * node_centrality
+        penalty = 1 + (0.6 * avg_neighbor_distance / (immediate_distance + 1e-6)) * (1 - visited_ratio)
+        score *= penalty * connectivity_factor
 
-        if combined_score < best_combined_score:
-            best_combined_score = combined_score
+        if score < min_score:
+            min_score = score
             next_node = node
 
     return next_node

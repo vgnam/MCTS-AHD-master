@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def adjusted_distance(node):
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        return distance_matrix[current_node][node] / (degree + 1e-6)
+
+    temperature = 0.5
+    weights = [math.exp(-adjusted_distance(node) / temperature) for node in unvisited_nodes]
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

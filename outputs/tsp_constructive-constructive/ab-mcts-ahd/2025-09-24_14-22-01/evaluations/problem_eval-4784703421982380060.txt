@@ -1,0 +1,27 @@
+import math
+    import random
+    if not unvisited_nodes:
+        return destination_node
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 / (1 + remaining_nodes)  # Dynamic temperature scaling
+    node_costs = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        foresighted_distance = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        weighted_cost = 0.4 * immediate_distance + 0.4 * foresighted_distance + 0.2 * centrality
+        node_costs.append((node, weighted_cost))
+    if not node_costs:
+        return destination_node
+    # Boltzmann distribution for probabilistic selection
+    costs = [cost for _, cost in node_costs]
+    min_cost = min(costs)
+    max_cost = max(costs)
+    normalized_costs = [(max_cost - cost + 1e-6) / (max_cost - min_cost + 1e-6) for cost in costs]
+    probabilities = [math.exp(-cost / temperature) for cost in normalized_costs]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+    next_node = random.choices([node for node, _ in node_costs], weights=probabilities, k=1)[0]
+    return next_node

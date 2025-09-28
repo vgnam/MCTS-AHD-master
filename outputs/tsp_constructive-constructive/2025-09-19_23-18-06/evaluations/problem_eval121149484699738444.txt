@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    progress_ratio = 1.0 - (total_unvisited / (total_unvisited + len(distance_matrix)))
+    candidates = []
+
+    for node in unvisited_nodes:
+        next_distance = distance_matrix[current_node][node]
+        if total_unvisited > 1:
+            remaining_nodes = unvisited_nodes - {node}
+
+            # Calculate connectivity index (global awareness)
+            connectivity_index = sum(distance_matrix[node][n] for n in remaining_nodes) / (len(remaining_nodes) ** 1.5)
+
+            # Calculate path momentum (favor consistent direction)
+            momentum = 0.0
+            if len(distance_matrix) > 2:
+                prev_node = current_node
+                momentum = sum(distance_matrix[prev_node][n] for n in remaining_nodes) / len(remaining_nodes)
+
+            # Degree-based penalty (non-linear)
+            degree = sum(1 for d in distance_matrix[node] if d > 0)
+            degree_penalty = (degree ** 1.5) / (len(distance_matrix) ** 1.2)
+
+            # Dynamic weight based on progress and connectivity
+            dynamic_weight = 1.0 / (1.0 + 0.8 * (len(remaining_nodes) / total_unvisited) * (1.0 - progress_ratio))
+
+            # Hybrid scoring function
+            total_distance = (next_distance * (1.0 - 0.3 * progress_ratio)) + \
+                             (0.4 * connectivity_index) + \
+                             (0.3 * momentum) - \
+                             (dynamic_weight * degree_penalty)
+        else:
+            total_distance = next_distance
+
+        candidates.append((node, total_distance))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

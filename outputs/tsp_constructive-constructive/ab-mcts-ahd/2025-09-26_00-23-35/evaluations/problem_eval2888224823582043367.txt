@@ -1,0 +1,50 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('-inf')
+    num_unvisited = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Adaptive weight balancing based on progress
+    progress_ratio = (total_nodes - num_unvisited) / total_nodes
+    weight_proximity = 0.5 * math.exp(-5 * progress_ratio)
+    weight_future = 0.5 * math.tanh(5 * progress_ratio)
+
+    # Learning-based bias (simulated learning factor)
+    learning_factor = 0.3 * (1 - progress_ratio) + 0.7 * progress_ratio
+
+    # Novelty factor (encourages less visited nodes)
+    visit_counts = {node: sum(1 for n in unvisited_nodes if n == node) for node in unvisited_nodes}
+    max_count = max(visit_counts.values()) if visit_counts else 1
+    novelty_weights = {node: (1 - visit_counts[node]/max_count) for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, num_unvisited - 1)
+
+        # Global centrality measure
+        node_centrality = sum(distance_matrix[node]) / total_nodes
+
+        # Adaptive bias combining distance, centrality, and novelty
+        bias_factor = (distance_to_node / (distance_matrix[current_node][destination_node] + 1e-6)) ** 0.7
+        bias_factor *= (1 + node_centrality ** 0.5) * novelty_weights[node]
+
+        # Score with adaptive weights and learning factor
+        score = (weight_proximity * distance_to_node + weight_future * avg_future_distance) * learning_factor
+        score /= (1 + 0.2 * bias_factor)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Probabilistic destination selection with decaying probability
+    destination_prob = 0.3 * math.exp(-0.5 * progress_ratio)
+    if random.random() < destination_prob and destination_node in unvisited_nodes:
+        next_node = destination_node
+
+    return next_node

@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        weight = (degree + 1e-6) / (distance + 1e-6) ** 2
+        total_weight += weight
+        candidates.append((node, weight))
+
+    if total_weight == 0:
+        return min(unvisited_nodes, key=lambda n: distance_matrix[current_node][n])
+
+    selected_node = None
+    r = random.random() * total_weight
+    cumulative_weight = 0.0
+
+    for node, weight in candidates:
+        cumulative_weight += weight
+        if r <= cumulative_weight:
+            selected_node = node
+            break
+
+    return next_node

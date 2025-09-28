@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_score = -float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Dynamic weights based on remaining nodes and exploration/exploitation trade-off
+    weight_proximity = 0.6 if remaining_nodes > 3 else 0.4
+    weight_efficiency = 0.4 if remaining_nodes > 3 else 0.6
+    weight_angular = 0.2  # New factor for angular deviation
+
+    # Track visited nodes to avoid revisiting similar paths
+    visited_history = set()
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+        total_increase = current_to_node + node_to_dest
+
+        # Dynamic penalty based on proximity and history
+        penalty = 0.3 * (1.0 / (current_to_node + 1e-6)) if current_to_node < 0.2 else 0
+        if node in visited_history:
+            penalty += 0.5
+
+        # Heuristic for path efficiency (minimum spanning tree approximation)
+        heuristic_mst = sum(min(distance_matrix[node][n], distance_matrix[n][node]) for n in unvisited_nodes if n != node)
+
+        # Novel angular deviation heuristic (avoids sharp turns)
+        if len(unvisited_nodes) > 1:
+            other_nodes = [n for n in unvisited_nodes if n != node]
+            avg_angle = sum(distance_matrix[node][n] for n in other_nodes) / len(other_nodes)
+            angular_penalty = 0.1 * abs(avg_angle - current_to_node)
+        else:
+            angular_penalty = 0
+
+        # Combined score with probabilistic selection
+        score = (weight_proximity * current_to_node +
+                 weight_efficiency * total_increase +
+                 weight_angular * angular_penalty +
+                 0.3 * heuristic_mst) - penalty
+
+        # Probabilistic selection to escape local optima
+        if best_node is None or (score > best_score and random.random() < 0.7):
+            best_score = score
+            best_node = node
+
+    visited_history.add(best_node)
+    return next_node

@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    defined as the inverse of the average distance to all other nodes. The algorithm balances these factors adaptively, with immediate distance starting at 60% weight and decreasing linearly to 30%, while centrality and future distance weights increase proportionally. The next node is selected by minimizing a weighted sum of these three components.}
+                                                                                                                                                                                                                                                                                                                                                              ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    defined as the inverse of the average distance to all other nodes. The algorithm balances these factors adaptively, with immediate distance starting at 60% weight and decreasing linearly to 30%, while centrality and future distance weights increase proportionally. The next node is selected by minimizing a weighted sum of these three components.}
+                                                                                                                                                                                                                                                                                                                                                              ^
+SyntaxError: unmatched '}'

@@ -1,0 +1,27 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, iteration=0, total_iterations=100):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate temperature (linear decrease from 1.0 to 0.1)
+    temperature = max(0.1, 1.0 - (iteration / total_iterations) * 0.9)
+
+    # Probability of exploration decreases with temperature
+    exploration_prob = 0.3 * temperature
+
+    if random.random() < exploration_prob:
+        # Exploration: select from a wider range with probability inversely proportional to distance
+        weights = [math.exp(-distance_matrix[current_node][node] / temperature) for node in nearest_neighbors]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+    else:
+        # Exploitation: select from top 3 nearest with probability
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+
+    return next_node

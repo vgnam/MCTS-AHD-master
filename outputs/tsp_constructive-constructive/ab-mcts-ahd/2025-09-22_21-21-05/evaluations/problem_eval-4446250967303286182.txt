@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    long_term_weight = 1 / (1 + math.exp(-(total_unvisited - 5)))  # Sigmoid adjustment
+    short_term_weight = 1 - long_term_weight
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / total_unvisited if total_unvisited else 0
+        combined_score = long_term_weight * avg_distance_to_remaining + short_term_weight * distance_to_current
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

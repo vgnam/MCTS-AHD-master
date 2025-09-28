@@ -1,0 +1,32 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    exploration_threshold = 0.5 * (total_unvisited / (total_unvisited + 1))
+    weight_scaling = max(0.2, 0.8 * (total_unvisited / (total_unvisited + 1)))
+
+    candidates = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        future_dist = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited
+
+        priority_score = (1 - exploration_threshold) * (current_dist + weight_scaling * future_dist) + exploration_threshold * centrality
+        candidates.append((node, priority_score, current_dist, future_dist))
+
+    if random.random() < exploration_threshold:
+        selected = min(candidates, key=lambda x: x[1])
+    else:
+        selected = min(candidates, key=lambda x: x[2] + x[3])
+
+    next_node = selected[0]
+
+    if len(unvisited_nodes) > 1:
+        tie_breaker = [node for node in unvisited_nodes if distance_matrix[current_node][node] == distance_matrix[current_node][next_node]]
+        if len(tie_breaker) > 1:
+            next_node = min(tie_breaker, key=lambda x: distance_matrix[x][destination_node])
+
+    return next_node

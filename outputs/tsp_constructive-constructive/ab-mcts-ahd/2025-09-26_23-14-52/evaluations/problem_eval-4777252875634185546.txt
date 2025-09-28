@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (total_unvisited / (total_unvisited + 2)))
+    min_score = float('inf')
+    next_node = None
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited if unvisited_nodes else 0
+        degree = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < float('inf'))
+        normalized_distance = current_distance / avg_distance if avg_distance != 0 else current_distance
+        score = (1 - temperature) * normalized_distance + temperature * (centrality + 0.3 * degree)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

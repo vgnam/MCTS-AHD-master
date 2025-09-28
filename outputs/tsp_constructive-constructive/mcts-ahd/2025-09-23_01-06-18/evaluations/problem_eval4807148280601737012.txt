@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_distance == 0:
+            return destination_node
+        threshold = 1.0 + (1.0 - (len(unvisited_nodes) / len(distance_matrix)))
+        if remaining_distance / avg_distance <= threshold:
+            return destination_node
+
+    def energy_function(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+
+        # Connectivity-based energy calculation
+        local_connectivity = sum(1 for other in unvisited_nodes if distance_matrix[node][other] < 1.3 * to_current)
+        global_connectivity = sum(1 for other in unvisited_nodes if distance_matrix[node][other] < 1.5 * to_current)
+
+        # Energy components
+        local_energy = to_current * (1.0 + 0.2 * local_connectivity / len(unvisited_nodes))
+        global_energy = to_destination * (1.0 - 0.3 * global_connectivity / len(unvisited_nodes))
+
+        # Adaptive temperature cooling
+        temperature = 1.0 - 0.8 * (1.0 - remaining_ratio)
+
+        # Connectivity-aware entropy
+        entropy = -sum((distance_matrix[node][other] / sum(distance_matrix[node])) * np.log(distance_matrix[node][other] / sum(distance_matrix[node]) + 1e-6) for other in unvisited_nodes)
+
+        return (local_energy + global_energy) * temperature - 0.1 * entropy
+
+    # Probabilistic selection based on energy levels
+    energy_levels = [energy_function(node) for node in unvisited_nodes]
+    min_energy = min(energy_levels)
+    max_energy = max(energy_levels)
+    normalized_energies = [(max_energy - e + 1e-6) / (max_energy - min_energy + 1e-6) for e in energy_levels]
+
+    # Avoid division by zero and ensure valid probabilities
+    total = sum(normalized_energies)
+    if total == 0:
+        probabilities = [1.0 / len(unvisited_nodes) for _ in unvisited_nodes]
+    else:
+        probabilities = [e / total for e in normalized_energies]
+
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+    return next_node

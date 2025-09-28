@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+
+        # Global distance variance as a measure of node connectivity
+        global_distances = [distance_matrix[node][n] for n in unvisited_nodes]
+        global_variance = sum((d - (sum(global_distances) / len(global_distances))) ** 2 for d in global_distances) / len(global_distances)
+
+        # Node degree (number of nodes within a certain distance threshold)
+        threshold = 1.5 * min(distance_matrix[node]) if distance_matrix[node] else 1.0
+        degree = sum(1 for n in range(len(distance_matrix)) if distance_matrix[node][n] <= threshold)
+
+        # Dynamic weights based on exploration vs exploitation
+        exploration_weight = 0.5 if len(unvisited_nodes) > len(distance_matrix) // 2 else 0.2
+        exploitation_weight = 1.0 - exploration_weight
+
+        # Centrality and inverse global distance with updated weights
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(len(distance_matrix))) + 1e-10)
+        inverse_global = 1 / (sum(global_distances) / len(global_distances) + 1e-10)
+
+        # Combine all factors with dynamic weights
+        score = (0.4 * local_distance +
+                0.3 * global_variance +
+                0.2 * degree +
+                exploitation_weight * (0.6 * centrality + 0.4 * inverse_global) +
+                exploration_weight * (0.5 * degree + 0.5 * global_variance))
+
+        return score
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

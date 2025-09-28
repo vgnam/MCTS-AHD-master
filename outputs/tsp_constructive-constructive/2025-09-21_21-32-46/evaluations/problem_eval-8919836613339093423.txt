@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    distances = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        distances.append((node, distance))
+    if not distances:
+        return destination_node
+    nodes, dists = zip(*distances)
+    probabilities = [1 / (dist + 1e-10) for dist in dists]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+    next_node = np.random.choice(nodes, p=normalized_probs)
+    return next_node

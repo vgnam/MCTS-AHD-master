@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    centralities = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = max(0, distance_matrix[current_node][node] - second_best)
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        centralities.append(centrality)
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    regret_threshold = 0.3 * (1.0 - (remaining_nodes / total_nodes))
+    distance_weight = 0.5 + 0.5 * (remaining_nodes / total_nodes)
+    exploration_factor = 0.7 + 0.3 * (1.0 - (remaining_nodes / total_nodes))
+
+    scores = []
+    for i, node in enumerate(unvisited_nodes):
+        regret_score = regrets[i] if regrets[i] > regret_threshold else 0
+        distance_score = distances[i]
+        exploration_score = exploration_factor * (1.0 / (distances[i]**2 + 1e-6)) * (1.0 / (centralities[i] + 1e-6))
+
+        combined_score = regret_score + distance_weight * distance_score - exploration_score
+        scores.append(combined_score)
+
+    probabilities = np.exp(-np.array(scores) / np.sum(np.array(scores)))
+    probabilities /= np.sum(probabilities)
+    selected_index = np.random.choice(len(unvisited_nodes), p=probabilities)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

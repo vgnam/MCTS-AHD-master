@@ -1,0 +1,28 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    phase = 1 - remaining_ratio
+
+    # Linear increase in global_weight early, quadratic transition later
+    local_weight = max(0.1, 1 - (phase ** 2))
+    global_weight = 1 - local_weight
+
+    # Look-ahead factor: average distance to remaining nodes
+    def look_ahead(node):
+        return sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+    def centrality(node):
+        return 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+
+    hybrid_score = lambda node: (
+        local_weight * distance_matrix[current_node][node] +
+        global_weight * (0.7 * centrality(node) + 0.3 * look_ahead(node))
+    )
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

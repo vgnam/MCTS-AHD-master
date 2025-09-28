@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    def sigmoid(x, a=1):
+        return 1 / (1 + np.exp(-a * x))
+
+    progress_momentum = sigmoid(2 * progress - 1, 5)
+    weight_local = 0.3 + 0.7 * (1 - progress_momentum)
+    weight_centrality = 0.5 * (1 - progress_momentum)
+    weight_coherence = 0.7 * progress_momentum
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        diversity_penalty = sum(1 / (distance_matrix[node][n] + 1e-10) for n in unvisited_nodes if n != node)
+        return (weight_local * local_distance) + (weight_centrality * centrality) - (weight_coherence * coherence) + (0.2 * diversity_penalty)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

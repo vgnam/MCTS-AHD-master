@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    min_cost = min(distances)
+    max_cost = max(distances)
+
+    farthest_node = unvisited_nodes[distances.index(max_cost)]
+
+    exploration_bonus = 0.5 if max_cost > avg_distance * 1.5 else 0.2
+    switch_probability = (min_cost / (avg_distance + 1e-6)) * exploration_bonus
+
+    if random.random() < switch_probability:
+        candidate_nodes = [node for node in unvisited_nodes if distance_matrix[current_node][node] < avg_distance * 1.2]
+        if candidate_nodes:
+            closest_node = min(candidate_nodes, key=lambda node: distance_matrix[current_node][node])
+            return closest_node
+
+    return next_node

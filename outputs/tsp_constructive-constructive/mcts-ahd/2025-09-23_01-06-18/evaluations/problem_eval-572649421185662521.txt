@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    exploration_factor = 0.3 ** (len(unvisited_nodes) / len(distance_matrix))
+
+    if destination_node in unvisited_nodes:
+        direct_path = distance_matrix[current_node][destination_node]
+        avg_future = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_future == 0:
+            return destination_node
+        direct_ratio = direct_path / avg_future
+
+        if direct_ratio <= (1.2 - exploration_factor):
+            return destination_node
+
+    def adaptive_heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        future_potential = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / len(unvisited_nodes)
+
+        exploration_bias = exploration_factor * (1 - (len(unvisited_nodes) / len(distance_matrix)))
+        exploitation_bias = (1 - exploration_factor) * (len(unvisited_nodes) / len(distance_matrix))
+
+        return (immediate_cost * exploitation_bias +
+                future_potential * exploration_bias +
+                exploration_bias * sum(distance_matrix[node][other] for other in unvisited_nodes))
+
+    next_node = min(unvisited_nodes, key=adaptive_heuristic)
+    return next_node

@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    stage_factor = 1.0 / (1.0 + 0.1 * remaining_nodes)
+
+    distances = []
+    regrets = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (immediate_distance - second_best) if immediate_distance > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+    exploration_factor = 1.0 + 0.3 * (remaining_nodes / total_nodes) * (1.0 / (1.0 + math.exp(-0.5 * (remaining_nodes - total_nodes / 2))))
+
+    dynamic_weight = 1.0 / (1.0 + math.exp(-0.2 * (remaining_nodes - total_nodes / 2)))
+    immediate_weight = dynamic_weight * 0.8
+    regret_weight = (1.0 - dynamic_weight) * 0.5
+
+    memory_penalty = 0.4 * (1.0 - remaining_nodes / total_nodes) * exploration_factor
+
+    combined_scores = [immediate_weight * distance + regret_weight * regret - memory_penalty for distance, regret in zip(distances, regrets)]
+    min_score = min(combined_scores)
+    selected_index = combined_scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

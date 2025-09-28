@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = -float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    progress_ratio = 1.0 - (remaining_count / total_nodes)
+    exploration_factor = 0.5 + 0.5 * (1.0 - progress_ratio)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        neighborhood_size = min(5, remaining_count)
+        neighborhood_nodes = sorted(unvisited_nodes - {node}, key=lambda n: distance_matrix[node][n])[:neighborhood_size]
+
+        if neighborhood_nodes:
+            neighborhood_connectivity = sum(distance_matrix[node][n] for n in neighborhood_nodes) / len(neighborhood_nodes)
+            node_influence = sum(1.0 / (1.0 + distance_matrix[node][n]) for n in unvisited_nodes)
+        else:
+            neighborhood_connectivity = 0
+            node_influence = 0
+
+        global_connectivity = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        immediate_weight = 0.6 * exploration_factor + 0.3 * (1.0 - exploration_factor)
+        connectivity_weight = 0.3 * exploration_factor + 0.4 * (1.0 - exploration_factor)
+        influence_weight = 0.4 * (1.0 - exploration_factor)
+
+        score = (immediate_weight * (1.0 / (1.0 + immediate_distance)) +
+                 connectivity_weight * (1.0 / (1.0 + neighborhood_connectivity)) +
+                 influence_weight * node_influence)
+
+        score *= (1.0 + 0.5 * (1.0 - progress_ratio))
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

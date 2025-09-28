@@ -1,0 +1,14 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:16: RuntimeWarning: divide by zero encountered in scalar divide
+  proximity_factor = distance_to_dest / distance_to_dest_from_current
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:17: RuntimeWarning: divide by zero encountered in scalar divide
+  score = harmonic_mean * proximity_factor - (distance_to_node / distance_to_dest_from_current)
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:17: RuntimeWarning: invalid value encountered in scalar subtract
+  score = harmonic_mean * proximity_factor - (distance_to_node / distance_to_dest_from_current)
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 52, in eval_heuristic
+    raise KeyError(f"Node {next_node} is already visited.")
+KeyError: 'Node None is already visited.'

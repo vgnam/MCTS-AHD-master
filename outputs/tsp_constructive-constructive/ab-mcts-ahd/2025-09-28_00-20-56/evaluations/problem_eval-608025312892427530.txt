@@ -1,0 +1,48 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    visited_history = {node: 1.0 for node in unvisited_nodes}
+    decay_factor = 0.9
+    min_total_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+
+        # Dynamic lookahead based on remaining steps
+        if len(unvisited_nodes) > 2:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            best_lookahead = float('inf')
+            for n1 in remaining_nodes:
+                remaining_after_n1 = [n for n in remaining_nodes if n != n1]
+                for n2 in remaining_after_n1:
+                    score = (distance_matrix[node][n1] +
+                             distance_matrix[n1][n2] +
+                             distance_matrix[n2][destination_node])
+                    if score < best_lookahead:
+                        best_lookahead = score
+            lookahead_dist = best_lookahead
+        else:
+            lookahead_dist = distance_matrix[node][destination_node]
+
+        # Apply historical penalty
+        historical_penalty = visited_history[node]
+        visited_history[node] *= decay_factor
+
+        total_distance = current_distance + 0.3 * lookahead_dist + 0.2 * historical_penalty
+
+        if total_distance < min_total_distance:
+            min_total_distance = total_distance
+            next_node = node
+
+    # Prioritize destination if it's unvisited and the path to it is not too long
+    if destination_node in unvisited_nodes:
+        direct_distance = distance_matrix[current_node][destination_node]
+        if direct_distance <= min_total_distance * 0.8:
+            next_node = destination_node
+
+    if next_node is not None:
+        visited_history[next_node] = 1.0
+
+    return next_node

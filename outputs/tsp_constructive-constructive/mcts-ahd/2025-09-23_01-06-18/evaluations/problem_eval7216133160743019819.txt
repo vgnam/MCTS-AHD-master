@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    def calculate_centrality(node, depth=2):
+        if depth == 0 or not unvisited_nodes:
+            return 0
+        remaining_nodes = [n for n in unvisited_nodes if n != node]
+        if not remaining_nodes:
+            return 0
+        next_candidates = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:3]
+        centrality = sum(
+            (1 / (1 + distance_matrix[node][candidate])) * (1 + calculate_centrality(candidate, depth-1))
+            for candidate in next_candidates
+        )
+        return centrality / len(next_candidates) if next_candidates else 0
+
+    def hybrid_score(node):
+        immediate_cost = distance_matrix[current_node][node]
+        centrality = calculate_centrality(node)
+        future_cost = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+        return 0.6 * immediate_cost + 0.4 * (centrality * (1 / (1 + future_cost)))
+
+    next_node = max(unvisited_nodes, key=hybrid_score)
+    return next_node

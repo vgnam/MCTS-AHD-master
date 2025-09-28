@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Dynamic weighting factor based on remaining nodes (sigmoid function)
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = remaining_nodes / total_nodes
+    weight_factor = 1 / (1 + math.exp(-10 * (progress_ratio - 0.5)))
+
+    min_score = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weighting: prioritize immediate distance early, then balance
+        combined_score = (1 - weight_factor) * immediate_distance + weight_factor * 0.5 * destination_distance
+
+        # Local search: occasionally reconsider the best choice
+        if random.random() < 0.1 and node != next_node:
+            alternative_score = immediate_distance + 0.5 * destination_distance
+            if alternative_score < combined_score:
+                combined_score = alternative_score
+
+        if combined_score < min_score:
+            min_score = combined_score
+            next_node = node
+
+    return next_node

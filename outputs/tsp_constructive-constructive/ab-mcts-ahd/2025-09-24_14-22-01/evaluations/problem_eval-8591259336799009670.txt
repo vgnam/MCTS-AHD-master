@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    alpha = 0.5 + (0.5 * len(unvisited_nodes) / (len(unvisited_nodes) + 1))  # Dynamic weight adjustment
+    max_score = -float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        if immediate_distance == 0 or potential_distance == 0:
+            score = float('inf')  # Prioritize nodes with zero distance
+        else:
+            score = (alpha * immediate_distance + (1 - alpha) * potential_distance) / (immediate_distance + potential_distance)
+        if score > max_score:
+            max_score = score
+            next_node = node
+    return next_node

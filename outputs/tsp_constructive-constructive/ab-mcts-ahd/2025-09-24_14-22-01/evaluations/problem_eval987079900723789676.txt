@@ -1,0 +1,13 @@
+important as remaining nodes decrease
+        weight_centrality = 1.0 - (remaining_nodes / total_unvisited)
+        weight_potential = (remaining_nodes / total_unvisited) ** 2
+
+        total_cost = immediate_distance + weight_potential * potential_distance + weight_centrality * centrality
+
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+    return next_node

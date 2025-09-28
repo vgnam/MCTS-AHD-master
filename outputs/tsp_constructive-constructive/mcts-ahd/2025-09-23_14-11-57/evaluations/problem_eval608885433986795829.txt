@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    min_weighted_score = float('inf')
+    progress = 1 - len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+    learning_rate = 0.1 * progress  # Higher learning rate early, lower later
+
+    # Initialize or update node preferences (simulating reinforcement learning)
+    if not hasattr(select_next_node, 'node_preferences'):
+        select_next_node.node_preferences = {node: 1.0 for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+
+        # Calculate regret (difference between immediate and future potential)
+        regret = immediate_distance - future_potential
+
+        # Update node preference based on regret (with learning rate)
+        select_next_node.node_preferences[node] = (1 - learning_rate) * select_next_node.node_preferences[node] + learning_rate * (1 if regret < 0 else 0.5)
+
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            penalty = (sum(distance_matrix[current_node][n] for n in remaining_nodes) / len(remaining_nodes)) * (1 - progress) if progress > 0.5 else 0
+        else:
+            avg_remaining_dist = 0
+            penalty = 0
+
+        dynamic_weight = 0.5 - 0.3 * progress  # Adjusted weight range
+        weighted_score = (immediate_distance + dynamic_weight * future_potential + penalty) * select_next_node.node_preferences[node]
+
+        if weighted_score < min_weighted_score:
+            min_weighted_score = weighted_score
+            best_node = node
+
+    return next_node

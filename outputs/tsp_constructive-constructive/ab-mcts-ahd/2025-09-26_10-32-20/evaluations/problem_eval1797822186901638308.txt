@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate dynamic weight based on average proximity of unvisited nodes to current node
+    avg_proximity = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    max_proximity = max(distance_matrix[current_node][node] for node in unvisited_nodes)
+    weight = 0.5 + 0.4 * (1 - avg_proximity / max_proximity) if max_proximity != 0 else 0.7
+
+    # Incorporate a lookahead term to consider potential future steps
+    lookahead_factor = 0.2
+    next_node = min(unvisited_nodes, key=lambda node:
+                    weight * distance_matrix[current_node][node] +
+                    (1 - weight) * distance_matrix[node][destination_node] +
+                    lookahead_factor * (sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / len(unvisited_nodes) if len(unvisited_nodes) > 1 else 0))
+
+    return next_node

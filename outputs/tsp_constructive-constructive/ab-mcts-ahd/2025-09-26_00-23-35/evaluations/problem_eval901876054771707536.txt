@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Historical path quality tracking (simplified for this example)
+    path_history = {node: 0 for node in unvisited_nodes}
+    if hasattr(select_next_node, 'history'):
+        path_history.update(select_next_node.history)
+
+    # Novelty bonus: rewards nodes with unique connectivity
+    node_degree = {node: sum(1 for n in unvisited_nodes if distance_matrix[node][n] > 0) for node in unvisited_nodes}
+    avg_degree = sum(node_degree.values()) / len(node_degree) if node_degree else 0
+    novelty_bonus = {node: max(0, (node_degree[node] - avg_degree) / (avg_degree + 1)) for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Dynamic weight adjustments with reinforcement learning influence
+        distance_weight = 1.0 - (0.3 * (remaining_nodes / len(unvisited_nodes)))
+        centrality_weight = 0.5 + (0.4 * (remaining_nodes / len(unvisited_nodes)))
+        detour_weight = 0.2 * (remaining_nodes / len(unvisited_nodes)) * (1 + path_history[node])
+
+        # Novel exploration bonus combines frequency and novelty
+        exploration_bonus = (1.0 / (1.0 + path_history[node])) * (1 + novelty_bonus[node])
+
+        detour_cost = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+
+        # Multi-objective scoring with reinforcement adjustments
+        score = (distance_weight * distance_to_node +
+                 centrality_weight * avg_distance +
+                 detour_weight * detour_cost +
+                 exploration_bonus)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Update historical data for next iteration
+    if next_node:
+        if not hasattr(select_next_node, 'history'):
+            select_next_node.history = {}
+        select_next_node.history[next_node] = select_next_node.history.get(next_node, 0) + 1
+
+    return next_node

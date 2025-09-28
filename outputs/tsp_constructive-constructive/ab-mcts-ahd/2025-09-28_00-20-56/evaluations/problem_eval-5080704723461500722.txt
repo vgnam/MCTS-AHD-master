@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_remaining_distance = sum(distance_matrix[node][destination_node] for node in unvisited_nodes)
+    avg_remaining_distance = total_remaining_distance / len(unvisited_nodes)
+    remaining_steps = len(unvisited_nodes)
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            best_lookahead = min(remaining_nodes, key=lambda n: distance_matrix[node][n] + distance_matrix[n][destination_node])
+            lookahead_dist = distance_matrix[node][best_lookahead] + distance_matrix[best_lookahead][destination_node]
+            adjusted_lookahead_dist = lookahead_dist * (avg_remaining_distance / lookahead_dist) ** 2
+        else:
+            adjusted_lookahead_dist = distance_matrix[node][destination_node]
+        return current_dist + 0.5 * adjusted_lookahead_dist
+
+    scores = [evaluate_node(node) for node in unvisited_nodes]
+    min_score = min(scores)
+    max_score = max(scores)
+    temperature = max(0.1, (avg_remaining_distance / (remaining_steps + 1)) ** 2)
+
+    def boltzmann_probability(score):
+        normalized = (score - min_score) / (max_score - min_score + 1e-10)
+        return math.exp(-normalized / temperature)
+
+    probabilities = [boltzmann_probability(score) for score in scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

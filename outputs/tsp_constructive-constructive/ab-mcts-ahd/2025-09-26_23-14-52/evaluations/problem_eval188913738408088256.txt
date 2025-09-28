@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / total_unvisited
+    distance_variance = sum((distance_matrix[current_node][node] - avg_distance) ** 2 for node in unvisited_nodes) / total_unvisited
+    exploration_factor = max(0.1, (total_unvisited / (total_unvisited + 1)) * (distance_variance / (max(1, max(max(row) for row in distance_matrix)) ** 2)))
+
+    scores = []
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited
+        distance_ratio = current_distance / (future_distance + 1e-6)
+        weighted_score = (1 - exploration_factor) * (current_distance + future_distance) + exploration_factor * centrality * distance_ratio
+        scores.append((node, weighted_score))
+
+    if not scores:
+        return destination_node
+
+    max_score = max(score for _, score in scores)
+    min_score = min(score for _, score in scores)
+    temperature = max(0.1, (max_score - min_score) / (max_score + 1e-6))
+
+    probabilities = []
+    for node, score in scores:
+        normalized_score = (score - min_score) / (max_score - min_score + 1e-6)
+        probability = (1 - temperature) * normalized_score + temperature * (1 - normalized_score)
+        probabilities.append((node, probability))
+
+    total_prob = sum(prob for _, prob in probabilities)
+    if total_prob == 0:
+        return destination_node
+
+    probabilities = [(node, prob / total_prob) for node, prob in probabilities]
+    rand_val = random.random()
+    cumulative_prob = 0.0
+
+    for node, prob in probabilities:
+        cumulative_prob += prob
+        if rand_val <= cumulative_prob:
+            return node
+
+    return next_node

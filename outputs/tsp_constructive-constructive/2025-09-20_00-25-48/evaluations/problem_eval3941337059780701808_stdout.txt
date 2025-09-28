@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 6, in <module>
+    from scipy.spatial import distance_matrix
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\spatial\__init__.py", line 116, in <module>
+    from ._geometric_slerp import geometric_slerp
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\spatial\_geometric_slerp.py", line 9, in <module>
+    from scipy.spatial.distance import euclidean
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\scipy\spatial\distance.py", line 121, in <module>
+    from ..special import rel_entr
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 879, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 975, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1074, in get_data
+KeyboardInterrupt

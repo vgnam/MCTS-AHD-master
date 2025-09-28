@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1 - remaining_nodes / total_nodes
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        reward_factor = math.exp(-immediate_distance) * (1 / (1 + future_distance))
+
+        phase_factor = (progress ** 2) if progress <= 0.5 else (1 - (1 - progress) ** 2)
+        distance_weight = 0.8 - 0.6 * phase_factor
+        future_weight = 0.2 + 0.6 * phase_factor
+
+        exploration_bonus = (1 / (1 + immediate_distance)) * (1 - progress)
+
+        combined_score = (distance_weight * immediate_distance) + \
+                         (future_weight * (1 / reward_factor)) - \
+                         (0.3 * exploration_bonus)
+
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

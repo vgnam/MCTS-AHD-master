@@ -1,0 +1,30 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    
+    # Calculate scores based on distance and connectivity
+    scores = []
+    for node in nearest_neighbors:
+        current_distance = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        score = current_distance + avg_distance
+        scores.append(score)
+    
+    # Convert scores to probabilities using inverse proportionality
+    if scores:
+        inverse_scores = [1 / (score + 1e-9) for score in scores]  # Add a small value to avoid division by zero
+        total_inverse_score = sum(inverse_scores)
+        probabilities = [score / total_inverse_score for score in inverse_scores]
+
+        # Stochastic selection based on probabilities
+        next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+    else:
+        next_node = None
+    
+    return next_node

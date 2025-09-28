@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance to centrality (weight_centrality increases from 0.3 to 0.7) and coherence (weight_coherence increases from 0.2 to 0.6) as the tour progresses. The next node is selected by minimizing a weighted score combining direct distance, centrality (inverse of total distances to all nodes), and coherence (average distance to unvisited nodes).}
+                                                                                                                                                                                                                                                                                                                                                            ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance to centrality (weight_centrality increases from 0.3 to 0.7) and coherence (weight_coherence increases from 0.2 to 0.6) as the tour progresses. The next node is selected by minimizing a weighted score combining direct distance, centrality (inverse of total distances to all nodes), and coherence (average distance to unvisited nodes).}
+                                                                                                                                                                                                                                                                                                                                                            ^
+SyntaxError: unmatched '}'

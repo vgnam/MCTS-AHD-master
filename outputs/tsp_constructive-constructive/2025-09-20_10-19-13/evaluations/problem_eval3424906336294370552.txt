@@ -1,0 +1,12 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, heuristic_weight=0.5):
+    if not unvisited_nodes:
+        return destination_node
+
+    def heuristic_score(node):
+        distance = distance_matrix[current_node][node]
+        # Example heuristic: node degree (number of connections)
+        node_degree = sum(1 for d in distance_matrix[node] if d > 0)
+        return (1 - heuristic_weight) * distance + heuristic_weight * node_degree
+
+    next_node = min(unvisited_nodes, key=heuristic_score)
+    return next_node

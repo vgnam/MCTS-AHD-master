@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    weights = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_potential = float('inf')
+
+        # Evaluate 2-node lookahead
+        for next_node in unvisited_nodes:
+            if next_node != node:
+                potential = immediate_distance + distance_matrix[node][next_node]
+                if potential < lookahead_potential:
+                    lookahead_potential = potential
+
+        # Combine immediate and lookahead with dynamic weights
+        progress = (len(distance_matrix) - len(unvisited_nodes)) / len(distance_matrix)
+        weight = (0.7 - 0.4 * progress) * (1 / (immediate_distance + 1e-6)) + \
+                 (0.3 + 0.4 * progress) * (1 / (lookahead_potential + 1e-6))
+        weights.append(weight)
+
+    # Normalize and select probabilistically
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+    next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+
+    return next_node

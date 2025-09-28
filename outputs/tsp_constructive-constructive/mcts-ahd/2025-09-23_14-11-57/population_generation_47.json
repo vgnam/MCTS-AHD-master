@@ -1,0 +1,37 @@
+[
+     {
+          "algorithm": "The algorithm selects the next node probabilistically, balancing immediate distance (prioritized) and a global estimate of remaining path length (secondary priority) via weighted random choice. The weight for each node is inversely proportional to the sum of the immediate distance and 30% of the global estimate, ensuring closer and more promising nodes are favored. The code normalizes these weights and uses them to randomly select the next node, avoiding deterministic traps while maintaining efficiency.",
+          "thought": "The new algorithm uses a probabilistic approach, selecting the next node based on a weighted random choice that balances immediate distance and a global estimate of the remaining path length, aiming to escape local optima while maintaining efficiency.",
+          "code": "import random\n    import math\n\n    weights = []\n    total_weight = 0.0\n\n    for node in unvisited_nodes:\n        immediate_distance = distance_matrix[current_node][node]\n        global_estimate = distance_matrix[node][destination_node]\n        weight = 1.0 / (immediate_distance + 0.3 * global_estimate)\n        weights.append(weight)\n        total_weight += weight\n\n    if total_weight == 0:\n        return random.choice(unvisited_nodes)\n\n    normalized_weights = [w / total_weight for w in weights]\n    next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]\n\n    return next_node",
+          "objective": 7.3084,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by balancing immediate distance from the current node and a lookahead estimate to the destination, prioritizing the former (weight 1.0) over the latter (weight 0.5) in a greedy-plus-lookahead strategy. The code iterates through unvisited nodes, computes a weighted sum of distances, and selects the node with the lowest total score, efficiently combining exploration and exploitation. The function returns the destination node if no unvisited nodes remain.",
+          "thought": "The algorithm selects the next node by considering both the immediate distance to the current node and the estimated total path length if that node is chosen, using a combination of greedy and lookahead strategies to balance exploration and exploitation.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n\n    best_node = None\n    best_score = float('inf')\n\n    for node in unvisited_nodes:\n        immediate_distance = distance_matrix[current_node][node]\n        lookahead_distance = distance_matrix[node][destination_node]\n        total_score = immediate_distance + 0.5 * lookahead_distance\n\n        if total_score < best_score:\n            best_score = total_score\n            best_node = node\n\n    return next_node",
+          "objective": 7.81822,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by prioritizing the one that minimizes the sum of the distance from the current node and the distance to the destination, ensuring immediate proximity while keeping the path efficient. The `current_node` and `destination_node` are key parameters, while `unvisited_nodes` and `distance_matrix` guide the selection. The code iterates through unvisited nodes, calculates the total increase in path length, and picks the node with the smallest increase.",
+          "thought": "This algorithm constructs the path by iteratively selecting the node that minimizes the increase in total path length when added to the current path, balancing immediate proximity with long-term path efficiency.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n\n    best_node = None\n    min_increase = float('inf')\n\n    for node in unvisited_nodes:\n        current_to_node = distance_matrix[current_node][node]\n        node_to_dest = distance_matrix[node][destination_node]\n        total_increase = current_to_node + node_to_dest\n\n        if total_increase < min_increase:\n            min_increase = total_increase\n            best_node = node\n\n    return next_node",
+          "objective": 8.17491,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node in TSP by balancing immediate distance (80% weight) and global estimate (20% weight), using logarithmic scaling to prioritize closer nodes. It normalizes weights probabilistically, with a fallback to random selection if weights sum to zero. The design emphasizes local efficiency while maintaining a global perspective.",
+          "thought": "The new algorithm prioritizes immediate distance (80% weight) and global estimate (20% weight) with a logarithmic scaling to favor closer nodes, using a deterministic fallback for edge cases.",
+          "code": "import random\nimport math\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    weights = []\n    total_weight = 0.0\n\n    for node in unvisited_nodes:\n        immediate_distance = distance_matrix[current_node][node]\n        global_estimate = distance_matrix[node][destination_node]\n        weight = math.log(1 + 1.0 / (0.8 * immediate_distance + 0.2 * global_estimate))\n        weights.append(weight)\n        total_weight += weight\n\n    if total_weight == 0:\n        return random.choice(unvisited_nodes)\n\n    normalized_weights = [w / total_weight for w in weights]\n    next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]\n\n    return next_node",
+          "objective": 18.89131,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by prioritizing the closest unvisited node to the current node, using the distance matrix to guide the path toward the destination. It ensures the path is constructed incrementally by always choosing the nearest neighbor, which simplifies the search but may not guarantee the globally optimal solution. The function dynamically updates the closest node based on the current position, balancing local optimality with the constraint of visiting all unvisited nodes.",
+          "thought": "The algorithm selects the next node to visit by choosing the closest unvisited node to the current node from the distance matrix, prioritizing nodes that are closer to the destination to guide the path towards the end of the tour.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n\n    closest_node = None\n    min_distance = float('inf')\n\n    for node in unvisited_nodes:\n        distance = distance_matrix[current_node][node]\n        if distance < min_distance:\n            min_distance = distance\n            closest_node = node\n\n    return next_node",
+          "objective": 33.76186,
+          "other_inf": null
+     }
+]

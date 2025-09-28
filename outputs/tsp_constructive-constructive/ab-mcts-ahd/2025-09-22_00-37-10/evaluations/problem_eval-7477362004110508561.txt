@@ -1,0 +1,7 @@
+import random
+        selected = min(scores, key=lambda x: x[1])
+        if random.random() < 0.3 and len(scores) > 1:  # 30% chance to pick a non-minimum score
+            selected = random.choices(scores, weights=[1/s for _, s in scores])[0]
+        next_node = selected[0]
+
+    return next_node

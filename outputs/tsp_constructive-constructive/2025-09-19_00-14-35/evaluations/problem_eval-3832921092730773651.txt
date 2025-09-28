@@ -1,0 +1,37 @@
+importance" metric that considers both local and global connectivity, and employs a sigmoid-based weighting adjustment to smooth transitions between exploration and exploitation phases.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = (remaining_nodes / total_nodes) ** 2
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Calculate node importance (combining local and global connectivity)
+        local_connectivity = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        global_connectivity = sum(distance_matrix[n][m] for n in unvisited_nodes for m in unvisited_nodes if n != m)
+
+        if remaining_nodes > 1:
+            node_importance = (local_connectivity / (remaining_nodes - 1)) / (global_connectivity / (remaining_nodes ** 2))
+        else:
+            node_importance = 0
+
+        # Sigmoid-based weight adjustment
+        def sigmoid(x):
+            return 1 / (1 + math.exp(-x))
+
+        phase = (total_nodes - remaining_nodes) / total_nodes
+        weight_local = 0.5 * sigmoid(5 * (0.5 - phase)) + 0.3
+        weight_importance = 0.4 * sigmoid(5 * (phase - 0.5))
+        weight_dest = -0.2 * (1 - sigmoid(5 * phase))
+
+        score = (weight_local * immediate_dist) + (weight_importance * node_importance) + (weight_dest * dest_dist)
+        return score
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

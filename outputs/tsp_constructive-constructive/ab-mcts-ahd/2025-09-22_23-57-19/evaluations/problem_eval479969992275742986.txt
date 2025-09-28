@@ -1,0 +1,6 @@
+import random
+            selected = random.choices([c[0] for c in candidates], weights=probabilities, k=1)[0]
+            if distance_matrix[current_node][selected] <= threshold:
+                next_node = selected
+
+    return next_node

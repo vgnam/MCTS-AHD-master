@@ -1,0 +1,17 @@
+defined priority list or a heuristic like minimizing the average distance to remaining nodes) to balance exploration and optimization, falling back to the destination node if no unvisited nodes remain.}
+
+```python
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate priority for each unvisited node (e.g., minimize average distance to remaining nodes)
+    def node_priority(node):
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+        return avg_distance
+
+    next_node = min(unvisited_nodes, key=node_priority)
+    return next_node

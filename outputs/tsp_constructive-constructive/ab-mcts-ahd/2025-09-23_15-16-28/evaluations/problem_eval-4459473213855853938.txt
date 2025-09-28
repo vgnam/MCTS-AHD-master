@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_combined = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        max_distance = max(distance_to_current, distance_to_destination)
+
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes) - 1)
+
+        combined = 0.7 * max_distance + 0.3 * centrality
+
+        if combined < min_combined:
+            min_combined = combined
+            next_node = node
+
+    return next_node

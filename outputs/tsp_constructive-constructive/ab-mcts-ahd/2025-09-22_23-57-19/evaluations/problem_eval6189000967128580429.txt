@@ -1,0 +1,43 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    weights = []
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        savings = distance_matrix[current_node][destination_node] - cost
+
+        if len(unvisited_nodes) > 1:
+            next_nodes = [n for n in unvisited_nodes if n != node]
+            future_savings = sum(distance_matrix[node][n] for n in next_nodes) / len(next_nodes)
+            total_weight = savings + 0.3 * future_savings
+        else:
+            total_weight = savings
+
+        candidates.append(node)
+        weights.append(total_weight)
+
+    if not candidates:
+        return random.choice(unvisited_nodes)
+
+    selected_node = random.choices(candidates, weights=weights, k=1)[0]
+
+    if len(unvisited_nodes) > 2 and random.random() < 0.3:
+        for node in unvisited_nodes:
+            if node == selected_node:
+                continue
+            potential_savings = (distance_matrix[current_node][destination_node] -
+                               distance_matrix[current_node][node] -
+                               distance_matrix[node][selected_node])
+            if potential_savings > 0.7 * (distance_matrix[current_node][destination_node] - distance_matrix[current_node][selected_node]):
+                selected_node = node
+                break
+
+    return next_node

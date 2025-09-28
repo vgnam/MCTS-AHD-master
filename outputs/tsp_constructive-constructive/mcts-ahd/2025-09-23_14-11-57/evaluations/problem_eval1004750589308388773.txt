@@ -1,0 +1,54 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic temperature based on progress
+    temperature = 1.0 - (remaining_nodes / total_nodes) ** 2
+
+    # Base weights with dynamic adjustment
+    immediate_weight = 0.5 * (1.0 - math.exp(-0.1 * remaining_nodes))
+    regret_weight = 0.5 * (1.0 - immediate_weight)
+
+    # Calculate immediate distances and regrets
+    distances = []
+    regrets = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+    # Normalize scores and apply temperature
+    max_distance = max(distances) if distances else 1.0
+    max_regret = max(regrets) if regrets else 1.0
+
+    normalized_scores = []
+    for distance, regret in zip(distances, regrets):
+        normalized_distance = distance / max_distance if max_distance > 0 else 0
+        normalized_regret = regret / max_regret if max_regret > 0 else 0
+        score = (immediate_weight * normalized_distance + regret_weight * normalized_regret) * (1.0 - temperature)
+        normalized_scores.append(score)
+
+    # Apply probabilistic selection with temperature
+    if temperature > 0:
+        exp_scores = [math.exp(-score / temperature) for score in normalized_scores]
+        total_exp = sum(exp_scores)
+        probs = [exp_score / total_exp for exp_score in exp_scores]
+        selected_index = random.choices(range(len(unvisited_nodes)), weights=probs, k=1)[0]
+    else:
+        selected_index = normalized_scores.index(min(normalized_scores))
+
+    next_node = list(unvisited_nodes)[selected_index]
+    return next_node

@@ -1,0 +1,35 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, iteration=0, total_iterations=100):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate centrality for each node (average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality[node] = total_distance / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+
+    # Temperature for stochasticity (decreases over iterations)
+    temperature = max(0.1, 1.0 - (iteration / total_iterations))
+
+    # Weighted score combining distance and centrality
+    scores = {}
+    for node in unvisited_nodes:
+        distance_score = 1.0 / (1.0 + distance_matrix[current_node][node])  # Inverse distance
+        centrality_score = 1.0 / (1.0 + centrality[node])  # Inverse centrality
+        scores[node] = (distance_score + centrality_score) / 2  # Equal weight
+
+    # Apply softmax with temperature to get probabilities
+    exp_scores = {node: math.exp(score / temperature) for node, score in scores.items()}
+    total_exp = sum(exp_scores.values())
+    probabilities = {node: exp_score / total_exp for node, exp_score in exp_scores.items()}
+
+    # Select node based on probabilities
+    nodes, probs = zip(*probabilities.items())
+    next_node = random.choices(nodes, weights=probs, k=1)[0]
+
+    return next_node

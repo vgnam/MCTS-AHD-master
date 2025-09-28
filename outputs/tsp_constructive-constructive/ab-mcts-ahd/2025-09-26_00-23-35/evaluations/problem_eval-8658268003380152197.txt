@@ -1,0 +1,46 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('inf')
+    num_unvisited = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic weight adjustment with exponential decay
+    proximity_weight = 0.7 * math.exp(-0.5 * (num_unvisited / total_nodes))
+    centrality_weight = 0.3 * (1 - math.exp(-0.5 * (num_unvisited / total_nodes)))
+
+    # Calculate centrality scores for all nodes
+    centrality_scores = {}
+    for node in range(total_nodes):
+        centrality_scores[node] = sum(distance_matrix[node]) / total_nodes
+
+    for node in unvisited_nodes:
+        # Exponential distance weighting
+        distance_to_node = distance_matrix[current_node][node]
+        exp_distance = math.exp(-distance_to_node / max(distance_matrix[current_node]))
+
+        # Centrality decay factor
+        centrality_factor = math.exp(-centrality_scores[node] / (centrality_scores[current_node] + 1e-6))
+
+        # Destination attractiveness
+        dest_attract = 1.0 if node == destination_node else 0.1
+
+        # Combined score
+        score = (proximity_weight * exp_distance +
+                centrality_weight * centrality_factor +
+                0.2 * dest_attract)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    # 20% chance to select destination node if available
+    if random.random() < 0.2 and destination_node in unvisited_nodes:
+        next_node = destination_node
+
+    return next_node

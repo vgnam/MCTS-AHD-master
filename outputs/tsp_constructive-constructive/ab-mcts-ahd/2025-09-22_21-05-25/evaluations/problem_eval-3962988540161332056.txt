@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    nearest_dist = distance_matrix[current_node][nearest_node]
+    farthest_dist = distance_matrix[current_node][farthest_node]
+    if len(unvisited_nodes) == 1:
+        return nearest_node
+    ratio = farthest_dist / (nearest_dist + 1e-10)
+    bias = 1 / (1 + math.exp(-(len(unvisited_nodes) - 5)))
+    prob = bias * (ratio - 1) / (ratio + 1)
+    if random.random() < prob:
+        return farthest_node
+    else:
+        return next_node

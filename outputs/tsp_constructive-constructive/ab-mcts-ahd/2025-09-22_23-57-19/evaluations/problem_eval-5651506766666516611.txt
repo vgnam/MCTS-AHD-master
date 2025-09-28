@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    max_savings = -float('inf')
+    next_node = None
+    savings_list = []
+
+    for node in unvisited_nodes:
+        direct_savings = distance_matrix[current_node][destination_node] - distance_matrix[current_node][node]
+        savings_list.append((node, direct_savings))
+
+    if not savings_list:
+        return unvisited_nodes.pop()
+
+    savings_list.sort(key=lambda x: x[1], reverse=True)
+    top_nodes = [node for node, savings in savings_list[:3]] if len(savings_list) >= 3 else [node for node, _ in savings_list]
+
+    for node in top_nodes:
+        if len(unvisited_nodes) > 2:
+            for next_node_candidate in unvisited_nodes:
+                if next_node_candidate == node:
+                    continue
+                potential_savings = (distance_matrix[current_node][destination_node] -
+                                   distance_matrix[current_node][node] -
+                                   distance_matrix[node][next_node_candidate])
+                dynamic_threshold = 0.7 + 0.1 * (distance_matrix[current_node][destination_node] / max(distance_matrix[current_node]))
+                if potential_savings > dynamic_threshold * savings_list[0][1]:
+                    next_node = node
+                    break
+        if next_node is not None:
+            break
+
+    if next_node is None:
+        next_node = top_nodes[0] if top_nodes else unvisited_nodes.pop()
+
+    return next_node

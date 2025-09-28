@@ -1,0 +1,57 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    # Calculate node centrality and neighborhood density
+    centrality = []
+    density = []
+    for node in unvisited_nodes:
+        node_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        centrality.append(sum(1.0 / (1.0 + d) for d in node_distances) / (remaining_nodes - 1) if remaining_nodes > 1 else 0)
+        density.append(len([d for d in node_distances if d < sum(node_distances) / (remaining_nodes - 1)]) / (remaining_nodes - 1) if remaining_nodes > 1 else 0)
+
+    # Calculate detour resistance
+    detour_resistance = []
+    for i, node in enumerate(unvisited_nodes):
+        direct_path = distance_matrix[current_node][node] + distance_matrix[node][destination_node]
+        avg_path = (sum(distance_matrix[current_node][n] for n in unvisited_nodes) +
+                    sum(distance_matrix[n][destination_node] for n in unvisited_nodes)) / (2 * remaining_nodes)
+        detour_resistance.append(1.0 - min(1.0, direct_path / (avg_path + 1e-6)))
+
+    # Calculate adaptive weights
+    weight_local = 0.4 + 0.2 * (1 - exploration_factor)
+    weight_centrality = 0.3 + 0.1 * exploration_factor
+    weight_density = 0.2 * exploration_factor
+    weight_detour = 0.5 - 0.3 * exploration_factor
+
+    # Calculate scores with probabilistic elements
+    scores = []
+    for i, node in enumerate(unvisited_nodes):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Novel probabilistic component
+        random_factor = random.uniform(0.8, 1.2) if exploration_factor > 0.5 else 1.0
+
+        score = (weight_local * current_dist +
+                 weight_centrality * (1 - centrality[i]) +
+                 weight_density * density[i] +
+                 weight_detour * detour_resistance[i]) * random_factor
+
+        scores.append((node, score))
+
+    # Probabilistic selection with temperature-based exploration
+    temperature = 1.0 if exploration_factor > 0.5 else 0.5
+    probabilities = [math.exp(-s[1] / temperature) for s in scores]
+    sum_prob = sum(probabilities)
+    probabilities = [p / sum_prob for p in probabilities]
+
+    next_node = random.choices([s[0] for s in scores], weights=probabilities, k=1)[0]
+    return next_node

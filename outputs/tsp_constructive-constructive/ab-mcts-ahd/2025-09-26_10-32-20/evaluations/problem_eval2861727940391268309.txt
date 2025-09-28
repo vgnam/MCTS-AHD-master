@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    # Adaptive weights based on node degrees and path entropy
+    node_degrees = [sum(row) for row in distance_matrix]
+    avg_degree = sum(node_degrees) / total_nodes
+    degree_variance = sum((d - avg_degree) ** 2 for d in node_degrees) / total_nodes
+
+    weight_local = 0.2 + 0.8 * (1 - progress)
+    weight_centrality = 0.6 * (0.2 ** progress) * (1 + degree_variance)
+    weight_coherence = 0.5 * (1 - (0.3 ** progress))
+    penalty_cycle = 0.1 * (1 - progress)
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = node_degrees[node] / (avg_degree + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+
+        # Penalize revisiting nodes to avoid cycles
+        if node in unvisited_nodes:
+            cycle_penalty = 0
+        else:
+            cycle_penalty = penalty_cycle * sum(distance_matrix[node][n] for n in range(total_nodes))
+
+        return (weight_local * local_distance) + (weight_centrality * centrality) - (weight_coherence * coherence) + cycle_penalty
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

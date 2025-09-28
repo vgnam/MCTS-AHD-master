@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    # Create a list of all nodes (current + unvisited)
+    nodes = [current_node] + list(unvisited_nodes)
+
+    # Initialize MST using Prim's algorithm
+    mst_edges = []
+    visited = {current_node}
+    unvisited = set(unvisited_nodes)
+
+    while unvisited:
+        min_edge = None
+        min_distance = float('inf')
+
+        for u in visited:
+            for v in unvisited:
+                if distance_matrix[u][v] < min_distance:
+                    min_distance = distance_matrix[u][v]
+                    min_edge = (u, v)
+
+        if min_edge:
+            u, v = min_edge
+            mst_edges.append((u, v, min_distance))
+            visited.add(v)
+            unvisited.remove(v)
+
+    # Find the node with the longest edge in MST
+    longest_edge_node = None
+    max_distance = -1
+
+    for u, v, distance in mst_edges:
+        if distance > max_distance:
+            max_distance = distance
+            longest_edge_node = v
+
+    return next_node

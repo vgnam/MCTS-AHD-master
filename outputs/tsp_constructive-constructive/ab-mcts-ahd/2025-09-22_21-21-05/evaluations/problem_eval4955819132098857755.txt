@@ -1,0 +1,5 @@
+import random
+        if random.random() < 0.2:  # 20% chance to pick a random node
+            next_node = random.choice(unvisited_nodes)
+
+    return next_node

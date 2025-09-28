@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    max_score = -float('inf')
+    total_unvisited = len(unvisited_nodes)
+    exploration_weight = 0.6 * (1 - (total_unvisited - len(unvisited_nodes)) / total_unvisited)
+    balance_factor = 0.5 + 0.5 * (1 - exploration_weight)
+    progress_weight = 1.0 + (total_unvisited / (total_unvisited + 1))
+
+    for node in unvisited_nodes:
+        dist_current = distance_matrix[current_node][node]
+        dist_dest = distance_matrix[node][destination_node]
+
+        if dist_current == 0:
+            angular_progress = 1.0
+        else:
+            angular_progress = dist_dest / dist_current
+
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+        penalty = 0.25 * avg_distance_to_remaining
+
+        score = (0.6 * angular_progress - 0.4 * dist_current) * (1 + exploration_weight) * balance_factor * progress_weight + penalty
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    return next_node

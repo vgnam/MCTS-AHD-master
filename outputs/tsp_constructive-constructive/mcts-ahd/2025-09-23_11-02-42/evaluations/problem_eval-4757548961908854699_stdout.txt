@@ -1,0 +1,12 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:15: RuntimeWarning: divide by zero encountered in scalar divide
+  detour_penalty = (distance_to_node + distance_to_destination - direct_distance) / direct_distance
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:18: RuntimeWarning: invalid value encountered in scalar multiply
+  exploitation_factor = (1.0 - detour_penalty) * (1.0 - dynamic_weight)
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 52, in eval_heuristic
+    raise KeyError(f"Node {next_node} is already visited.")
+KeyError: 'Node None is already visited.'

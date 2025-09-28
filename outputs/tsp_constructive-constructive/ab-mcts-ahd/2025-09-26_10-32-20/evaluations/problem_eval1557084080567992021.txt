@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    avg_current_dist = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    avg_dest_dist = sum(distance_matrix[node][destination_node] for node in unvisited_nodes) / len(unvisited_nodes)
+    total_avg = avg_current_dist + avg_dest_dist
+    if total_avg == 0:
+        weight_current = 0.5
+        weight_dest = 0.5
+    else:
+        weight_current = avg_dest_dist / total_avg
+        weight_dest = avg_current_dist / total_avg
+    hybrid_score = lambda node: weight_current * distance_matrix[current_node][node] + weight_dest * distance_matrix[node][destination_node]
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

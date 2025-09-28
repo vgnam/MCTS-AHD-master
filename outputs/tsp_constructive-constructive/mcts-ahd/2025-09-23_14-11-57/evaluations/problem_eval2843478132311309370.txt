@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    immediate_weight = 0.6 * (remaining_nodes / (remaining_nodes + 10))
+    future_weight = 0.4 * (1 - (remaining_nodes / (remaining_nodes + 10)))
+
+    node_degrees = [sum(1 for d in distance_matrix[node] if d > 0) for node in unvisited_nodes]
+    max_degree = max(node_degrees) if node_degrees else 1
+    degree_weights = [1 - (d / max_degree) for d in node_degrees]
+
+    entropy_terms = []
+    for node in unvisited_nodes:
+        node_distances = [d for d in distance_matrix[node] if d > 0]
+        mean_dist = sum(node_distances) / len(node_distances) if node_distances else 0
+        variance = sum((d - mean_dist) ** 2 for d in node_distances) / len(node_distances) if node_distances else 0
+        entropy_terms.append(variance)
+
+    max_entropy = max(entropy_terms) if entropy_terms else 1
+    entropy_weights = [1 - (e / max_entropy) for e in entropy_terms]
+
+    scores = []
+    for i, node in enumerate(unvisited_nodes):
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+        total_increase = current_to_node + node_to_dest
+
+        penalty = 0.3 * (1.0 / (current_to_node + 1e-6)) if current_to_node < 0.7 else 0
+        entropy_penalty = 0.2 * entropy_weights[i]
+        memory_factor = 0.2 * (1 - degree_weights[i])
+
+        combined_score = immediate_weight * current_to_node + future_weight * total_increase - penalty - entropy_penalty + memory_factor
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_node] if selected_index < len(unvisited_nodes) else destination_node
+
+    return next_node

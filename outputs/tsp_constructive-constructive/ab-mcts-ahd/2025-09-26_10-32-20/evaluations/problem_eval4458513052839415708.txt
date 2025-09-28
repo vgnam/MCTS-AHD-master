@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    # Adaptive weight normalization with sigmoid-based exploration-exploitation tradeoff
+    exploration_weight = 1 / (1 + math.exp(-10 * (progress - 0.5)))
+    weight_local = 0.3 + 0.4 * exploration_weight
+    weight_centrality = 0.5 * (1 - exploration_weight)
+    weight_coherence = 0.4 * (1 - abs(2 * progress - 1))
+
+    # Momentum term for smoothing selection decisions
+    if not hasattr(select_next_node, 'prev_selection'):
+        select_next_node.prev_selection = None
+    momentum = 0.2 if select_next_node.prev_selection is not None else 0
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = sum(distance_matrix[node][n] for n in range(total_nodes)) / total_nodes
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+
+        # Incorporate momentum term
+        if select_next_node.prev_selection is not None:
+            local_distance += momentum * distance_matrix[select_next_node.prev_selection][node]
+
+        return (weight_local * local_distance) - (weight_centrality * centrality) + (weight_coherence * coherence)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    select_next_node.prev_selection = next_node
+    return next_node

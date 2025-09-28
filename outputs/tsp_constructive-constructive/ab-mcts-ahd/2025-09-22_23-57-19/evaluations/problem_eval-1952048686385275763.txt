@@ -1,0 +1,7 @@
+import random
+        if random.random() < 0.2:
+            candidates_sorted = sorted(candidates, key=lambda x: x[1])
+            if len(candidates_sorted) > 1:
+                next_node = candidates_sorted[1][0]
+
+    return next_node

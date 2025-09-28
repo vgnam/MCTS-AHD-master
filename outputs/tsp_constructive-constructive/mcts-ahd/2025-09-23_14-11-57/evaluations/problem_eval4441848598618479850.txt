@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, decay_rate=0.99):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    scores = []
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            min_remaining_dist = min(distance_matrix[node][n] for n in remaining_nodes)
+            weighted_lookahead = min_remaining_dist * (temperature ** 2)
+        else:
+            weighted_lookahead = 0
+
+        score = current_to_node + weighted_lookahead
+        candidates.append(node)
+        scores.append(score)
+
+    probabilities = [1.0 / (s + 1e-10) for s in scores]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    next_node = np.random.choice(candidates, p=normalized_probs)
+    temperature *= decay_rate
+
+    return next_node

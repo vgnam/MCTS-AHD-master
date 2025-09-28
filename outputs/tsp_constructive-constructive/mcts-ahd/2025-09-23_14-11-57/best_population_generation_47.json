@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm selects the next node probabilistically, balancing immediate distance (prioritized) and a global estimate of remaining path length (secondary priority) via weighted random choice. The weight for each node is inversely proportional to the sum of the immediate distance and 30% of the global estimate, ensuring closer and more promising nodes are favored. The code normalizes these weights and uses them to randomly select the next node, avoiding deterministic traps while maintaining efficiency.",
+     "thought": "The new algorithm uses a probabilistic approach, selecting the next node based on a weighted random choice that balances immediate distance and a global estimate of the remaining path length, aiming to escape local optima while maintaining efficiency.",
+     "code": "import random\n    import math\n\n    weights = []\n    total_weight = 0.0\n\n    for node in unvisited_nodes:\n        immediate_distance = distance_matrix[current_node][node]\n        global_estimate = distance_matrix[node][destination_node]\n        weight = 1.0 / (immediate_distance + 0.3 * global_estimate)\n        weights.append(weight)\n        total_weight += weight\n\n    if total_weight == 0:\n        return random.choice(unvisited_nodes)\n\n    normalized_weights = [w / total_weight for w in weights]\n    next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]\n\n    return next_node",
+     "objective": 7.3084,
+     "other_inf": null
+}

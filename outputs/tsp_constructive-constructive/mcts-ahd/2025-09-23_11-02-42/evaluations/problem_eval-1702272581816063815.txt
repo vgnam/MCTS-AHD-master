@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if distance_to_destination == 0:
+            score = 1.0 / (distance_to_node + 1e-6)
+        else:
+            direct_distance = distance_matrix[current_node][destination_node]
+            detour_ratio = (distance_to_node + distance_to_destination) / (direct_distance + 1e-6)
+            centrality = sum(distance_matrix[node]) / total_nodes
+            exploration_incentive = (total_nodes - remaining_nodes) / total_nodes
+
+            detour_penalty = (detour_ratio - 1.0) * (1.0 - exploration_incentive)
+            centrality_factor = 1.0 / (centrality + 1e-6)
+
+            score = (0.5 * (1.0 / (distance_to_node + 1e-6)) +
+                    0.3 * (1.0 - detour_penalty) +
+                    0.2 * centrality_factor * exploration_incentive)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

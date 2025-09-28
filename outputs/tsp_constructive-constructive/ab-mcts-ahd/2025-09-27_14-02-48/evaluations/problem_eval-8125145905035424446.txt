@@ -1,0 +1,55 @@
+importance of local and global costs based on the ratio of remaining unvisited nodes to total nodes, and incorporates a penalty term for nodes that are not on the straight path to the destination.
+}
+
+```python
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    ratio = remaining_nodes / total_nodes
+    
+    min_score = float('inf')
+    next_node = None
+    
+    current_x = current_node % int(math.sqrt(total_nodes))
+    current_y = current_node // int(math.sqrt(total_nodes))
+    destination_x = destination_node % int(math.sqrt(total_nodes))
+    destination_y = destination_node // int(math.sqrt(total_nodes))
+    
+    for node in unvisited_nodes:
+        node_x = node % int(math.sqrt(total_nodes))
+        node_y = node // int(math.sqrt(total_nodes))
+        
+        local_cost = distance_matrix[current_node][node]
+        global_cost = distance_matrix[node][destination_node]
+        
+        # Calculate the penalty term based on the node's deviation from the straight path to the destination
+        straight_path_x = destination_x - current_x
+        straight_path_y = destination_y - current_y
+        node_vector_x = node_x - current_x
+        node_vector_y = node_y - current_y
+        cross_product = straight_path_x * node_vector_y - straight_path_y * node_vector_x
+        penalty_term = abs(cross_product) / math.sqrt(straight_path_x**2 + straight_path_y**2 + 1e-9)
+        
+        # Dynamic weighting scheme
+        weight_local = 0.4 * ratio
+        weight_global = 0.6 * (1 - ratio)
+        
+        score = weight_local * local_cost + weight_global * global_cost + 0.1 * penalty_term * (local_cost + global_cost)
+        
+        if score < min_score:
+            min_score = score
+            next_node = node
+    
+    if destination_node in unvisited_nodes:
+        local_cost = distance_matrix[current_node][destination_node]
+        global_cost = 0
+        score = 0.4 * local_cost + 0.6 * global_cost
+        if score < min_score:
+            next_node = destination_node
+    
+    return next_node

@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    decay_factor = 1.0 / (1.0 + remaining_count)  # Decays as unvisited nodes decrease
+    global_weight = 0.7 * (1 - decay_factor) + 0.3  # Adjusts between 0.3 and 0.7
+    local_weight = 1.0 - global_weight
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        sum_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes)
+        penalty = 0.0 if node not in unvisited_nodes else 0.0  # Optional: Add penalty if needed
+
+        return local_weight * current_dist + global_weight * sum_future_dist + penalty
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

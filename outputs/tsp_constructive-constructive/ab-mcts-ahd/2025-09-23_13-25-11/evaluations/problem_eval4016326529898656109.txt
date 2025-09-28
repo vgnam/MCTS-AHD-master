@@ -1,0 +1,38 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate variance of distances to unvisited nodes
+    distances_to_unvisited = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    mean_dist = sum(distances_to_unvisited) / remaining_nodes
+    variance = sum((dist - mean_dist) ** 2 for dist in distances_to_unvisited) / remaining_nodes
+
+    # Dynamic weights based on variance and remaining nodes
+    weight_current = (remaining_nodes / total_nodes) * (1 - variance)
+    weight_future = (1 - weight_current) * (1 + variance)
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if not unvisited_nodes - {node}:
+            return current_dist
+
+        future_distances = [distance_matrix[node][other] for other in unvisited_nodes - {node}]
+        min_future_dist = min(future_distances)
+        mean_future_dist = sum(future_distances) / len(future_distances)
+
+        # Combine current distance and future potential with probabilistic factor
+        return (weight_current * current_dist + weight_future * min_future_dist) * (1 + random.uniform(-0.1, 0.1))
+
+    # Select node with lowest evaluation or with probability based on rank
+    ranked_nodes = sorted(unvisited_nodes, key=evaluate_node)
+    if random.random() < 0.3:  # 30% chance to pick top 20% of candidates
+        next_node = random.choice(ranked_nodes[:max(1, len(ranked_nodes) // 5)])
+    else:
+        next_node = ranked_nodes[0]
+
+    return next_node

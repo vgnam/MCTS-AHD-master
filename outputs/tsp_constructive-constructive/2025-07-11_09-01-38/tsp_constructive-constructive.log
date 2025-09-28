@@ -1,0 +1,4 @@
+[2025-07-11 09:01:38,453][root][INFO] - Workspace: D:\MCTS-AHD-master\outputs\tsp_constructive-constructive\2025-07-11_09-01-38
+[2025-07-11 09:01:38,454][root][INFO] - Project Root: D:\MCTS-AHD-master
+[2025-07-11 09:01:38,454][root][INFO] - Using LLM: gemini-2.5-flash
+[2025-07-11 09:01:38,454][root][INFO] - Using Algorithm: mcts_ahd

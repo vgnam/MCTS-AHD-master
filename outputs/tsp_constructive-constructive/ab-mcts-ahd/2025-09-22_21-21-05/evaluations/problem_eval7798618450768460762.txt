@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    decay_factor = 0.7
+    weight_current = (1.0 - visited_ratio) ** decay_factor
+    weight_destination = visited_ratio ** (1.0 / decay_factor)
+    weight_global = 0.4 * (1.0 - visited_ratio)
+    weight_congestion = 0.5 * visited_ratio
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        congestion_penalty = 0.0
+        for neighbor in unvisited_nodes:
+            if neighbor != node and distance_matrix[node][neighbor] < distance_to_current * 0.7:
+                congestion_penalty += 0.2
+
+        combined_score = (weight_current * distance_to_current) + (weight_destination * distance_to_destination) + (weight_global * avg_distance_to_remaining) + (weight_congestion * congestion_penalty)
+        scores.append((node, combined_score))
+
+    if scores:
+        min_score = min(score for _, score in scores)
+        max_score = max(score for _, score in scores)
+        normalized_scores = [(node, (max_score - score + min_score) / (max_score - min_score + 1e-10)) for node, score in scores]
+        total_weight = sum(weight for _, weight in normalized_scores)
+        probabilities = [weight / total_weight for _, weight in normalized_scores]
+        next_node = np.random.choice([node for node, _ in normalized_scores], p=probabilities)
+    else:
+        next_node = unvisited_nodes[0]
+
+    return next_node

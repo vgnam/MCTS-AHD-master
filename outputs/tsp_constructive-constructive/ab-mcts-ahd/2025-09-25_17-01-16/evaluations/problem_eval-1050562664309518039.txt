@@ -1,0 +1,64 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+
+    # Calculate region diversity: average distance between unvisited nodes
+    if len(unvisited_nodes) > 1:
+        diversity_scores = []
+        for node in unvisited_nodes:
+            diversity = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1)
+            diversity_scores.append(diversity)
+        avg_diversity = sum(diversity_scores) / len(diversity_scores)
+    else:
+        avg_diversity = 0
+
+    # Calculate path smoothness: angle between current path and potential path
+    def calculate_smoothness(node):
+        if len(unvisited_nodes) < 2:
+            return 0
+        prev_node = current_node if len(unvisited_nodes) == len(distance_matrix) - 1 else None
+        if prev_node is None:
+            return 0
+        vec1 = (distance_matrix[current_node][prev_node], 0)
+        vec2 = (distance_matrix[node][current_node], 0)
+        if vec1[0] == 0 or vec2[0] == 0:
+            return 0
+        dot_product = vec1[0] * vec2[0]
+        magnitude_product = vec1[0] * vec2[0]
+        angle = math.acos(dot_product / magnitude_product) if magnitude_product != 0 else 0
+        return 1 - (angle / math.pi)  # Normalized smoothness (0 to 1)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Hub potential (unchanged from original)
+        avg_distance_to_unvisited = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        hub_score = 1.0 / (1.0 + avg_distance_to_unvisited) if avg_distance_to_unvisited > 0 else 0
+
+        # Novelty bonus based on geographic dispersion
+        novelty_bonus = sum(1 for other in unvisited_nodes if distance_matrix[node][other] > avg_diversity * 1.2) / len(unvisited_nodes)
+
+        # Adaptive destination focus based on remaining nodes
+        remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+        destination_focus = 0.3 * (1.5 - 0.5 * remaining_ratio)  # Increases as nodes decrease
+
+        # Path smoothness penalty
+        smoothness_penalty = 1 - calculate_smoothness(node)
+
+        # Adaptive weights
+        proximity_weight = 0.4 * (0.7 + 0.3 * remaining_ratio)
+        hub_weight = 0.3 * (0.5 + 0.5 * remaining_ratio)
+        diversity_weight = 0.3
+
+        total_score = (proximity_weight * distance_to_current +
+                       destination_focus * distance_to_destination +
+                       hub_weight * hub_score +
+                       diversity_weight * novelty_bonus +
+                       0.2 * smoothness_penalty)
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    temp = remaining_nodes / total_nodes
+
+    def sigmoid(x):
+        return 1 / (1 + math.exp(-10 * (x - 0.5)))
+
+    weight_local = 0.7 * (1 - sigmoid(temp))
+    weight_centrality = 0.2 + 0.5 * sigmoid(temp)
+    weight_coherence = 0.1 + 0.4 * sigmoid(temp)
+
+    def calculate_clustering_potential(node):
+        if not unvisited_nodes:
+            return 0
+        avg_dist = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        min_dist = min(distance_matrix[node][n] for n in unvisited_nodes)
+        return (avg_dist - min_dist) / (avg_dist + 1e-10)
+
+    def calculate_score(node):
+        direct_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        clustering = calculate_clustering_potential(node)
+        return (weight_local * direct_distance) + (weight_centrality * centrality) - (weight_coherence * coherence) + (0.2 * clustering)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

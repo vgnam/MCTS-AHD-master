@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 / (1.0 + remaining_nodes)
+
+    candidates = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        if remaining_nodes == 1:
+            centrality = 0
+        else:
+            centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+
+        max_distance = max(distance_to_current, centrality, 1.0)
+        normalized_distance = distance_to_current / max_distance
+        normalized_centrality = centrality / max_distance
+
+        score = (normalized_distance * (1.0 - temperature)) + (normalized_centrality * temperature)
+        candidates.append((node, score))
+
+    if not candidates:
+        return destination_node
+
+    scores = [score for _, score in candidates]
+    min_score = min(scores)
+    max_score = max(scores)
+
+    if max_score == min_score:
+        probabilities = [1.0 / len(candidates) for _ in candidates]
+    else:
+        normalized_scores = [(max_score - score) / (max_score - min_score) for _, score in candidates]
+        probabilities = [s / sum(normalized_scores) for s in normalized_scores]
+
+    next_node = np.random.choice([node for node, _ in candidates], p=probabilities)
+
+    return next_node

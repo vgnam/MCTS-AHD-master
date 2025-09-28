@@ -1,0 +1,38 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        # Dynamic bias towards destination based on remaining nodes
+        bias = len(unvisited_nodes) / (len(distance_matrix) - 1)
+        if random.random() < bias:
+            return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    # Temperature-based stochasticity (decreases over time)
+    temperature = max(0.1, 1.0 - (len(unvisited_nodes) / len(distance_matrix)))
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate node diversity (inverse of average distance to other nodes)
+    diversity_scores = {}
+    for node in unvisited_nodes:
+        distances = [distance_matrix[node][other] for other in unvisited_nodes if other != node]
+        avg_distance = sum(distances) / len(distances) if distances else float('inf')
+        diversity_scores[node] = 1.0 / avg_distance if avg_distance > 0 else 0.0
+
+    # Combine proximity and diversity with temperature
+    combined_scores = []
+    for node in unvisited_nodes:
+        proximity_score = 1.0 / (1.0 + distance_matrix[current_node][node])
+        diversity_score = diversity_scores[node]
+        combined_score = (1 - temperature) * proximity_score + temperature * diversity_score
+        combined_scores.append((node, combined_score))
+
+    # Select based on combined scores
+    nodes, scores = zip(*combined_scores)
+    next_node = random.choices(nodes, weights=scores, k=1)[0]
+
+    return next_node

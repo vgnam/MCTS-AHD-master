@@ -1,0 +1,46 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('-inf')
+    total_unvisited = len(unvisited_nodes)
+
+    # Adaptive temperature (high early, low later)
+    temperature = 1.0 - (0.7 * (total_unvisited / (total_unvisited + 1)))
+
+    # Dynamic destination bias (increases as unvisited nodes decrease)
+    destination_bias = 1.0 - (0.9 * (total_unvisited / (total_unvisited + 1)))
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, total_unvisited - 1)
+
+        # Nearest-neighbor component (weighted by distance)
+        nn_score = -distance_to_node
+
+        # Farthest-first component (weighted by inverse distance)
+        ff_score = 1.0 / (distance_to_node + 1e-6)
+
+        # Regret-based penalty (difference between current and best possible future)
+        regret_penalty = -0.5 * (avg_future_distance - min(distance_matrix[node][n] for n in unvisited_nodes if n != node))
+
+        # Combined score with temperature and bias
+        combined_score = (0.4 * nn_score + 0.6 * ff_score + regret_penalty) * (1.0 - temperature)
+
+        # Apply destination bias if applicable
+        if node == destination_node:
+            combined_score += destination_bias * 10.0
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    # Small chance to explore random nodes (temperature-dependent)
+    if random.random() < temperature * 0.2:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

@@ -1,0 +1,16 @@
+default 0.3) controls the trade-off, favoring nodes that reduce the distance to the destination while considering local distances.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, beta=0.3):
+    next_node = None
+    min_total_score = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        total_score = distance_to_destination - beta * distance_to_current
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

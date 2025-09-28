@@ -1,0 +1,11 @@
+importance as nodes are visited
+
+        score = (weight_immediate * distance_to_node +
+                weight_long_term * distance_to_destination -
+                weight_centrality * centrality[node])
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate heuristic score combining distance and centrality
+    def heuristic_score(node):
+        distance = distance_matrix[current_node][node]
+        # Centrality estimate: inverse of average distance to all other unvisited nodes
+        if len(unvisited_nodes) > 1:
+            avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+            centrality = 1 / avg_distance if avg_distance > 0 else 0
+        else:
+            centrality = 0
+        # Weighted combination (distance has 70% weight, centrality 30%)
+        return 0.7 * distance + 0.3 * centrality
+
+    # Select top 5 candidates based on heuristic score
+    candidates = sorted(unvisited_nodes, key=lambda node: heuristic_score(node))[:5]
+
+    # Probabilistic selection: higher probability for better scores
+    weights = [1.0 / (1.0 + heuristic_score(node)) for node in candidates]
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    next_node = random.choices(candidates, weights=normalized_weights, k=1)[0]
+    return next_node

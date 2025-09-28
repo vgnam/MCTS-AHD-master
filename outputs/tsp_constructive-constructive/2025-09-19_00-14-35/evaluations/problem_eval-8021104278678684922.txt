@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    visited_nodes = total_nodes - len(unvisited_nodes)
+    progress_ratio = visited_nodes / total_nodes if total_nodes > 0 else 0
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        avg_remaining_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if len(unvisited_nodes) > 1 else 0
+        path_continuity_penalty = max(distance_matrix[node][n] for n in unvisited_nodes if n != node) if len(unvisited_nodes) > 1 else 0
+
+        # Dynamic weighting based on progress
+        exploration_weight = 1 - progress_ratio
+        exploitation_weight = progress_ratio
+
+        novelty_factor = (len(unvisited_nodes) / total_nodes) if total_nodes > 0 else 0
+
+        weighted_score = (current_dist * exploitation_weight +
+                          0.5 * avg_remaining_dist * exploration_weight +
+                          0.3 * path_continuity_penalty * exploitation_weight +
+                          0.2 * novelty_factor * exploration_weight)
+        return weighted_score
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

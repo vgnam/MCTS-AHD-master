@@ -1,0 +1,28 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_combined_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weight adjustment based on remaining nodes
+        weight_current = 0.7 - 0.1 * (1 / (remaining_nodes + 1))
+        weight_destination = 1 - weight_current
+
+        # Add small randomness to avoid local optima
+        random_factor = random.uniform(0.9, 1.1)
+
+        combined_score = (weight_current * distance_to_current + weight_destination * distance_to_destination) * random_factor
+
+        if combined_score < min_combined_score:
+            min_combined_score = combined_score
+            next_node = node
+
+    return next_node

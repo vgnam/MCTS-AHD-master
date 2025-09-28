@@ -1,0 +1,31 @@
+importance (10-30%) and flow disruption factors based on tour progress. It balances exploration and exploitation through a connectivity_factor that increases local importance and reduces connectivity weight as the tour progresses. The score combines weighted average distance, local distance (positive weight), and penalizes flow disruption (negative weight).}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    connectivity_factor = 1.0 - (remaining_nodes / total_nodes)
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        avg_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, remaining_nodes - 1)
+
+        if remaining_nodes > 1:
+            max_flow = max(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+            flow_disruption = max_flow - current_dist
+        else:
+            flow_disruption = 0
+
+        weight_avg = 0.6 + 0.2 * connectivity_factor
+        weight_local = 0.1 + 0.2 * (1 - connectivity_factor)
+        weight_flow = -0.1 * flow_disruption if flow_disruption > 0 else 0
+
+        score = (weight_avg * avg_dist) + (weight_local * current_dist) + (weight_flow * flow_disruption)
+
+        scores.append((node, score))
+
+    next_node = min(scores, key=lambda x: x[1])[0]
+    return next_node

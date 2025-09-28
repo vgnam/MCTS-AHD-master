@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    max_distance = max(distances)
+    min_distance = min(distances)
+    destination_distance = distance_matrix[current_node][destination_node] if destination_node in unvisited_nodes else float('inf')
+    
+    threshold = min_distance + (max_distance - min_distance) * 0.3
+    
+    if destination_distance < threshold:
+        next_node = destination_node
+    else:
+        next_node = unvisited_nodes[distances.index(min_distance)]
+    
+    return next_node

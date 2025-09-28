@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_utility = -float('inf')
+    exploration_bias = 0.7
+    decay_factor = 0.95
+    temperature = 0.8
+
+    # Calculate average remaining distance to destination
+    avg_remaining = sum(distance_matrix[node][destination_node] for node in unvisited_nodes) / len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Sigmoid-based utility function
+        normalized_potential = potential_distance / avg_remaining
+        utility = (1 - normalized_potential) * exploration_bias + \
+                 (1 - immediate_distance / max(distance_matrix[current_node])) * (1 - exploration_bias)
+
+        # Dynamic temperature adjustment
+        adjusted_temp = temperature * (decay_factor ** len(unvisited_nodes))
+
+        # Probabilistic selection with Boltzmann distribution
+        if best_node is None or (utility / adjusted_temp) > best_utility:
+            best_utility = utility / adjusted_temp
+            best_node = node
+
+    return next_node

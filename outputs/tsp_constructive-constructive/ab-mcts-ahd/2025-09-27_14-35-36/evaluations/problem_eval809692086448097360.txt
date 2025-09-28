@@ -1,0 +1,25 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate average distance and temperature parameter
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    temperature = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+
+    # Calculate degree-adjusted weights
+    degrees = [sum(1 for n in unvisited_nodes if distance_matrix[node][n] < avg_distance) for node in unvisited_nodes]
+    weights = []
+    for i, node in enumerate(unvisited_nodes):
+        dist_weight = math.exp(-distance_matrix[current_node][node] / (avg_distance * (1 + temperature)))
+        degree_weight = 1 / (1 + degrees[i])  # Inverse degree weighting
+        combined_weight = (dist_weight + degree_weight) / 2
+        weights.append(combined_weight)
+
+    # Normalize weights and select node
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+    next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+    return next_node

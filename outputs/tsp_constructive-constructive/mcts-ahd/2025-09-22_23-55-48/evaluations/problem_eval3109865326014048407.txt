@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_heuristic = float('inf')
+    next_node = None
+
+    for candidate in unvisited_nodes:
+        distance_to_candidate = distance_matrix[current_node][candidate]
+        remaining_nodes = unvisited_nodes - {candidate}
+
+        if not remaining_nodes:
+            heuristic = distance_to_candidate + distance_matrix[candidate][destination_node]
+        else:
+            avg_remaining_distance = sum(distance_matrix[candidate][node] for node in remaining_nodes) / len(remaining_nodes)
+            heuristic = distance_to_candidate + avg_remaining_distance
+
+        if heuristic < min_heuristic:
+            min_heuristic = heuristic
+            next_node = candidate
+
+    return next_node

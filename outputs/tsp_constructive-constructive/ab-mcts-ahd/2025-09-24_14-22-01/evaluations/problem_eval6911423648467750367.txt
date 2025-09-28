@@ -1,0 +1,33 @@
+import math
+    import random
+
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 - 0.5 * (remaining_nodes / len(unvisited_nodes))
+    scores = []
+    centralities = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        estimated_distance = distance_matrix[node][destination_node]
+
+        # Calculate centrality as average distance to other unvisited nodes
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+        # Dynamic weights and penalty
+        weight_immediate = 0.6 + 0.2 * (remaining_nodes / len(unvisited_nodes))
+        weight_estimated = 0.4 - 0.2 * (remaining_nodes / len(unvisited_nodes))
+        penalty = (centrality / (remaining_nodes + 1)) * (1.0 / (remaining_nodes + 1))
+
+        score = (weight_immediate * immediate_distance) + (weight_estimated * estimated_distance) + penalty
+        scores.append(score)
+        centralities.append(centrality)
+
+    # Apply temperature-based softmax for probabilistic selection
+    exp_scores = [math.exp(-score / temperature) for score in scores]
+    probs = [exp_score / sum(exp_scores) for exp_score in exp_scores]
+
+    next_node = random.choices(unvisited_nodes, weights=probs)[0]
+    return next_node

@@ -1,0 +1,62 @@
+importance of local and global costs based on the ratio of remaining unvisited nodes to the total number of nodes, and introduces a penalty term for nodes that are not on the direction towards the destination node.}
+```python
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    total_nodes = len(distance_matrix)
+    remaining_nodes_ratio = len(unvisited_nodes) / total_nodes
+    
+    min_score = float('inf')
+    next_node = None
+    
+    current_node_coords = (current_node, )
+    destination_node_coords = (destination_node, )
+    if isinstance(current_node, tuple):
+        current_node_coords = current_node
+    if isinstance(destination_node, tuple):
+        destination_node_coords = destination_node
+    
+    for node in unvisited_nodes:
+        node_coords = (node, )
+        if isinstance(node, tuple):
+            node_coords = node
+        
+        local_cost = distance_matrix[current_node][node]
+        global_cost = distance_matrix[node][destination_node]
+        
+        # Calculate the direction penalty
+        current_to_node_vector = (node_coords[0] - current_node_coords[0], )
+        if len(node_coords) > 1:
+            current_to_node_vector = tuple(node_coords[i] - current_node_coords[i] for i in range(len(node_coords)))
+        
+        current_to_destination_vector = (destination_node_coords[0] - current_node_coords[0], )
+        if len(destination_node_coords) > 1:
+            current_to_destination_vector = tuple(destination_node_coords[i] - current_node_coords[i] for i in range(len(destination_node_coords)))
+        
+        dot_product = sum(a * b for a, b in zip(current_to_node_vector, current_to_destination_vector))
+        magnitude_product = (sum(a ** 2 for a in current_to_node_vector)) ** 0.5 * (sum(a ** 2 for a in current_to_destination_vector)) ** 0.5
+        if magnitude_product == 0:
+            direction_penalty = 1
+        else:
+            cos_theta = dot_product / magnitude_product
+            direction_penalty = 1 - cos_theta
+        
+        # Dynamic weighting scheme
+        local_weight = 0.4 * remaining_nodes_ratio
+        global_weight = 0.6 * (1 - remaining_nodes_ratio)
+        
+        score = local_weight * local_cost + global_weight * global_cost + 0.1 * direction_penalty * local_cost
+        
+        if score < min_score:
+            min_score = score
+            next_node = node
+    
+    if destination_node in unvisited_nodes:
+        local_cost = distance_matrix[current_node][destination_node]
+        global_cost = 0
+        score = local_weight * local_cost + global_weight * global_cost
+        if score < min_score:
+            next_node = destination_node
+    
+    return next_node

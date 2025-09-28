@@ -1,0 +1,26 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        avg_distance_to_unvisited = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if distance_to_destination == 0:
+            ratio = float('inf')
+        else:
+            ratio = distance_to_current / distance_to_destination
+
+        weight_avg = 1 / (1 + math.exp(-remaining_nodes + 1))
+        weight_dest = 0.3
+        total_score = distance_to_current + (avg_distance_to_unvisited * weight_avg) + (distance_to_destination * weight_dest) + ratio
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

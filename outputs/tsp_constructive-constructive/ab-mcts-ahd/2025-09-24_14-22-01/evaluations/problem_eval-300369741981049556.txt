@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    centroid = calculate_centroid(unvisited_nodes, distance_matrix)
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        heuristic_value = distance_matrix[node][centroid]
+        total_cost = 0.5 * immediate_distance + 0.3 * potential_distance + 0.2 * heuristic_value
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node
+
+def calculate_centroid(unvisited_nodes, distance_matrix):
+    centroid = None
+    min_total_distance = float('inf')
+    for candidate in unvisited_nodes:
+        total_distance = sum(distance_matrix[candidate][node] for node in unvisited_nodes)
+        if total_distance < min_total_distance:
+            min_total_distance = total_distance
+            centroid = candidate
+    return next_node

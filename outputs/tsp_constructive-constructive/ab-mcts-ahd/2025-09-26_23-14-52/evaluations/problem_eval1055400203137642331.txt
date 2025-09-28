@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weighting based on remaining nodes
+        weight_current = 1.5 * (1 - 0.1 * (remaining_nodes - 1))
+        weight_future = 0.3 * (1 + 0.1 * (remaining_nodes - 1))
+
+        # Normalize the score by the number of remaining nodes
+        weighted_score = (weight_current * current_distance + weight_future * future_distance) / remaining_nodes
+
+        # Penalize nodes with high variability in distances to other unvisited nodes
+        if len(unvisited_nodes) > 1:
+            distances_to_others = [distance_matrix[node][other] for other in unvisited_nodes if other != node]
+            variability_penalty = sum(abs(d - current_distance) for d in distances_to_others) / len(distances_to_others)
+            weighted_score += 0.2 * variability_penalty
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+        elif weighted_score == best_score:
+            if future_distance > distance_matrix[next_node][destination_node]:
+                next_node = node
+
+    return next_node

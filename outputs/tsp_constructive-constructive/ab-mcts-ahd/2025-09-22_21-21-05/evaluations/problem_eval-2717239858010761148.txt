@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    best_score = float('inf')
+    next_node = None
+
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / total_unvisited
+    path_length_factor = 1.0 / (1.0 + total_unvisited) ** 0.5
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        weight = 1.0 - (0.6 * (total_unvisited - 1) / total_unvisited) ** 1.5
+        normalized_distance = distance_to_current / (avg_distance + 1e-6)
+
+        if unvisited_nodes:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            avg_distance_to_remaining = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes) if remaining_nodes else 0
+
+            connectivity_score = sum(1.0 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes) / len(unvisited_nodes)
+            attractiveness_factor = (1.0 + connectivity_score) ** 0.5
+
+            combined_score = (distance_to_current + weight * distance_to_destination) * (1 + normalized_distance) * attractiveness_factor
+            combined_score += 0.5 * avg_distance_to_remaining + 0.3 * path_length_factor
+        else:
+            combined_score = distance_to_current + distance_to_destination
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

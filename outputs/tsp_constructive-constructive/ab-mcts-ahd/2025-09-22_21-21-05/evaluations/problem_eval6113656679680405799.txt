@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    unvisited_count = len(unvisited_nodes)
+    total_nodes = unvisited_count + 1  # +1 for current_node
+    destination_bias = (total_nodes - unvisited_count) / total_nodes  # scales from 0 to 1
+
+    min_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            distance *= (1 - destination_bias)  # reduce distance penalty for destination as bias increases
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    return next_node

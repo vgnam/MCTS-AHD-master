@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    iterations = len(distance_matrix) - len(unvisited_nodes)
+    max_iterations = len(distance_matrix)
+    temperature = max(0.1, 0.7 * (1 - iterations / max_iterations))
+
+    if destination_node in unvisited_nodes:
+        if random.random() < temperature:
+            return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    if random.random() < temperature * (1 - min_distance / max(distance_matrix[current_node])):
+        candidate_nodes = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= min_distance * 1.2]
+        if candidate_nodes:
+            next_node = random.choice(candidate_nodes)
+
+    return next_node

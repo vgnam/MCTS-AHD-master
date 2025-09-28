@@ -1,0 +1,31 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_node + distance_to_destination
+        else:
+            direct_distance = distance_matrix[current_node][destination_node]
+            detour_factor = (distance_to_node + distance_to_destination - direct_distance) / (1.0 + direct_distance)
+
+            # Dynamic weight using sigmoid function
+            weight = 1 / (1 + math.exp(-(remaining_nodes - 5)))
+
+            # Penalty for nodes that are too far from the current path
+            max_allowed_detour = 1.5 * direct_distance
+            penalty = max(0, (distance_to_node + distance_to_destination - direct_distance - max_allowed_detour) / max_allowed_detour)
+
+            score = (1 - weight) * distance_to_node + weight * detour_factor + penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

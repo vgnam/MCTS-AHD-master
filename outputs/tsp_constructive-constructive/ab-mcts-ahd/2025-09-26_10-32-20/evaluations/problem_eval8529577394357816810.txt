@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    proximity_weight = 0.5 * (1 - remaining_ratio) ** 2
+    hub_weight = 1 - proximity_weight
+
+    def hub_centrality(node):
+        direct_centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        potential_connections = sum(distance_matrix[node][n] for n in unvisited_nodes)
+        return direct_centrality * (1 + 0.3 * potential_connections)
+
+    hybrid_score = lambda node: (
+        proximity_weight * distance_matrix[current_node][node] +
+        hub_weight * hub_centrality(node)
+    )
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

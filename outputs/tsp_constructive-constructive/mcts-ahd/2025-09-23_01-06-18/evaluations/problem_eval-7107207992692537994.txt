@@ -1,0 +1,50 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_distance == 0:
+            return destination_node
+        priority = remaining_distance / avg_distance
+        if priority <= 1.2:
+            return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = 1 - (remaining_nodes / total_nodes)
+    base_pressure = 0.6 + 0.4 * progress_factor
+    base_temp = 0.8 - 0.7 * progress_factor
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node]
+        global_potential = distance_matrix[node][destination_node]
+
+        # Dynamic regret considering multiple future steps
+        future_regret = 0
+        for n in unvisited_nodes:
+            if n != node:
+                future_regret += max(distance_matrix[node][k] - distance_matrix[node][n] for k in unvisited_nodes if k != n)
+
+        # Path diversity metric
+        diversity_penalty = 0
+        if remaining_nodes > 1:
+            avg_neighbor_dist = sum(distance_matrix[node][n] for n in unvisited_nodes) / remaining_nodes
+            diversity_penalty = abs(avg_neighbor_dist - local_cost) * 0.5
+
+        # Adaptive weights based on node characteristics
+        node_density = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.5 * local_cost) / remaining_nodes
+        pressure = base_pressure + 0.2 * node_density
+        temperature = base_temp - 0.1 * node_density
+
+        weight_factor = 1 + 0.3 * math.log(remaining_nodes + 1)
+        weighted_score = (pressure * local_cost + (1 - pressure) * global_potential) * temperature
+        weighted_score += 0.2 * future_regret - 0.4 * diversity_penalty
+        weighted_score *= weight_factor
+
+        return weighted_score
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

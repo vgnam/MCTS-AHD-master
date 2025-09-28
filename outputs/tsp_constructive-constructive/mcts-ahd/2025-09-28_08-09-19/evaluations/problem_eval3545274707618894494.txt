@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = remaining_nodes + 1
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = 0
+        connectivity = 0
+
+        # Limited-depth lookahead (2 steps ahead)
+        remaining_after_node = unvisited_nodes - {node}
+        if remaining_after_node:
+            next_candidates = remaining_after_node.copy()
+            next_candidate = min(next_candidates, key=lambda x: distance_matrix[node][x])
+            lookahead_distance = distance_matrix[node][next_candidate]
+            connectivity = sum(1 for n in remaining_after_node if distance_matrix[node][n] < 1.2 * lookahead_distance)
+
+        connectivity_weight = 1.0 + (1.0 - (remaining_nodes / total_nodes)) * (connectivity / (remaining_nodes - 1)) * 0.5 if remaining_nodes > 1 else 0
+        score = immediate_distance + 0.3 * (lookahead_distance * connectivity_weight)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

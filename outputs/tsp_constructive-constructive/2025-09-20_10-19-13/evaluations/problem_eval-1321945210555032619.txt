@@ -1,0 +1,9 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    def closeness_centrality(node):
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        avg_distance = total_distance / (len(unvisited_nodes) - 1) if (len(unvisited_nodes) - 1) > 0 else float('inf')
+        return 1 / avg_distance if avg_distance != 0 else float('inf')
+    next_node = max(unvisited_nodes, key=closeness_centrality)
+    return next_node

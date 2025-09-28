@@ -1,0 +1,4 @@
+import random
+    next_node = min(unvisited_nodes, key=lambda node: hybrid_score(node) + 0.01 * random.random())
+
+    return next_node

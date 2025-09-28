@@ -1,0 +1,17 @@
+import random
+        rand_val = random.random()
+        cumulative_prob = 0.0
+        for node, prob in normalized_probs.items():
+            cumulative_prob += prob
+            if rand_val <= cumulative_prob:
+                return node
+    else:
+        # Fall back to greedy nearest-neighbor if destination is already visited
+        min_distance = float('inf')
+        next_node = None
+        for node in unvisited_nodes:
+            distance = distance_matrix[current_node][node]
+            if distance < min_distance:
+                min_distance = distance
+                next_node = node
+        return next_node

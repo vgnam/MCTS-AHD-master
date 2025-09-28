@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+    exploration_factor = 1 - remaining_ratio  # Higher exploration as fewer nodes remain
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic probabilistic selection
+    if random.random() < (0.9 - 0.4 * exploration_factor):  # Adjust selection probability
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        # Bias towards nodes that minimize max distance from current path
+        if len(candidates) > 1:
+            candidates = sorted(candidates, key=lambda node: max(distance_matrix[node][n] for n in unvisited_nodes if n != node))
+        next_node = candidates[0] if candidates else random.choice(nearest_neighbors)
+    else:
+        # Random selection with bias towards nodes that are not already in a tight cluster
+        if len(nearest_neighbors) > 1:
+            nearest_neighbors = sorted(nearest_neighbors, key=lambda node: sum(distance_matrix[node][n] for n in nearest_neighbors if n != node), reverse=True)
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

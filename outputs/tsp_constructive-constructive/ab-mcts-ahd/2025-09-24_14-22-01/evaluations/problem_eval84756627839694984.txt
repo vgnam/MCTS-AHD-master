@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    remaining_nodes = len(unvisited_nodes)
+    if remaining_nodes == 0:
+        return destination_node
+
+    short_term_weight = max(0.5, 0.7 - (0.05 * (10 - remaining_nodes)))  # Decrease short-term weight as nodes decrease
+    long_term_weight = 1.0 - short_term_weight
+
+    min_cost = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        novelty_penalty = 0.1 * (remaining_nodes - 1)  # Penalize revisiting nodes
+        weighted_cost = short_term_weight * immediate_distance + long_term_weight * potential_distance + novelty_penalty
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+    return next_node

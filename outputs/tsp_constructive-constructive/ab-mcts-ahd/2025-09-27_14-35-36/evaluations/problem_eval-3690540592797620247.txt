@@ -1,0 +1,13 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Randomly select a subset of unvisited nodes (exploration)
+    candidate_size = min(3, len(unvisited_nodes))  # Adjust candidate size as needed
+    candidates = random.sample(list(unvisited_nodes), candidate_size)
+
+    # Choose the nearest node from the candidates (exploitation)
+    next_node = min(candidates, key=lambda node: distance_matrix[current_node][node])
+    return next_node

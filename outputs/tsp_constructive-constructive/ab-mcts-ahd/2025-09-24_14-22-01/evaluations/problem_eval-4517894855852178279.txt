@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic weights based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = (total_nodes - remaining_nodes) / total_nodes
+    current_weight = 0.7 * (1 - progress) + 0.5
+    destination_weight = 0.3 * progress + 0.2
+
+    # Calculate distance statistics for penalty
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    std_dev = (sum((d - avg_distance) ** 2 for d in distances) / len(distances)) ** 0.5
+
+    min_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Apply penalty for outlier distances
+        if std_dev > 0:
+            z_score = abs(distance_to_node - avg_distance) / std_dev
+            penalty = 0.1 * max(0, z_score - 1)  # Penalize nodes 1 std dev above average
+        else:
+            penalty = 0
+
+        score = current_weight * distance_to_node + destination_weight * distance_to_destination + penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

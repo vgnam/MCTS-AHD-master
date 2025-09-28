@@ -1,0 +1,27 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, exploration_factor=0.5):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Temperature-based stochasticity: higher temperature increases randomness
+    if random.random() < (1.0 - math.exp(-temperature)):
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Exploration factor controls the probability of picking a distant node
+        if random.random() < exploration_factor:
+            next_node = random.choice(nearest_neighbors)
+        else:
+            # Pick a node with a probability inversely proportional to its distance
+            distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+            max_distance = max(distances)
+            probabilities = [(max_distance - d + 1) / sum(max_distance - d + 1 for d in distances) for d in distances]
+            next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

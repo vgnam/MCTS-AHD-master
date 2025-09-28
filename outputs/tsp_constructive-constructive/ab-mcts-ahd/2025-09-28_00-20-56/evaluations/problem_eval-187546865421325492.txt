@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_score(node):
+        start_distance = distance_matrix[node][current_node]
+        distant_unvisited_penalty = sum(1 for other_node in unvisited_nodes if other_node != node and distance_matrix[node][other_node] >= 3)
+        return start_distance + distant_unvisited_penalty
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

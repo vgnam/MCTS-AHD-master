@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    remaining_nodes = len(unvisited_nodes)
+    base_weight = 0.5  # Slightly lower than original to give more weight to dynamic factors
+    dynamic_weight = 1.0 / (1.0 + remaining_nodes)  # Same as original
+    temperature = 0.1 * (remaining_nodes / len(unvisited_nodes))  # Introduces temperature for probabilistic selection
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        if len(unvisited_nodes) == 1:
+            avg_distance = 0
+        else:
+            avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+
+        score = (base_weight * distance_to_current) + ((1 - base_weight) * dynamic_weight * avg_distance)
+        scores.append((node, score))
+
+    # Normalize scores to probabilities
+    min_score = min(score for _, score in scores)
+    max_score = max(score for _, score in scores)
+    normalized_scores = [(node, (score - min_score) / (max_score - min_score)) for node, score in scores]
+
+    # Apply softmax with temperature to get probabilities
+    exp_scores = [(node, math.exp(-normalized_score / temperature)) for node, normalized_score in normalized_scores]
+    total = sum(score for _, score in exp_scores)
+    probabilities = [(node, score / total) for node, score in exp_scores]
+
+    # Select node based on probabilities
+    rand_val = random.random()
+    cumulative_prob = 0.0
+    for node, prob in probabilities:
+        cumulative_prob += prob
+        if rand_val <= cumulative_prob:
+            return node
+    return next_node

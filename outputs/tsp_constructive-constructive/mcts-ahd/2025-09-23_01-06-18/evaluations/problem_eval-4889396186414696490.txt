@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = (1 - (remaining_nodes / total_nodes)) ** 3
+    exploration_weight = 0.6 - 0.2 * progress_factor
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        future_cost = distance_matrix[node][destination_node]
+
+        min_immediate = min(distance_matrix[current_node][n] for n in unvisited_nodes)
+        max_immediate = max(distance_matrix[current_node][n] for n in unvisited_nodes)
+        immediate_regret = (immediate_cost - min_immediate) / (max_immediate - min_immediate + 1e-6)
+
+        future_regret = 0
+        if remaining_nodes > 1:
+            remaining_unvisited = [n for n in unvisited_nodes if n != node]
+            min_future = min(distance_matrix[node][n] for n in remaining_unvisited)
+            max_future = max(distance_matrix[node][n] for n in remaining_unvisited)
+            future_regret = (future_cost - min_future) / (max_future - min_future + 1e-6)
+
+        regret_factor = 0.2 + 0.4 * progress_factor
+        combined_regret = 0.6 * immediate_regret + 0.4 * future_regret
+
+        return (exploration_weight * immediate_cost + (1 - exploration_weight) * future_cost) + regret_factor * combined_regret
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

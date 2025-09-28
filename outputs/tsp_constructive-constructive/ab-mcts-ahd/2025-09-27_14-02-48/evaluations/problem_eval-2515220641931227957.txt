@@ -1,0 +1,41 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    temperature = 100 / len(unvisited_nodes)
+    next_node = None
+    max_score = -float('inf')
+    
+    for node in unvisited_nodes:
+        remaining_nodes = unvisited_nodes - {node}
+        
+        # Calculate the score for the current node
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node] if node != destination_node else 0
+        
+        # Calculate a penalty for nodes that are not well-connected to other unvisited nodes
+        connectivity_penalty = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes) if remaining_nodes else 0
+        
+        score = -distance_to_node - distance_to_destination + 0.1 * (1 / (1 + connectivity_penalty))
+        
+        # Apply simulated annealing-inspired mechanism
+        score_with_temperature = score / temperature
+        
+        # Calculate the probability of selecting the current node
+        probability = math.exp(score_with_temperature)
+        
+        # Check if the current node should be selected
+        if random.random() < probability and score > max_score:
+            max_score = score
+            next_node = node
+    
+    # Special handling for the destination node
+    if destination_node in unvisited_nodes:
+        destination_score = -distance_matrix[current_node][destination_node]
+        if random.random() < math.exp(destination_score / temperature) and destination_score > max_score:
+            next_node = destination_node
+    
+    return next_node

@@ -1,0 +1,37 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visited_history=None, alpha=0.7, beta=0.3):
+    if visited_history is None:
+        visited_history = {}
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on distance and visit frequency
+    weights = []
+    for node in unvisited_nodes:
+        distance_weight = 1.0 / (1.0 + distance_matrix[current_node][node])
+        visit_penalty = math.exp(-visited_history.get(node, 0) * beta)
+        weight = alpha * distance_weight + (1 - alpha) * visit_penalty
+        weights.append(weight)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    if total_weight == 0:
+        normalized_weights = [1.0 / len(unvisited_nodes)] * len(unvisited_nodes)
+    else:
+        normalized_weights = [w / total_weight for w in weights]
+
+    # Select node based on weighted probability
+    if random.random() < 0.8:  # 80% chance to use weighted selection
+        next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+    else:  # 20% chance to pick a random node
+        next_node = random.choice(unvisited_nodes)
+
+    # Update visit history
+    visited_history[next_node] = visited_history.get(next_node, 0) + 1
+
+    return next_node

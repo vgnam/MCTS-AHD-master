@@ -1,0 +1,24 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, iteration=0, max_iterations=100):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic temperature based on iteration progress
+    temperature = 1.0 - (iteration / max_iterations) if max_iterations > 0 else 0.5
+
+    # Probability of selecting nearest neighbor decreases with iteration
+    if random.random() < (0.9 * temperature):
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Weighted random selection with inverse distance
+        weights = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in nearest_neighbors]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+
+    return next_node

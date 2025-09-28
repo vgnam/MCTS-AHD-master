@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    current_to_dest = distance_matrix[current_node][destination_node]
+    max_distance = max((distance_matrix[current_node][node] + distance_matrix[node][destination_node] for node in unvisited_nodes), default=1)
+
+    temperature = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+    proximity_weight = 0.5 + 0.5 * (1 - (current_to_dest / max_distance)) if max_distance > 0 else 0.5
+
+    def weighted_score(node):
+        local_score = distance_matrix[current_node][node]
+        global_score = distance_matrix[node][destination_node]
+        exploration_term = temperature * (local_score - global_score) ** 2
+        return (proximity_weight * local_score + (1 - proximity_weight) * global_score) + exploration_term
+
+    next_node = min(unvisited_nodes, key=weighted_score)
+    return next_node

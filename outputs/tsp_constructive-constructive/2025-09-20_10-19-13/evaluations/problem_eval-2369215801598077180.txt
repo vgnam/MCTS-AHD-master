@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=0.5, iteration=0):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate weights for each node based on distance and temperature
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Dynamic weight: distance adjusted by temperature decay
+        weight = distance * (1 - temperature * (0.9 ** iteration))
+        weights.append(weight)
+
+    # Select node with minimum weighted distance
+    next_node = unvisited_nodes[weights.index(min(weights))]
+    return next_node

@@ -1,0 +1,13 @@
+importance of local choices as path shortens
+        weight_destination = 0.3 + 0.1 * (1 / remaining_nodes)
+        weight_centroid = 0.3 - 0.1 * (1 / remaining_nodes)  # Decreases importance of centroid as path shortens
+
+        # Calculate centroid of unvisited nodes
+        centroid = sum(unvisited_nodes) / len(unvisited_nodes)
+        centroid_influence = abs(node - centroid)
+
+        # Combine with dynamic weights
+        return weight_current * dist_current + weight_destination * dist_destination + weight_centroid * centroid_influence
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

@@ -1,0 +1,51 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    progress_ratio = 1 - (len(unvisited_nodes) / total_nodes)
+    temperature = 1.0 - progress_ratio ** 2
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) == 1:
+            score = distance_to_current + distance_to_destination
+        else:
+            neighbor_count = min(3, len(unvisited_nodes))
+            nearest_neighbors = sorted(unvisited_nodes, key=lambda n: distance_matrix[node][n])[:neighbor_count]
+            avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / neighbor_count if neighbor_count else 0
+
+            # Calculate node centrality (inverse of average neighbor distance)
+            centrality = 1 / (avg_neighbor_distance + 1e-6)
+
+            # Calculate path entropy (diversity of connections)
+            entropy = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+            # Dynamic penalty factor
+            penalty_factor = (1 - centrality) * (1 + entropy * progress_ratio)
+
+            # Adaptive weight components
+            distance_weight = 0.5 + 0.5 * (1 - progress_ratio)
+            connectivity_weight = 1 - distance_weight
+
+            # Non-linear transformations
+            transformed_current = distance_to_current ** 0.6
+            transformed_neighbor = avg_neighbor_distance ** 0.7
+
+            score = (distance_weight * transformed_current +
+                    connectivity_weight * transformed_neighbor) * (1 + penalty_factor)
+
+        scores.append(score)
+
+    # Apply temperature-based probabilistic selection
+    if temperature > 0.1:
+        exp_scores = [math.exp(-s / temperature) for s in scores]
+        probs = [e / sum(exp_scores) for e in exp_scores]
+        next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+    else:
+        next_node = unvisited_nodes[scores.index(min(scores))]
+
+    return next_node

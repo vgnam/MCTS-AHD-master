@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    min_score = float('inf')
+    next_node = None
+    num_nodes = len(distance_matrix)
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_from_node = distance_matrix[node][destination_node]
+        centrality_heuristic = sum(distance_matrix[node]) / (num_nodes - 1)
+        score = (0.5 * distance_to_node + 0.3 * distance_from_node) + (0.2 * centrality_heuristic)
+        if score < min_score:
+            min_score = score
+            next_node = node
+    return next_node

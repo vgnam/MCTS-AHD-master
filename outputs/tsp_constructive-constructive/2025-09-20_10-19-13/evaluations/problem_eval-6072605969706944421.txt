@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    visit_frequencies = {node: 0 for node in unvisited_nodes}
+    penalty_factor = 0.1
+
+    def weighted_distance(node):
+        base_distance = distance_matrix[current_node][node]
+        penalty = penalty_factor * visit_frequencies.get(node, 0)
+        return base_distance + penalty
+
+    next_node = min(unvisited_nodes, key=weighted_distance)
+    visit_frequencies[next_node] = visit_frequencies.get(next_node, 0) + 1
+
+    return next_node

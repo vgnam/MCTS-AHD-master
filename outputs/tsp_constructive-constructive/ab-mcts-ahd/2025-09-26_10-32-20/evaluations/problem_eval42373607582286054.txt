@@ -1,0 +1,27 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate dynamic weights based on remaining nodes and current path length
+    remaining_nodes = len(unvisited_nodes)
+    weight_local = 0.6 * (1 / (1 + remaining_nodes))
+    weight_global = 0.4 * (remaining_nodes / (remaining_nodes + 1))
+
+    # Penalty term for recently visited nodes
+    penalty = {node: 0.1 * (1 if node == current_node else 0) for node in unvisited_nodes}
+
+    # Hybrid score with dynamic weights and penalty
+    hybrid_score = lambda node: (weight_local * distance_matrix[current_node][node] +
+                                weight_global * distance_matrix[node][destination_node] +
+                                penalty[node])
+
+    # Probabilistic selection based on scores
+    scores = [hybrid_score(node) for node in unvisited_nodes]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - score + 0.1) / (max_score - min_score + 0.1) for score in scores]
+
+    next_node = random.choices(unvisited_nodes, weights=normalized_scores, k=1)[0]
+    return next_node

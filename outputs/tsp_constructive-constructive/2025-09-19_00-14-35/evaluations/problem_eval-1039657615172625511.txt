@@ -1,0 +1,73 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, memory_size=5):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    # Adaptive learning rate based on remaining nodes
+    learning_rate = 0.1 + 0.9 * (1 - exploration_factor)
+
+    # Memory-based novelty bonus
+    memory = []
+    if hasattr(select_next_node, 'node_memory'):
+        memory = select_next_node.node_memory.get(current_node, [])
+        memory = [n for n in memory if n in unvisited_nodes][-memory_size:]
+
+    # Boltzmann distribution parameters
+    temperature = 1.0 / (1 + exploration_factor * 2)
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Temporal difference learning component
+        td_error = 0
+        if memory:
+            last_node = memory[-1] if len(memory) > 0 else current_node
+            td_error = distance_matrix[last_node][node] - distance_matrix[current_node][node]
+
+        # Memory-based novelty bonus
+        recency_bonus = 0
+        frequency_penalty = 0
+        if node in memory:
+            recency_bonus = 0.2 * (1 - (memory.index(node) / len(memory)))
+            frequency_penalty = -0.1 * (memory.count(node) / len(memory))
+
+        # Dynamic weight adjustments
+        weight_local = 0.3 + 0.2 * (1 - exploration_factor)
+        weight_td = 0.2 * learning_rate
+        weight_dest = 0.2 - 0.1 * exploration_factor
+        weight_novelty = 0.3 * exploration_factor
+
+        score = (weight_local * current_dist) + (weight_td * td_error) + \
+                (weight_dest * dest_dist) + (weight_novelty * (recency_bonus + frequency_penalty))
+
+        scores.append((node, score))
+
+    # Boltzmann selection
+    if scores:
+        min_score = min(s[1] for s in scores)
+        max_score = max(s[1] for s in scores)
+        normalized_scores = [(node, (score - min_score) / (max_score - min_score + 1e-6)) for node, score in scores]
+        probabilities = [math.exp(-s / temperature) for _, s in normalized_scores]
+        total = sum(probabilities)
+        probabilities = [p/total for p in probabilities]
+        next_node = random.choices([n for n, _ in normalized_scores], weights=probabilities, k=1)[0]
+
+        # Update memory
+        if not hasattr(select_next_node, 'node_memory'):
+            select_next_node.node_memory = {}
+        if current_node not in select_next_node.node_memory:
+            select_next_node.node_memory[current_node] = []
+        select_next_node.node_memory[current_node].append(next_node)
+        if len(select_next_node.node_memory[current_node]) > memory_size:
+            select_next_node.node_memory[current_node].pop(0)
+
+        return next_node
+    return next_node

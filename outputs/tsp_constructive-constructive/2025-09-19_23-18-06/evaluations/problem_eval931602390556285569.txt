@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    progress = 1.0 - len(unvisited_nodes) / total_nodes
+    temperature = 0.3 * (1.0 - progress)  # Decrease temperature as path progresses
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+
+        if unvisited_nodes:
+            # Node significance combining degree and closeness centrality
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] < float('inf'))
+            closeness_centrality = 1.0 / (sum(distance_matrix[node][n] for n in range(total_nodes)) / total_nodes + 1e-6)
+            node_significance = (node_degree + closeness_centrality) / (total_nodes - 1)
+
+            # Dynamic exploration term
+            exploration_term = temperature * node_significance
+        else:
+            exploration_term = 0.0
+
+        # Weighted score with probabilistic selection
+        weighted_score = (1.0 - temperature) * immediate_dist + exploration_term
+        candidates.append((node, weighted_score))
+
+    # Select node with probability inversely proportional to score
+    total_score = sum(score for _, score in candidates)
+    if total_score > 0:
+        probabilities = [(1.0 - score / total_score) for _, score in candidates]
+    else:
+        probabilities = [1.0 / len(candidates)] * len(candidates)
+
+    next_node = random.choices([node for node, _ in candidates], weights=probabilities, k=1)[0]
+    return next_node

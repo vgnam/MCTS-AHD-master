@@ -1,0 +1,22 @@
+importance of potential distance and diversity factor to 0.2 each, ensuring faster local optimization while still ensuring progress toward the destination.}
+
+```python
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    visited_frequency = {node: 0 for node in unvisited_nodes}
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        diversity_factor = 1 / (1 + visited_frequency.get(node, 0))
+        total_cost = 0.7 * immediate_distance + 0.2 * potential_distance + 0.2 * diversity_factor
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    else:
+        visited_frequency[next_node] += 1
+    return next_node

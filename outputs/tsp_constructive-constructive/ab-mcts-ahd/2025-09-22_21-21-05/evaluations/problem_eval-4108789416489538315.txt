@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    unvisited_count = len(unvisited_nodes)
+    total_nodes = unvisited_count + 1
+    remaining_ratio = unvisited_count / total_nodes
+
+    # Calculate centrality for each node (simplified degree centrality)
+    centrality = {}
+    for node in unvisited_nodes + [current_node]:
+        centrality[node] = sum(1 for neighbor in unvisited_nodes + [current_node] if distance_matrix[node][neighbor] > 0)
+
+    # Dynamic bias combining remaining tour length and centrality
+    destination_bias = (0.8 ** remaining_ratio) * (centrality[destination_node] / sum(centrality.values()))
+
+    min_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        centrality_score = centrality[node] / sum(centrality.values())
+
+        if node == destination_node:
+            score = distance * (1 - destination_bias) + centrality_score * 0.2
+        else:
+            score = distance * (1 + centrality_score * 0.3)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

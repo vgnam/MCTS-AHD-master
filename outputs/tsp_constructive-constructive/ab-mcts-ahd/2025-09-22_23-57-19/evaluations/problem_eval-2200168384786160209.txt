@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    max_cost = -float('inf')
+    farthest_node = None
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost > max_cost:
+            max_cost = cost
+            farthest_node = node
+
+    if farthest_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2 and random.random() < 0.7:
+        return farthest_node
+    else:
+        candidates = []
+        for node in unvisited_nodes:
+            if node == farthest_node:
+                continue
+            cost = distance_matrix[current_node][node]
+            candidates.append((node, cost))
+
+        if not candidates:
+            return farthest_node
+
+        total_cost = sum(cost for _, cost in candidates)
+        probabilities = [cost / total_cost for _, cost in candidates]
+        selected_node = random.choices([node for node, _ in candidates], weights=probabilities, k=1)[0]
+
+        return next_node

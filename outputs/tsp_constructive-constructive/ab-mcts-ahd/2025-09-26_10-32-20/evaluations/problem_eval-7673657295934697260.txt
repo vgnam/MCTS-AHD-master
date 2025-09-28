@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    local_weight = 1.0 / (1.0 + remaining_nodes)
+    global_weight = 1.0 - local_weight
+    decay_factor = 0.5 ** (1.0 / remaining_nodes)
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        local_distance = distance_matrix[current_node][node]
+        global_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        return (local_weight * local_distance +
+                global_weight * decay_factor * global_distance)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

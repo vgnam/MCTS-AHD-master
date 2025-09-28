@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    max_distance = max(max(row) for row in distance_matrix)
+    path_length = len(distance_matrix) - len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        if distance_matrix[current_node][node] == 0 or distance_matrix[node][destination_node] == 0:
+            return node
+
+        # Dynamic weight based on path progress
+        progress_ratio = path_length / len(distance_matrix)
+        weight = 0.9 - 0.6 * progress_ratio
+
+        # Local search: consider neighboring nodes
+        local_factor = 1.0
+        for neighbor in unvisited_nodes:
+            if neighbor != node:
+                local_factor += 0.1 / (distance_matrix[node][neighbor] / max_distance + 1e-6)
+
+        normalized_distance = distance_matrix[current_node][node] / max_distance
+        score = (weight * normalized_distance) + ((1 - weight) * (distance_matrix[node][destination_node] / max_distance))
+        score /= local_factor
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

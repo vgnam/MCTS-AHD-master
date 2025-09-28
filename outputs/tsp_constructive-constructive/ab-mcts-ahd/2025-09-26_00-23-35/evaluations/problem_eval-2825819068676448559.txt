@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    dest_distance = distance_matrix[current_node][destination_node]
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 / (1 + remaining_nodes) ** 0.5
+
+    if destination_node in unvisited_nodes:
+        unvisited_nodes_with_dest = unvisited_nodes
+    else:
+        unvisited_nodes_with_dest = unvisited_nodes.union({destination_node})
+
+    scores = []
+    for node in unvisited_nodes_with_dest:
+        distance = distance_matrix[current_node][node]
+        proximity_score = 1.0 / (1 + distance)
+        destination_score = 1.0 / (1 + abs(distance - dest_distance))
+        combined_score = (0.7 * proximity_score + 0.3 * destination_score) * (1 + temperature)
+        scores.append((node, combined_score))
+
+    scores.sort(key=lambda x: x[1], reverse=True)
+    selected_node, _ = scores[0]
+
+    if selected_node == destination_node and destination_node in unvisited_nodes:
+        next_node = destination_node
+    else:
+        next_node = selected_node if selected_node in unvisited_nodes else None
+
+    return next_node

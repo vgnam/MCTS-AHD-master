@@ -1,0 +1,39 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visitation_counts=None, temperature=1.0):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate proximity-based weights
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    max_dist = max(distances)
+    range_dist = max_dist - min_dist if max_dist != min_dist else 1
+
+    # Normalize distances to [0, 1] for proximity weights
+    proximity_weights = [(max_dist - dist + min_dist) / range_dist for dist in distances]
+
+    # Incorporate visitation frequency (if provided)
+    if visitation_counts:
+        total_counts = sum(visitation_counts[node] for node in unvisited_nodes)
+        freq_weights = [total_counts / (visitation_counts[node] + 1) for node in unvisited_nodes]
+        combined_weights = [p * f for p, f in zip(proximity_weights, freq_weights)]
+    else:
+        combined_weights = proximity_weights
+
+    # Apply temperature-based stochasticity
+    if random.random() < math.exp(-1 / temperature):
+        # Exploit: choose based on combined weights
+        next_node = random.choices(unvisited_nodes, weights=combined_weights, k=1)[0]
+    else:
+        # Explore: choose randomly but bias towards less frequent nodes
+        if visitation_counts:
+            explore_weights = [1 / (visitation_counts[node] + 1) for node in unvisited_nodes]
+            next_node = random.choices(unvisited_nodes, weights=explore_weights, k=1)[0]
+        else:
+            next_node = random.choice(unvisited_nodes)
+
+    return next_node

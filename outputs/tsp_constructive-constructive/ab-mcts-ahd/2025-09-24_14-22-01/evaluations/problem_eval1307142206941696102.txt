@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    total_nodes = len(unvisited_nodes) + 1  # +1 for current_node
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    weight = 0.3 + 0.4 * visited_ratio  # Dynamically adjust weight based on progress
+    avg_unvisited_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        penalty = 0.05 * (1 - visited_ratio) * len(unvisited_nodes)  # Penalty increases as unvisited nodes decrease
+        exploration_term = (immediate_distance - avg_unvisited_distance) ** 2  # Encourages diversity
+        weighted_cost = weight * immediate_distance + (1 - weight) * potential_distance + penalty + 0.1 * exploration_term
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+    return next_node

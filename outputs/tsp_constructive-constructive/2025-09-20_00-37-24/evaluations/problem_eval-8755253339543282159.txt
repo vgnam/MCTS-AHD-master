@@ -1,0 +1,35 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, alpha=0.95):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate probabilities based on inverse distance and temperature
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    max_dist = max(distances)
+
+    # Normalize and invert to prioritize closer nodes
+    probabilities = []
+    for dist in distances:
+        if max_dist == min_dist:
+            normalized = 0.5
+        else:
+            normalized = (dist - min_dist) / (max_dist - min_dist)
+        inverted = 1 - normalized
+        probabilities.append(inverted ** (1 / temperature))
+
+    # Normalize probabilities
+    total = sum(probabilities)
+    probabilities = [p / total for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    # Apply temperature cooling
+    temperature *= alpha
+
+    return next_node

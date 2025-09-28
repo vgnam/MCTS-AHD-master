@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = -float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate centrality measure
+    avg_distances = []
+    for node in unvisited_nodes:
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_nodes
+        avg_distances.append(avg_dist)
+
+    avg_avg_distance = sum(avg_distances) / remaining_nodes if remaining_nodes > 0 else 0
+
+    for i, node in enumerate(unvisited_nodes):
+        distance = distance_matrix[current_node][node]
+        centrality_factor = 1.0 - (avg_distances[i] / (avg_avg_distance + 1e-6))
+        destination_bonus = 1.0
+
+        if node == destination_node:
+            destination_bonus = 1.2  # Bonus for destination
+
+        # Dynamic priority score
+        score = (1.0 / (distance + 1e-6)) * (centrality_factor + destination_bonus)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

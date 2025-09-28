@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    dynamic_weight = 1 / (1 + math.exp(-(remaining_nodes - 5)))  # Sigmoid adjustment for weight balance
+
+    min_weighted_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+
+        # Future connectivity: average distance to remaining unvisited nodes
+        future_connectivity = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+        # Penalty for nodes that create isolated sub-paths
+        isolation_penalty = max(distance_matrix[node][n] for n in unvisited_nodes if n != node) if remaining_nodes > 1 else 0
+
+        weighted_score = (1 - dynamic_weight) * current_distance + dynamic_weight * future_connectivity + 0.2 * isolation_penalty
+
+        if weighted_score < min_weighted_score:
+            min_weighted_score = weighted_score
+            next_node = node
+
+    return next_node

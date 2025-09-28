@@ -1,0 +1,72 @@
+[
+     {
+          "algorithm": "The algorithm prioritizes the destination node if it's unvisited, otherwise it selects the next node by balancing proximity to the current node and the ratio of that distance to the candidate's distance from the destination, minimizing their maximum to ensure a trade-off between immediate proximity and overall path efficiency. The key design is the use of `max(distance_matrix[current_node][node], distance_matrix[current_node][node] / (distance_matrix[node][destination_node] + 1e-10))` to balance the two factors, with the destination given highest priority when unvisited.",
+          "thought": "The new algorithm prioritizes the destination node if unvisited, otherwise balances immediate proximity and path efficiency by minimizing the maximum of the distance to the current node and a weighted ratio of that distance to the distance from the candidate to the destination, ensuring a trade-off between immediate proximity and overall path efficiency.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        next_node = destination_node\n    else:\n        next_node = min(unvisited_nodes, key=lambda node: max(distance_matrix[current_node][node], (distance_matrix[current_node][node] / (distance_matrix[node][destination_node] + 1e-10))))\n    return next_node",
+          "objective": 6.66726,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm prioritizes the destination node if it's unvisited, otherwise it selects the next node by balancing proximity to the current node and progress toward the destination, using the sum of direct distance and a ratio of that distance to the candidate's distance from the destination. The key design idea is to minimize a weighted combination of immediate distance and potential future progress toward the destination.",
+          "thought": "The new algorithm prioritizes the destination node if unvisited, otherwise balances immediate proximity and progress toward the destination by minimizing the sum of the distance to the current node and the ratio of that distance to the distance from the candidate to the destination.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        next_node = destination_node\n    else:\n        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] + (distance_matrix[current_node][node] / distance_matrix[node][destination_node] if distance_matrix[node][destination_node] != 0 else float('inf')))\n    return next_node",
+          "objective": 6.67121,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm prioritizes immediate distance (60% weight) over the ratio of current-to-destination distance (40% weight) when selecting the next node, while ensuring the destination is visited first if it's still unvisited. The `select_next_node` function balances short-term efficiency (immediate distance) and long-term progress (destination ratio) using a weighted sum.",
+          "thought": "The new algorithm combines the destination prioritization of No.2 with the weighted sum of immediate distance and destination ratio from No.1, using a 60% weight for immediate distance and 40% for the ratio, to balance short-term and long-term efficiency.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        next_node = destination_node\n    else:\n        next_node = min(unvisited_nodes, key=lambda node: 0.6 * distance_matrix[current_node][node] + 0.4 * (distance_matrix[current_node][node] / distance_matrix[node][destination_node] if distance_matrix[node][destination_node] != 0 else float('inf')))\n    return next_node",
+          "objective": 6.75,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by prioritizing the destination (if unvisited) and otherwise minimizing the maximum of the immediate distance and a weighted combination (60% immediate distance + 40% ratio of immediate distance to destination distance) to balance proximity and progress toward the destination. The weights (0.6 and 0.4) reflect higher priority on immediate distance while still considering the ratio to the destination.",
+          "thought": "The new algorithm combines the destination prioritization of No.2 with the weighted distance ratio optimization of No.1, selecting the next node by minimizing the maximum of immediate distance and a weighted ratio of distances to the destination (60% immediate distance, 40% ratio of distances to destination).",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        next_node = destination_node\n    else:\n        next_node = min(unvisited_nodes, key=lambda node: max(distance_matrix[current_node][node], 0.6 * distance_matrix[current_node][node] + 0.4 * (distance_matrix[current_node][node] / distance_matrix[node][destination_node] if distance_matrix[node][destination_node] != 0 else float('inf'))))\n    return next_node",
+          "objective": 6.75311,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm prioritizes moving toward the destination node (if unvisited) while balancing immediate distance and progress toward the destination, using a weighted sum (70% immediate distance, 30% ratio of distances to destination). If the destination is visited, it selects the next node based on the weighted criterion. The code structure ensures the destination is prioritized when possible, otherwise optimizes a trade-off between short-term and long-term path efficiency.",
+          "thought": "The new algorithm combines the destination prioritization from No.2 with a weighted balance of immediate distance and progress toward the destination inspired by No.1, using a weighted sum of the current distance and a ratio of distances to the destination.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        next_node = destination_node\n    else:\n        next_node = min(unvisited_nodes, key=lambda node: 0.7 * distance_matrix[current_node][node] + 0.3 * (distance_matrix[current_node][node] / distance_matrix[node][destination_node] if distance_matrix[node][destination_node] != 0 else float('inf')))\n    return next_node",
+          "objective": 6.8001,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm prioritizes the destination node if unvisited, otherwise selects the next node by balancing proximity to the current node and progress toward the destination, using the maximum of the distance to the current node and the ratio of that distance to the distance from the candidate to the destination. This ensures a trade-off between immediate proximity and overall path efficiency.",
+          "thought": "The new algorithm will prioritize selecting the destination node if unvisited, otherwise it will choose the next node by minimizing the maximum of the distance to the current node and the ratio of the distance to the current node over the distance to the destination, balancing immediate proximity and progress toward the goal.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        next_node = destination_node\n    else:\n        next_node = min(unvisited_nodes, key=lambda node: max(distance_matrix[current_node][node], (distance_matrix[current_node][node] / distance_matrix[node][destination_node]) if distance_matrix[node][destination_node] != 0 else float('inf')))\n    return next_node",
+          "objective": 6.87178,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm prioritizes visiting the destination node if it's unvisited, otherwise it selects the next node by minimizing the ratio of the distance from the current node to the candidate node over the distance from the candidate node to the destination. This ensures the path stays close to the current node while progressively moving toward the destination, balancing proximity and progress toward the goal. The key design idea is that the heuristic favors nodes that are both nearby and on a direct path to the destination.",
+          "thought": "The new algorithm prioritizes selecting the destination node if unvisited, otherwise it balances proximity to the current node and the potential to form a shorter path by considering the ratio of distances to the destination and current node, favoring nodes that minimize this ratio while ensuring the path remains efficient.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        next_node = destination_node\n    else:\n        next_node = min(unvisited_nodes, key=lambda node: (distance_matrix[current_node][node] / distance_matrix[node][destination_node]) if distance_matrix[node][destination_node] != 0 else float('inf'))\n    return next_node",
+          "objective": 6.89499,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm prioritizes the destination node if it remains unvisited, otherwise it selects the nearest unvisited neighbor based on the distance matrix. The function takes the current node, destination, unvisited nodes, and distance matrix as inputs, and returns the next node in the path. The destination node has higher priority than other nodes, while the nearest neighbor heuristic applies when the destination is already visited.",
+          "thought": "The algorithm selects the next node by choosing the unvisited node closest to the current node, prioritizing the destination node if it is unvisited, otherwise falling back to the nearest neighbor heuristic.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        next_node = destination_node\n    else:\n        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])\n    return next_node",
+          "objective": 7.00437,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm prioritizes the destination node if unvisited; otherwise, it selects the next node by minimizing a balance between direct distance to the current node and the product of distances to the current node and destination, ensuring a trade-off between immediate proximity and path efficiency. The `max` function ensures the selection favors nodes that are either close to the current node or efficiently bridge to the destination, while the `min` function enforces the overall shortest path criteria. The heuristic balances locality and global efficiency, making it adaptive to both immediate and long-term path optimization.",
+          "thought": "The new algorithm prioritizes the destination node if unvisited, otherwise selects the next node by minimizing the maximum of the distance to the current node and the product of the distance to the current node and the distance to the destination, ensuring a balance between immediate proximity and path efficiency.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        next_node = destination_node\n    else:\n        next_node = min(unvisited_nodes, key=lambda node: max(distance_matrix[current_node][node], distance_matrix[current_node][node] * distance_matrix[node][destination_node]))\n    return next_node",
+          "objective": 7.03185,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm prioritizes immediate proximity when few nodes remain unvisited (high weight on `distance_matrix[current_node][node]`) and balances it with destination proximity (weighted by `distance_matrix[node][destination_node]`) when more nodes are left. The weight for immediate proximity decreases as the number of remaining nodes grows, ensuring a smooth transition from local to global optimization. The key design is the dynamic weighting of distances based on unvisited nodes, making the heuristic adaptive to the problem's state.",
+          "thought": "The new algorithm introduces a weighted combination of immediate proximity and destination proximity, where the weight for immediate proximity is inversely proportional to the number of remaining unvisited nodes, ensuring a balance between local and global optimization.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if destination_node in unvisited_nodes:\n        next_node = destination_node\n    else:\n        remaining_nodes = len(unvisited_nodes)\n        next_node = min(unvisited_nodes, key=lambda node: (remaining_nodes * distance_matrix[current_node][node] + distance_matrix[node][destination_node]))\n    return next_node",
+          "objective": 7.15156,
+          "other_inf": null
+     }
+]

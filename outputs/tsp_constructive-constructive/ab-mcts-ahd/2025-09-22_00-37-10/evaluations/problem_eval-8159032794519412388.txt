@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Dynamic lookahead horizon based on remaining nodes
+        horizon = max(1, remaining_nodes // 2)
+        lookahead_horizon = sum(sorted(distance_matrix[node][neighbor] for neighbor in unvisited_nodes if neighbor != node)[:horizon])
+
+        # Non-linear weight for long-term planning
+        weight = 1.0 - (remaining_nodes / (len(unvisited_nodes) + 1)) ** 2
+        lookahead_distance = distance_matrix[node][destination_node] * weight + lookahead_horizon * (1 - weight)
+
+        # Clustering-based proximity penalty
+        cluster_penalty = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, remaining_nodes)
+        cluster_centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes))
+        proximity_penalty = cluster_penalty * (1 - cluster_centrality)
+
+        # Score calculation with adaptive weights
+        score = immediate_distance + lookahead_distance + 0.3 * proximity_penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    exploration_bias = 1 - remaining_ratio
+
+    max_distance = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        weighted_distance = distance * (1 + exploration_bias)
+        if weighted_distance > max_distance:
+            max_distance = weighted_distance
+            next_node = node
+
+    return next_node

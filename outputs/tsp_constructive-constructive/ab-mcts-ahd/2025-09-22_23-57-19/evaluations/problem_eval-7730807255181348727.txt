@@ -1,0 +1,14 @@
+import random
+    next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+
+    # Secondary lookahead check for potential detours
+    if len(unvisited_nodes) > 2:
+        for candidate in nodes:
+            if candidate == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][candidate] + distance_matrix[candidate][next_node]
+            if potential_cost < min_score * 1.2:
+                next_node = candidate
+                break
+
+    return next_node

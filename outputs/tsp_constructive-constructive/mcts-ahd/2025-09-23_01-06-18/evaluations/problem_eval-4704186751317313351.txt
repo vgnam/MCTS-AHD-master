@@ -1,0 +1,15 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        probabilities = [0.8 if node == destination_node else 0.2 / (len(unvisited_nodes) - 1) for node in unvisited_nodes]
+    else:
+        inverse_distances = [1 / (distance_matrix[current_node][node] + 1e-10) for node in unvisited_nodes]
+        total_inverse = sum(inverse_distances)
+        probabilities = [inv_dist / total_inverse for inv_dist in inverse_distances]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

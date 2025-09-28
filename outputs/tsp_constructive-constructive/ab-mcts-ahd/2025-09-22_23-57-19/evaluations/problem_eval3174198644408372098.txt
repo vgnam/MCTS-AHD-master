@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    max_cost = -float('inf')
+    farthest_node = None
+    node_costs = {}
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        node_costs[node] = cost
+        if cost > max_cost:
+            max_cost = cost
+            farthest_node = node
+
+    if farthest_node is None:
+        return unvisited_nodes.pop()
+
+    threshold = 0.6 + 0.2 * (len(unvisited_nodes) / (len(unvisited_nodes) + len(distance_matrix)))  # Dynamic threshold
+    candidates = [node for node in unvisited_nodes if node_costs[node] >= max_cost * threshold]
+
+    if not candidates:
+        candidates = [farthest_node]
+
+    selected_node = max(candidates, key=lambda node: node_costs[node])
+
+    if len(unvisited_nodes) > 2:
+        penalty = {node: 0.1 * (1 - (node_costs[node] / max_cost)) for node in candidates}
+        weighted_scores = {node: node_costs[node] * (1 - penalty[node]) for node in candidates}
+        selected_node = max(weighted_scores, key=weighted_scores.get)
+
+    return next_node

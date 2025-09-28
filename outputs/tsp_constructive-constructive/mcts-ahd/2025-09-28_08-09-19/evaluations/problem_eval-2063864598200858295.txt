@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    temperature = 1.0 - (remaining_count / (remaining_count + 1)) * 0.6
+
+    scores = []
+    nodes = list(unvisited_nodes)
+
+    for node in nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.5 * min(distance_matrix[node][n] for n in unvisited_nodes if n != node)) if len(unvisited_nodes) > 1 else 0
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        future_connectivity = 0
+        if remaining_count > 1:
+            future_nodes = unvisited_nodes - {node}
+            future_connectivity = sum(1 for n in future_nodes if distance_matrix[node][n] < 1.3 * min(distance_matrix[node][n] for n in future_nodes if n != node)) if len(future_nodes) > 1 else 0
+
+        centrality_penalty = 0.3 * centrality if connectivity < 2 else 0
+
+        score = (immediate_distance ** 0.8) / (1 + connectivity + future_connectivity) - centrality_penalty
+        scores.append(score)
+
+    probabilities = [math.exp(s / temperature) for s in scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+    return next_node

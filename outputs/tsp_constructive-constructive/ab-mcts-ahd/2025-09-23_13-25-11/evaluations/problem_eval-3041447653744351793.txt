@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining_count = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    weight_proximity = 0.5 + 0.3 * (1 - remaining_count / (total_nodes - 1))
+    weight_connectivity = 0.5 - 0.2 * (1 - remaining_count / (total_nodes - 1))
+    weight_centrality = 0.2 * (remaining_count / (total_nodes - 1))
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        node_centrality = sum(distance_matrix[node][other] for other in range(total_nodes)) / total_nodes
+
+        return (weight_proximity * current_dist +
+                weight_connectivity * avg_future_dist -
+                weight_centrality * node_centrality)
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

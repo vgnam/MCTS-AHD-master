@@ -1,0 +1,16 @@
+import math
+    import random
+
+    # Calculate probabilities for all unvisited nodes
+    probabilities = [evaluate_node(node) for node in unvisited_nodes]
+
+    # Normalize probabilities
+    total_prob = sum(probabilities)
+    if total_prob == 0:
+        total_prob = 1.0
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    # Select next node based on probabilities
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_probs, k=1)[0]
+
+    return next_node

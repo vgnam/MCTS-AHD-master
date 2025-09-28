@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_degree = sum(sum(1 for d in row if d > 0) for row in distance_matrix)
+    avg_degree = total_degree / len(distance_matrix) if distance_matrix else 0
+    degree_weight = 0.3 if len(unvisited_nodes) > len(distance_matrix) // 2 else 0.7
+
+    next_node = None
+    best_score = float('-inf')
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        normalized_degree = (degree - avg_degree) / (avg_degree + 1) if avg_degree > 0 else 0
+        score = -distance + degree_weight * (1 / (degree + 1)) - 0.1 * normalized_degree
+        if score > best_score:
+            best_score = score
+            next_node = node
+    return next_node

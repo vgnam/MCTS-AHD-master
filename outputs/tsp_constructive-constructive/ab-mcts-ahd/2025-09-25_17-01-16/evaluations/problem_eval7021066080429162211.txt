@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+
+    # Calculate node density in the neighborhood
+    neighborhood_density = len(unvisited_nodes) / len(distance_matrix)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Hub potential: weighted by inverse of average distance to other unvisited nodes
+        avg_distance_to_unvisited = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        hub_score = 1.0 / (1.0 + avg_distance_to_unvisited) if avg_distance_to_unvisited > 0 else 0
+
+        # Novelty score: reward nodes with unique connections to unvisited regions
+        novelty_score = sum(1 for other in unvisited_nodes if distance_matrix[node][other] > distance_to_current * 1.5) / len(unvisited_nodes)
+
+        # Adaptive weight adjustment based on neighborhood density and path history
+        proximity_weight = 0.5 * (0.8 + 0.2 * neighborhood_density)
+        destination_weight = 0.3 * (0.7 + 0.3 * (1 - neighborhood_density))
+        hub_weight = 0.2 * (0.6 + 0.4 * neighborhood_density)
+
+        # Path history penalty: discourage revisiting nodes in the same region
+        path_history_penalty = sum(1 for other in unvisited_nodes if distance_matrix[node][other] < distance_to_current * 0.7) / len(unvisited_nodes)
+
+        total_score = (proximity_weight * distance_to_current +
+                       destination_weight * distance_to_destination +
+                       hub_weight * hub_score +
+                       0.1 * novelty_score -
+                       0.2 * path_history_penalty)
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

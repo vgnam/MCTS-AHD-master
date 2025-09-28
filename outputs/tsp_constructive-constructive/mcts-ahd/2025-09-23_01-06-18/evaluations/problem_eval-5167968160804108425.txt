@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = 1 - (remaining_nodes / total_nodes)
+    adaptive_pressure = 0.3 + 0.7 * (progress_factor ** 2)
+
+    max_distance = max(max(row) for row in distance_matrix)
+    avg_connectivity = sum(sum(1 for d in row if d < distance_matrix[current_node][i]) for i in unvisited_nodes) / (total_nodes * remaining_nodes)
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node] / max_distance
+        connectivity_detour = (sum(distance_matrix[node][n] for n in unvisited_nodes) / remaining_nodes) / distance_matrix[current_node][node]
+        global_metric = (distance_matrix[node][destination_node] + sum(distance_matrix[n][destination_node] for n in unvisited_nodes)) / (2 * max_distance)
+
+        connectivity_bonus = (1 - avg_connectivity) * (1 - progress_factor)
+        normalized_score = (adaptive_pressure * local_cost + (1 - adaptive_pressure) * global_metric) * (1 - 0.3 * connectivity_bonus)
+
+        return normalized_score
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        immediate_distance = distance_matrix[current_node][node]
+        if len(unvisited_nodes) == 1:
+            return immediate_distance
+        next_unvisited = [n for n in unvisited_nodes if n != node]
+        next_node = min(next_unvisited, key=lambda n: distance_matrix[node][n])
+        lookahead_distance = distance_matrix[node][next_node]
+        return immediate_distance + 0.5 * lookahead_distance
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

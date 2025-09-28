@@ -1,0 +1,8 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    total_distance = sum(distances)
+    probabilities = [1 - (d / total_distance) for d in distances]
+    selected_node = np.random.choice(unvisited_nodes, p=probabilities)
+    return next_node

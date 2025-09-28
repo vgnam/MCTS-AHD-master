@@ -1,0 +1,10 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_distance = min(distances)
+    weights = [1 / (d + 1e-6) if d != 0 else 1.0 for d in distances]
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+    selected_index = np.random.choice(len(unvisited_nodes), p=normalized_weights)
+    return next_node

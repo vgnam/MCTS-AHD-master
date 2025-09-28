@@ -1,0 +1,9 @@
+import random
+    selected_node = random.choices(candidates, weights=probabilities, k=1)[0]
+
+    # Occasionally override with nearest neighbor if threshold not met
+    min_cost = min(distance_matrix[current_node][node] for node in unvisited_nodes)
+    if distance_matrix[current_node][selected_node] > min_cost * threshold:
+        selected_node = min(unvisited_nodes, key=lambda x: distance_matrix[current_node][x])
+
+    return next_node

@@ -1,0 +1,23 @@
+default but gives the destination node a higher priority if it is unvisited and within a dynamically calculated threshold (min_distance multiplied by a factor that increases as the number of remaining unvisited nodes decreases). This ensures the destination is favored earlier in the journey when fewer nodes remain.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        remaining_nodes = len(unvisited_nodes)
+        threshold_factor = 1.5 + (10 / (remaining_nodes + 1))  # Adjusts threshold based on remaining nodes
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance < min_distance * threshold_factor:
+            next_node = destination_node
+
+    return next_node

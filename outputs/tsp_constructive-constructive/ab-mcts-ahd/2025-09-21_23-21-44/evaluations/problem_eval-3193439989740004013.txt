@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = num_nodes
+    dynamic_weight = min(0.5 + (remaining_nodes / total_nodes) * 0.3, 0.8)
+
+    min_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_from_node = distance_matrix[node][destination_node]
+
+        centrality_heuristic = sum(distance_matrix[node]) / (num_nodes - 1)
+
+        path_momentum = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        bottleneck_penalty = max(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+
+        score = (dynamic_weight * distance_to_node +
+                (1 - dynamic_weight) * distance_from_node +
+                0.15 * centrality_heuristic -
+                0.1 * path_momentum +
+                0.05 * bottleneck_penalty)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

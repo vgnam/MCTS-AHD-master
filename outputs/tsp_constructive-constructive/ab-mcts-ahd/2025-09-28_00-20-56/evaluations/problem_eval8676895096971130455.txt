@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        # Immediate distance
+        current_dist = distance_matrix[current_node][node]
+
+        # Dynamic weight based on remaining nodes (sigmoid function)
+        remaining = len(unvisited_nodes)
+        total_nodes = remaining + 1  # +1 for the current node
+        weight = 1 / (1 + math.exp(-(remaining - total_nodes/2) / (total_nodes/4)))
+
+        # Lookahead to best 3-step path
+        if len(unvisited_nodes) > 2:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            # Find best 2-step lookahead
+            best_intermediate = min(remaining_nodes, key=lambda n: distance_matrix[node][n])
+            # Then find best final step from best_intermediate
+            remaining_after_intermediate = [n for n in remaining_nodes if n != best_intermediate]
+            best_final = min(remaining_after_intermediate, key=lambda n: distance_matrix[best_intermediate][n] + distance_matrix[n][destination_node])
+            lookahead_dist = distance_matrix[node][best_intermediate] + distance_matrix[best_intermediate][best_final] + distance_matrix[best_final][destination_node]
+        elif len(unvisited_nodes) > 1:
+            best_intermediate = min(remaining_nodes, key=lambda n: distance_matrix[node][n] + distance_matrix[n][destination_node])
+            lookahead_dist = distance_matrix[node][best_intermediate] + distance_matrix[best_intermediate][destination_node]
+        else:
+            lookahead_dist = distance_matrix[node][destination_node]
+
+        # Combine with dynamic weight
+        return current_dist + weight * lookahead_dist
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

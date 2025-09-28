@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_steps = len(unvisited_nodes)
+    best_score = float('-inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        # Immediate distance to current node
+        distance_to_current = distance_matrix[current_node][node]
+
+        # Long-term distance to destination
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weight based on remaining steps (exponential decay)
+        weight = math.exp(-0.5 * remaining_steps)
+
+        # Path smoothness metric: penalizes sharp turns
+        if current_node == destination_node:
+            smoothness = 0  # No turn if starting
+        else:
+            # Calculate angle between current path and potential next path
+            vec_current = (distance_matrix[destination_node][current_node], 0)  # Simplified vector
+            vec_next = (distance_matrix[node][destination_node], 0)
+            dot_product = vec_current[0] * vec_next[0] + vec_current[1] * vec_next[1]
+            magnitude_current = math.sqrt(vec_current[0]**2 + vec_current[1]**2)
+            magnitude_next = math.sqrt(vec_next[0]**2 + vec_next[1]**2)
+            if magnitude_current == 0 or magnitude_next == 0:
+                angle = 0
+            else:
+                cos_angle = dot_product / (magnitude_current * magnitude_next)
+                angle = math.acos(min(1, max(-1, cos_angle)))  # Clamp to avoid numerical errors
+            smoothness = math.sin(angle)  # Penalize sharp turns
+
+        # Combined score: maximize (immediate + weighted long-term) while minimizing smoothness penalty
+        combined_score = -distance_to_current - weight * distance_to_destination - smoothness
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

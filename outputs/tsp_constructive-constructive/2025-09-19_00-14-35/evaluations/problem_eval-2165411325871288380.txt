@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if len(unvisited_nodes) == 1:
+        return next(iter(unvisited_nodes))
+
+    temperature = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+    exploration_weight = temperature
+    global_weight = 1.0 - temperature
+
+    def evaluate_node(node):
+        immediate_cost = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_dists = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            avg_remaining = sum(remaining_dists) / (len(unvisited_nodes) - 1)
+            min_remaining = min(remaining_dists)
+            global_cost = global_weight * (0.6 * avg_remaining + 0.4 * min_remaining)
+        else:
+            global_cost = 0
+        return immediate_cost + exploration_weight * global_cost
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

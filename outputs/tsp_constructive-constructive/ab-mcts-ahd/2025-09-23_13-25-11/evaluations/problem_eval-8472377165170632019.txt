@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    unvisited_count = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = 1 / (1 + math.exp(-0.1 * (total_nodes - unvisited_count)))
+
+    def node_degree(node):
+        return sum(1 for neighbor in range(total_nodes) if distance_matrix[node][neighbor] > 0)
+
+    def heuristic_weight(node):
+        immediate_cost = distance_matrix[current_node][node]
+        estimated_remaining_cost = distance_matrix[node][destination_node]
+        degree_penalty = node_degree(node) / total_nodes
+        exploration_term = (distance_matrix[node][destination_node] / sum(distance_matrix[node])) if sum(distance_matrix[node]) > 0 else 0
+        return immediate_cost + (1 - exploration_factor) * estimated_remaining_cost + exploration_factor * exploration_term - 0.3 * degree_penalty
+
+    next_node = min(unvisited_nodes, key=heuristic_weight)
+    return next_node

@@ -1,0 +1,44 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic bias for destination node
+    remaining_nodes = len(unvisited_nodes)
+    if remaining_nodes == 1:
+        return unvisited_nodes[0]
+
+    # Temperature-based exploration factor (decreases as nodes are visited)
+    temperature = 1.0 - (1.0 / remaining_nodes)
+    dynamic_bias = 0.7 * (1.0 + temperature)  # Higher temperature increases bias
+
+    # Check if destination is unvisited and apply dynamic bias
+    if destination_node in unvisited_nodes:
+        if random.random() < dynamic_bias:
+            return destination_node
+
+    # Find the nearest unvisited node
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    # Dynamic exploration range (increases with temperature)
+    exploration_range = min_distance * (1.0 + temperature * 0.5)
+
+    # Collect nearby nodes within dynamic range
+    nearby_nodes = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= exploration_range]
+
+    # Weighted selection: higher probability for closer nodes
+    if nearby_nodes:
+        weights = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in nearby_nodes]
+        total_weight = sum(weights)
+        normalized_weights = [w / total_weight for w in weights]
+        return random.choices(nearby_nodes, weights=normalized_weights, k=1)[0]
+
+    return next_node

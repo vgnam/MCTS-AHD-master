@@ -1,0 +1,30 @@
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    distances = np.array([distance_matrix[current_node][node] for node in unvisited_nodes])
+    min_distance = np.min(distances)
+    min_distance_nodes = [node for node, distance in zip(unvisited_nodes, distances) if distance == min_distance]
+    
+    temperature = 0.5  # temperature parameter to control exploration-exploitation trade-off
+    
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        probabilities = np.array([np.exp(-distance / temperature) for distance in distances])
+        probabilities /= np.sum(probabilities)
+        
+        if np.random.rand() < 0.5:  # 50% chance to choose the destination node if it's closer
+            if destination_distance <= min_distance:
+                next_node = destination_node
+            else:
+                next_node = np.random.choice(list(unvisited_nodes), p=probabilities)
+        else:
+            next_node = np.random.choice(min_distance_nodes)
+    else:
+        probabilities = np.array([np.exp(-distance / temperature) for distance in distances])
+        probabilities /= np.sum(probabilities)
+        next_node = np.random.choice(list(unvisited_nodes), p=probabilities)
+    
+    return next_node

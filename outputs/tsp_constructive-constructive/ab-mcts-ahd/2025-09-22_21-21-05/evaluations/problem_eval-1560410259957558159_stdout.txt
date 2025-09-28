@@ -1,0 +1,10 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:18: RuntimeWarning: invalid value encountered in scalar divide
+  combined_score = (distance_to_current + distance_to_destination) + weight_factor * (avg_distance_to_remaining * (1 - centrality_score / sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) if unvisited_nodes else 1)) + penalty
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 52, in eval_heuristic
+    raise KeyError(f"Node {next_node} is already visited.")
+KeyError: 'Node None is already visited.'

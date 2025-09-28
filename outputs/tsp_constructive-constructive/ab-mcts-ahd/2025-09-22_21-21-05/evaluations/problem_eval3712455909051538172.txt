@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    decay_factor = (remaining_count / total_nodes) ** 2
+    novelty_weight = 0.5 * decay_factor
+
+    scores = []
+    nodes = []
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Centrality: sum of inverse distances to all nodes (incentivizes hub nodes)
+        centrality = sum(1 / (distance_matrix[node][n] + 1e-6) for n in range(total_nodes)) / total_nodes
+
+        # Density: variance of distances to remaining nodes (incentivizes diversity)
+        remaining_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        density = np.var(remaining_distances) if len(remaining_distances) > 1 else 0
+
+        # Reinforcement penalty for revisits (exponential decay)
+        revisit_penalty = 0.2 * (1 - decay_factor)
+
+        # Combined score with novelty weighting
+        score = (1 - novelty_weight) * (distance_to_current + distance_to_destination) + \
+                novelty_weight * (centrality + density) - revisit_penalty
+
+        scores.append(score)
+        nodes.append(node)
+
+    # Probabilistic selection to avoid local optima
+    if scores:
+        min_score = min(scores)
+        adjusted_scores = [min_score + 0.1 * (s - min_score) for s in scores]
+        probabilities = np.exp(-np.array(adjusted_scores) / np.sum(adjusted_scores))
+        probabilities /= probabilities.sum()
+        next_node = np.random.choice(nodes, p=probabilities)
+    else:
+        next_node = destination_node
+
+    return next_node

@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    total_unvisited = len(unvisited_nodes)
+    if not unvisited_nodes:
+        return None
+
+    # Dynamic probability for destination node (decreases linearly with unvisited nodes)
+    dest_prob = max(0.1, 0.7 * (1 - (total_unvisited / (total_unvisited + 10))))
+
+    if destination_node in unvisited_nodes and random.random() < dest_prob:
+        return destination_node
+
+    # Find nearest unvisited node
+    min_distance = float('inf')
+    nearest_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            nearest_node = node
+
+    # Dynamic probability for random nearby node (increases exponentially)
+    rand_prob = min(0.5, 0.3 * (2 ** (1 - (total_unvisited / (total_unvisited + 1)))))
+
+    if nearest_node is not None and random.random() < rand_prob:
+        nearby_nodes = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= min_distance * 1.2]
+        if nearby_nodes:
+            return random.choice(nearby_nodes)
+
+    return next_node

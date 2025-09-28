@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    if remaining_nodes == 0:
+        return destination_node
+
+    # Calculate mean and variance of distances from current_node to unvisited nodes
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    mean_distance = sum(distances) / remaining_nodes
+    variance = sum((d - mean_distance) ** 2 for d in distances) / remaining_nodes
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        # New dynamic weight: prioritize immediate distance when few nodes remain
+        dynamic_weight = (remaining_nodes / (remaining_nodes + 1)) * (1 - variance / (mean_distance + 1e-6))
+
+        # Penalize nodes with high variance in their own lookahead distances
+        lookahead_variances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        if lookahead_variances:
+            lookahead_mean = sum(lookahead_variances) / len(lookahead_variances)
+            lookahead_variance = sum((d - lookahead_mean) ** 2 for d in lookahead_variances) / len(lookahead_variances)
+            penalty = lookahead_variance * (1 + 1 / remaining_nodes)
+        else:
+            penalty = 0
+
+        score = immediate_distance + dynamic_weight * lookahead_distance + penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

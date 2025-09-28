@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_total_cost = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        remaining_distance = distance_matrix[node][destination_node]
+
+        # Dynamic scaling factor based on remaining nodes
+        scaling_factor = 1.0 + (0.5 * (remaining_nodes / len(distance_matrix)))
+
+        # Weighted cost with dynamic scaling
+        total_cost = current_distance + (remaining_distance * scaling_factor)
+
+        # Tie-breaking with node degrees (sum of distances to all other nodes)
+        if total_cost == min_total_cost:
+            current_degree = sum(distance_matrix[node])
+            next_degree = sum(distance_matrix[next_node]) if next_node is not None else float('inf')
+            if current_degree < next_degree:
+                next_node = node
+        elif total_cost < min_total_cost:
+            min_total_cost = total_cost
+            next_node = node
+
+    return next_node

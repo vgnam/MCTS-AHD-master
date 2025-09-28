@@ -1,0 +1,27 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        # Probability of selecting destination increases as unvisited nodes decrease
+        prob_dest = 0.7 + 0.3 * (len(unvisited_nodes) / len(distance_matrix))
+        if random.random() < prob_dest:
+            return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Adaptive stochasticity: probability depends on distance to nearest neighbor
+    nearest_dist = distance_matrix[current_node][nearest_neighbors[0]]
+    avg_dist = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    stochastic_prob = 0.1 + 0.8 * (nearest_dist / avg_dist)  # Higher if nearest is much closer
+
+    if random.random() < stochastic_prob:
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

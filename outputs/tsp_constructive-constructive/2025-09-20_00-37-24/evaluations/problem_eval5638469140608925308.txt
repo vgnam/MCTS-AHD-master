@@ -1,0 +1,43 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if len(nearest_neighbors) == 0:
+        return None
+
+    # Calculate selection probabilities based on inverse distance ratio
+    distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+    min_dist = min(distances)
+    if min_dist == 0:
+        min_dist = 1e-6  # avoid division by zero
+
+    # Adaptive probability: closer nodes have higher probability, but with noise
+    probabilities = [1.0 / (1.0 + (d / min_dist)) for d in distances]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    # Introduce penalty for recently visited nodes (simulated here as higher distance)
+    # This is a simplified version - in practice you'd track history
+    if len(nearest_neighbors) > 1:
+        # Simulate recent visits by increasing distance for some nodes
+        for i in range(len(distances)):
+            if random.random() < 0.3:  # 30% chance of being "recently visited"
+                distances[i] *= 1.5  # penalty factor
+
+    # Selection with adaptive probabilities
+    if random.random() < 0.8:  # 80% chance to use probability-based selection
+        next_node = random.choices(nearest_neighbors, weights=normalized_probs, k=1)[0]
+    else:  # 20% chance to pick a random node with penalty consideration
+        # Recalculate weights with penalties
+        adjusted_probs = [1.0 / (1.0 + (d / min_dist)) for d in distances]
+        total_adj_prob = sum(adjusted_probs)
+        normalized_adj_probs = [p / total_adj_prob for p in adjusted_probs]
+        next_node = random.choices(nearest_neighbors, weights=normalized_adj_probs, k=1)[0]
+
+    return next_node

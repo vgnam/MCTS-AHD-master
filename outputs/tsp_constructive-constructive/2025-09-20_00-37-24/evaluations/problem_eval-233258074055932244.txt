@@ -1,0 +1,23 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        prob_destination = max(0.1, 0.9 * (len(unvisited_nodes) / (len(unvisited_nodes) + len(distance_matrix))))
+        if random.random() < prob_destination:
+            return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    temperature = len(unvisited_nodes) / len(distance_matrix)
+    if random.random() < temperature:
+        weights = [math.exp(-i * 0.5) for i in range(len(nearest_neighbors))]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+    else:
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+
+    return next_node

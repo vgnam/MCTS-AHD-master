@@ -1,0 +1,81 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, exploration_decay=0.9):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Initialize or update preference matrix (simplified for this example)
+    if not hasattr(select_next_node, 'preference_matrix'):
+        select_next_node.preference_matrix = {}
+
+    def min_spanning_tree_cost(node, nodes):
+        if len(nodes) <= 1:
+            return 0.0
+        remaining = nodes - {node}
+        edges = []
+        for u in remaining:
+            for v in remaining:
+                if u < v:
+                    edges.append((u, v, distance_matrix[u][v]))
+        edges.sort(key=lambda x: x[2])
+        parent = {n: n for n in remaining}
+        def find(u):
+            while parent[u] != u:
+                parent[u] = parent[parent[u]]
+                u = parent[u]
+            return u
+        mst_cost = 0.0
+        for u, v, w in edges:
+            root_u = find(u)
+            root_v = find(v)
+            if root_u != root_v:
+                parent[root_v] = root_u
+                mst_cost += w
+        return mst_cost
+
+    def connectivity_factor(node, nodes):
+        if len(nodes) <= 1:
+            return 0.0
+        remaining = nodes - {node}
+        avg_dist = sum(distance_matrix[node][n] for n in remaining) / len(remaining)
+        return avg_dist
+
+    def exploration_bonus(node, nodes):
+        # Encourage exploration of less visited nodes
+        if not hasattr(select_next_node, 'visit_counts'):
+            select_next_node.visit_counts = {}
+        visit_counts = select_next_node.visit_counts
+        total_visits = sum(visit_counts.get(n, 0) for n in nodes) if nodes else 0
+        if total_visits == 0:
+            return 1.0
+        return (1 - visit_counts.get(node, 0) / total_visits) ** exploration_decay
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0.0
+    weight_direct = 0.6 - 0.2 * remaining_ratio
+    weight_mst = 0.3 + 0.1 * remaining_ratio
+    weight_connectivity = 0.2
+    weight_exploration = 0.1 * (1 - remaining_ratio)  # More exploration early
+
+    candidates = []
+    for node in unvisited_nodes:
+        direct_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining = unvisited_nodes - {node}
+            mst_cost = min_spanning_tree_cost(node, remaining)
+            conn_factor = connectivity_factor(node, remaining)
+            exp_bonus = exploration_bonus(node, remaining)
+            score = (weight_direct * direct_dist +
+                     weight_mst * mst_cost +
+                     weight_connectivity * conn_factor -
+                     weight_exploration * exp_bonus)
+        else:
+            score = direct_dist
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+
+    # Update visit counts for exploration bonus
+    if not hasattr(select_next_node, 'visit_counts'):
+        select_next_node.visit_counts = {}
+    select_next_node.visit_counts[next_node] = select_next_node.visit_counts.get(next_node, 0) + 1
+
+    return next_node

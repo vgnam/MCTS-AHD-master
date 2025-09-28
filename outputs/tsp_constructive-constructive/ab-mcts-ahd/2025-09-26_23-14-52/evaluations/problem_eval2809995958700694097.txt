@@ -1,0 +1,30 @@
+importance (centrality and degree) using a temperature-based weighting, but replaces the linear decay with a sigmoid temperature function to better balance exploration and exploitation. It also incorporates a "proximity bonus" that rewards nodes closer to the destination in earlier stages, and a "diversity penalty" to avoid revisiting similar regions.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    temperature = 1 / (1 + math.exp(-(total_unvisited / (total_unvisited + 2) - 0.5) * 5))
+    best_score = float('-inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited
+        degree = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < float('inf'))
+
+        proximity_bonus = 1 / (1 + future_distance) if total_unvisited > len(unvisited_nodes) / 2 else 0
+        diversity_penalty = -0.2 * sum(1 for n in unvisited_nodes if distance_matrix[node][n] < current_distance)
+
+        weighted_score = (1 - temperature) * (-current_distance + proximity_bonus) + temperature * (centrality + 0.3 * degree + diversity_penalty)
+
+        if weighted_score > best_score:
+            best_score = weighted_score
+            next_node = node
+        elif weighted_score == best_score:
+            if future_distance < distance_matrix[next_node][destination_node]:
+                next_node = node
+
+    return next_node

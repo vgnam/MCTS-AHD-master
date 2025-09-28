@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+
+        # Calculate angular deviation (simplified as direction change)
+        if current_node == destination_node:
+            angular_dev = 0
+        else:
+            vec_current = (distance_matrix[current_node][destination_node], 0)  # Simplified vector
+            vec_next = (distance_to_dest, distance_to_node)
+            dot_product = vec_current[0] * vec_next[0] + vec_current[1] * vec_next[1]
+            mag_current = (vec_current[0]**2 + vec_current[1]**2)**0.5
+            mag_next = (vec_next[0]**2 + vec_next[1]**2)**0.5
+            if mag_current * mag_next == 0:
+                angular_dev = 0
+            else:
+                cos_theta = dot_product / (mag_current * mag_next)
+                angular_dev = (1 - cos_theta) / 2  # Normalized to [0,1]
+
+        # Dynamic weight adjustment
+        exploration_weight = 1 / (1 + math.exp(-(remaining_nodes - 5)))  # Sigmoid transition
+        exploitation_weight = 1 - exploration_weight
+
+        score = (exploitation_weight * 0.6 * distance_to_node +
+                 exploitation_weight * 0.4 * distance_to_dest +
+                 exploration_weight * 0.5 * angular_dev)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

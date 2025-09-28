@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+    num_unvisited = len(unvisited_nodes)
+
+    # Dynamic weight adjustment with path diversity consideration
+    proximity_weight = 0.6 * (num_unvisited / (num_unvisited + 2)) + 0.2
+    centrality_weight = 0.4 * (1 - num_unvisited / (num_unvisited + 2)) + 0.5
+    novelty_weight = 0.3 * (1 - 0.5 * (num_unvisited / (num_unvisited + 1)))
+
+    # Historical node selection pattern tracking (simplified)
+    node_selection_history = {node: 0 for node in unvisited_nodes}
+    if hasattr(select_next_node, 'history'):
+        node_selection_history.update(select_next_node.history)
+    diversity_bonus = {node: 1 - (node_selection_history[node] / max(1, sum(node_selection_history.values()))) for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+
+        # Enhanced centrality calculation with local search
+        local_neighbors = [n for n in unvisited_nodes if n != node and distance_matrix[node][n] < 1.5 * distance_to_node]
+        local_avg = sum(distance_matrix[node][n] for n in local_neighbors) / max(1, len(local_neighbors))
+        local_variance = sum((distance_matrix[node][n] - local_avg) ** 2 for n in local_neighbors) / max(1, len(local_neighbors))
+
+        centrality_score = local_avg - 0.5 * local_variance
+        novelty_penalty = local_variance * novelty_weight
+
+        # Combined score with diversity bonus
+        score = (-proximity_weight * distance_to_node +
+                 centrality_weight * centrality_score -
+                 novelty_penalty +
+                 0.2 * diversity_bonus[node] * centrality_score)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Update historical tracking
+    if next_node is not None:
+        if not hasattr(select_next_node, 'history'):
+            select_next_node.history = {}
+        select_next_node.history[next_node] = select_next_node.history.get(next_node, 0) + 1
+
+    return next_node

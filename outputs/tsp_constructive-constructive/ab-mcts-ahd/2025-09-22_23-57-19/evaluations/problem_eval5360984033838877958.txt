@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    max_cost = -float('inf')
+    farthest_node = None
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost > max_cost:
+            max_cost = cost
+            farthest_node = node
+
+    if farthest_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        remaining_nodes = len(unvisited_nodes) - 1
+        density_factor = remaining_nodes / len(distance_matrix)
+        base_threshold = max_cost * (1 + 0.1 * density_factor)
+
+        straight_cost = distance_matrix[current_node][destination_node]
+        angular_threshold = base_threshold * (1 - 0.2 * (1 - (straight_cost / max_cost)))
+
+        for node in unvisited_nodes:
+            if node == farthest_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][farthest_node]
+            angular_deviation = abs((distance_matrix[current_node][node] - straight_cost) / straight_cost)
+
+            if potential_cost < angular_threshold and angular_deviation < 0.3:
+                farthest_node = node
+                break
+
+    return next_node

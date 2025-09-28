@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if len(unvisited_nodes) == 1:
+        return next(iter(unvisited_nodes))
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+            bottleneck_penalty = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        else:
+            avg_remaining_dist = 0
+            bottleneck_penalty = 0
+        weight = 0.5 * (1 - math.exp(-0.1 * len(unvisited_nodes)))
+        return current_dist + weight * avg_remaining_dist + 0.2 * bottleneck_penalty
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

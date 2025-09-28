@@ -1,0 +1,31 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_distance = min(distances)
+    max_distance = max(distances)
+
+    exploration_factor = sum(1.0 / (i + 1) for i in range(len(unvisited_nodes)))
+    temperature = 1.0 / math.log(len(unvisited_nodes) + 1)
+
+    probabilities = []
+    for node, dist in zip(unvisited_nodes, distances):
+        normalized_dist = (dist - min_distance) / (max_distance - min_distance + 1e-10)
+        prob = math.exp(-normalized_dist / (temperature * exploration_factor))
+        probabilities.append(prob)
+
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

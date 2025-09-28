@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    min_distance = float('inf')
+    dest_distance = distance_matrix[current_node][destination_node]
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate base probabilities
+    nearest_prob = 0.7  # Base probability for nearest neighbor
+    dest_prob = 0.3    # Base probability for destination
+
+    # Adjust probabilities based on remaining nodes and detour tolerance
+    detour_tolerance = 1.0 + (remaining_nodes / len(unvisited_nodes + [destination_node])) * 0.5
+    distance_ratio = dest_distance / (min_distance + 1e-6)
+
+    # Modify probabilities based on distance ratio and detour tolerance
+    if distance_ratio > 1.0:
+        dest_prob += (distance_ratio - 1.0) * 0.2
+        nearest_prob -= (distance_ratio - 1.0) * 0.2
+    else:
+        nearest_prob += (1.0 - distance_ratio) * 0.2
+        dest_prob -= (1.0 - distance_ratio) * 0.2
+
+    # Ensure probabilities are within bounds
+    nearest_prob = max(0.1, min(0.9, nearest_prob))
+    dest_prob = max(0.1, min(0.9, dest_prob))
+
+    # Select next node probabilistically
+    if destination_node in unvisited_nodes and np.random.rand() < dest_prob:
+        next_node = destination_node
+    else:
+        # Find nearest neighbor among unvisited nodes
+        for node in unvisited_nodes:
+            distance = distance_matrix[current_node][node]
+            if distance < min_distance:
+                min_distance = distance
+                next_node = node
+
+    return next_node

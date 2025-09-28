@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def score(node):
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        proximity = distance_matrix[node][destination_node]
+
+        # Dynamic weighting with sigmoid for degree and proximity penalty
+        degree_weight = 1.0 / (1.0 + math.exp(-0.1 * (degree - 3)))
+        proximity_penalty = 1.0 + 0.3 * (proximity / max(distance_matrix[node]))
+
+        return distance * (1.0 + degree_weight * 0.4) * proximity_penalty
+
+    next_node = min(unvisited_nodes, key=score)
+    return next_node

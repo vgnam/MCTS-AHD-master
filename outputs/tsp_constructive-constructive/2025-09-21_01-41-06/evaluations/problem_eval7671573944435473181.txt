@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 0.5  # Initial temperature for exploration control
+    candidates = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        candidates.append((node, distance))
+
+    # Calculate selection probabilities using softmax with temperature
+    distances = [d for _, d in candidates]
+    min_dist = min(distances)
+    max_dist = max(distances)
+    normalized_distances = [(max_dist - d) / (max_dist - min_dist + 1e-10) for d in distances]  # Avoid division by zero
+
+    # Apply softmax with temperature
+    exp_values = [math.exp(normalized_dist / temperature) for normalized_dist in normalized_distances]
+    sum_exp = sum(exp_values)
+    probabilities = [exp / sum_exp for exp in exp_values]
+
+    # Select node based on probabilities
+    next_node = random.choices([node for node, _ in candidates], weights=probabilities, k=1)[0]
+    return next_node

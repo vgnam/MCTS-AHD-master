@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    base_weight = 0.5 * (remaining_count / (remaining_count + 1))
+    penalty_weight = 0.5 * (1 / (remaining_count + 1))
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        max_future_dist = max(distance_matrix[node][other] for other in remaining_nodes)
+        normalized_penalty = (max_future_dist - avg_future_dist) / (max_future_dist + 1e-6)
+
+        score = (base_weight * current_dist) + (penalty_weight * normalized_penalty * max_future_dist)
+        return score
+
+    candidates = list(unvisited_nodes)
+    scores = [evaluate_node(node) for node in candidates]
+    threshold = min(scores) + 0.2 * (max(scores) - min(scores))
+    filtered_nodes = [node for node, score in zip(candidates, scores) if score <= threshold]
+    next_node = min(filtered_nodes, key=lambda node: evaluate_node(node))
+    return next_node

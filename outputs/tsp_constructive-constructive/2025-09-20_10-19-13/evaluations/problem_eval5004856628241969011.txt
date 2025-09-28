@@ -1,0 +1,5 @@
+import random
+    if random.random() < 0.7:  # 70% chance to pick closest
+        return closest
+    else:
+        return next_node

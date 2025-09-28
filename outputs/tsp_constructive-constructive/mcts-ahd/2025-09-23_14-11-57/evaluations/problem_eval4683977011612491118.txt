@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_weight = 0.0
+    node_weights = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+
+        # Dynamic exploration factor based on remaining nodes
+        exploration_factor = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+
+        # Weight calculation combining distance and exploration
+        weight = (1 / (immediate_distance + 1e-6)) * (node_to_dest ** 0.3) * exploration_factor
+
+        node_weights.append((node, weight))
+        total_weight += weight
+
+    # Probabilistic selection based on weights
+    if total_weight > 0:
+        rand_val = random.random() * total_weight
+        cumulative = 0.0
+        for node, weight in node_weights:
+            cumulative += weight
+            if rand_val <= cumulative:
+                return node
+
+    # Fallback to nearest node if probabilistic selection fails
+    min_distance = float('inf')
+    best_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            best_node = node
+
+    return next_node

@@ -1,0 +1,23 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate temperature based on remaining nodes (lower temperature as more nodes are visited)
+    temperature = len(unvisited_nodes) / (len(distance_matrix) - 1)
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Probability of choosing nearest neighbor decreases with temperature
+    if random.random() < (0.9 * temperature):
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Use Boltzmann distribution to select a node with probability proportional to exp(-distance/temperature)
+        weights = [math.exp(-distance_matrix[current_node][node] / temperature) for node in unvisited_nodes]
+        next_node = random.choices(unvisited_nodes, weights=weights, k=1)[0]
+
+    return next_node

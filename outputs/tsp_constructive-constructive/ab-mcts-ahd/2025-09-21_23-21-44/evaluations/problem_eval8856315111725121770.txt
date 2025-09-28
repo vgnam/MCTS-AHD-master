@@ -1,0 +1,19 @@
+importance" metric (derived from distance and degree), with a small random perturbation to escape local optima.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    scores = []
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        node_importance = (sum(d for d in distance_matrix[node] if d > 0) / (degree + 1)) ** 0.5
+        penalty = 1.0 + 0.1 * (1.0 / (1.0 + len(unvisited_nodes)))
+        weighted_score = 0.5 * current_distance + 0.5 * (node_importance * penalty)
+        scores.append((weighted_score, node))
+    scores.sort(key=lambda x: x[0])
+    next_node = scores[0][1]
+    if len(scores) > 1 and scores[1][0] - scores[0][0] < 0.1 * scores[0][0]:
+        import random
+        next_node = random.choice([scores[0][1], scores[1][1]])
+    return next_node

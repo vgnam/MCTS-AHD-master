@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidate_nodes = []
+    min_distance = float('inf')
+    centrality_scores = {node: sum(distance_matrix[node]) for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            candidate_nodes = [node]
+        elif distance == min_distance:
+            candidate_nodes.append(node)
+
+    if len(candidate_nodes) == 1:
+        return candidate_nodes[0]
+
+    remaining_nodes = len(unvisited_nodes)
+    bias_factor = (remaining_nodes / (remaining_nodes + 1)) ** 1.5
+    weights = []
+
+    for node in candidate_nodes:
+        distance_to_dest = distance_matrix[node][destination_node]
+        centrality = centrality_scores[node]
+        weight = (1 - bias_factor) * (distance_to_dest ** 0.5) + bias_factor * (centrality ** 0.3)
+        weights.append(weight)
+
+    weights = [w / sum(weights) for w in weights]
+    return next_node

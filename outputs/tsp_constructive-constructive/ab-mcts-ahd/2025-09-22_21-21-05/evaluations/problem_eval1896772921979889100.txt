@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+    num_unvisited = len(unvisited_nodes)
+    exploration_factor = (num_unvisited ** 0.5) / (num_unvisited + 1)  # Dynamic exploration scaling
+    penalty_threshold = 0.3 * sum(distance_matrix[0]) / len(distance_matrix)  # Adjusted penalty threshold
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / num_unvisited if num_unvisited else 0
+
+        # Probabilistic penalty for close nodes
+        penalty = 1.5 if distance_to_current < penalty_threshold else 1.0
+
+        # Balanced score combining immediate and long-term potential
+        combined_score = (distance_to_destination + exploration_factor * avg_distance_to_remaining) / (distance_to_current + 1e-6) * penalty
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

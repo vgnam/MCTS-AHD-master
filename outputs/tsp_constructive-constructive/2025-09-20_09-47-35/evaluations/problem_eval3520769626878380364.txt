@@ -1,0 +1,32 @@
+import math
+    
+    def calculate_angle(current_node, next_node, destination_node, distance_matrix):
+        a = distance_matrix[current_node][next_node]
+        b = distance_matrix[next_node][destination_node]
+        c = distance_matrix[current_node][destination_node]
+        
+        if a == 0 or b == 0:
+            return 0  # Avoid division by zero
+        
+        try:
+            angle = math.acos((a**2 + b**2 - c**2) / (2 * a * b))
+            return angle
+        except ValueError:
+            return 0  # Handle potential domain errors for arccos
+    
+    best_node = None
+    best_score = float('inf')
+    
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        angle = calculate_angle(current_node, node, destination_node, distance_matrix)
+        
+        # Combine distance and angle to prioritize nodes that are close and also lead towards the destination.
+        # You can adjust the weights to fine-tune the algorithm.
+        score = distance + 0.5 * angle #Smaller score is better
+        
+        if score < best_score:
+            best_score = score
+            best_node = node
+            
+    return next_node

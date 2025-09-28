@@ -1,0 +1,7 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    heuristic_factor = 0.7  # Weight for distance, adjust for exploration/exploitation trade-off
+    next_node = min(unvisited_nodes, key=lambda node: (heuristic_factor * distance_matrix[current_node][node] + (1 - heuristic_factor) * (node % 10)))
+    return next_node

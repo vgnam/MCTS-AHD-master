@@ -1,0 +1,43 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights for each unvisited node
+    weights = []
+    distances = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        distances.append(distance)
+
+    min_dist = min(distances) if distances else 0
+    max_dist = max(distances) if distances else 1
+
+    # Dynamic exploration factor based on remaining nodes
+    exploration_factor = 0.5 + (len(unvisited_nodes) / (len(unvisited_nodes) + len(distance_matrix))) * 0.5
+
+    for i, node in enumerate(unvisited_nodes):
+        if max_dist == min_dist:
+            normalized_dist = 0.5
+        else:
+            normalized_dist = (max_dist - distances[i]) / (max_dist - min_dist)
+
+        # Weight combines distance and exploration factor
+        weight = (1 - exploration_factor) * normalized_dist + exploration_factor * (1 - normalized_dist)
+        weights.append(weight)
+
+    # Normalize weights to form a probability distribution
+    total_weight = sum(weights)
+    if total_weight == 0:
+        probabilities = [1.0 / len(unvisited_nodes) for _ in unvisited_nodes]
+    else:
+        probabilities = [w / total_weight for w in weights]
+
+    # Select node based on weighted probability
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

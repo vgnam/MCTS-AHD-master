@@ -1,0 +1,21 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate distances to all unvisited nodes
+    distances = [(node, distance_matrix[current_node][node]) for node in unvisited_nodes]
+
+    # Sort nodes by distance
+    sorted_nodes = sorted(distances, key=lambda x: x[1])
+
+    # Select top candidates (top 3 or all if less than 3)
+    top_candidates = min(3, len(sorted_nodes))
+    candidates = [node for node, _ in sorted_nodes[:top_candidates]]
+
+    # Probabilistically select among candidates (closer nodes have higher probability)
+    weights = [1 / (1 + i) for i in range(top_candidates)]
+    next_node = random.choices(candidates, weights=weights, k=1)[0]
+
+    return next_node

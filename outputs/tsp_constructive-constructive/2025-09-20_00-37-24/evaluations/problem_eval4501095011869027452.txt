@@ -1,0 +1,21 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Introduce stochasticity: 70% chance to pick from top 2 nearest, 20% from next 2, 10% random
+    rand_val = random.random()
+    if rand_val < 0.7:  # 70% chance to pick from top 2
+        candidates = nearest_neighbors[:min(2, len(nearest_neighbors))]
+    elif rand_val < 0.9:  # 20% chance to pick from next 2
+        candidates = nearest_neighbors[min(2, len(nearest_neighbors)):min(4, len(nearest_neighbors))]
+    else:  # 10% chance to pick a random node
+        candidates = nearest_neighbors
+
+    next_node = random.choice(candidates)
+    return next_node

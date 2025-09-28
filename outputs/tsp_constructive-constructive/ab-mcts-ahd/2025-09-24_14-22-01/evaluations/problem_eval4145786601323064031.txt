@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    ratio = remaining_nodes / total_nodes
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight using sigmoid function
+        weight = 1 / (1 + math.exp(-10 * (ratio - 0.5)))
+
+        # Penalty for nodes too close to destination early in the process
+        if ratio > 0.5:
+            penalty = 0.1 * immediate_distance
+        else:
+            penalty = 0
+
+        weighted_cost = (1 - weight) * immediate_distance + weight * potential_distance + penalty
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+    return next_node

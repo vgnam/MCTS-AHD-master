@@ -1,0 +1,16 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = {}
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        scores[node] = 1 / (1 + distance_to_node)
+
+    total_score = sum(scores.values())
+    selection_probs = {node: score / total_score for node, score in scores.items()}
+
+    next_node = random.choices(list(unvisited_nodes), weights=selection_probs.values(), k=1)[0]
+    return next_node

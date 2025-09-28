@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate dynamic weight based on remaining distance to destination
+    remaining_distance = distance_matrix[current_node][destination_node]
+    dynamic_weight = 0.5 + 0.4 * (remaining_distance / max(distance_matrix[current_node][node] for node in unvisited_nodes))
+
+    # Calculate scores with dynamic weight and probabilistic adjustment
+    scores = []
+    for node in unvisited_nodes:
+        ratio = distance_matrix[node][destination_node] / distance_matrix[current_node][node]
+        penalty = distance_matrix[node][destination_node]
+        score = (dynamic_weight * ratio) - (0.3 * penalty)
+        scores.append(score)
+
+    # Introduce probabilistic selection to avoid local optima
+    if len(scores) > 1 and max(scores) - min(scores) > 0.1:
+        normalized_scores = [(s - min(scores)) / (max(scores) - min(scores)) for s in scores]
+        next_node = np.random.choice(unvisited_nodes, p=normalized_scores)
+    else:
+        next_node = unvisited_nodes[np.argmax(scores)]
+
+    return next_node

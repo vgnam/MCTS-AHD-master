@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Track node selection frequency (simplified for demonstration)
+    node_selection_count = {node: 0 for node in unvisited_nodes}
+    if hasattr(select_next_node, 'history'):
+        for node in select_next_node.history:
+            if node in node_selection_count:
+                node_selection_count[node] += 1
+    else:
+        select_next_node.history = []
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        local_distance = distance_matrix[current_node][node]
+        global_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        remaining_nodes = len(unvisited_nodes)
+
+        # Dynamic weight factor with probabilistic component
+        base_weight = 1 - (1 / (1 + remaining_nodes))
+        random_factor = np.random.uniform(0, 0.5)  # Add randomness
+        weight_factor = base_weight + random_factor
+
+        # Penalize frequently selected nodes
+        popularity_penalty = node_selection_count[node] * 0.1
+
+        # Novel scoring equation
+        score = (1 - weight_factor) * local_distance + weight_factor * global_distance + popularity_penalty
+        return score
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    select_next_node.history.append(next_node)
+    return next_node

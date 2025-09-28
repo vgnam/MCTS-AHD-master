@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Build MST using Prim's algorithm
+    mst = {}
+    visited = set()
+    visited.add(current_node)
+    heap = []
+    for node in range(len(distance_matrix)):
+        if node != current_node and node in unvisited_nodes:
+            heapq.heappush(heap, (distance_matrix[current_node][node], current_node, node))
+
+    while heap and len(visited) < len(distance_matrix):
+        dist, u, v = heapq.heappop(heap)
+        if v not in visited:
+            visited.add(v)
+            mst[v] = u
+            for node in range(len(distance_matrix)):
+                if node != v and node in unvisited_nodes and node not in visited:
+                    heapq.heappush(heap, (distance_matrix[v][node], v, node))
+
+    # Traverse MST to find next node
+    next_node = None
+    stack = [current_node]
+    while stack:
+        node = stack.pop()
+        if node in unvisited_nodes:
+            next_node = node
+            break
+        for neighbor in range(len(distance_matrix)):
+            if mst.get(neighbor) == node:
+                stack.append(neighbor)
+
+    if next_node is None:
+        return destination_node
+    return next_node

@@ -1,0 +1,13 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, exponent=2.0):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    probabilities = [1.0 / (distance ** exponent) for distance in distances]  # Power-law decay
+    normalized_probabilities = [p / sum(probabilities) for p in probabilities]
+
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_probabilities, k=1)[0]
+    return next_node

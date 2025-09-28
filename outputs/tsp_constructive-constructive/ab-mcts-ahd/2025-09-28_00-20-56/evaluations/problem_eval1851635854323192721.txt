@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        # Dynamic weights based on remaining nodes
+        remaining = len(unvisited_nodes)
+        immediate_weight = 1.0 - (0.8 / (remaining + 1))
+        lookahead_weight = 0.2 + (0.6 / (remaining + 1))
+
+        # Immediate distance
+        current_dist = distance_matrix[current_node][node]
+
+        # Lookahead to next node
+        if remaining > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            best_lookahead = min(remaining_nodes, key=lambda n: distance_matrix[node][n] + distance_matrix[n][destination_node])
+            lookahead_dist = distance_matrix[node][best_lookahead] + distance_matrix[best_lookahead][destination_node]
+        else:
+            lookahead_dist = distance_matrix[node][destination_node]
+
+        # Combine with dynamic weights
+        return immediate_weight * current_dist + lookahead_weight * lookahead_dist
+
+    # Probabilistic selection to escape local optima
+    candidates = sorted(unvisited_nodes, key=evaluate_node)
+    if len(candidates) > 1 and random.random() < 0.2:  # 20% chance to pick non-optimal candidate
+        return random.choice(candidates[1:min(3, len(candidates))])
+    return next_node

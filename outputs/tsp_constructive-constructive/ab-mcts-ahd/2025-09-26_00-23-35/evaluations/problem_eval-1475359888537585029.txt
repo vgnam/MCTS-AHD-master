@@ -1,0 +1,28 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    min_distance = float('inf')
+    dest_distance = distance_matrix[current_node][destination_node]
+    candidates = []
+
+    # Temperature for probabilistic selection (decreases with remaining nodes)
+    temperature = max(0.1, 1.0 - (1.0 / len(unvisited_nodes)))
+
+    # Find nearest neighbor
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    # Adjust selection based on destination distance and temperature
+    if next_node != destination_node and len(unvisited_nodes) > 1:
+        if (dest_distance < min_distance * 0.8) or random.random() < temperature:
+            next_node = destination_node if destination_node in unvisited_nodes else next_node
+
+    return next_node

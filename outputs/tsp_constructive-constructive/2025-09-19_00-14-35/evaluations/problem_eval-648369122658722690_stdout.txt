@@ -1,0 +1,14 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 29, in select_next_node
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 29, in <lambda>
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 18, in evaluate_node
+    connectivity_score = sum(1 for n in remaining_nodes if distance_matrix[node][n] > 0) / len(remaining_nodes)
+ZeroDivisionError: division by zero

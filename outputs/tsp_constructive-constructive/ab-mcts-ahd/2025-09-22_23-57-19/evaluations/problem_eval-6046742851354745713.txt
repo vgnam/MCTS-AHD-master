@@ -1,0 +1,25 @@
+import random
+    rand_val = random.random()
+    cumulative_weight = 0.0
+    next_node = None
+
+    for i, node in enumerate(unvisited_nodes):
+        cumulative_weight += normalized_weights[i]
+        if rand_val <= cumulative_weight:
+            next_node = node
+            break
+
+    if next_node is None:
+        next_node = unvisited_nodes.pop()
+
+    dynamic_threshold = 1.0 + (len(unvisited_nodes) / (len(unvisited_nodes) + 1)) * 0.5
+    if len(unvisited_nodes) > 2:
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            cost = distance_matrix[current_node][node]
+            if cost < min_cost * dynamic_threshold:
+                next_node = node
+                break
+
+    return next_node

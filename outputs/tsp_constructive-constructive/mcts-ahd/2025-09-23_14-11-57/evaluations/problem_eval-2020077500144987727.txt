@@ -1,0 +1,54 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    proximity_potentials = []
+    centralities = []
+    diversities = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+
+        # Calculate regret
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Calculate proximity potential
+        proximity_potential = (immediate_distance + future_potential) / (1 + sum(distance_matrix[node][n] for n in unvisited_nodes if n != node))
+        proximity_potentials.append(proximity_potential)
+
+        # Calculate node centrality (average distance to other unvisited nodes)
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        centralities.append(centrality)
+
+        # Calculate diversity (inverse of average distance to visited nodes)
+        diversity = 1.0 / (1e-6 + sum(distance_matrix[node][n] for n in distance_matrix if n not in unvisited_nodes and n != current_node) / (len(distance_matrix) - len(unvisited_nodes) - 1)) if len(unvisited_nodes) < len(distance_matrix) - 1 else 0
+        diversities.append(diversity)
+
+    # Adaptive weights
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    regret_weight = max(0.1, 0.5 * (remaining_nodes / total_nodes))
+    distance_weight = 0.6 * (remaining_nodes / total_nodes)
+    proximity_weight = 0.3 * (remaining_nodes / total_nodes)
+    centrality_weight = 0.2 * (1 - remaining_nodes / total_nodes)
+    diversity_weight = 0.1 * (1 - remaining_nodes / total_nodes)
+
+    # Combine weighted scores
+    scores = [
+        regret_weight * regret + distance_weight * distance + proximity_weight * potential + centrality_weight * centrality + diversity_weight * diversity
+        for regret, distance, potential, centrality, diversity in zip(regrets, distances, proximity_potentials, centralities, diversities)
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

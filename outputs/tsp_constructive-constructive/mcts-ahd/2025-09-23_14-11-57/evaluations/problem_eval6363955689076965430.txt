@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1 - remaining_nodes / (remaining_nodes + 1)
+    base_immediate_weight = 0.5
+    base_future_weight = 0.3
+    base_regret_weight = 0.2
+
+    immediate_weight = base_immediate_weight * (1.0 - progress)
+    future_weight = base_future_weight * (1.0 + 0.5 * progress)
+    regret_weight = base_regret_weight * (1.0 - progress)
+
+    distances = []
+    future_costs = []
+    regrets = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+        future_costs.append(future_potential)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+    memory_penalty = 0.1 * (1.0 / (min(distances) + 1e-6)) * (1.0 - progress) if progress > 0.5 else 0
+
+    combined_scores = [immediate_weight * distance + future_weight * future_cost + regret_weight * regret - memory_penalty for distance, future_cost, regret in zip(distances, future_costs, regrets)]
+    min_score = min(combined_scores)
+    selected_index = combined_scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

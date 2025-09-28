@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def adaptive_centrality(node, unvisited, current):
+        if len(unvisited) == 1:
+            return 0.0
+        local_distances = [distance_matrix[node][n] for n in unvisited if n != node]
+        global_distances = [distance_matrix[current][n] for n in unvisited]
+        local_centrality = sum(local_distances) / len(local_distances)
+        global_centrality = sum(global_distances) / len(global_distances)
+        return 0.6 * local_centrality + 0.4 * global_centrality
+
+    def locality_score(node, unvisited):
+        if len(unvisited) == 1:
+            return 1.0
+        remaining_nodes = unvisited - {node}
+        avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+        return 1.0 / (avg_distance + 1e-6)
+
+    total_unvisited = len(unvisited_nodes)
+    progress_ratio = 1.0 - (total_unvisited / (total_unvisited + len(distance_matrix)))
+    proximity_pressure = (1.0 - progress_ratio) ** 2
+    dynamic_weight = 0.7 + 0.3 * progress_ratio
+
+    candidates = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        centrality = adaptive_centrality(node, unvisited_nodes, current_node)
+        locality = locality_score(node, unvisited_nodes)
+        weight_dist = 0.5 + 0.2 * progress_ratio
+        weight_cent = 0.3 + 0.2 * (1.0 - progress_ratio)
+        score = (weight_dist * distance +
+                weight_cent * centrality +
+                0.2 * locality * (1.0 + 0.5 * proximity_pressure))
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

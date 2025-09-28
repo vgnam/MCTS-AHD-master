@@ -1,0 +1,32 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    candidate_nodes = []
+    min_score = float('inf')
+
+    # Calculate node centrality (average distance to all other nodes)
+    centrality = np.mean(distance_matrix, axis=1)
+    remaining_nodes = len(unvisited_nodes)
+    decay_factor = 1.0 / (1.0 + remaining_nodes)  # Decay factor based on remaining nodes
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Combine distance, centrality, and decay factor
+        score = distance * (1 + decay_factor * centrality[node])
+        if score < min_score:
+            min_score = score
+            candidate_nodes = [node]
+        elif score == min_score:
+            candidate_nodes.append(node)
+
+    if len(candidate_nodes) > 1:
+        # Weight inversely to distance and centrality
+        weights = [(1.0 / (distance_matrix[current_node][node] + 1e-6)) * (1.0 / (centrality[node] + 1e-6)) for node in candidate_nodes]
+        weights = [w / sum(weights) for w in weights]
+        next_node = random.choices(candidate_nodes, weights=weights, k=1)[0]
+    else:
+        next_node = candidate_nodes[0]
+
+    return next_node

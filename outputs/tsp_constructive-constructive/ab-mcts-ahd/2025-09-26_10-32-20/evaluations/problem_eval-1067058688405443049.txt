@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Calculate entropy-based scaling factor
+    avg_distance = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / remaining_nodes
+    entropy_factor = 1 - (avg_distance / max(sum(row) for row in distance_matrix) if max(sum(row) for row in distance_matrix) != 0 else 1)
+
+    # Dynamic weight adjustment
+    weight_connectivity = 0.5 * (1 - entropy_factor) + 0.2 * (remaining_nodes / total_nodes)
+    weight_local = 0.3 * entropy_factor + 0.1 * (remaining_nodes / total_nodes)
+    weight_diversity = 0.4 * (1 - entropy_factor) + 0.3 * (remaining_nodes / total_nodes)
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        connectivity = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        diversity = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1 if remaining_nodes > 1 else 1)
+
+        # Novel scoring mechanism with entropy-based adjustments
+        local_term = weight_local * (local_distance / (1 + entropy_factor))
+        connectivity_term = weight_connectivity * (connectivity * (1 + entropy_factor))
+        diversity_term = weight_diversity * (diversity / (1 + entropy_factor))
+
+        return local_term + connectivity_term + diversity_term
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    progress_ratio = 1 - (remaining_nodes / len(distance_matrix))
+    immediate_weight = 0.8 - 0.6 * progress_ratio
+    future_weight = 0.2 + 0.6 * progress_ratio
+
+    visit_counts = [sum(1 for d in distance_matrix[node] if d > 0) for node in unvisited_nodes]
+    max_visits = max(visit_counts) if visit_counts else 1
+    novelty_weights = [1 - (v / max_visits) for v in visit_counts]
+
+    path_diversity = []
+    for node in unvisited_nodes:
+        diversity = sum(1 for n in unvisited_nodes if n != node and distance_matrix[node][n] > 0.7 * distance_matrix[current_node][n])
+        path_diversity.append(diversity)
+
+    max_diversity = max(path_diversity) if path_diversity else 1
+    diversity_weights = [0.3 * (d / max_diversity) for d in path_diversity]
+
+    scores = []
+    for i, node in enumerate(unvisited_nodes):
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+        total_increase = current_to_node + node_to_dest
+
+        penalty = 0.25 * (1.0 / (current_to_node + 1e-6)) if current_to_node < 0.6 else 0
+        novelty_factor = 0.2 * novelty_weights[i]
+        diversity_factor = diversity_weights[i]
+
+        combined_score = immediate_weight * current_to_node + future_weight * total_increase - penalty + novelty_factor + diversity_factor
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

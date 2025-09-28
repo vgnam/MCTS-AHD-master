@@ -1,0 +1,40 @@
+importance" metric derived from betweenness centrality.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def node_importance(node, unvisited):
+        if len(unvisited) <= 2:
+            return 1.0
+        remaining = unvisited - {node}
+        total = 0.0
+        for n in remaining:
+            total += sum(1 for m in remaining if distance_matrix[n][m] < distance_matrix[node][m])
+        return total / (len(remaining) ** 2)
+
+    def historical_score(node, current, memory):
+        if not memory:
+            return 0.0
+        recent = memory[-min(5, len(memory)):]
+        return sum(1 for n in recent if distance_matrix[current][node] < distance_matrix[current][n]) / len(recent)
+
+    memory = []
+    exploration_factor = 0.7 ** (10 - len(unvisited_nodes))
+    candidates = []
+
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+        importance = node_importance(node, unvisited_nodes)
+        hist_score = historical_score(node, current_node, memory)
+        weight_dist = 0.4 + 0.4 * exploration_factor
+        weight_imp = 0.3 * (1 - exploration_factor)
+        weight_hist = 0.3 * exploration_factor
+        score = (weight_dist * immediate_dist +
+                 weight_imp * importance +
+                 weight_hist * hist_score)
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    memory.append(next_node)
+    return next_node

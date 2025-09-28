@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=0.5, exploration_decay=0.9):
+    if not unvisited_nodes:
+        return destination_node
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    if random.random() < temperature:
+        temperature *= exploration_decay
+        return random.choice(list(unvisited_nodes))
+    else:
+        return next_node

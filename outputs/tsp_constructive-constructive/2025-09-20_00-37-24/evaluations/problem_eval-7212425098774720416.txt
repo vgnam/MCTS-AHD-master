@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Calculate penalties for each unvisited node
+    penalties = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Penalty is a combination of distance and visit frequency (higher distance = higher penalty)
+        penalties[node] = distance * (1 + math.log(len(unvisited_nodes) + 1))
+
+    # Normalize penalties to get selection probabilities
+    total_penalty = sum(penalties.values())
+    probabilities = {node: (total_penalty - penalty) / total_penalty for node, penalty in penalties.items()}
+
+    # Stochastic selection: 90% chance to pick from top 3 by probability, 10% chance to pick randomly
+    if random.random() < 0.9:
+        top_nodes = sorted(probabilities.keys(), key=lambda x: -probabilities[x])[:min(3, len(probabilities))]
+        next_node = random.choices(top_nodes, weights=[probabilities[node] for node in top_nodes], k=1)[0]
+    else:
+        next_node = random.choices(list(probabilities.keys()), weights=list(probabilities.values()), k=1)[0]
+
+    return next_node

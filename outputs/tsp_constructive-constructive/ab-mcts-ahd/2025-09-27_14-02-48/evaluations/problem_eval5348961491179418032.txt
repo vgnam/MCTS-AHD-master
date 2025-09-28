@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    max_distance = float('-inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance > max_distance:
+            max_distance = distance
+            next_node = node
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        exploration_factor = len(unvisited_nodes) / (len(unvisited_nodes) + 1)  # Decreases as unvisited nodes decrease
+        threshold = (max_distance * exploration_factor) + (destination_distance * (1 - exploration_factor))
+        if destination_distance < threshold:
+            next_node = destination_node
+    return next_node

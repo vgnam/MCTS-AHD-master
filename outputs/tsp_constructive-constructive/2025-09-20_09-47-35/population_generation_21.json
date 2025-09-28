@@ -1,0 +1,44 @@
+[
+     {
+          "algorithm": "The algorithm selects the next node in the TSP path by prioritizing the unvisited node closest to the current node, using the distance matrix to determine distances. The destination node is only returned if no unvisited nodes remain, ensuring the path remains feasible. The key design choice is prioritizing local optimality (shortest immediate distance) over global considerations, which simplifies the heuristic but may not always yield the optimal overall path.",
+          "thought": "The algorithm selects the next node to visit by choosing the unvisited node with the shortest distance from the current node, ensuring the path remains feasible towards the destination.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])\n    return next_node",
+          "objective": 7.00437,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by minimizing the sum of the distance from the current node and the straight-line distance to the destination, balancing immediate proximity and long-term efficiency. The `distance_matrix[current_node][node]` prioritizes local progress, while `distance_matrix[node][destination_node]` ensures alignment with the final destination, with `unvisited_nodes` guiding the selection from remaining options. The `min` function efficiently identifies the optimal node based on these combined metrics.",
+          "thought": "The algorithm constructs a path by iteratively selecting the next node that minimizes the sum of the distance to the current node and the straight-line distance to the destination, balancing immediate progress and overall path efficiency.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] + distance_matrix[node][destination_node])\n    return next_node",
+          "objective": 7.99477,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm chooses the next node by minimizing a weighted sum of its distance from the current node and a 'detour factor'. The detour factor estimates the percentage increase in direct path length to the destination if the node is visited. Shorter distances and smaller detour factors contribute to a lower weighted sum, favoring nodes that are both close and don't significantly lengthen the path to the final destination.\n",
+          "thought": "This algorithm selects the next node by considering a weighted combination of distance from the current node and the 'detour factor' reflecting how much longer the path becomes by including that node.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    #{This algorithm selects the next node by considering a weighted combination of distance from the current node and the 'detour factor' reflecting how much longer the path becomes by including that node.}\n    if not unvisited_nodes:\n        return destination_node\n\n    # Calculate distances to each unvisited node\n    distances = {node: distance_matrix[current_node][node] for node in unvisited_nodes}\n\n    # Calculate detour factor for each unvisited node\n    detour_factors = {node: (distance_matrix[current_node][node] + distance_matrix[node][destination_node]) / distance_matrix[current_node][destination_node] for node in unvisited_nodes}\n\n    # Weighted combination of distance and detour factor (adjust weight as needed)\n    weights = {node: distances[node] + 0.5 * detour_factors[node] for node in unvisited_nodes}\n\n    # Select the node with the minimum weighted value\n    next_node = min(weights, key=weights.get)\n\n    return next_node",
+          "objective": 8.02198,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node in the TSP path by prioritizing immediate proximity (nearest neighbor) while also considering future steps (lookahead) to minimize total path length. It calculates potential savings for each unvisited node by combining the immediate cost to the node, the minimum cost from that node to the next step, and subtracting the direct cost from the current node to the destination. The node with the lowest computed cost is chosen, balancing short-term and long-term efficiency.",
+          "thought": "This algorithm uses a hybrid approach that combines nearest neighbor selection with a lookahead mechanism to balance immediate proximity and potential future savings, aiming to minimize the total path length by considering both the current step and the next possible steps.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n\n    # Calculate potential savings for each unvisited node, considering both immediate and next-step distances\n    potential_savings = {}\n    for node in unvisited_nodes:\n        immediate_cost = distance_matrix[current_node][node]\n        # Look ahead to the next possible step\n        remaining_nodes = unvisited_nodes - {node}\n        if remaining_nodes:\n            next_step_cost = min(distance_matrix[node][next_node] for next_node in remaining_nodes)\n        else:\n            next_step_cost = distance_matrix[node][destination_node]\n        total_cost = immediate_cost + next_step_cost - distance_matrix[current_node][destination_node]\n        potential_savings[node] = total_cost\n\n    # Select the node with the minimum potential cost\n    next_node = min(potential_savings, key=potential_savings.get)\n    return next_node",
+          "objective": 8.38246,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node to visit based on a modified savings calculation that considers the distance to the final destination. It prioritizes nodes that offer significant savings relative to the distance to the destination node by weighting savings inversely proportional to that distance. The node with the maximum weighted savings is then chosen as the next node.\n",
+          "thought": "Modify algorithm No.2 to maximize savings, but incorporate the distance to the final destination in the calculation, weighting savings by the inverse of the distance to the destination.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n\n    # Calculate savings for each unvisited node\n    savings = {node: distance_matrix[current_node][node] + distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node] for node in unvisited_nodes}\n\n    # Weight the savings by the inverse of the distance to the destination\n    weighted_savings = {node: savings[node] / distance_matrix[node][destination_node] for node in unvisited_nodes}\n\n    # Select the node with the maximum weighted savings\n    next_node = max(weighted_savings, key=weighted_savings.get)\n\n    return next_node",
+          "objective": 31.92154,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm greedily selects the next unvisited node to minimize the increase in total distance compared to directly going to the destination. For each unvisited node, it calculates the added distance by visiting it before returning to the destination node. The node with the smallest added distance is then chosen as the next node to visit.\n",
+          "thought": "node: distance_matrix[current_node][node] + distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node] for node in unvisited_nodes",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n\n    # Calculate savings for each unvisited node\n    savings = {node: distance_matrix[current_node][node] + distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node] for node in unvisited_nodes}\n\n    # Select the node with the maximum savings\n    next_node = max(savings, key=savings.get)\n\n    return next_node\n# The algorithm greedily selects the next unvisited node that maximizes the \"savings,\" calculated as the reduction in total distance by visiting that node before return next_node",
+          "objective": 32.06483,
+          "other_inf": null
+     }
+]

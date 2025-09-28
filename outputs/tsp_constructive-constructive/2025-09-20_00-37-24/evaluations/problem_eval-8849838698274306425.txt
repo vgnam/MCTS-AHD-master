@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_score = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            avg_distance = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+            score = distance_to_node + avg_distance
+        else:
+            score = distance_to_node
+
+        if score < best_score:
+            best_score = score
+            best_node = node
+
+    return next_node

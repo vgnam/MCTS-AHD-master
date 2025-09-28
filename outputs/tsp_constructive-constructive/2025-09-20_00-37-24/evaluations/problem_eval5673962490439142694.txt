@@ -1,0 +1,41 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Priority to destination if unvisited
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Calculate probabilities based on inverse distance and potential path reduction
+    probabilities = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        dist = distance_matrix[current_node][node]
+        # Inverse distance weighting
+        weight = 1.0 / (dist + 1e-6)  # Small epsilon to avoid division by zero
+        # Additional heuristic: consider potential reduction in total path length
+        if len(unvisited_nodes) > 1:
+            # Estimate path reduction by considering the next step's implications
+            next_nearest = min(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+            weight *= (1.0 / (next_nearest + 1e-6))
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    probabilities = [p / total_weight for p in probabilities]
+
+    # Stochastic selection: 80% chance to pick from top 50% of weighted options
+    if random.random() < 0.8:
+        # Sort nodes by probability and pick from top half
+        sorted_nodes = sorted(unvisited_nodes, key=lambda x: probabilities[unvisited_nodes.index(x)], reverse=True)
+        candidates = sorted_nodes[:max(1, len(sorted_nodes) // 2)]
+        next_node = random.choice(candidates)
+    else:
+        # 20% chance to pick from all nodes according to probability distribution
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

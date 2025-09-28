@@ -1,0 +1,14 @@
+important later
+
+        weighted_distance = (
+            weight_current * distance_to_current +
+            weight_destination * distance_to_destination +
+            weight_centrality * node_centrality[node] +
+            weight_exploration * exploration_bonus[node]
+        )
+
+        if weighted_distance < min_weighted_distance:
+            min_weighted_distance = weighted_distance
+            next_node = node
+
+    return next_node

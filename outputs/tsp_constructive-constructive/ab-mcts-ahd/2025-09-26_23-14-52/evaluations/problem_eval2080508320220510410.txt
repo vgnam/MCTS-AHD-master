@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+        squared_sum = current_distance**2 + destination_distance**2
+
+        # Compute angle heuristic: cos(θ) = (a² + b² - c²) / (2ab)
+        a = distance_matrix[current_node][destination_node]
+        b = current_distance
+        c = destination_distance
+        angle_heuristic = (a**2 + b**2 - c**2) / (2 * a * b) if (a and b) else 0
+
+        # Weighted score combining squared distances and angle heuristic
+        score = squared_sum + (1 - angle_heuristic) * destination_distance
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+        elif score == min_score:
+            if destination_distance < distance_matrix[next_node][destination_node]:
+                next_node = node
+
+    return next_node

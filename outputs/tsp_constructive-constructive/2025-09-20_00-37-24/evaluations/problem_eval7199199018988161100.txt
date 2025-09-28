@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate exploration factor (increases as fewer nodes remain)
+    exploration_factor = 1 - (len(unvisited_nodes) / len(distance_matrix))
+    exploration_prob = 0.5 + 0.4 * exploration_factor  # Base 50% + dynamic adjustment
+
+    # Sort by distance and apply weighted probability
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+
+    # Weighted probability: inverse distance with exploration bias
+    weights = [1 / (d + 1e-6) for d in distances]  # Avoid division by zero
+    if random.random() < exploration_prob:
+        # Exploration mode: normalize weights for random selection
+        sum_weights = sum(weights)
+        normalized_weights = [w / sum_weights for w in weights]
+        next_node = random.choices(nearest_neighbors, weights=normalized_weights, k=1)[0]
+    else:
+        # Exploitation mode: pick from top 3 with distance-biased probability
+        top_candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        top_weights = weights[:min(3, len(weights))]
+        sum_top_weights = sum(top_weights)
+        normalized_top_weights = [w / sum_top_weights for w in top_weights]
+        next_node = random.choices(top_candidates, weights=normalized_top_weights, k=1)[0]
+
+    return next_node

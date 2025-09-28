@@ -1,0 +1,45 @@
+importance.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    centralities = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+        centralities.append(centrality)
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    regret_weight = max(0.1, 0.7 * (remaining_nodes / total_nodes))
+    distance_weight = 1.0 - regret_weight
+    centrality_weight = max(0.1, 0.4 * (remaining_nodes / total_nodes))
+
+    scores = [
+        regret_weight * regret + distance_weight * distance - centrality_weight * centrality
+        for regret, distance, centrality in zip(regrets, distances, centralities)
+    ]
+
+    if remaining_nodes > total_nodes / 2:
+        min_score = min(scores)
+        selected_index = scores.index(min_score)
+    else:
+        import random
+        probabilities = [1 / (1 + score) for score in scores]
+        selected_index = random.choices(range(len(scores)), weights=probabilities, k=1)[0]
+
+    next_node = list(unvisited_nodes)[selected_index]
+    return next_node

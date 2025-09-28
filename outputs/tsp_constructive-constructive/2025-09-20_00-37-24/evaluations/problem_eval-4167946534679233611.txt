@@ -1,0 +1,32 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    # {This algorithm uses a combination of destination-driven selection, nearest neighbor consideration with a distance-based probability, and strategic diversification to select the next node.}
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate probabilities based on distance
+    distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+    max_distance = max(distances)
+    probabilities = [(max_distance - d + 1e-9) for d in distances] # Add a small value to avoid zero probability
+    sum_probabilities = sum(probabilities)
+    probabilities = [p / sum_probabilities for p in probabilities]
+
+    # Introduce a diversification factor
+    diversification_factor = 0.1
+    adjusted_probabilities = [(1 - diversification_factor) * p + diversification_factor / len(nearest_neighbors) for p in probabilities]
+
+    # Select next node based on probabilities
+    cumulative_probability = 0.0
+    random_number = random.random()
+
+    for i, node in enumerate(nearest_neighbors):
+        cumulative_probability += adjusted_probabilities[i]
+        if random_number < cumulative_probability:
+            return node
+
+    return nearest_neighbors[-1]  # Fallback: return next_node

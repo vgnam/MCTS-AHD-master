@@ -1,0 +1,7 @@
+import random
+    next_node = random.choices(top_candidates, weights=normalized_probs, k=1)[0]
+
+    if next_node in visit_counts:
+        visit_counts[next_node] += 1
+
+    return next_node

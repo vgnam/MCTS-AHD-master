@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+    total_unvisited = len(unvisited_nodes)
+    base_weight = 0.7 * (1 - math.exp(-total_unvisited / 10))  # Dynamic base weight
+    exploration_bonus = 1.0 / (1 + math.sqrt(total_unvisited))  # Exploration incentive
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Centrality: average distance to all unvisited nodes
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (total_unvisited - 1) if total_unvisited > 1 else 0
+
+        # Density: inverse of average distance to unvisited nodes
+        density = (total_unvisited - 1) / sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) if total_unvisited > 1 else 0
+
+        # Hybrid score with exploration bonus
+        hybrid_score = (1 - base_weight) * current_distance + base_weight * future_distance + 0.3 * centrality + exploration_bonus * density
+
+        if hybrid_score > best_score:
+            best_score = hybrid_score
+            next_node = node
+        elif hybrid_score == best_score:
+            if future_distance < distance_matrix[next_node][destination_node]:
+                next_node = node
+
+    return next_node

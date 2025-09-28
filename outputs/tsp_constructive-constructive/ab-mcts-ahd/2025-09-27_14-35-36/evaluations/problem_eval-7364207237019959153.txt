@@ -1,0 +1,11 @@
+import random
+    selected_index = random.choices(range(len(candidates)), weights=normalized_weights, k=1)[0]
+    next_node = candidates[selected_index][0]
+
+    # Apply exploration factor to decide between farthest and destination
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        if random.random() < exploration_factor or dest_distance <= candidates[0][1]:
+            next_node = destination_node
+
+    return next_node

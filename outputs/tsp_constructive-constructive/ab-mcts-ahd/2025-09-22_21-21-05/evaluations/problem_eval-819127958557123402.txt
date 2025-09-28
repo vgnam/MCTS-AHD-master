@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+    destination_weight = (remaining_nodes / total_nodes) ** 2
+    weight_current = 1.5
+    centrality_weight = 0.5
+
+    avg_distances = []
+    for node in unvisited_nodes:
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_nodes
+        avg_distances.append(avg_dist)
+
+    avg_avg_distance = sum(avg_distances) / remaining_nodes if remaining_nodes > 0 else 0
+
+    min_score = float('inf')
+    candidates = []
+
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        centrality_factor = 1.0 - (avg_distances[i] / (avg_avg_distance + 1e-6))
+
+        penalty = 0.0
+        for neighbor in unvisited_nodes:
+            if neighbor != node and distance_matrix[node][neighbor] < distance_to_current * 1.2:
+                penalty += 0.2
+
+        if node == destination_node:
+            combined_score = distance_to_current * destination_weight + penalty
+        else:
+            combined_score = weight_current * distance_to_current + centrality_weight * centrality_factor + penalty
+
+        if combined_score < min_score:
+            min_score = combined_score
+            candidates = [node]
+        elif combined_score == min_score:
+            candidates.append(node)
+
+    if candidates:
+        next_node = np.random.choice(candidates) if len(candidates) > 1 else candidates[0]
+        return next_node
+    else:
+        return next_node

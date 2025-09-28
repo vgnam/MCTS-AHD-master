@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    base_decay_factor = 0.9
+    dynamic_weight = 1.0 / (1.0 + remaining_nodes ** 2)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        if len(unvisited_nodes) == 1:
+            avg_distance = 0
+        else:
+            avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+
+        max_distance = max(distance_to_current, avg_distance, 1.0)
+        normalized_current = distance_to_current / max_distance
+        normalized_avg = avg_distance / max_distance
+
+        decay_factor = base_decay_factor * (1.0 - dynamic_weight)
+        score = normalized_current * (normalized_avg ** decay_factor) + (normalized_avg * (1 - dynamic_weight))
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

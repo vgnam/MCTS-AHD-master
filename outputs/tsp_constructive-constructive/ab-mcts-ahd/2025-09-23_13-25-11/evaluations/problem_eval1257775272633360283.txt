@@ -1,0 +1,10 @@
+importance as fewer nodes remain, using inverse weighting to dynamically balance priorities.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining_nodes = len(unvisited_nodes)
+    weight_immediate = remaining_nodes / (1 + remaining_nodes)
+    weight_global = 1 / (1 + remaining_nodes)
+    next_node = min(unvisited_nodes, key=lambda node: (weight_immediate * distance_matrix[current_node][node] + weight_global * sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)))
+    return next_node

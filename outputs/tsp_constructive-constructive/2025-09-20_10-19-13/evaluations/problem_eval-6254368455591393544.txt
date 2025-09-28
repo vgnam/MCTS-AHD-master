@@ -1,0 +1,12 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    temperature = 0.3  # Controls randomness (higher = more random)
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    max_dist = max(distances)
+    normalized_distances = [(max_dist - d) / (max_dist - min_dist + 1e-10) for d in distances]  # Invert and normalize
+    probabilities = [np.exp(d / temperature) for d in normalized_distances]
+    probabilities = [p / sum(probabilities) for p in probabilities]  # Normalize to sum to 1
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+    return next_node

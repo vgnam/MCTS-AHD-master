@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    temperature = max(0.1, 1.0 - (remaining_nodes / total_nodes))
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+
+        if remaining_nodes > 1:
+            remaining_unvisited = unvisited_nodes - {node}
+
+            # Local neighborhood density (average distance to nearby nodes)
+            local_density = sum(distance_matrix[node][n] for n in remaining_unvisited) / len(remaining_unvisited)
+
+            # Global connectivity (simplified betweenness centrality approximation)
+            global_connectivity = sum(1.0 / (distance_matrix[node][n] + 1e-6) for n in range(total_nodes))
+
+            # Node potential combining local and global factors
+            node_potential = (1.0 / (local_density + 1e-6)) * global_connectivity
+
+            # Adaptive exploration function with sigmoid weighting
+            exploration_factor = 1.0 / (1.0 + math.exp(-3.0 * (temperature - 0.5)))
+            exploration_term = exploration_factor * node_potential
+        else:
+            exploration_term = 0.0
+
+        # Dynamic probability weight combining immediate distance and exploration
+        prob_weight = math.exp(-immediate_dist / (temperature + 1e-6)) * (1.0 + exploration_term)
+        candidates.append((node, prob_weight))
+
+    # Probabilistic selection based on normalized weights
+    weights = [w for _, w in candidates]
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    next_node = random.choices([n for n, _ in candidates], weights=probabilities, k=1)[0]
+    return next_node

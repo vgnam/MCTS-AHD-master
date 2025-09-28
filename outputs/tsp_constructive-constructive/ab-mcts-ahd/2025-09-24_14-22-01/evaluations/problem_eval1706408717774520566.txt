@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    alpha = 0.7 if remaining_nodes > 2 else 0.3
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        if immediate_distance == 0 or potential_distance == 0:
+            geometric_mean = float('inf')
+        else:
+            geometric_mean = (immediate_distance * potential_distance) ** 0.5
+        position_factor = (distance_matrix[current_node][destination_node] - immediate_distance) / distance_matrix[current_node][destination_node] if distance_matrix[current_node][destination_node] > 0 else 0
+        revisit_penalty = (remaining_nodes / (remaining_nodes + 1)) ** 2
+        product_cost = immediate_distance * potential_distance
+        weighted_cost = geometric_mean * (1 - alpha) + (position_factor * alpha) * revisit_penalty + product_cost * (0.1 / remaining_nodes)
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node

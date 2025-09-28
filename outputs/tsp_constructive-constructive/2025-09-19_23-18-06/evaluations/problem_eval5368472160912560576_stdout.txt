@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance, the weighted average future distance from No.2 for global optimization, and adds a penalty for excessive path length increases to further improve solution quality.}
+                                                                                                                                                                                   ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance, the weighted average future distance from No.2 for global optimization, and adds a penalty for excessive path length increases to further improve solution quality.}
+                                                                                                                                                                                   ^
+SyntaxError: unmatched '}'

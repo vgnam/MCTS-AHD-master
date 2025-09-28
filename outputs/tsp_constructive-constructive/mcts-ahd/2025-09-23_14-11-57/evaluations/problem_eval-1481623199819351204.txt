@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_score = float('inf')
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+
+        # Dynamic revisit penalty based on remaining nodes' proximity
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            avg_proximity = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            revisit_penalty = 0.5 * avg_proximity * (1 / len(remaining_nodes))
+        else:
+            revisit_penalty = 0
+
+        # Angular alignment with destination (favor nodes closer to the straight-line path)
+        if current_node != destination_node and node != destination_node:
+            vec_current_to_node = (node[0] - current_node[0], node[1] - current_node[1])
+            vec_current_to_dest = (destination_node[0] - current_node[0], destination_node[1] - current_node[1])
+            dot_product = vec_current_to_node[0] * vec_current_to_dest[0] + vec_current_to_node[1] * vec_current_to_dest[1]
+            mag_current_to_node = (vec_current_to_node[0]**2 + vec_current_to_node[1]**2)**0.5
+            mag_current_to_dest = (vec_current_to_dest[0]**2 + vec_current_to_dest[1]**2)**0.5
+            if mag_current_to_node > 0 and mag_current_to_dest > 0:
+                cos_angle = dot_product / (mag_current_to_node * mag_current_to_dest)
+                angular_penalty = 1 - cos_angle  # Penalize nodes that deviate from the straight-line path
+            else:
+                angular_penalty = 0
+        else:
+            angular_penalty = 0
+
+        # Combine scores
+        score = current_to_node + revisit_penalty + 0.3 * angular_penalty
+
+        if score < best_score:
+            best_score = score
+            best_node = node
+
+    return next_node

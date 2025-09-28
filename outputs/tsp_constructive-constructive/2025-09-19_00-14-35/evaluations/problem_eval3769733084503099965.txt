@@ -1,0 +1,53 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            remaining_nodes_list = [n for n in unvisited_nodes if n != node]
+            distances_to_remaining = [distance_matrix[node][n] for n in remaining_nodes_list]
+            avg_remaining_dist = sum(distances_to_remaining) / len(distances_to_remaining)
+            std_dev_remaining = (sum((d - avg_remaining_dist) ** 2 for d in distances_to_remaining) / len(distances_to_remaining)) ** 0.5
+            diversity_score = std_dev_remaining / (avg_remaining_dist + 1e-6)
+            connectivity_score = 1.0 / (1.0 + avg_remaining_dist)
+            potential_gain = (distance_matrix[current_node][destination_node] - immediate_dist - dest_dist) / (1 + immediate_dist)
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] > 0 and n != node)
+            centrality_score = node_degree / (total_nodes - 1)
+            popularity_score = sum(1 for n in range(total_nodes) if distance_matrix[n][node] < distance_matrix[n][current_node])
+        else:
+            diversity_score = 0
+            connectivity_score = 0
+            potential_gain = 0
+            centrality_score = 0
+            popularity_score = 0
+
+        weight_local = 0.3 - 0.15 * exploration_factor
+        weight_connectivity = 0.25 + 0.15 * exploration_factor
+        weight_diversity = 0.15 * (1 - exploration_factor)
+        weight_dest = -0.15 * (1 - exploration_factor)
+        weight_gain = 0.1 * (1 - exploration_factor)
+        weight_centrality = 0.05 * (1 - exploration_factor)
+        weight_popularity = 0.1 * (1 - exploration_factor)
+
+        score = (weight_local * immediate_dist) + (weight_connectivity * connectivity_score) + \
+                (weight_diversity * diversity_score) + (weight_dest * dest_dist) + \
+                (weight_gain * potential_gain) + (weight_centrality * centrality_score) + \
+                (weight_popularity * popularity_score)
+        return score
+
+    scores = [evaluate_node(node) for node in unvisited_nodes]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(score - min_score) / (max_score - min_score + 1e-6) for score in scores]
+    probabilities = [1 - s for s in normalized_scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

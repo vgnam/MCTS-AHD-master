@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Precompute centrality of current node
+    current_centrality = sum(distance_matrix[current_node][node] for node in range(len(distance_matrix))) / len(distance_matrix)
+
+    # Track selection frequency (simplified for this example)
+    selection_frequencies = {node: 1.0 for node in unvisited_nodes}  # In practice, this would be updated over multiple runs
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        avg_distance_to_unvisited = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weight based on current centrality
+        centrality_weight = 1.0 / (1.0 + current_centrality) if current_centrality > 0 else 0.0
+
+        # Reinforcement term based on selection frequency
+        reinforcement_term = 1.0 / selection_frequencies[node]
+
+        total_score = (distance_to_current * 0.4) + \
+                      (avg_distance_to_unvisited * centrality_weight * 0.3) + \
+                      (distance_to_destination * 0.2) + \
+                      (reinforcement_term * 0.1)
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

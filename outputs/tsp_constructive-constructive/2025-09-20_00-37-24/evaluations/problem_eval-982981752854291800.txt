@@ -1,0 +1,32 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate a score for each unvisited node combining distance and remaining nodes
+    scores = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        remaining = len(unvisited_nodes)
+        # Score favors closer nodes but penalizes when few nodes remain (reduces myopia)
+        score = distance / (1 + math.log(remaining + 1))  # Logarithmic adjustment
+        scores.append((node, score))
+
+    # Sort by score (lower is better)
+    scores.sort(key=lambda x: x[1])
+    candidates = [node for node, _ in scores[:min(3, len(scores))]]
+
+    # Probabilistic selection: 70% chance to pick from top 3, 20% from next 3, 10% random
+    rand_val = random.random()
+    if rand_val < 0.7:
+        next_node = random.choice(candidates)
+    elif rand_val < 0.9:
+        next_node = random.choice([node for node, _ in scores[3:min(6, len(scores))]])
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

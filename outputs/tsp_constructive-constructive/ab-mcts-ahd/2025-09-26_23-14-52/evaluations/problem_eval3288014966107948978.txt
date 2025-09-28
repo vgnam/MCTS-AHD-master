@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    exploration_decay = 0.95 ** remaining_nodes
+    temp = 0.5 * (1 + math.tanh(2 * (remaining_nodes / (remaining_nodes + 1) - 0.5)))
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        future_dist = distance_matrix[node][destination_node]
+        base_score = current_dist + temp * future_dist
+        normalized_score = base_score / (1 + future_dist)
+        exploration_noise = exploration_decay * random.uniform(0, 1)
+        scores.append((node, normalized_score + exploration_noise))
+
+    scores.sort(key=lambda x: x[1])
+    selected_index = min(int(len(scores) * 0.3), len(scores) - 1)
+    candidates = scores[:selected_index + 1]
+    probabilities = [math.exp(-score[1] / temp) for score in candidates]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices([c[0] for c in candidates], weights=probabilities, k=1)[0]
+    return next_node

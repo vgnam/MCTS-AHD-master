@@ -1,0 +1,3 @@
+import random
+    next_node = random.choices(list(normalized_scores.keys()), weights=normalized_scores.values(), k=1)[0]
+    return next_node

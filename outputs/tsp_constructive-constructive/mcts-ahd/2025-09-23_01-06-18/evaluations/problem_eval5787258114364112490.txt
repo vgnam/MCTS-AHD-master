@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = 1 - (remaining_nodes / len(distance_matrix))
+    detour_weight = 0.1 + 0.7 * (remaining_nodes / (remaining_nodes + 1)) * (1 - progress_factor)
+
+    path_diversity = 0.4 * (len(distance_matrix) - remaining_nodes) / len(distance_matrix)
+
+    # Calculate node centrality (average connectivity to other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+    # Novelty factor: rewards nodes with unique connectivity patterns
+    novelty = {}
+    for node in unvisited_nodes:
+        distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        novelty[node] = sum(abs(d - centrality[node]) for d in distances) / len(distances)
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        detour_cost = to_destination - distance_matrix[current_node][destination_node]
+        diversity_cost = centrality[node] - distance_matrix[current_node][node]
+        novelty_bonus = 0.3 * novelty[node] * (1 - progress_factor)
+        return to_current + detour_weight * detour_cost + path_diversity * diversity_cost - novelty_bonus
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

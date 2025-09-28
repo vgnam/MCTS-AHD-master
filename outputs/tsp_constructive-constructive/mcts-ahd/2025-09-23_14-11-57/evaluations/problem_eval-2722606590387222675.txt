@@ -1,0 +1,64 @@
+import numpy as np
+from scipy.cluster.hierarchy import linkage, fcluster
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Hierarchical clustering of unvisited nodes
+    unvisited_list = list(unvisited_nodes)
+    if len(unvisited_list) < 2:
+        return unvisited_list[0]
+
+    cluster_distances = np.zeros((len(unvisited_list), len(unvisited_list)))
+    for i in range(len(unvisited_list)):
+        for j in range(len(unvisited_list)):
+            if i == j:
+                cluster_distances[i][j] = 0
+            else:
+                cluster_distances[i][j] = distance_matrix[unvisited_list[i]][unvisited_list[j]]
+
+    Z = linkage(cluster_distances, method='average')
+    clusters = fcluster(Z, t=2, criterion='maxclust')
+
+    # Calculate cluster-based metrics
+    cluster_metrics = {}
+    for cluster_id in np.unique(clusters):
+        cluster_nodes = [unvisited_list[i] for i, c in enumerate(clusters) if c == cluster_id]
+        if len(cluster_nodes) == 1:
+            node = cluster_nodes[0]
+            immediate = distance_matrix[current_node][node]
+            global_cost = immediate + distance_matrix[node][destination_node]
+            cluster_metrics[node] = {
+                'immediate': immediate,
+                'global': global_cost,
+                'density': 0
+            }
+        else:
+            avg_immediate = np.mean([distance_matrix[current_node][n] for n in cluster_nodes])
+            avg_global = np.mean([distance_matrix[n][destination_node] for n in cluster_nodes])
+            density = np.mean([np.mean([distance_matrix[n][m] for m in cluster_nodes if m != n]) for n in cluster_nodes])
+            for node in cluster_nodes:
+                cluster_metrics[node] = {
+                    'immediate': avg_immediate,
+                    'global': avg_global,
+                    'density': density
+                }
+
+    # Calculate probabilities
+    probabilities = []
+    for node in unvisited_nodes:
+        metrics = cluster_metrics[node]
+        prob = (0.5 * (metrics['immediate'] / max(m['immediate'] for m in cluster_metrics.values())) +
+                0.3 * (metrics['global'] / max(m['global'] for m in cluster_metrics.values())) -
+                0.2 * metrics['density'])
+        probabilities.append(prob)
+
+    probabilities = np.array(probabilities)
+    probabilities = 1 / (1 + np.exp(probabilities))  # Sigmoid to convert to probabilities
+    probabilities = probabilities / np.sum(probabilities)  # Normalize
+
+    # Select node with highest probability
+    next_node = np.random.choice(list(unvisited_nodes), p=probabilities)
+
+    return next_node

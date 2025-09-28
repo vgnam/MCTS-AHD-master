@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    scores = []
+    nodes = []
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Dynamic weight based on remaining nodes (inverted logic)
+        weight = 0.5 * (total_unvisited - 1) / total_unvisited
+
+        # Novel mechanism: penalize nodes too close to current node if many nodes remain
+        proximity_penalty = (1 - weight) * distance_to_current if total_unvisited > 2 else 0
+
+        combined_score = distance_to_current + weight * (distance_to_destination + avg_distance_to_remaining) + proximity_penalty
+        scores.append(combined_score)
+        nodes.append(node)
+
+    # Probabilistic selection: nodes with lower scores are more likely to be chosen
+    if scores:
+        min_score = min(scores)
+        normalized_scores = [min_score / (s + 1e-10) for s in scores]  # Avoid division by zero
+        total_score = sum(normalized_scores)
+        probabilities = [s / total_score for s in normalized_scores]
+        next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+    else:
+        next_node = destination_node
+
+    return next_node

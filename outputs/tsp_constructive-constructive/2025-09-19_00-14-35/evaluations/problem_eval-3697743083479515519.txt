@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+            flow_disruption = max(distance_matrix[node][n] for n in unvisited_nodes if n != node) - current_dist
+            path_direction = (destination_node - current_node) if isinstance(current_node, int) else 0
+            angular_deviation = abs((node - current_node) - path_direction) if isinstance(current_node, int) else 0
+            path_coherence = (current_dist + dest_dist) / (centrality + 1e-6)
+        else:
+            centrality = 0
+            flow_disruption = 0
+            angular_deviation = 0
+            path_coherence = 0
+
+        weight_local = 0.7 - 0.6 * exploration_factor
+        weight_centrality = 0.2 + 0.4 * exploration_factor
+        weight_flow = -0.3 * flow_disruption if flow_disruption > 0 else 0
+        weight_deviation = -0.2 * angular_deviation
+        weight_coherence = 0.1 * path_coherence
+
+        score = (weight_local * current_dist) + (weight_centrality * centrality) + (weight_flow * flow_disruption) + (weight_deviation * angular_deviation) + (weight_coherence * path_coherence)
+
+        scores.append((node, score))
+
+    next_node = min(scores, key=lambda x: x[1])[0]
+    return next_node

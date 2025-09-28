@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes) - 1
+    alpha = 0.5 * (1 - (remaining_nodes / len(unvisited_nodes)))
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        weighted_cost = 0.7 * immediate_distance + 0.3 * potential_distance
+        if immediate_distance == 0 or potential_distance == 0:
+            harmonic_mean = float('inf')
+        else:
+            harmonic_mean = 2 * (immediate_distance * potential_distance) / (immediate_distance + potential_distance)
+        position_factor = (distance_matrix[current_node][destination_node] - immediate_distance) / distance_matrix[current_node][destination_node] if distance_matrix[current_node][destination_node] > 0 else 0
+        refined_cost = harmonic_mean * (1 - alpha) + position_factor * alpha
+        if refined_cost < min_cost:
+            min_cost = refined_cost
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node

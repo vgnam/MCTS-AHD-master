@@ -1,0 +1,21 @@
+defaulting to the destination if no unvisited nodes remain.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    exploration_weight = 0.4  # Weight for exploration factor
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        exploration_factor = 1 / (1 + immediate_distance)  # Encourages closer nodes to the current node
+        total_cost = (1 - exploration_weight) * immediate_distance + exploration_weight * potential_distance + exploration_factor
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+    return next_node

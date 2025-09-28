@@ -1,0 +1,10 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        global_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        inverse_global = 1 / (global_distance + 1e-10)
+        return local_distance + 0.6 * global_distance + 0.3 * inverse_global
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

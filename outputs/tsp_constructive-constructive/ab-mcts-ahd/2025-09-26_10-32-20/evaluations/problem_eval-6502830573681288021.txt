@@ -1,0 +1,9 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    def score(node):
+        dist = distance_matrix[current_node][node]
+        degree = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < dist)
+        return (1.0 / (dist ** 2)) * (1.0 + 0.3 * degree)
+    next_node = max(unvisited_nodes, key=score)
+    return next_node

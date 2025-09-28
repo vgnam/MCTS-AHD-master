@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    exploration_pressure = (1.0 - (remaining_count / total_nodes)) ** 2
+    progress_factor = 1.0 - (remaining_count / total_nodes) ** 0.5
+
+    node_scores = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_dist = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = avg_dist
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.1 * avg_dist)
+        else:
+            node_centrality = 0
+            connectivity = 0
+
+        topological_factor = (connectivity / (total_nodes - 1)) ** 1.5 if (total_nodes - 1) > 0 else 0
+        distance_ratio = immediate_dist / (node_centrality + 1e-6) if node_centrality > 0 else 1.0
+
+        base_score = immediate_dist * (1.0 + 0.5 * topological_factor)
+        penalty = (1.0 + 0.3 * progress_factor) * (1.0 + 0.2 * distance_ratio)
+
+        adjusted_score = base_score * penalty
+        node_scores.append((node, adjusted_score))
+
+    if node_scores:
+        node_scores.sort(key=lambda x: x[1])
+        candidates = [node for node, score in node_scores[:max(1, len(node_scores) // 3)]]
+        if candidates:
+            next_node = candidates[0]
+
+    if next_node is None:
+        next_node = min(unvisited_nodes, key=lambda n: distance_matrix[current_node][n])
+
+    return next_node

@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    avg_remaining_distance = sum(distance_matrix[node][destination_node] for node in unvisited_nodes) / len(unvisited_nodes)
+    dynamic_threshold = avg_remaining_distance * 0.8 * (0.9 ** len(unvisited_nodes))
+
+    min_total_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        remaining_distance = distance_matrix[node][destination_node]
+        total_distance = current_distance + remaining_distance
+
+        if total_distance < min_total_distance:
+            min_total_distance = total_distance
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        direct_distance = distance_matrix[current_node][destination_node]
+        if direct_distance <= dynamic_threshold:
+            next_node = destination_node
+
+    return next_node

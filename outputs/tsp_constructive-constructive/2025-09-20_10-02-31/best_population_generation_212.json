@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm alternates between selecting the nearest unvisited node (prioritizing local optimization) and the node that minimizes the maximum distance to remaining unvisited nodes (prioritizing global optimization), balancing trade-offs between immediate proximity and long-term path efficiency. The alternation is controlled by the parity of remaining unvisited nodes (odd/even), with `min_max_distance` being the critical function for global optimization.",
+     "thought": "The new algorithm alternates between selecting the closest unvisited node and the node that minimizes the maximum distance to remaining unvisited nodes, aiming to balance local and global optimization.",
+     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n\n    def min_max_distance(node):\n        remaining_nodes = unvisited_nodes - {node}\n        if not remaining_nodes:\n            return distance_matrix[current_node][node]\n        return max(distance_matrix[node][n] for n in remaining_nodes)\n\n    if len(unvisited_nodes) % 2 == 1:\n        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])\n    else:\n        next_node = min(unvisited_nodes, key=min_max_distance)\n\n    return next_node",
+     "objective": 16.70467,
+     "other_inf": null
+}

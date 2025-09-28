@@ -1,0 +1,10 @@
+import random
+    next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+
+    # Override with destination if it's closer and not the only remaining node
+    if destination_node in unvisited_nodes and remaining_nodes > 1:
+        dest_distance = distance_matrix[current_node][destination_node]
+        if dest_distance < distance_matrix[current_node][next_node] * 0.9:
+            next_node = destination_node
+
+    return next_node

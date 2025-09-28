@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    current_path_length = sum(distance_matrix[current_node][n] for n in unvisited_nodes if n != current_node)
+    avg_path_length = current_path_length / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+    normalized_path_length = avg_path_length / total_nodes
+
+    def sigmoid(x):
+        return 1 / (1 + math.exp(-x))
+
+    def novelty_score(node):
+        if remaining_nodes > 1:
+            distances_to_unvisited = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distances_to_unvisited) / (remaining_nodes - 1)
+            variance_remaining_dist = sum((d - avg_remaining_dist) ** 2 for d in distances_to_unvisited) / (remaining_nodes - 1)
+            centrality = 1 / (1 + avg_remaining_dist)
+            connectivity = 1 / (1 + variance_remaining_dist)
+            return centrality * connectivity
+        else:
+            return 0
+
+    def heuristic_penalty(node):
+        if node in unvisited_nodes:
+            return 0
+        else:
+            return 1.5
+
+    def weighted_score(node):
+        local_distance = distance_matrix[current_node][node]
+        dest_distance = distance_matrix[node][destination_node]
+
+        connectivity_score = novelty_score(node)
+        penalty = heuristic_penalty(node)
+
+        weight_local = sigmoid(0.5 - 0.2 * exploration_factor - 0.1 * normalized_path_length)
+        weight_connectivity = sigmoid(0.3 + 0.2 * exploration_factor + 0.1 * normalized_path_length)
+        weight_dest = sigmoid(-0.2 + 0.1 * (1 - exploration_factor))
+
+        return (weight_local * local_distance) + (weight_connectivity * (1 - connectivity_score)) + (weight_dest * dest_distance) + penalty
+
+    next_node = min(unvisited_nodes, key=weighted_score)
+    return next_node

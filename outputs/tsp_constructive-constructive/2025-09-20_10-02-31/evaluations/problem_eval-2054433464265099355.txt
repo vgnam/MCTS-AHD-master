@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def dynamic_weight(node):
+        immediate_dist = distance_matrix[current_node][node]
+        future_dist = sum(distance_matrix[node][n] for n in unvisited_nodes - {node}) / len(unvisited_nodes) if unvisited_nodes - {node} else 0
+        progress_factor = 1 - (len(unvisited_nodes) / len(distance_matrix))
+        return (1 - progress_factor) * immediate_dist + progress_factor * future_dist
+
+    if len(unvisited_nodes) % 3 == 0:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    elif len(unvisited_nodes) % 3 == 1:
+        next_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    else:
+        next_node = min(unvisited_nodes, key=dynamic_weight)
+
+    return next_node

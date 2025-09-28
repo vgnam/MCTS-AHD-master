@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic weighting using sigmoid function
+    progress = 1 - (remaining_nodes / total_nodes)
+    weight_immediate = 1 / (1 + math.exp(-10 * (progress - 0.5)))
+    weight_lookahead = 1 - weight_immediate
+
+    best_node = None
+    best_score = float('inf')
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Look-ahead: evaluate potential dead-end risk
+        min_lookahead = float('inf')
+        max_lookahead = 0
+        for next_node in unvisited_nodes:
+            if next_node != node:
+                lookahead_distance = distance_matrix[node][next_node]
+                if lookahead_distance < min_lookahead:
+                    min_lookahead = lookahead_distance
+                if lookahead_distance > max_lookahead:
+                    max_lookahead = lookahead_distance
+
+        # Dead-end penalty: higher penalty when min_lookahead is much smaller than max_lookahead
+        dead_end_penalty = (max_lookahead - min_lookahead) / (max_lookahead + 1e-6)
+
+        # Weighted score with dynamic weights and dead-end penalty
+        score = (weight_immediate * immediate_distance +
+                 weight_lookahead * min_lookahead +
+                 0.2 * dead_end_penalty)
+
+        if score < best_score:
+            best_score = score
+            best_node = node
+
+    return next_node

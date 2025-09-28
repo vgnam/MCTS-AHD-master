@@ -1,0 +1,20 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    distances = [(node, distance_matrix[current_node][node]) for node in unvisited_nodes]
+    distances.sort(key=lambda x: x[1])
+
+    # Calculate selection probabilities inversely proportional to distance (exponentially decaying)
+    total_weight = sum(math.exp(-d) for _, d in distances)
+    probabilities = [math.exp(-d) / total_weight for _, d in distances]
+
+    # Choose a node based on the calculated probabilities
+    next_node = random.choices([node for node, _ in distances], weights=probabilities, k=1)[0]
+
+    return next_node

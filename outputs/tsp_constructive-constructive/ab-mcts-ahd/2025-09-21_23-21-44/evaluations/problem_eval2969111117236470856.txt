@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    weight_factor = 1 / (1 + math.exp(-(remaining_nodes - 5)))  # Sigmoid adjustment
+    current_weight = 0.6 + 0.2 * weight_factor
+    future_weight = 0.4 - 0.2 * weight_factor
+
+    min_weighted_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = min(distance_matrix[node][n] for n in unvisited_nodes if n != node) if remaining_nodes > 1 else 0
+        weighted_score = current_weight * current_distance + future_weight * future_distance
+
+        if weighted_score < min_weighted_score:
+            min_weighted_score = weighted_score
+            next_node = node
+
+    return next_node

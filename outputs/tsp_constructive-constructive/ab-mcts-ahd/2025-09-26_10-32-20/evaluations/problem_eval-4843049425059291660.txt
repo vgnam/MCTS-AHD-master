@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate nearest neighbor component (60%)
+    nearest_neighbor = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    nearest_score = distance_matrix[current_node][nearest_neighbor]
+
+    # Calculate global measure (40%)
+    centrality = lambda node: 1 / (sum(distance_matrix[node][n] for n in range(len(distance_matrix))) + 1e-10)
+    revisit_penalty = lambda node: math.exp(-len(unvisited_nodes) / len(distance_matrix))
+    global_score = lambda node: 0.6 * centrality(node) + 0.4 * revisit_penalty(node)
+
+    # Hybrid score with probabilistic selection
+    hybrid_score = lambda node: 0.6 * distance_matrix[current_node][node] + 0.4 * global_score(node)
+    scores = [hybrid_score(node) for node in unvisited_nodes]
+    probabilities = [1 / (score + 1e-10) for score in scores]
+    probabilities = [p / sum(probabilities) for p in probabilities]
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

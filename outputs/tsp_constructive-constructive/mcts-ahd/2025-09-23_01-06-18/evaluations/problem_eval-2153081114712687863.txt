@@ -1,0 +1,40 @@
+importance, incorporating a node centrality metric to prioritize high-degree nodes early, while maintaining a penalty for revisiting non-destination nodes and adjusting weights non-linearly to prevent premature convergence.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes if total_nodes > 0 else 0.0
+
+    # Calculate node centrality (average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        detour_cost = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+
+        # Non-linear dynamic weighting
+        weight_proximity = 0.9 * (1 - progress_ratio)**2
+        weight_detour = 0.1 + 0.8 * progress_ratio**2
+        weight_centrality = 0.2 * (1 - progress_ratio)
+
+        # Normalize centrality
+        max_centrality = max(centrality.values()) if centrality else 1.0
+        normalized_centrality = centrality[node] / max_centrality if max_centrality > 0 else 0.0
+
+        # Penalty for revisiting nodes
+        penalty = 0.3 if node in unvisited_nodes and node != destination_node else 0.0
+
+        return (weight_proximity * immediate_cost +
+                weight_detour * detour_cost +
+                weight_centrality * normalized_centrality +
+                penalty)
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

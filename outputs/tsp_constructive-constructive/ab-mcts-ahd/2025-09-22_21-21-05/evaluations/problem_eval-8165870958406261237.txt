@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        destination_distance = distance_matrix[current_node][destination_node]
+        exploration_phase = len(unvisited_nodes) / (len(unvisited_nodes) + len(unvisited_nodes) - len(unvisited_nodes))
+        dynamic_threshold = 1 / (1 + math.exp(-10 * (exploration_phase - 0.5)))
+        bias = 1 - (destination_distance / (avg_distance + 1e-10))
+        if bias > dynamic_threshold:
+            return destination_node
+
+    candidates = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        local_density = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < distance)
+        novelty_bonus = math.exp(-0.5 * local_density)  # Decaying bonus for sparse areas
+        weight = (1 / (distance + 1e-10)) * novelty_bonus
+        candidates.append((node, weight))
+        total_weight += weight
+
+    if not candidates:
+        return destination_node if destination_node in unvisited_nodes else unvisited_nodes[0]
+
+    rand_val = random.random() * total_weight
+    cumulative = 0.0
+    for node, weight in candidates:
+        cumulative += weight
+        if rand_val <= cumulative:
+            return node
+
+    return next_node

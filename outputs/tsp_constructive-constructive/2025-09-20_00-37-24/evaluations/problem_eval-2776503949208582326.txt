@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic temperature for exploration
+    temperature = 1.0 / (1.0 + math.exp(-0.1 * len(unvisited_nodes)))
+    exploration_prob = temperature * 0.5  # Scale exploration based on temperature
+
+    if random.random() < exploration_prob:
+        # Longer-range connection selection
+        candidates = nearest_neighbors[int(len(nearest_neighbors) * 0.3):]  # Skip nearest 30%
+        if not candidates:
+            candidates = nearest_neighbors
+        weights = [1.0 / (1.0 + math.exp(-0.2 * (i - len(nearest_neighbors)/2))) for i in range(len(candidates))]
+        next_node = random.choices(candidates, weights=weights, k=1)[0]
+    else:
+        # Nearest-neighbor selection with dynamic candidate pool
+        candidate_count = max(1, min(5, int(1 + len(nearest_neighbors) * 0.2)))
+        candidates = nearest_neighbors[:candidate_count]
+        next_node = random.choice(candidates)
+
+    return next_node

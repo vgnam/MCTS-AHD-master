@@ -1,0 +1,29 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    { #This algorithm uses a combination of shortest distance and pheromone-inspired selection to guide the path, favoring nodes with shorter distances and higher artificial pheromone levels. }
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate attractiveness based on distance (inverse relationship)
+    attractiveness = {node: 1.0 / (distance_matrix[current_node][node] + 1e-9) for node in unvisited_nodes}
+
+    # Introduce artificial pheromone (initially uniform)
+    pheromone = {node: 1.0 for node in unvisited_nodes} #initial pheromone
+
+    # Calculate probabilities based on attractiveness and pheromone
+    probabilities = {}
+    total_score = sum((attractiveness[node] * pheromone[node]) for node in unvisited_nodes)
+    for node in unvisited_nodes:
+        probabilities[node] = (attractiveness[node] * pheromone[node]) / total_score if total_score > 0 else 1.0 / len(unvisited_nodes)
+
+    # Stochastic selection based on probabilities
+    next_node = random.choices(list(unvisited_nodes), weights=list(probabilities.values()), k=1)[0]
+
+    # Pheromone update (simulated evaporation and deposition) - can be moved out to main TSP loop for efficiency
+    # For simplicity, we will update pheromone levels only for the selected next_node
+    # pheromone[next_node] = (1 - 0.1) * pheromone[next_node] + 0.1  # evaporation (0.1 is evaporation rate)
+    # pheromone[next_node] += 1.0 / (distance_matrix[current_node][next_node] + 1e-9) #deposition
+    return next_node

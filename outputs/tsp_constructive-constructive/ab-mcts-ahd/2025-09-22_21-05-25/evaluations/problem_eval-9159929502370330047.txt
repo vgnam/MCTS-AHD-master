@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    def evaluate_node(node):
+        current_to_node = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_unvisited = [n for n in unvisited_nodes if n != node]
+            farthest_remaining = max(remaining_unvisited, key=lambda n: distance_matrix[node][n])
+            node_to_farthest = distance_matrix[node][farthest_remaining]
+            return node_to_farthest / current_to_node if current_to_node != 0 else float('inf')
+        else:
+            return current_to_node
+    next_node = max(unvisited_nodes, key=evaluate_node)
+    return next_node

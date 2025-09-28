@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    weight_distance = 0.7 - 0.4 * progress
+    weight_coherence = 0.3 * (0.5 - abs(progress - 0.5))
+
+    def calculate_score(node):
+        distance = distance_matrix[current_node][node]
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        return (weight_distance * distance) - (weight_coherence * coherence)
+
+    next_node = max(unvisited_nodes, key=calculate_score)
+    return next_node

@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Compute centroid and remaining path metrics
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        remaining_path_length = sum(distance_matrix[node][destination_node] for node in unvisited_nodes)
+    else:
+        centroid_x = 0
+        remaining_path_length = 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Dynamic weight adjustment based on remaining path length
+        weight_current = 1.0 if remaining_path_length < 2 * distance_matrix[current_node][destination_node] else 0.7
+        weight_dest = 0.5 if remaining_path_length > distance_matrix[current_node][destination_node] else 0.3
+        weight_centroid = 0.3 if len(unvisited_nodes) > 3 else 0.1
+
+        # Look-ahead penalty: estimate detour risk
+        look_ahead_penalty = 0
+        if len(unvisited_nodes) > 1:
+            other_nodes = [n for n in unvisited_nodes if n != node]
+            if other_nodes:
+                min_future_distance = min(distance_matrix[node][n] for n in other_nodes)
+                look_ahead_penalty = min_future_distance * 0.2
+
+        # Novel scoring function
+        score = (weight_current * distance_to_current +
+                 weight_dest * distance_to_dest +
+                 weight_centroid * centroid_penalty +
+                 look_ahead_penalty)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

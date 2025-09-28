@@ -1,0 +1,21 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    local_weight = math.sqrt(remaining_nodes) / (math.sqrt(remaining_nodes) + 1)
+    global_weight = 1 - local_weight
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        sum_inv_dist = sum(1 / distance_matrix[node][n] for n in unvisited_nodes)
+        harmonic_mean = len(unvisited_nodes) / sum_inv_dist
+        return (local_weight * distance_matrix[current_node][node] +
+                global_weight * harmonic_mean)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    # Calculate exploration factors for each node
+    exploration_factors = {}
+    total_distance = 0
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        total_distance += cost
+        exploration_factors[node] = cost * (1 + (sum(distance_matrix[node]) / len(distance_matrix[node])))
+
+    if not exploration_factors:
+        return unvisited_nodes.pop()
+
+    # Select node with highest exploration factor
+    next_node = max(exploration_factors.items(), key=lambda x: x[1])[0]
+
+    # Dynamic threshold based on current path quality
+    if len(unvisited_nodes) > 2:
+        greedy_cost = distance_matrix[current_node][next_node]
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][node]
+            threshold = greedy_cost * (1 + (0.1 * (potential_cost / greedy_cost)))
+            if exploration_factors[node] > exploration_factors[next_node] * (1 - 0.1 * (potential_cost / greedy_cost)):
+                next_node = node
+                break
+
+    return next_node

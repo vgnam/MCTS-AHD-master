@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance (20-40%) and flow disruption based on remaining nodes, balancing exploration and exploitation through a progress_factor that increases connectivity weight as the tour nears completion.}
+                                                                                                                                                                                                       ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance (20-40%) and flow disruption based on remaining nodes, balancing exploration and exploitation through a progress_factor that increases connectivity weight as the tour nears completion.}
+                                                                                                                                                                                                       ^
+SyntaxError: unmatched '}'

@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Compute centroid of unvisited nodes
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    else:
+        centroid_x = 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Dynamic weight for centroid penalty based on remaining distance to destination
+        dynamic_weight = 0.3 * (1 - (distance_to_dest / sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)))
+
+        # Look-ahead mechanism: evaluate potential detours by considering next closest unvisited node
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            next_closest_node = min(remaining_nodes, key=lambda n: distance_matrix[node][n])
+            detour_penalty = distance_matrix[node][next_closest_node] - distance_matrix[current_node][next_closest_node]
+        else:
+            detour_penalty = 0
+
+        # Normalized scoring system
+        max_distance = max(distance_matrix[node][n] for n in unvisited_nodes if n != node) if len(unvisited_nodes) > 1 else 1
+        normalized_distance_to_current = distance_to_current / max_distance
+        normalized_distance_to_dest = distance_to_dest / max_distance
+        normalized_centroid_penalty = centroid_penalty / max_distance
+
+        # Weighted score with dynamic adjustments
+        score = (normalized_distance_to_current +
+                 0.5 * normalized_distance_to_dest +
+                 dynamic_weight * normalized_centroid_penalty +
+                 0.2 * detour_penalty)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

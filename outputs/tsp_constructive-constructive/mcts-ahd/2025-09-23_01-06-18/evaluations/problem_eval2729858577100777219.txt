@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - remaining_nodes / total_nodes
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        regret = immediate_cost - min(distance_matrix[current_node][n] for n in unvisited_nodes)
+
+        hub_score = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.1 * min(distance_matrix[node][m] for m in unvisited_nodes if m != n)) if remaining_nodes > 1 else 0
+
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        diversity_score = avg_distance / (sum(sum(distance_matrix[n]) for n in unvisited_nodes) / (remaining_nodes * (remaining_nodes - 1) + 1e-6))
+
+        global_connectivity = (distance_matrix[node][destination_node] + avg_distance) / 2
+
+        weight_immediate = 0.5 - 0.4 * (progress ** 2)
+        weight_regret = 0.3 + 0.3 * (progress ** 2)
+        weight_hub = 0.1 * (progress ** 3)
+        weight_global = 0.1 * (1 - progress ** 3)
+
+        weighted_score = (weight_immediate * immediate_cost +
+                          weight_regret * regret +
+                          weight_hub * hub_score +
+                          weight_global * global_connectivity) / (weight_immediate + weight_regret + weight_hub + weight_global + 1e-6)
+        return weighted_score
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

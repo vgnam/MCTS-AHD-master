@@ -1,0 +1,21 @@
+importance" factor, calculated as the ratio of the current node's average distance to all nodes, ensuring more informed local-global optimization transitions.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+    base_weight_current = remaining_nodes / total_nodes
+    base_weight_future = 1 - base_weight_current
+    node_importance = sum(distance_matrix[current_node]) / len(distance_matrix[current_node])
+    adjusted_weight_current = base_weight_current * (1 + node_importance / 100)
+    adjusted_weight_future = base_weight_future * (1 - node_importance / 200)
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        return adjusted_weight_current * current_dist + adjusted_weight_future * avg_future_dist
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

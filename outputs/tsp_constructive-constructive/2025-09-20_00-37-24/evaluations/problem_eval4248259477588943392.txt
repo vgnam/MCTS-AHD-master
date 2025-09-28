@@ -1,0 +1,37 @@
+importance" (based on average distances to other nodes), creating a balance between proximity and global connectivity. It first checks for the destination node, then selects among the nearest neighbors with probabilities adjusted by both distance and importance scores.}
+
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate importance scores: average distance to other nodes (lower is more important)
+    importance_scores = {}
+    for node in unvisited_nodes:
+        avg_distance = np.mean([distance_matrix[node][other] for other in unvisited_nodes if other != node])
+        importance_scores[node] = avg_distance
+
+    # Get nearest neighbors
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Create weighted probabilities: inverse of distance * importance score
+    weights = []
+    for node in nearest_neighbors:
+        distance = distance_matrix[current_node][node]
+        importance = importance_scores[node]
+        # Avoid division by zero and favor closer, more important nodes
+        weight = (1 / (distance + 1e-6)) * (1 / (importance + 1e-6))
+        weights.append(weight)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    # Select node based on probabilities
+    next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+
+    return next_node

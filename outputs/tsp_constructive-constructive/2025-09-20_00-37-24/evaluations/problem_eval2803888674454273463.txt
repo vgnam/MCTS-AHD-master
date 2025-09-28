@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Calculate potential for each node (inverse of sum of distances to all unvisited nodes)
+    potentials = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes)
+        potentials[node] = 1.0 / (total_distance + 1e-10)  # Avoid division by zero
+
+    # Combine distance and potential into a weighted score
+    scores = {}
+    for node in unvisited_nodes:
+        distance_score = 1.0 / (distance_matrix[current_node][node] + 1e-10)
+        potential_score = potentials[node]
+        scores[node] = distance_score * potential_score
+
+    # Temperature-based stochastic selection
+    temperature = 0.5  # Controls randomness (higher = more random)
+    normalized_scores = [math.exp(score / temperature) for score in scores.values()]
+    total = sum(normalized_scores)
+    probabilities = [score / total for score in normalized_scores]
+
+    next_node = random.choices(list(scores.keys()), weights=probabilities, k=1)[0]
+    return next_node

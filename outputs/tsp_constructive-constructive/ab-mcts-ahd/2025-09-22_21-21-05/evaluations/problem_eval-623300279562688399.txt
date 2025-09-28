@@ -1,0 +1,36 @@
+default but adjusts its choice based on a dynamic bias that considers both proximity to the destination and the node's centrality in the remaining graph.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+
+    total_unvisited = len(unvisited_nodes)
+    avg_distances = []
+    for node in unvisited_nodes:
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes) / total_unvisited
+        avg_distances.append(avg_dist)
+
+    avg_avg_distance = sum(avg_distances) / total_unvisited if total_unvisited > 0 else 0
+
+    for i, node in enumerate(unvisited_nodes):
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        destination_distance = distance_matrix[current_node][destination_node]
+        bias_threshold = 0.5 * (1 + (destination_distance / (avg_distance + 1e-10)))
+        bias = 1 - (destination_distance / (avg_distance + 1e-10))
+
+        centrality_factor = 1.0 - (avg_distances[unvisited_nodes.index(destination_node)] / (avg_avg_distance + 1e-6))
+        combined_bias = bias * 0.7 + centrality_factor * 0.3
+
+        if combined_bias > bias_threshold:
+            next_node = destination_node
+
+    return next_node

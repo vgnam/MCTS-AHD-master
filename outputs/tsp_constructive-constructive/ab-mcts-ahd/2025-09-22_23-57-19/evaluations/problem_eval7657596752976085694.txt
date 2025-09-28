@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    centrality = {}
+    distance_scores = {}
+    total_centrality = 0
+    for node in unvisited_nodes:
+        node_centrality = sum(distance_matrix[node])
+        centrality[node] = node_centrality
+        total_centrality += node_centrality
+        distance_scores[node] = distance_matrix[current_node][node]
+
+    avg_centrality = total_centrality / len(unvisited_nodes) if unvisited_nodes else 0
+    exploration_factor = min(1.0, 1.0 / (len(unvisited_nodes) + 1) * 1.5)
+
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        threshold = min_cost * (1.0 + exploration_factor * 0.5)
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            if potential_cost <= threshold and centrality[node] > avg_centrality * exploration_factor:
+                next_node = node
+                break
+
+    return next_node

@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    exploration_factor = len(unvisited_nodes) / (len(unvisited_nodes) + len(unvisited_nodes) - len(unvisited_nodes))
+    destination_bias = 0.5 + 0.5 * exploration_factor
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if destination_distance <= avg_distance * (1 - exploration_factor):
+            return destination_node
+
+    novelty_bonus = {}
+    for node in unvisited_nodes:
+        local_connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < distance_matrix[current_node][node])
+        novelty_bonus[node] = (1 - exploration_factor) * (1 / (1 + local_connectivity))
+
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        weighted_score = distance * (1 - novelty_bonus[node])
+        if weighted_score < min_distance:
+            min_distance = weighted_score
+            next_node = node
+
+    return next_node

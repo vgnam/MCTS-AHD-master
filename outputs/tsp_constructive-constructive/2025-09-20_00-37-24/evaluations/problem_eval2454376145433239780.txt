@@ -1,0 +1,32 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    # Calculate probabilities based on inverse distance and temperature
+    temperature = len(unvisited_nodes) / (len(unvisited_nodes) + 1)  # Decreases as unvisited_nodes decrease
+    probabilities = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        weight = math.exp(-distance / temperature)  # Higher weight for closer nodes
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    probabilities = [w / total_weight for w in probabilities]
+
+    # Choose node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    # Occasionally (10% chance) choose the destination if it's still unvisited
+    if destination_node in unvisited_nodes and random.random() < 0.1:
+        next_node = destination_node
+
+    return next_node

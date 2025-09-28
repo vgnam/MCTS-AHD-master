@@ -1,0 +1,48 @@
+importance" metric calculated as the harmonic mean of distances to remaining nodes to better capture centrality, and a "path momentum" term that considers the direction of travel to avoid sharp turns.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    visited_count = total_nodes - len(unvisited_nodes)
+    learning_rate = 0.9 ** visited_count
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            if remaining_nodes:
+                # Calculate node importance (harmonic mean of distances to remaining nodes)
+                sum_inv_dists = sum(1 / distance_matrix[node][n] for n in remaining_nodes)
+                node_importance = len(remaining_nodes) / sum_inv_dists if sum_inv_dists != 0 else 0
+
+                # Calculate path momentum (direction consistency)
+                if visited_count > 1:
+                    prev_node = next(n for n in range(total_nodes) if n not in unvisited_nodes and n != current_node)
+                    prev_dir = (current_node - prev_node, current_node - prev_node)
+                    curr_dir = (node - current_node, node - current_node)
+                    dot_product = prev_dir[0] * curr_dir[0] + prev_dir[1] * curr_dir[1]
+                    momentum = dot_product / (sum(x**2 for x in prev_dir)**0.5 * sum(x**2 for x in curr_dir)**0.5)
+                else:
+                    momentum = 1.0
+
+                # Dynamic weight balancing
+                immediate_weight = 1.0 - learning_rate
+                importance_weight = learning_rate * 0.6
+                destination_weight = learning_rate * 0.3
+                momentum_weight = 0.1 * (1 - learning_rate)
+
+                return (immediate_weight * current_dist +
+                        importance_weight * node_importance +
+                        destination_weight * dest_dist +
+                        momentum_weight * (1 - momentum))
+            else:
+                return current_dist + dest_dist
+        else:
+            return current_dist + dest_dist
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

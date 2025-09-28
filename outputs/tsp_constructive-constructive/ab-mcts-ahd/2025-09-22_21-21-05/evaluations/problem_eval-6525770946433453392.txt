@@ -1,0 +1,28 @@
+importance of local and global factors based on the proximity to the destination, using a decay factor to emphasize local optimization as the destination is approached, while also incorporating a novel penalty mechanism that scales with the distance to the destination to discourage detours.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    num_unvisited = len(unvisited_nodes)
+    distance_to_destination = distance_matrix[current_node][destination_node]
+    decay_factor = max(0.1, 1.0 - (distance_to_destination / (2 * sum(distance_matrix[0]) / len(distance_matrix))))
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / num_unvisited if num_unvisited else 0
+
+        # Novel penalty: scales with distance to destination
+        penalty = 1.0 + (distance_to_dest / distance_to_destination) if distance_to_destination > 0 else 1.0
+
+        # Dynamic weighting: decay_factor reduces global importance as destination approaches
+        combined_score = (distance_to_current + distance_to_dest + decay_factor * avg_distance_to_remaining) * penalty
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

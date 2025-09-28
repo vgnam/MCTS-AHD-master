@@ -1,0 +1,22 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Adaptive selection pressure: decrease probability of choosing nearest neighbor as steps increase
+    exploration_factor = 1.0 / (1.0 + len(unvisited_nodes))
+    if random.random() < (0.9 * exploration_factor):
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Dynamic random selection: bias toward nodes with higher potential (inverse distance)
+        weights = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in nearest_neighbors]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+
+    return next_node

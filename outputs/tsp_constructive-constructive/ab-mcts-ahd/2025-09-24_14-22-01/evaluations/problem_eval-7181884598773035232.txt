@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes) - 1
+    if remaining_nodes == 0:
+        return destination_node
+
+    # Dynamic weight using sigmoid function
+    sigmoid_input = (remaining_nodes - 5) / 3  # Centered around 5 nodes remaining
+    weight_immediate = 1 / (1 + math.exp(-sigmoid_input))
+
+    # Node centrality measure (average distance to all unvisited nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        centrality[node] = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1)
+
+    # Penalty factor with non-linear decay
+    penalty_factor = 0.5 * (remaining_nodes / (remaining_nodes + 2))**2
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        penalty = penalty_factor * potential_distance * (1 + centrality[node] / sum(centrality.values()))
+
+        # Combined cost with centrality consideration
+        weighted_cost = (weight_immediate * immediate_distance +
+                        (1 - weight_immediate) * potential_distance -
+                        penalty +
+                        0.3 * centrality[node])
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    return next_node

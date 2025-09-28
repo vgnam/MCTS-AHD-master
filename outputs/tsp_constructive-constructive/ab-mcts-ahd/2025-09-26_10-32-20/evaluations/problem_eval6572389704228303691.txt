@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = remaining_nodes + 1
+
+    # Dynamic weight adjustment: global weight decreases as nodes are visited
+    global_weight = 0.7 * (remaining_nodes / total_nodes)
+    local_weight = 1.0 - global_weight
+
+    # Calculate hybrid score with dynamic weights
+    hybrid_score = lambda node: local_weight * distance_matrix[current_node][node] + global_weight * distance_matrix[node][destination_node]
+
+    # Incorporate nearest-neighbor and farthest-insertion as tie-breakers
+    nearest_neighbor = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_insertion = max(unvisited_nodes, key=lambda node: distance_matrix[node][destination_node])
+
+    # Select node with best hybrid score, with tie-breakers
+    next_node = min(unvisited_nodes, key=lambda node: (hybrid_score(node), distance_matrix[current_node][node]))
+
+    return next_node

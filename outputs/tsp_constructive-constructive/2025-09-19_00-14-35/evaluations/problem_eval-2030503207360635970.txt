@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = (remaining_nodes / total_nodes) ** 2
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            local_connectivity = sum(1.0 / (1.0 + distance_matrix[node][n]) for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+            flow_disruption = (max(distance_matrix[node][n] for n in unvisited_nodes if n != node) - immediate_dist) ** 2
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] > 0 and n != node)
+            proximity_centrality = (node_degree / (total_nodes - 1)) * (1 / (1 + immediate_dist))
+        else:
+            local_connectivity = 0
+            flow_disruption = 0
+            proximity_centrality = 0
+
+        weight_local = 0.3 + 0.3 * exploration_factor
+        weight_connectivity = 0.2 + 0.2 * exploration_factor
+        weight_dest = -0.3 + 0.2 * (1 - exploration_factor)
+        weight_flow = -0.2 * flow_disruption if flow_disruption > 0 else 0
+        weight_proximity = 0.3 * exploration_factor
+
+        score = (weight_local * immediate_dist) + (weight_connectivity * local_connectivity) + (weight_flow * flow_disruption) + (weight_dest * dest_dist) + (weight_proximity * proximity_centrality)
+        return score
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

@@ -1,0 +1,12 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 20, in select_next_node
+    centrality = len([n for n in distance_matrix[node] if n != node and distance_matrix[node][n] < float('inf')]) / len(unvisited_nodes)
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 20, in <listcomp>
+    centrality = len([n for n in distance_matrix[node] if n != node and distance_matrix[node][n] < float('inf')]) / len(unvisited_nodes)
+IndexError: only integers, slices (`:`), ellipsis (`...`), numpy.newaxis (`None`) and integer or boolean arrays are valid indices

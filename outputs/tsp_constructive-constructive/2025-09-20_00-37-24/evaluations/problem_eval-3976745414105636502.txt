@@ -1,0 +1,29 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate total distance from current node to each unvisited node
+    total_distances = []
+    for node in unvisited_nodes:
+        total_distance = distance_matrix[current_node][node]
+        total_distances.append((node, total_distance))
+
+    # Sort by total distance
+    sorted_nodes = sorted(total_distances, key=lambda x: x[1])
+    nearest_neighbors = [node for node, _ in sorted_nodes]
+
+    # 70% chance to pick from top 4 nearest, 20% chance to pick from next 3, 10% chance to pick random
+    rand_val = random.random()
+    if rand_val < 0.7:
+        candidates = nearest_neighbors[:min(4, len(nearest_neighbors))]
+    elif rand_val < 0.9:
+        candidates = nearest_neighbors[min(4, len(nearest_neighbors)):min(7, len(nearest_neighbors))]
+    else:
+        candidates = nearest_neighbors
+
+    next_node = random.choice(candidates)
+    return next_node

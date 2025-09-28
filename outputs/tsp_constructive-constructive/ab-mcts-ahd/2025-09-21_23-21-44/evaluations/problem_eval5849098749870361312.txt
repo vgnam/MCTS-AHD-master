@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 / (1 + remaining_nodes)
+
+    # Calculate local density for each node
+    local_density = {}
+    for node in unvisited_nodes:
+        local_density[node] = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+
+    # Calculate weighted scores
+    scores = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+        future_dist = distance_matrix[node][destination_node]
+        density_factor = 1 + (local_density[node] / (sum(local_density.values()) / remaining_nodes))
+
+        weighted_score = (0.6 - temperature) * immediate_dist + (0.4 + temperature) * future_dist * density_factor
+        scores.append((node, weighted_score))
+
+    # Apply softmax selection with temperature
+    exp_scores = [math.exp(-s[1] / temperature) for s in scores]
+    probs = [e / sum(exp_scores) for e in exp_scores]
+    next_node = random.choices([s[0] for s in scores], weights=probs, k=1)[0]
+
+    return next_node

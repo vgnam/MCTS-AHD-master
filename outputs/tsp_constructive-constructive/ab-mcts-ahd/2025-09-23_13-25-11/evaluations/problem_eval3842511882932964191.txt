@@ -1,0 +1,8 @@
+import random
+    next_node = random.choices(
+        population=list(unvisited_nodes),
+        weights=list(probabilities.values()),
+        k=1
+    )[0]
+
+    return next_node

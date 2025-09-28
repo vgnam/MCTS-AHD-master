@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    remaining_nodes = unvisited_nodes - {destination_node}
+    if not remaining_nodes:
+        return destination_node
+
+    # Calculate centrality scores for remaining nodes
+    centrality_scores = {}
+    for node in remaining_nodes:
+        centrality = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        centrality_scores[node] = centrality
+
+    # Normalize centrality scores
+    max_centrality = max(centrality_scores.values()) if centrality_scores else 1.0
+    normalized_centrality = {node: score / max_centrality for node, score in centrality_scores.items()}
+
+    # Dynamic weight adjustment (multiplicative)
+    dynamic_weight = 0.1 * (1 - (len(remaining_nodes) / len(unvisited_nodes))) ** 2
+
+    # Calculate costs with probabilistic weights
+    costs = []
+    for node in remaining_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        exploration_factor = normalized_centrality[node]
+
+        # Weighted cost with exploration factor
+        weighted_cost = (0.5 - dynamic_weight) * immediate_distance + (0.4 + dynamic_weight) * potential_distance + 0.1 * exploration_factor
+        costs.append((node, weighted_cost))
+
+    # Probabilistic selection based on normalized costs
+    if not costs:
+        return destination_node
+
+    min_cost = min(cost[1] for cost in costs)
+    max_cost = max(cost[1] for cost in costs)
+    normalized_costs = [(node, (max_cost - cost + min_cost) / (max_cost - min_cost + 1e-9)) for node, cost in costs]
+
+    # Select node with probability proportional to normalized cost
+    total_weight = sum(weight for _, weight in normalized_costs)
+    rand_val = random.random() * total_weight
+    cumulative_weight = 0.0
+    for node, weight in normalized_costs:
+        cumulative_weight += weight
+        if rand_val <= cumulative_weight:
+            return node
+    return next_node

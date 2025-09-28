@@ -1,0 +1,31 @@
+importance score based on proximity to unvisited nodes and a probabilistic selection mechanism, where the selection probability is influenced by both immediate cost and the node's strategic value, with a bias towards exploration early in the path and exploitation later.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes if total_nodes > 0 else 0.0
+
+    exploration_bias = 0.5 * (1 - progress_ratio) ** 3
+    exploitation_bias = 0.5 * progress_ratio ** 2
+
+    def node_importance(node):
+        avg_distance_to_unvisited = sum(distance_matrix[node][u] for u in unvisited_nodes) / remaining_nodes
+        return 1 / (1 + avg_distance_to_unvisited)
+
+    def selection_probability(node):
+        immediate_cost = distance_matrix[current_node][node]
+        normalized_cost = immediate_cost / max(distance_matrix[current_node]) if max(distance_matrix[current_node]) != 0 else 0
+        importance = node_importance(node)
+        return (1 - normalized_cost) * (exploration_bias * importance + exploitation_bias * (1 - normalized_cost))
+
+    probabilities = [selection_probability(node) for node in unvisited_nodes]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities] if total_prob > 0 else [1/len(probabilities)] * len(probabilities)
+
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+    return next_node

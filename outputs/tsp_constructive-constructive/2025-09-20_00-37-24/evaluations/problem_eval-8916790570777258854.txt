@@ -1,0 +1,28 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        # Dynamic bias towards destination based on remaining nodes
+        remaining_nodes = len(unvisited_nodes)
+        bias_prob = 1 / (1 + math.exp(-(remaining_nodes - 5)))  # Sigmoid function to adjust bias
+        if random.random() < bias_prob:
+            return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Adaptive selection probability based on remaining nodes
+    selection_prob = 1 / (1 + math.exp(-(len(unvisited_nodes) - 3)))  # Sigmoid function
+
+    if random.random() < selection_prob:  # Higher probability to pick from top 3 when few nodes remain
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Weighted random selection favoring closer nodes
+        weights = [1 / (distance_matrix[current_node][node] + 1e-6) for node in nearest_neighbors]
+        next_node = random.choices(nearest_neighbors, weights=weights, k=1)[0]
+
+    return next_node

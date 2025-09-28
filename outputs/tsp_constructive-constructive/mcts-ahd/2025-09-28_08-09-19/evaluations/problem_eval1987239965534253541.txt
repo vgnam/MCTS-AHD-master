@@ -1,0 +1,58 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Phase 1: Initial candidate selection with weighted components
+    candidates = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = -(distance_to_current + distance_to_destination)
+        else:
+            # Centrality: harmonic mean of distances to other nodes
+            centrality = 1.0 / (sum(1.0 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes if n != node) / (remaining_nodes - 1)) if remaining_nodes > 1 else 0
+
+            # Connectivity: relative density of nearby nodes
+            avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+            connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * avg_distance) / remaining_nodes
+
+            # Dynamic weights based on progress
+            progress = 1 - (remaining_nodes / len(unvisited_nodes + [current_node]))
+            immediate_weight = 0.4 + 0.3 * progress
+            centrality_weight = 0.3 * (1 - progress)
+            connectivity_weight = 0.3 * (1 - progress)
+
+            # Base score
+            score = (immediate_weight * (1.0 / (distance_to_current + 1e-6)) +
+                     centrality_weight * centrality +
+                     connectivity_weight * connectivity)
+
+        candidates.append((node, score))
+
+    # Phase 2: Refine candidates with distance-based penalties
+    refined_scores = []
+    for node, score in candidates:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Spatial penalty: discourage nodes that create sharp turns
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+        spatial_penalty = 0.2 * abs(distance_to_current - distance_to_destination) / (avg_distance + 1e-6)
+
+        # Progress-based penalty: encourage forward movement
+        progress_penalty = 0.1 * (1.0 - (distance_to_destination / (sum(distance_matrix[n][destination_node] for n in unvisited_nodes) + 1e-6)))
+
+        # Final score
+        final_score = score - spatial_penalty - progress_penalty
+        refined_scores.append((node, final_score))
+
+    # Select node with highest refined score
+    next_node = max(refined_scores, key=lambda x: x[1])[0]
+
+    return next_node

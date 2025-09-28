@@ -1,0 +1,13 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining_nodes = len(unvisited_nodes)
+    exploration_factor = 1.0 / (remaining_nodes + 1)  # Dynamic exploration factor
+    def calculate_score(node):
+        immediate_distance = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / remaining_nodes
+        return immediate_distance + exploration_factor * avg_distance
+    scores = [calculate_score(node) for node in unvisited_nodes]
+    min_score = min(scores)
+    candidates = [node for node, score in zip(unvisited_nodes, scores) if score == min_score]
+    return next_node

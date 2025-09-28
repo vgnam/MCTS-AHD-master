@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate adaptive exploration probability based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    exploration_prob = 1 / (1 + math.exp(-(remaining_nodes - 5)))  # Sigmoid function centered at 5 nodes
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if random.random() < exploration_prob:
+        # Dynamic candidate selection: more options when few nodes remain
+        candidate_count = min(3 + (10 - remaining_nodes) // 2, len(nearest_neighbors))
+        candidates = nearest_neighbors[:candidate_count]
+        next_node = random.choice(candidates)
+    else:
+        # Exploit nearest neighbors with higher probability
+        if random.random() < 0.7:  # 70% chance to pick from top 2
+            candidates = nearest_neighbors[:min(2, len(nearest_neighbors))]
+        else:  # 30% chance to pick from top 3
+            candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+
+    return next_node

@@ -1,0 +1,27 @@
+import random
+    import math
+
+    probabilities = []
+    total_score = 0.0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if len(unvisited_nodes) == 1:
+            future_score = 0
+        else:
+            future_score = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+
+        combined_score = distance_to_current + 0.5 * distance_to_destination + 0.3 * future_score
+        probability = math.exp(-combined_score)
+        probabilities.append(probability)
+        total_score += probability
+
+    if total_score == 0:
+        return random.choice(unvisited_nodes)
+
+    normalized_probs = [p / total_score for p in probabilities]
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+
+    return next_node

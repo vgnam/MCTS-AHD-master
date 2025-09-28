@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate centrality score: normalized by remaining nodes to avoid bias
+        centrality_score = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+        # Dynamic weight adjustment: hub score gets more weight as fewer nodes remain
+        hub_weight = 0.1 + 0.2 * (1 - remaining_nodes / len(distance_matrix))
+
+        # Normalized scoring to ensure comparability
+        max_distance = max(max(row) for row in distance_matrix)
+        normalized_distance_to_current = distance_to_current / max_distance
+        normalized_distance_to_destination = distance_to_destination / max_distance
+        normalized_centrality_score = centrality_score / max_distance
+
+        total_score = 0.5 * normalized_distance_to_current + 0.3 * normalized_distance_to_destination + hub_weight * normalized_centrality_score
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

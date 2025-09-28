@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate distances and their variance
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    mean_distance = sum(distances) / len(distances)
+    variance = sum((d - mean_distance) ** 2 for d in distances) / len(distances)
+    normalized_distances = [(d - mean_distance) / (variance + 1e-6) for d in distances]
+
+    # Create probability distribution where closer nodes have higher probability
+    probabilities = [max(0, 1 - abs(n)) for n in normalized_distances]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    # Dynamic stochasticity: higher variance increases randomness
+    if random.random() < (0.5 + 0.5 * variance / (mean_distance + 1e-6)):
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    else:
+        # Fallback to nearest neighbor when variance is low
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    return next_node

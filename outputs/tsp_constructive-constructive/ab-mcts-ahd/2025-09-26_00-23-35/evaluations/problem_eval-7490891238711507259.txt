@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    min_distance = float('inf')
+    dest_distance = distance_matrix[current_node][destination_node]
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate centrality for each node (average distance to other unvisited nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (remaining_nodes - 1)
+        centrality[node] = avg_dist
+
+    # Find nearest neighbor with dynamic weight
+    best_score = float('-inf')
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            weight = 1.0
+        else:
+            weight = (1.0 - (distance / (dest_distance + 1e-6))) * (centrality[node] / (centrality.get(destination_node, 1) + 1e-6))
+
+        score = -distance + weight * (1.0 / (1 + remaining_nodes))
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Probabilistic adjustment
+    if next_node != destination_node and destination_node in unvisited_nodes:
+        prob_threshold = (min_distance / (dest_distance + 1e-6)) * (1.0 / (1 + remaining_nodes))
+        if random.random() < prob_threshold:
+            next_node = destination_node
+
+    return next_node

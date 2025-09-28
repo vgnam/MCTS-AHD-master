@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_score(node):
+        num_unvisited = len(unvisited_nodes)
+        current_distance = distance_matrix[current_node][node]
+        remaining_distance = distance_matrix[node][destination_node]
+
+        # Calculate detour penalty based on angular deviation
+        vec_current = (distance_matrix[current_node][node], 0)
+        vec_remaining = (distance_matrix[node][destination_node], 0)
+        angular_deviation = abs(vec_current[0] * vec_remaining[1] - vec_current[1] * vec_remaining[0])
+
+        detour_penalty = sum(max(0, distance_matrix[current_node][node] + distance_matrix[node][other_node] - distance_matrix[current_node][other_node]) for other_node in unvisited_nodes if other_node != node)
+
+        # Dynamic weighting: penalty increases as tour progresses
+        return (current_distance + remaining_distance) + (1 / (num_unvisited + 1)) * detour_penalty + angular_deviation
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

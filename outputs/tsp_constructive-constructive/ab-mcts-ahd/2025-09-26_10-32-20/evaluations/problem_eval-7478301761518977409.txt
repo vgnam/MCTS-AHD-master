@@ -1,0 +1,13 @@
+importance
+        betweenness = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        score = (local_weight * distance_matrix[current_node][node] +
+                 0.5 * global_weight * betweenness +
+                 penalty)
+        return score
+
+    scores = [calculate_score(node) for node in unvisited_nodes]
+    exp_scores = [math.exp(-score) for score in scores]
+    probs = [exp_score / sum(exp_scores) for exp_score in exp_scores]
+    next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+    return next_node

@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes if total_nodes > 0 else 0.0
+    exploration_factor = 0.7 * (1 - progress_ratio) + 0.3 * (progress_ratio ** 2)
+
+    def node_reward(node):
+        direct_reward = -distance_matrix[current_node][node]
+        future_reward = -sum(distance_matrix[node][n] + distance_matrix[n][destination_node]
+                            for n in unvisited_nodes if n != node and n != destination_node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+        return 0.6 * direct_reward + 0.4 * future_reward
+
+    def node_centrality(node):
+        centrality = sum(distance_matrix[node][n] for n in range(total_nodes) if n != node)
+        return 1 / (centrality + 1)
+
+    def heuristic(node):
+        reward = node_reward(node)
+        centrality = node_centrality(node)
+        revisit_penalty = 0.5 if node in unvisited_nodes and node != destination_node else 0.0
+
+        exploration_term = exploration_factor * centrality
+        exploitation_term = (1 - exploration_factor) * reward
+
+        return exploitation_term + exploration_term - revisit_penalty
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

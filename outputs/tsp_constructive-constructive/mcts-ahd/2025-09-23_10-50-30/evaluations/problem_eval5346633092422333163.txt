@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    remaining_count = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        total_remaining_distance = sum(distance_matrix[node][n] for n in remaining_nodes) if remaining_nodes else 0
+        avg_remaining_distance = total_remaining_distance / len(remaining_nodes) if remaining_nodes else 0
+
+        # Dynamic weight adjustment with exponential scaling
+        weight_factor = 1.0 - math.exp(-remaining_count / (remaining_count + 1))
+        penalty_term = (distance_to_node ** 1.5) * weight_factor
+        score = (avg_remaining_distance - distance_to_node) - penalty_term
+        candidates.append((node, score))
+
+    # Normalize scores to probabilities
+    total_score = sum(score for _, score in candidates)
+    if total_score == 0:
+        return random.choice(list(unvisited_nodes))
+
+    normalized_scores = [(node, score / total_score) for node, score in candidates]
+    selected_node = random.choices(
+        [node for node, _ in normalized_scores],
+        weights=[prob for _, prob in normalized_scores],
+        k=1
+    )[0]
+
+    return next_node

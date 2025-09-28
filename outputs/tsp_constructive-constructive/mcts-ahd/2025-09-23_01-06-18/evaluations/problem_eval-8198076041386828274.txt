@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes if total_nodes > 0 else 0.0
+    exploration_phase = 1 - progress_ratio
+
+    # Memory of recently visited nodes (last 3)
+    memory_window = 3
+    recent_visits = getattr(select_next_node, 'recent_visits', [])
+    recent_visits = [current_node] + recent_visits[:memory_window-1]
+    select_next_node.recent_visits = recent_visits
+
+    def attraction_repulsion(node):
+        # Attraction to destination (weighted by exploration phase)
+        attraction = (1 - exploration_phase) * distance_matrix[node][destination_node]
+
+        # Repulsion from recently visited nodes
+        repulsion = sum(distance_matrix[node][n] for n in recent_visits if n != node) / len(recent_visits) if recent_visits else 0
+
+        return attraction - repulsion
+
+    def dynamic_centrality(node):
+        # Centrality adjusted by exploration phase and attraction
+        base_centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        attraction_factor = (1 - exploration_phase) * distance_matrix[node][destination_node]
+        return (base_centrality + attraction_factor) / (1 + exploration_phase)
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        ar_factor = attraction_repulsion(node)
+        centrality = dynamic_centrality(node)
+
+        # Dynamic weights based on exploration phase and centrality
+        weight_immediate = 0.4 + 0.3 * exploration_phase + 0.3 * (1 - centrality)
+        weight_ar = 0.3 + 0.2 * exploration_phase
+        weight_centrality = 0.3 + 0.2 * (1 - exploration_phase)
+
+        # Penalty for revisiting non-destination nodes
+        penalty = 0.2 if node in recent_visits and node != destination_node else 0.0
+
+        return weight_immediate * immediate_cost + weight_ar * ar_factor + weight_centrality * centrality + penalty
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

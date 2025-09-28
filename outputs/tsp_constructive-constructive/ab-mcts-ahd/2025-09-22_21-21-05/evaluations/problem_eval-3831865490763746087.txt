@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = (total_nodes - remaining_nodes) / total_nodes
+
+    # Connectivity-aware dynamic weight
+    current_connectivity = sum(1 for dist in distance_matrix[current_node] if dist < (sum(distance_matrix[current_node]) / len(distance_matrix[current_node])) * 1.2)
+    connectivity_weight = 0.4 * (current_connectivity / len(distance_matrix[current_node])) + 0.3 * (1 - progress_factor)
+
+    best_score = float('-inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Connectivity bonus: reward nodes with high local connectivity
+        node_connectivity = sum(1 for dist in distance_matrix[node] if dist < (sum(distance_matrix[node]) / len(distance_matrix[node])) * 1.2)
+        connectivity_bonus = 0.2 * (node_connectivity / len(distance_matrix[node]))
+
+        # Recent visits penalty: penalize nodes visited in last few steps (simulated here)
+        recent_visits_penalty = 1.0 if node in unvisited_nodes else 1.3
+
+        # Exploration factor: increases as progress decreases
+        exploration_factor = 0.5 * (1 - progress_factor)
+
+        combined_score = (
+            -distance_to_current * (1 + connectivity_weight) +
+            connectivity_weight * distance_to_destination +
+            connectivity_bonus +
+            exploration_factor * (1 / (1 + distance_to_current))
+        ) / recent_visits_penalty
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

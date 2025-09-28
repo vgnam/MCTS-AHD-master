@@ -1,0 +1,9 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    weights = {'proximity_weight': 0.7, 'destination_weight': 0.3}
+    next_node = min(unvisited_nodes, key=lambda node: (
+        weights['proximity_weight'] * distance_matrix[current_node][node] +
+        weights['destination_weight'] * distance_matrix[node][destination_node]
+    ))
+    return next_node

@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    if remaining_nodes == 0:
+        return destination_node
+
+    # Dynamic weight based on remaining nodes
+    weight = 0.5 if remaining_nodes > 1 else 0.8
+
+    # Calculate average distance to unvisited nodes
+    avg_lookahead = sum(distance_matrix[node][destination_node] for node in unvisited_nodes) / remaining_nodes
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        # Normalized score with dynamic weight and average lookahead adjustment
+        normalized_lookahead = lookahead_distance - avg_lookahead
+        score = immediate_distance - weight * normalized_lookahead
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

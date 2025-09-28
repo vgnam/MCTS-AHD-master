@@ -1,0 +1,36 @@
+importance metric based on degree centrality, while maintaining the original progress-based temperature control for exploration decay.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - remaining_nodes / total_nodes
+    temperature = 0.8 - 0.7 * progress
+
+    def node_importance(node):
+        return sum(1 for n in range(total_nodes) if distance_matrix[node][n] < float('inf')) / total_nodes
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node]
+        global_potential = (distance_matrix[node][destination_node] +
+                           sum(distance_matrix[node][n] for n in unvisited_nodes if n != destination_node)) / (remaining_nodes + 1)
+        regret_potential = max(distance_matrix[current_node][n] - distance_matrix[current_node][node] for n in unvisited_nodes) if unvisited_nodes else 0
+        detour_sensitivity = (distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]) / (distance_matrix[current_node][destination_node] + 1e-6)
+        importance = node_importance(node)
+
+        exploration_term = (0.5 * regret_potential + 0.3 * detour_sensitivity) * temperature
+        exploitation_term = (0.6 * (1 - progress) * local_cost + 0.4 * progress * global_potential)
+        importance_term = 0.2 * importance
+
+        return exploitation_term + exploration_term + importance_term
+
+    probabilities = [math.exp(-heuristic(node)) for node in unvisited_nodes]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+    return next_node

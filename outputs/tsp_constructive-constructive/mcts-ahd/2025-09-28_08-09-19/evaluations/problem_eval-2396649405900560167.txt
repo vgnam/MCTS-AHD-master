@@ -1,0 +1,47 @@
+importance, using a dynamic weight system that prioritizes connectivity and centrality based on the problem's progress, while incorporating a novel "anticipation factor" that estimates future path potential and applies a context-sensitive penalty to nodes that disrupt connectivity or increase future path lengths.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = -distance_to_current - distance_to_destination
+        else:
+            # Calculate node importance (combining centrality and connectivity)
+            centrality = 1.0 / (sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)) if remaining_nodes > 1 else 0
+            connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * distance_to_current) / remaining_nodes
+
+            # Adaptive weights based on problem progress
+            progress_factor = 1.0 - (remaining_nodes / (remaining_nodes + len(unvisited_nodes)))
+            immediate_weight = 0.6 - 0.3 * progress_factor
+            importance_weight = 0.4 + 0.3 * progress_factor
+
+            # Anticipation factor (estimates future path potential)
+            anticipation = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+            anticipation_factor = 1.0 / (1.0 + anticipation)
+
+            # Context-sensitive penalty
+            penalty = 0.0
+            if connectivity < 0.5:
+                penalty += 0.3 * (1.0 - connectivity)
+            if distance_to_destination > 1.5 * (sum(distance_matrix[n][destination_node] for n in unvisited_nodes) / remaining_nodes):
+                penalty += 0.2 * (distance_to_destination / (1.0 + distance_to_current))
+
+            # Score combines weighted components with anticipation and penalty
+            score = (immediate_weight * (-distance_to_current) +
+                     importance_weight * (centrality + connectivity) +
+                     0.3 * anticipation_factor) - penalty
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

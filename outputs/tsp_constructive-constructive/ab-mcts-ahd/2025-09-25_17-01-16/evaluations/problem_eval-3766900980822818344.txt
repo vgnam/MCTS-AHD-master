@@ -1,0 +1,19 @@
+import math
+    import random
+
+    scores = []
+    for node in unvisited_nodes:
+        dist_to_current = distance_matrix[current_node][node]
+        dist_to_dest = distance_matrix[node][destination_node]
+        score = math.exp(-dist_to_current) * (1 / (1 + dist_to_dest))
+        scores.append((node, score))
+
+    if not scores:
+        return None
+
+    nodes, scores = zip(*scores)
+    total_score = sum(scores)
+    probabilities = [s / total_score for s in scores]
+
+    next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+    return next_node

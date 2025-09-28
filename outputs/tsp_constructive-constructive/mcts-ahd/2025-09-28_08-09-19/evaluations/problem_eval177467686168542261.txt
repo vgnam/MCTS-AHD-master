@@ -1,0 +1,8 @@
+import exp
+    exp_scores = [exp(-s) for (_, s) in scores]
+    sum_exp = sum(exp_scores)
+    probs = [e / sum_exp for e in exp_scores]
+    import random
+    next_node = random.choices([n for (n, _) in scores], weights=probs)[0]
+
+    return next_node

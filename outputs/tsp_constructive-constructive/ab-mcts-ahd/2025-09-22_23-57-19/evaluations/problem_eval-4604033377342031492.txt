@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        if np.random.rand() < 0.7:  # Higher probability to choose destination
+            return destination_node
+
+    # Calculate a weighted score: 70% distance, 30% randomness
+    scores = []
+    for node in unvisited_nodes:
+        distance_score = distance_matrix[current_node][node]
+        random_score = np.random.uniform(0, 1)
+        combined_score = 0.7 * distance_score + 0.3 * random_score
+        scores.append(combined_score)
+
+    next_node = unvisited_nodes[np.argmax(scores)]
+    return next_node

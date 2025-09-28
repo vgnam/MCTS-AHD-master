@@ -1,0 +1,24 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic probability threshold based on remaining unvisited nodes
+    remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+    dynamic_threshold = 0.7 + 0.2 * (1 - remaining_ratio)  # Ranges from 0.7 to 0.9
+
+    if random.random() < dynamic_threshold:
+        candidates = nearest_neighbors[:min(4, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Reduced randomness: pick from a slightly larger pool
+        candidates = nearest_neighbors[:min(6, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+
+    return next_node

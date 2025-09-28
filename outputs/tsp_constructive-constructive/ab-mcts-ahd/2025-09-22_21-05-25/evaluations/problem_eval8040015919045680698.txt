@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes[0]
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    mst_node = min(unvisited_nodes, key=lambda node: sum(distance_matrix[node][n] for n in unvisited_nodes if n != node))
+    alpha = 0.7
+    weighted_nodes = {node: alpha * distance_matrix[current_node][node] + (1 - alpha) * sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) for node in unvisited_nodes}
+    next_node = min(weighted_nodes, key=weighted_nodes.get)
+    return next_node

@@ -1,0 +1,7 @@
+import choices
+        weights = [1/score for score in scores.values()]
+        next_node = choices(list(scores.keys()), weights=weights, k=1)[0]
+    else:
+        next_node = min_score_node
+
+    return next_node

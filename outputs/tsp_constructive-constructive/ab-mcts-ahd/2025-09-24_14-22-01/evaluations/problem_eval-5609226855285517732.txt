@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    remaining_nodes = len(unvisited_nodes)
+    min_cost = float('inf')
+    next_node = None
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes if node != destination_node) / len(unvisited_nodes) if unvisited_nodes else 0
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        node_centrality = sum(distance_matrix[node]) / len(distance_matrix[node]) if len(distance_matrix[node]) > 0 else 1.0
+        centrality_factor = 1.0 / (1.0 + (node_centrality - avg_distance) ** 2)
+        weight = 1.0 / (1.0 + remaining_nodes ** 0.5)
+        weighted_cost = immediate_distance + weight * potential_distance * centrality_factor
+        penalty = 1.0 + 0.3 * (potential_distance / node_centrality) if node_centrality > 0 else 1.0
+        weighted_cost *= penalty
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node

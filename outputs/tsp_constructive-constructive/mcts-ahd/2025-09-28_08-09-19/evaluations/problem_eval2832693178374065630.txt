@@ -1,0 +1,51 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+
+    # Precompute node centrality and historical access frequency
+    centrality = {}
+    access_frequency = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        access_frequency[node] = 1.0  # Initialize with equal frequency
+
+    # Dynamic weights based on remaining nodes
+    immediate_weight = 0.6 * (1 - (remaining_count / total_nodes) ** 2)
+    connectivity_weight = 0.3 * (1 - (remaining_count / total_nodes) ** 1.5)
+    exploration_bias = 0.1 * (remaining_count / total_nodes) ** 1.2
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        # Connectivity measure: number of close neighbors
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.1 * avg_distance)
+            connectivity_factor = 1.0 + (connectivity / len(remaining_nodes)) * 0.4
+
+            # Novel exploration term: penalizes hub nodes and favors less frequent nodes
+            hub_penalty = 1 + (centrality[node] / (avg_distance + 1e-6)) * 0.2
+            frequency_bonus = 1 - (access_frequency[node] / (sum(access_frequency.values()) + 1e-6)) * 0.3
+
+            # Combined score with exploration bias
+            score = (immediate_weight * (immediate_distance - avg_distance) +
+                     connectivity_weight * (immediate_distance * connectivity_factor) +
+                     exploration_bias * (frequency_bonus / hub_penalty))
+        else:
+            score = immediate_distance
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Update access frequency for the selected node (simulated)
+    if next_node in access_frequency:
+        access_frequency[next_node] += 1
+
+    return next_node

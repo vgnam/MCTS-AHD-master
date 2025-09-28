@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate spatial distribution metrics
+    unvisited_set = set(unvisited_nodes)
+    avg_distance = sum(distance_matrix[current_node][n] for n in unvisited_set) / len(unvisited_set)
+    std_dev = (sum((distance_matrix[current_node][n] - avg_distance)**2 for n in unvisited_set) / len(unvisited_set))**0.5
+
+    # Dynamic weights based on spatial distribution
+    w_proximity = 0.5 + 0.2 * (std_dev / avg_distance) if avg_distance > 0 else 0.5
+    w_destination = 0.3 + 0.1 * (std_dev / avg_distance) if avg_distance > 0 else 0.3
+    w_future = 0.2 - 0.1 * (std_dev / avg_distance) if avg_distance > 0 else 0.2
+    w_future = max(0.1, w_future)  # Ensure minimum weight
+
+    # Normalize weights
+    total_weight = w_proximity + w_destination + w_future
+    w_proximity /= total_weight
+    w_destination /= total_weight
+    w_future /= total_weight
+
+    for node in unvisited_nodes:
+        # Immediate proximity component
+        distance_to_node = distance_matrix[current_node][node]
+
+        # Destination alignment component
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Future adaptability component (heuristic lookahead)
+        future_nodes = unvisited_set - {node}
+        if future_nodes:
+            avg_future_distance = sum(distance_matrix[node][n] for n in future_nodes) / len(future_nodes)
+            future_entropy = sum(distance_matrix[n][destination_node] for n in future_nodes) / len(future_nodes)
+        else:
+            avg_future_distance = 0
+            future_entropy = 0
+
+        # Combined score
+        score = (w_proximity * distance_to_node +
+                 w_destination * distance_to_destination +
+                 w_future * (0.7 * avg_future_distance + 0.3 * future_entropy))
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,27 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    path_length = sum(distance_matrix[current_node][destination_node] for _ in range(remaining_nodes))
+
+    # Dynamic weight factor with logarithmic scaling, path length, and decay
+    weight_factor = max(0.1, 0.5 * (math.log(remaining_nodes + 1) / math.log(total_nodes + 1)) + 0.3 * (path_length / total_nodes))
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        # Penalty for revisiting nodes
+        revisit_penalty = 0.1 if node in unvisited_nodes else 0.0
+        combined_score = distance_to_current + weight_factor * distance_to_destination + revisit_penalty
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

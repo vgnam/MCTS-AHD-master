@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def min_max_distance(node):
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return distance_matrix[current_node][node]
+        return max(distance_matrix[node][n] for n in remaining_nodes)
+
+    temperature = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+    if len(unvisited_nodes) % 2 == 1:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    else:
+        if temperature > 0.5:
+            next_node = min(unvisited_nodes, key=lambda node: (1 - temperature) * distance_matrix[current_node][node] + temperature * min_max_distance(node))
+        else:
+            next_node = min(unvisited_nodes, key=min_max_distance)
+
+    return next_node

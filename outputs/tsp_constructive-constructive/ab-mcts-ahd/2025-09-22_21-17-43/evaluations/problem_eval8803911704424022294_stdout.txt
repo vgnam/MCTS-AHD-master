@@ -1,0 +1,49 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+[*] Instance 0: 14.763545248310137
+[*] Instance 1: 15.244763916759293
+[*] Instance 2: 14.24465469214897
+[*] Instance 3: 15.871622798250895
+[*] Instance 4: 16.236849611716416
+[*] Instance 5: 16.38528933980926
+[*] Instance 6: 15.293268977623356
+[*] Instance 7: 15.29342754944957
+[*] Instance 8: 14.571642570914925
+[*] Instance 9: 15.010757191641623
+[*] Instance 10: 15.332338002387136
+[*] Instance 11: 15.2850490857727
+[*] Instance 12: 14.486086513042444
+[*] Instance 13: 15.177429894179225
+[*] Instance 14: 14.409936826779207
+[*] Instance 15: 15.952879365398266
+[*] Instance 16: 14.478597703666829
+[*] Instance 17: 15.02239478072661
+[*] Instance 18: 16.399396966333164
+[*] Instance 19: 14.414723462064172
+[*] Instance 20: 13.365438255609856
+[*] Instance 21: 15.080176702854878
+[*] Instance 22: 14.768659615637699
+[*] Instance 23: 14.118731613486402
+[*] Instance 24: 14.884028796482266
+[*] Instance 25: 17.29122554789437
+[*] Instance 26: 14.08157814547526
+[*] Instance 27: 13.8901344408608
+[*] Instance 28: 14.21542522365805
+[*] Instance 29: 16.006859224863366
+[*] Instance 30: 15.280743146813881
+[*] Instance 31: 14.894670145124614
+[*] Instance 32: 14.498104167221976
+[*] Instance 33: 13.686308086350872
+[*] Instance 34: 16.65472432337546
+[*] Instance 35: 16.974059650087202
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 23, in select_next_node
+    next_node = min(unvisited_nodes, key=lambda node: dynamic_score(node))
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 23, in <lambda>
+    next_node = min(unvisited_nodes, key=lambda node: dynamic_score(node))
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line -1, in dynamic_score
+KeyboardInterrupt

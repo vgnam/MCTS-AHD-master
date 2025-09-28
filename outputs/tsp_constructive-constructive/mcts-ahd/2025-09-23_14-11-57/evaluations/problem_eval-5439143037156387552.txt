@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    future_potentials = []
+    node_entropies = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+        future_potentials.append(future_potential)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Calculate node entropy: diversity of distances to other unvisited nodes
+        if other_nodes:
+            entropy = sum(abs(distance_matrix[node][n] - immediate_distance) for n in other_nodes) / len(other_nodes)
+        else:
+            entropy = 0
+        node_entropies.append(entropy)
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    # Exponentially decaying regret weight
+    regret_weight = max(0.1, 0.8 * (1 - progress ** 2))
+    # Distance and future potential weights increase with progress
+    distance_weight = 0.5 * progress
+    future_weight = 0.5 * progress
+    # Entropy weight is inversely proportional to progress
+    entropy_weight = 0.5 * (1 - progress)
+
+    scores = [
+        regret_weight * regret + distance_weight * distance + future_weight * future_potential + entropy_weight * entropy
+        for regret, distance, future_potential, entropy in zip(regrets, distances, future_potentials, node_entropies)
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

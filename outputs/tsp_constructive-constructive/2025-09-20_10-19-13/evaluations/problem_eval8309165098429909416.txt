@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, exploration_factor=0.1, temp=1.0):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate probabilities for each node using a softmax function
+    def softmax(x, temp):
+        e_x = [math.exp(-dist / temp) for dist in x]
+        sum_e_x = sum(e_x)
+        return [e / sum_e_x for e in e_x]
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    probabilities = softmax(distances, temp)
+
+    # Select node with probability proportional to its softmax score
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    # With a small probability, explore a random unvisited node
+    if random.random() < exploration_factor:
+        next_node = random.choice(list(unvisited_nodes))
+
+    return next_node

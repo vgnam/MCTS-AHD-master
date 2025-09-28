@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, decay_factor=0.9):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate dynamic weights for each node
+    weights = {}
+    for node in unvisited_nodes:
+        base_distance = distance_matrix[current_node][node]
+        # Penalize nodes visited more recently
+        weights[node] = base_distance * (decay_factor ** (len(unvisited_nodes) - unvisited_nodes.index(node)))
+
+    # Select node with the smallest weighted distance
+    next_node = min(unvisited_nodes, key=lambda node: weights[node])
+    return next_node

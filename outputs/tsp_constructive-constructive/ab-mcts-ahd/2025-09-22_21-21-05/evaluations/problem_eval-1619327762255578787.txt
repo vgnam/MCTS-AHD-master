@@ -1,0 +1,9 @@
+import random
+    rand_val = random.random() * total_score
+    cumulative = 0.0
+    for node, score in scored_candidates:
+        cumulative += score
+        if rand_val <= cumulative:
+            return node
+
+    return next_node

@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight adjustment: more emphasis on future distance as fewer nodes remain
+        remaining_nodes = len(unvisited_nodes)
+        weight_factor = 1.0 if remaining_nodes == 1 else 1.0 + (1.0 / remaining_nodes)
+        weighted_score = (1.5 * current_distance) + (0.5 * weight_factor * future_distance)
+
+        # Inverse score for probabilistic selection
+        score = 1.0 / weighted_score if weighted_score != 0 else float('inf')
+        scores.append((node, score))
+        total_weight += score
+
+    if total_weight == 0:
+        return unvisited_nodes[0]  # fallback if all scores are zero
+
+    # Probabilistic selection
+    rand_val = random.random() * total_weight
+    cumulative = 0.0
+    for node, score in scores:
+        cumulative += score
+        if rand_val <= cumulative:
+            return node
+
+    return next_node

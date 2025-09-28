@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = set(unvisited_nodes) | {current_node, destination_node}
+    num_remaining = len(remaining_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Phase-based dynamic weights
+    phase = num_remaining / total_nodes
+    alpha = min(0.9, 0.1 + 0.8 * (1 - phase))  # Increase alpha in later phases
+    beta = 1 - alpha
+    gamma = 0.3 * phase  # Increase gamma in early phases
+
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Adaptive centrality with phase scaling
+        centrality = sum(distance_matrix[node][n] for n in remaining_nodes) / num_remaining
+        scaled_centrality = gamma * centrality
+
+        # Combined cost function
+        weighted_cost = (alpha * immediate_distance +
+                        beta * potential_distance +
+                        scaled_centrality)
+
+        # Product-based trade-off for final selection
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    return next_node

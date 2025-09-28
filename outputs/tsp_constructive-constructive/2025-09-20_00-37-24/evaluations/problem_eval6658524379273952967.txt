@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    nearest_distance = distance_matrix[current_node][nearest_neighbors[0]]
+
+    # Dynamic probability based on unvisited nodes and distance to nearest neighbor
+    exploration_prob = 0.1 + (0.8 * (len(unvisited_nodes) / (len(unvisited_nodes) + 10))) * (nearest_distance / max(1, max(distance_matrix[current_node][node] for node in unvisited_nodes)))
+
+    if random.random() < (1 - exploration_prob):  # Higher probability to pick from top 3 nearest
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:  # Adaptive exploration
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

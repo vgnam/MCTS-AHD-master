@@ -1,0 +1,14 @@
+import math
+    probs = softmax(scores)
+
+    # Select node based on probabilities
+    import random
+    r = random.random()
+    cumulative_prob = 0.0
+    for node, prob in probs:
+        cumulative_prob += prob
+        if r <= cumulative_prob:
+            next_node = node
+            break
+
+    return next_node

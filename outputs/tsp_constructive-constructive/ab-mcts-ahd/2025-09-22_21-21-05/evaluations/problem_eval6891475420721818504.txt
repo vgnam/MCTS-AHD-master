@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = 0.5 + 0.5 * (1.0 - (remaining_nodes / len(distance_matrix)))  # Dynamic weight based on progress
+
+    # Calculate centrality and future potential
+    avg_distances = []
+    future_potentials = []
+    for node in unvisited_nodes:
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_nodes
+        future_potential = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+        avg_distances.append(avg_dist)
+        future_potentials.append(future_potential)
+
+    avg_avg_distance = sum(avg_distances) / remaining_nodes if remaining_nodes > 0 else 0
+    avg_future_potential = sum(future_potentials) / remaining_nodes if remaining_nodes > 0 else 0
+
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_current = distance_matrix[current_node][node]
+        centrality_factor = (avg_avg_distance - avg_distances[i]) / (avg_avg_distance + 1e-6)
+        future_factor = (avg_future_potential - future_potentials[i]) / (avg_future_potential + 1e-6)
+
+        # Dynamic weighting
+        weight_proximity = 1.0 / (remaining_nodes + 1)
+        weight_centrality = progress_factor * 0.4
+        weight_future = (1.0 - progress_factor) * 0.6
+
+        combined_score = (weight_proximity * distance_to_current) + (weight_centrality * centrality_factor) + (weight_future * future_factor)
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

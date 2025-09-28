@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = remaining_nodes + 1
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_node + distance_to_destination
+        else:
+            direct_distance = distance_matrix[current_node][destination_node]
+            detour_ratio = direct_distance / (distance_to_node + distance_to_destination)
+            detour_penalty = (1.0 - detour_ratio) * direct_distance
+
+            exploration_bonus = 0.0
+            max_distance_to_unvisited = 0.0
+            for other_node in unvisited_nodes:
+                if other_node != node:
+                    other_distance = distance_matrix[node][other_node]
+                    exploration_bonus += other_distance
+                    if other_distance > max_distance_to_unvisited:
+                        max_distance_to_unvisited = other_distance
+            if remaining_nodes > 1:
+                exploration_bonus /= (remaining_nodes - 1)
+
+            # Dynamic weighting using sigmoid function
+            node_density = len(unvisited_nodes) / (len(distance_matrix) - 1)
+            weight_factor = 1 / (1 + math.exp(-5 * (node_density - 0.5)))
+
+            detour_weight = 0.5 + 0.3 * weight_factor
+            exploration_weight = 0.1 - 0.05 * weight_factor
+
+            # Adjust score with dynamic weights
+            score = distance_to_node + detour_weight * detour_penalty - exploration_weight * exploration_bonus
+
+            # Heuristic to minimize max distance to unvisited nodes
+            score += 0.2 * max_distance_to_unvisited
+
+            # Dynamic adjustment based on remaining nodes ratio
+            if remaining_nodes / total_nodes < 0.5:
+                score *= 0.8
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

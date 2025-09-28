@@ -1,0 +1,29 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    weights = []
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        candidates.append(node)
+        weights.append(1.0 / (distance + 0.001))  # Avoid division by zero
+
+    # Add destination with higher weight if it's unvisited and nearby
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        candidates.append(destination_node)
+        weights.append(2.0 / (dest_distance + 0.001))  # Higher weight for destination
+
+    # Normalize weights and add small randomness
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+    randomized_weights = [w + random.uniform(0, 0.1) for w in normalized_weights]
+    total_randomized = sum(randomized_weights)
+    normalized_randomized = [w / total_randomized for w in randomized_weights]
+
+    next_node = random.choices(candidates, weights=normalized_randomized, k=1)[0]
+    return next_node

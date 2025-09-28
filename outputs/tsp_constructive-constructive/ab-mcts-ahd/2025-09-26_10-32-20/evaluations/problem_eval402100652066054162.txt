@@ -1,0 +1,48 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    local_distances = [distance_matrix[current_node][n] for n in unvisited_nodes]
+    global_distances = [distance_matrix[n][destination_node] for n in unvisited_nodes]
+
+    avg_local = sum(local_distances) / remaining_nodes if remaining_nodes > 0 else 0
+    avg_global = sum(global_distances) / remaining_nodes if remaining_nodes > 0 else 0
+
+    std_local = (sum((d - avg_local) ** 2 for d in local_distances) / remaining_nodes) ** 0.5 if remaining_nodes > 1 else 0
+    std_global = (sum((d - avg_global) ** 2 for d in global_distances) / remaining_nodes) ** 0.5 if remaining_nodes > 1 else 0
+
+    distance_entropy = (std_local + std_global) / (avg_local + avg_global + 1e-6)
+
+    if len(distance_matrix) > 1:
+        prev_node = current_node - 1 if current_node > 0 else len(distance_matrix) - 1
+        path_momentum = -distance_matrix[prev_node][current_node] / (max(sum(row) for row in distance_matrix) + 1e-6)
+    else:
+        path_momentum = 0
+
+    exploration_pressure = (remaining_nodes / total_nodes) * (1 - path_momentum)
+
+    def calculate_score(node):
+        local = distance_matrix[current_node][node]
+        global_ = distance_matrix[node][destination_node]
+
+        normalized_local = (local - min(local_distances)) / (max(local_distances) - min(local_distances) + 1e-6)
+        normalized_global = (global_ - min(global_distances)) / (max(global_distances) - min(global_distances) + 1e-6)
+
+        distance_ratio = (normalized_local + normalized_global) / 2
+
+        exploration_term = exploration_pressure * (1 - distance_ratio)
+        exploitation_term = (1 - exploration_pressure) * distance_ratio
+
+        entropy_factor = 1 - distance_entropy
+        weighted_score = (exploitation_term * entropy_factor) + (exploration_term * (1 - entropy_factor))
+
+        return weighted_score
+
+    scores = [calculate_score(node) for node in unvisited_nodes]
+    probabilities = [s / (sum(scores) + 1e-6) for s in scores]
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+
+    return next_node

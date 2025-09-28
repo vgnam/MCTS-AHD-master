@@ -1,0 +1,7 @@
+import random
+    if random.random() < 0.8:
+        next_node = unvisited_nodes[probabilities.index(max(probabilities))]
+    else:
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Initialize Q-values and exploration rate
+    Q = {node: 0 for node in unvisited_nodes}
+    exploration_rate = 0.3
+    learning_rate = 0.1
+    discount_factor = 0.9
+
+    # Simulate Q-learning for a fixed number of iterations
+    for _ in range(10):
+        for node in unvisited_nodes:
+            # Immediate reward (negative distance to current node)
+            immediate_reward = -distance_matrix[current_node][node]
+            # Future reward estimate (negative distance to destination)
+            future_reward = -distance_matrix[node][destination_node]
+
+            # Q-value update
+            Q[node] = (1 - learning_rate) * Q[node] + learning_rate * (immediate_reward + discount_factor * future_reward)
+
+    # Select node with highest Q-value or explore randomly
+    if random.random() < exploration_rate:
+        next_node = random.choice(list(unvisited_nodes))
+    else:
+        next_node = max(Q.items(), key=lambda x: x[1])[0]
+
+    return next_node

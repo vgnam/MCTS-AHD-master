@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    max_utility = -float('inf')
+
+    remaining_nodes = len(unvisited_nodes)
+    base_weight = 0.7
+    adjusted_weight = base_weight * (1.0 + 0.1 * (1.0 / (remaining_nodes + 1)))
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+
+        penalty = 0.0
+        if remaining_nodes > 2:
+            for other_node in unvisited_nodes:
+                if other_node != node:
+                    detour = distance_matrix[node][other_node] + distance_matrix[other_node][destination_node] - distance_matrix[node][destination_node]
+                    penalty += detour * 0.2
+
+        utility = (distance_to_current + adjusted_weight * distance_to_dest) - penalty
+        normalized_utility = utility / (distance_matrix[current_node][destination_node] + 1e-6)
+
+        if normalized_utility > max_utility:
+            max_utility = normalized_utility
+            next_node = node
+
+    return next_node

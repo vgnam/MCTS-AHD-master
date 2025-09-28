@@ -1,0 +1,56 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    k = min(5, len(unvisited_nodes))
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:k]
+    
+    scores = []
+    for node in nearest_neighbors:
+        local_cost = distance_matrix[current_node][node]
+        global_cost = 0
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            if destination_node in remaining_nodes:
+                remaining_nodes.remove(destination_node)
+            if remaining_nodes:
+                nearest_remaining = min(remaining_nodes, key=lambda x: distance_matrix[node][x])
+                global_cost = distance_matrix[node][nearest_remaining] + distance_matrix[nearest_remaining][destination_node]
+            else:
+                global_cost = distance_matrix[node][destination_node]
+        score = 0.65 * local_cost + 0.35 * global_cost
+        
+        # Additional 'look-ahead' step
+        if len(unvisited_nodes) > 2:
+            remaining_nodes = unvisited_nodes - {node}
+            nearest_to_node = min(remaining_nodes, key=lambda x: distance_matrix[node][x])
+            score += 0.1 * distance_matrix[node][nearest_to_node]
+        
+        scores.append((node, score))
+    
+    if destination_node in unvisited_nodes:
+        local_cost = distance_matrix[current_node][destination_node]
+        global_cost = 0
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = unvisited_nodes - {destination_node}
+            nearest_remaining = min(remaining_nodes, key=lambda x: distance_matrix[destination_node][x])
+            global_cost = distance_matrix[destination_node][nearest_remaining] + distance_matrix[nearest_remaining][current_node]
+        score = 0.65 * local_cost + 0.35 * global_cost
+        scores.append((destination_node, score))
+    
+    # Simulated annealing-inspired probabilistic selection
+    T = 100 / (1 + math.log(len(unvisited_nodes) + 1))
+    scores.sort(key=lambda x: x[1])
+    probabilities = [math.exp(-x[1]/T) for x in scores]
+    probabilities = [x/sum(probabilities) for x in probabilities]
+    cumulative_probabilities = [sum(probabilities[:i+1]) for i in range(len(probabilities))]
+    r = random.random()
+    for i, cumulative_probability in enumerate(cumulative_probabilities):
+        if r <= cumulative_probability:
+            next_node = scores[i][0]
+            break
+    
+    return next_node

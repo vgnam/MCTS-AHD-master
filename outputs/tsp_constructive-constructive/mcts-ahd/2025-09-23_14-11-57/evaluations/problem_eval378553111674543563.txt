@@ -1,0 +1,36 @@
+importance score that combines distance, degree centrality, and a novelty factor (prioritizing less frequently visited nodes), while adjusting weights based on remaining nodes and incorporating a penalty for overly short distances to encourage exploration.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    distance_weight = 0.4 if remaining_nodes > 4 else 0.2
+    centrality_weight = 0.3 if remaining_nodes > 4 else 0.5
+    novelty_weight = 0.3 if remaining_nodes > 4 else 0.3
+
+    node_degrees = [sum(1 for d in distance_matrix[node] if d > 0) for node in unvisited_nodes]
+    max_degree = max(node_degrees) if node_degrees else 1
+    centrality_scores = [d / max_degree for d in node_degrees]
+
+    visit_counts = [sum(1 for row in distance_matrix if row[node] == 0) for node in unvisited_nodes]
+    max_visits = max(visit_counts) if visit_counts else 1
+    novelty_scores = [1 - (v / max_visits) for v in visit_counts]
+
+    scores = []
+    for i, node in enumerate(unvisited_nodes):
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+        total_distance = current_to_node + node_to_dest
+
+        penalty = 0.15 * (1.0 / (current_to_node + 1e-6)) if current_to_node < 0.3 else 0
+        combined_score = (distance_weight * current_to_node +
+                          centrality_weight * centrality_scores[i] +
+                          novelty_weight * novelty_scores[i] -
+                          penalty)
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_node]
+
+    return next_node

@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    remaining_nodes = unvisited_nodes - {destination_node}
+    if not remaining_nodes:
+        return destination_node
+
+    # Calculate average and density factors
+    avg_distance = sum(distance_matrix[current_node][node] for node in remaining_nodes) / len(remaining_nodes)
+    node_density = {}
+    for node in remaining_nodes:
+        neighbors = [n for n in remaining_nodes if n != node]
+        node_density[node] = sum(distance_matrix[node][n] for n in neighbors) / len(neighbors) if neighbors else 0
+    avg_density = sum(node_density.values()) / len(node_density) if node_density else 1
+
+    # Dynamic weight adjustment
+    weights = {
+        'immediate': 0.35,
+        'potential': 0.35,
+        'heuristic': 0.2,
+        'density': 0.1
+    }
+    if len(remaining_nodes) < 5:
+        weights['immediate'] += 0.1
+        weights['potential'] += 0.1
+        weights['heuristic'] -= 0.1
+
+    # Local search refinement
+    candidate_nodes = list(remaining_nodes)
+    if len(candidate_nodes) > 3:
+        candidate_nodes = candidate_nodes[:3]
+
+    min_cost = float('inf')
+    next_node = None
+    for node in candidate_nodes:
+        immediate = distance_matrix[current_node][node]
+        potential = distance_matrix[node][destination_node]
+        heuristic = (immediate + potential) / (avg_distance + 1e-6)
+        density = (node_density[node] / (avg_density + 1e-6)) if avg_density else 1
+
+        # Hybrid cost function
+        total_cost = (weights['immediate'] * immediate +
+                      weights['potential'] * potential +
+                      weights['heuristic'] * heuristic +
+                      weights['density'] * (immediate * density))
+
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+
+    return next_node

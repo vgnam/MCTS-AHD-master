@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (remaining_nodes / len(distance_matrix)))
+
+    def calculate_score(node):
+        direct_distance = distance_matrix[current_node][node]
+        if not unvisited_nodes:
+            return direct_distance
+
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        normalized_centrality = centrality / max(sum(distance_matrix[node][n] for n in distance_matrix) / len(distance_matrix), 1)
+        combined_score = direct_distance + (1 - temperature) * normalized_centrality
+        return combined_score
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

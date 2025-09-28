@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    nearest_node = None
+    nearest_distance = float('inf')
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < nearest_distance:
+            nearest_distance = distance
+            nearest_node = node
+
+    # Calculate dynamic threshold based on distance ratio
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        threshold = 1.0 + (destination_distance / nearest_distance) * 0.5  # Dynamic adjustment
+    else:
+        threshold = 1.5  # Default threshold
+
+    # Apply penalty for frequently visited nodes (simulated with a simple counter)
+    visit_penalty = {node: 1.0 for node in unvisited_nodes}
+    for node in unvisited_nodes:
+        if node != destination_node:
+            visit_penalty[node] += 0.1 * (len(unvisited_nodes) - unvisited_nodes.index(node))
+
+    # Select next node with dynamic threshold and penalty
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        adjusted_distance = distance * visit_penalty[node]
+        if adjusted_distance <= threshold * nearest_distance:
+            if adjusted_distance < min_distance:
+                min_distance = adjusted_distance
+                next_node = node
+
+    # Fallback to nearest node if no node meets the threshold
+    if next_node is None:
+        next_node = nearest_node
+
+    return next_node

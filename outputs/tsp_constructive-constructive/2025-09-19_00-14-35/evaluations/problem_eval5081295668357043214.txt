@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    scores = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            connectivity_score = sum(1.0 / distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+            detour_penalty = (current_dist + dest_dist) - distance_matrix[current_node][destination_node]
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] > 0 and n != node)
+            centrality_score = node_degree / (total_nodes - 1)
+        else:
+            connectivity_score = 0
+            detour_penalty = 0
+            centrality_score = 0
+
+        weight_local = 0.4 - 0.1 * exploration_factor
+        weight_connectivity = 0.5 * exploration_factor
+        weight_dest = 0.3 + 0.2 * (1 - exploration_factor)
+        weight_detour = -0.3 * detour_penalty if detour_penalty > 0 else 0
+        weight_centrality = 0.2 * exploration_factor
+
+        score = (weight_local * current_dist) + (weight_connectivity * connectivity_score) + (weight_detour * detour_penalty) + (weight_dest * dest_dist) + (weight_centrality * centrality_score)
+
+        scores.append((node, score))
+
+    next_node = min(scores, key=lambda x: x[1])[0]
+    return next_node

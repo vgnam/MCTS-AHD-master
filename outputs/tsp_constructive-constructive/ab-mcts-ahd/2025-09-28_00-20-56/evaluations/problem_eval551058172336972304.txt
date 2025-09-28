@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    # Dynamic threshold based on remaining nodes
+    threshold_factor = 1.0 + (1.5 - 1.0) * (remaining_nodes / len(distance_matrix))
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    # Probabilistic selection if destination is not the nearest
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance <= min_distance * threshold_factor:
+            # 70% chance to pick destination if within threshold, 30% to pick nearest
+            if random.random() < 0.7:
+                next_node = destination_node
+
+    return next_node

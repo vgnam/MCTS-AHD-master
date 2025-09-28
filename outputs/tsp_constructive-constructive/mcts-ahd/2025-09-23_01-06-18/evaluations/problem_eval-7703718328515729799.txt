@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 1.0 / (1 + len(unvisited_nodes) / len(distance_matrix))
+    destination_penalty = 1.0 if destination_node in unvisited_nodes else 0.5
+
+    if destination_node in unvisited_nodes:
+        if len(unvisited_nodes) == 1:
+            return destination_node
+
+        proximity_scores = {node: 1 / (1 + distance_matrix[current_node][node]) for node in unvisited_nodes}
+        max_proximity = max(proximity_scores.values())
+
+        destination_score = (proximity_scores[destination_node] / max_proximity) * destination_penalty
+        random_score = random.random() * temperature
+
+        if random_score < destination_score:
+            return destination_node
+        else:
+            return max(unvisited_nodes, key=lambda node: proximity_scores[node])
+    else:
+        return next_node

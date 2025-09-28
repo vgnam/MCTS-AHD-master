@@ -1,0 +1,33 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate centrality as inverse of average distance to all other nodes
+    centrality = {}
+    for node in unvisited_nodes:
+        avg_dist = np.mean([distance_matrix[node][other] for other in unvisited_nodes if other != node])
+        centrality[node] = 1 / avg_dist if avg_dist != 0 else float('inf')
+
+    # Adaptive stochasticity: higher chance of randomness when fewer nodes remain
+    remaining_nodes = len(unvisited_nodes)
+    randomness_prob = min(0.1 + (1 - remaining_nodes / len(distance_matrix)) * 0.9, 0.9)
+
+    if random.random() < randomness_prob:
+        # Weighted random selection based on centrality and distance
+        weights = []
+        for node in unvisited_nodes:
+            dist = distance_matrix[current_node][node]
+            weight = centrality[node] / (dist + 1e-6)  # Avoid division by zero
+            weights.append(weight)
+        next_node = random.choices(unvisited_nodes, weights=weights, k=1)[0]
+    else:
+        # Dynamic nearest-neighbor selection (considering centrality)
+        candidates = sorted(unvisited_nodes, key=lambda node: (distance_matrix[current_node][node], -centrality[node]))
+        next_node = candidates[0]
+
+    return next_node

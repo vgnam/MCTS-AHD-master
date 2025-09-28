@@ -1,0 +1,59 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    clusterings = []
+    novelties = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        # Calculate regret
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Calculate clustering
+        nearby_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        clustering = 1 / (sum(nearby_distances) / len(nearby_distances)) if nearby_distances else 0
+        clusterings.append(clustering)
+
+        # Calculate novelty (centrality and path diversity)
+        centrality = sum(distance_matrix[node]) / len(distance_matrix)
+        novelty = centrality * (1 - immediate_distance / max(distance_matrix[current_node]))
+        novelties.append(novelty)
+
+    # Adaptive weights based on phase
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    phase = 1 - (remaining_nodes / total_nodes)
+    regret_weight = max(0.1, 0.8 * (1 - phase**2))
+    distance_weight = 0.3 * phase
+    clustering_weight = 0.2 * phase**2
+    novelty_weight = 0.1 * phase**3
+
+    # Normalize scores
+    max_regret = max(regrets) if regrets else 1
+    max_distance = max(distances) if distances else 1
+    max_clustering = max(clusterings) if clusterings else 1
+    max_novelty = max(novelties) if novelties else 1
+
+    normalized_regrets = [r / max_regret if max_regret else 0 for r in regrets]
+    normalized_distances = [d / max_distance if max_distance else 0 for d in distances]
+    normalized_clusterings = [c / max_clustering if max_clustering else 0 for c in clusterings]
+    normalized_novelties = [n / max_novelty if max_novelty else 0 for n in novelties]
+
+    # Combine weighted scores
+    scores = [regret_weight * r + distance_weight * d + clustering_weight * c + novelty_weight * n
+              for r, d, c, n in zip(normalized_regrets, normalized_distances, normalized_clusterings, normalized_novelties)]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

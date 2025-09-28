@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate dynamic adjustment factor
+    adjustment = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+
+    # Weighted distance metric: blend nearest-neighbor and farthest-insertion
+    def weighted_distance(node):
+        nearest_dist = distance_matrix[current_node][node]
+        farthest_dist = max(distance_matrix[current_node][n] for n in unvisited_nodes)
+        return adjustment * nearest_dist + (1 - adjustment) * farthest_dist
+
+    next_node = min(unvisited_nodes, key=weighted_distance)
+    return next_node

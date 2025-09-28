@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate penalty factor based on remaining unvisited nodes
+    penalty_factor = 1.0 / (1.0 + len(unvisited_nodes))
+
+    # Define a scoring function combining distance and penalty
+    def score(node):
+        base_distance = distance_matrix[current_node][node]
+        penalty = penalty_factor * sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        return base_distance + penalty
+
+    # Select the node with the minimum score
+    next_node = min(unvisited_nodes, key=score)
+    return next_node

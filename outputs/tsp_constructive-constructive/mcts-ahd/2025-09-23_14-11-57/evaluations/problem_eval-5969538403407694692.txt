@@ -1,0 +1,62 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    clusterings = []
+    explorations = []
+    path_potentials = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        # Calculate regret
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Calculate clustering
+        nearby_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        clustering = 1 / (sum(nearby_distances) / len(nearby_distances)) if nearby_distances else 0
+        clusterings.append(clustering)
+
+        # Calculate exploration bonus (decaying novelty)
+        total_nodes = len(distance_matrix)
+        exploration_bonus = (1 / (1 + (total_nodes - len(unvisited_nodes)) / total_nodes)) ** 2
+        explorations.append(exploration_bonus)
+
+        # Calculate path potential (long-term impact)
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if len(unvisited_nodes) > 1 else 0
+        path_potential = (1 / (avg_future_distance + 1)) * (1 + exploration_bonus)
+        path_potentials.append(path_potential)
+
+    # Adaptive weights based on phase and exploration progress
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    phase = 1 - (remaining_nodes / total_nodes)
+    exploration_progress = (total_nodes - remaining_nodes) / total_nodes
+    regret_weight = max(0.1, 0.8 * (1 - phase**3))
+    distance_weight = 0.3 * phase
+    clustering_weight = 0.2 * phase**2
+    exploration_weight = 0.2 * (1 - exploration_progress**2)
+    potential_weight = 0.3 * phase
+
+    # Combine weighted scores
+    scores = [
+        regret_weight * regret +
+        distance_weight * distance +
+        clustering_weight * clustering +
+        exploration_weight * exploration +
+        potential_weight * potential
+        for regret, distance, clustering, exploration, potential in zip(regrets, distances, clusterings, explorations, path_potentials)
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

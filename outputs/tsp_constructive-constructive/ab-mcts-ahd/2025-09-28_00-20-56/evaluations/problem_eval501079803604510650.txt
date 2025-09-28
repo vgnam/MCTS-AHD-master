@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        # Immediate distance (70% weight)
+        current_dist = distance_matrix[current_node][node]
+        # Dynamic 3-step lookahead (30% weight)
+        if len(unvisited_nodes) > 2:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            # Evaluate all possible 2-step paths
+            lookahead_scores = []
+            for n1 in remaining_nodes:
+                remaining_after_n1 = [n for n in remaining_nodes if n != n1]
+                if remaining_after_n1:
+                    best_n2 = min(remaining_after_n1, key=lambda n: distance_matrix[n1][n] + distance_matrix[n][destination_node])
+                    lookahead_dist = distance_matrix[node][n1] + distance_matrix[n1][best_n2] + distance_matrix[best_n2][destination_node]
+                    lookahead_scores.append(lookahead_dist)
+            if lookahead_scores:
+                lookahead_dist = min(lookahead_scores)
+            else:
+                lookahead_dist = distance_matrix[node][destination_node]
+        else:
+            lookahead_dist = distance_matrix[node][destination_node]
+        # Combine with weights and apply temperature-based softmax
+        return current_dist * 0.7 + lookahead_dist * 0.3
+
+    # Calculate scores and apply softmax for probabilistic selection
+    scores = [evaluate_node(node) for node in unvisited_nodes]
+    exp_scores = [math.exp(-s) for s in scores]  # Higher scores become smaller probabilities
+    total = sum(exp_scores)
+    probs = [e / total for e in exp_scores]
+    next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+    return next_node

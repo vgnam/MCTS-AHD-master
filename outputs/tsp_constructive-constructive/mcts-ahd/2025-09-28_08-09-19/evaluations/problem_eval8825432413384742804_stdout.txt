@@ -1,0 +1,74 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+[*] Instance 0: 13.089641918895415
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:19: RuntimeWarning: overflow encountered in scalar power
+  score = (distance_to_current ** weight) / (distance_to_destination ** (1.0 / weight))
+[*] Instance 1: 11.757755631986605
+[*] Instance 2: 10.936226798329361
+[*] Instance 3: 10.076241799700435
+[*] Instance 4: 13.681566485988492
+[*] Instance 5: 8.858664349536367
+[*] Instance 6: 10.177841847638067
+[*] Instance 7: 17.528091027889435
+[*] Instance 8: 14.195158250437494
+[*] Instance 9: 13.160920234570904
+[*] Instance 10: 11.40140374124732
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:19: RuntimeWarning: divide by zero encountered in scalar divide
+  score = (distance_to_current ** weight) / (distance_to_destination ** (1.0 / weight))
+[*] Instance 11: 10.641680939259981
+[*] Instance 12: 12.010316364227515
+[*] Instance 13: 10.136458261360048
+[*] Instance 14: 11.977663940684181
+[*] Instance 15: 10.521113308952726
+[*] Instance 16: 10.644565278231694
+[*] Instance 17: 8.899337679815662
+[*] Instance 18: 19.46151472896654
+[*] Instance 19: 13.126514879524578
+[*] Instance 20: 9.737698035162182
+[*] Instance 21: 12.454499482559314
+[*] Instance 22: 17.799336798606195
+[*] Instance 23: 13.63051969369939
+[*] Instance 24: 11.12570656641747
+[*] Instance 25: 10.279899072395661
+[*] Instance 26: 15.718780478684318
+[*] Instance 27: 15.533758840500326
+[*] Instance 28: 10.145375564853724
+[*] Instance 29: 9.831775526548732
+[*] Instance 30: 11.006861573373545
+[*] Instance 31: 24.834835107956707
+[*] Instance 32: 9.032747694323529
+[*] Instance 33: 12.868180179824416
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:19: RuntimeWarning: overflow encountered in scalar divide
+  score = (distance_to_current ** weight) / (distance_to_destination ** (1.0 / weight))
+[*] Instance 34: 13.133640478163395
+[*] Instance 35: 9.748335474645156
+[*] Instance 36: 9.619788799895318
+[*] Instance 37: 11.888690192953478
+[*] Instance 38: 11.514984709043679
+[*] Instance 39: 8.859130831449685
+[*] Instance 40: 9.586502378863653
+[*] Instance 41: 19.18289746765857
+[*] Instance 42: 11.135814205148856
+[*] Instance 43: 12.121849394222659
+[*] Instance 44: 10.690296918061117
+[*] Instance 45: 9.483146063322017
+[*] Instance 46: 18.580377308077175
+[*] Instance 47: 9.20770349515515
+[*] Instance 48: 10.69749124123551
+[*] Instance 49: 15.382428318453522
+[*] Instance 50: 9.30492855984791
+[*] Instance 51: 10.612341786143016
+[*] Instance 52: 21.423632409574815
+[*] Instance 53: 11.823127869342358
+[*] Instance 54: 12.395431591056974
+[*] Instance 55: 11.068858425977945
+[*] Instance 56: 19.36635107000944
+[*] Instance 57: 11.432660440874766
+[*] Instance 58: 8.716125365418723
+[*] Instance 59: 10.28963512926292
+[*] Instance 60: 12.665000179490965
+[*] Instance 61: 16.98457386381024
+[*] Instance 62: 9.316191824021057
+[*] Instance 63: 9.420209969813152
+[*] Average:
+12.373981216299088

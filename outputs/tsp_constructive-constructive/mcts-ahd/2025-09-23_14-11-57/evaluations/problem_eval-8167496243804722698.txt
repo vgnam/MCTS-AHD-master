@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    connectivity_scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        # Calculate regret: difference between best and second-best options
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Calculate connectivity score: sum of distances to other unvisited nodes, normalized by remaining nodes
+        if len(unvisited_nodes) > 1:
+            connectivity_score = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+        else:
+            connectivity_score = 0
+        connectivity_scores.append(connectivity_score)
+
+    # Dynamic weights: regret and connectivity weights decrease as nodes are visited
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    distance_weight = 0.5
+    regret_weight = 0.4 * (total_nodes / remaining_nodes)
+    connectivity_weight = 0.6 * (total_nodes / remaining_nodes)
+
+    # Combine weighted scores: prioritize distance, but adjust regret and connectivity dynamically
+    scores = [
+        distance_weight * distance + regret_weight * regret + connectivity_weight * score
+        for distance, regret, score in zip(distances, regrets, connectivity_scores)
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

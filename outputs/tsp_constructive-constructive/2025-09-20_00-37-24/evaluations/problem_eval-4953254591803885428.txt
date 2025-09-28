@@ -1,0 +1,32 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate heuristic scores: distance + normalized centrality (average distance to other nodes)
+    def heuristic_score(node):
+        dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) <= 1:
+            return dist
+        centrality = np.mean([distance_matrix[node][other] for other in unvisited_nodes if other != node])
+        return dist + 0.5 * centrality  # Weight centrality slightly less than distance
+
+    # Sort nodes by heuristic score
+    scored_nodes = sorted(unvisited_nodes, key=lambda node: heuristic_score(node))
+
+    # Dynamic probability: higher for nodes with lower scores (better heuristic value)
+    probabilities = np.exp(-np.linspace(0, 2, len(scored_nodes)))  # Exponential decay
+    probabilities /= probabilities.sum()  # Normalize
+
+    # 90% chance to pick from top 3 by heuristic, 10% chance to pick randomly
+    if random.random() < 0.9:
+        candidates = scored_nodes[:min(3, len(scored_nodes))]
+        next_node = random.choices(candidates, weights=probabilities[:len(candidates)])[0]
+    else:
+        next_node = random.choices(scored_nodes, weights=probabilities)[0]
+
+    return next_node

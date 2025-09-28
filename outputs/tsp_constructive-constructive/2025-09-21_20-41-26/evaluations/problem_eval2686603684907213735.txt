@@ -1,0 +1,22 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes[0]
+
+    # Calculate dynamic weight for destination preference
+    weight = 1 - (len(unvisited_nodes) / len(distance_matrix))
+
+    # Probabilistic selection: prefer destination with increasing weight
+    if destination_node in unvisited_nodes:
+        if random.random() < weight:
+            return destination_node
+
+    # Otherwise, select the closest unvisited node
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        if distance_matrix[current_node][node] < min_distance:
+            min_distance = distance_matrix[current_node][node]
+            next_node = node
+    return next_node

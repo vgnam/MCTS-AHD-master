@@ -1,0 +1,30 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    exploration_phase = len(unvisited_nodes) / (len(unvisited_nodes) + len(unvisited_nodes) - len(unvisited_nodes))
+    dynamic_threshold = 1 / (1 + math.exp(-10 * (exploration_phase - 0.5)))
+
+    if destination_node in unvisited_nodes:
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        destination_distance = distance_matrix[current_node][destination_node]
+        bias = 1 - (destination_distance / (avg_distance + 1e-10))
+        if bias > dynamic_threshold:
+            return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    novelty_scores = {}
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        local_connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < distance)
+        novelty_scores[node] = (1 - exploration_phase) * (1 / (1 + local_connectivity))
+        weighted_score = distance * (1 - novelty_scores[node])
+        if weighted_score < min_distance:
+            min_distance = weighted_score
+            next_node = node
+
+    return next_node

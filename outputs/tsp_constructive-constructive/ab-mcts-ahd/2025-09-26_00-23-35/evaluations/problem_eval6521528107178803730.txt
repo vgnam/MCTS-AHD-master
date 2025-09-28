@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+
+    if not unvisited_nodes:
+        return None
+
+    total_unvisited = len(unvisited_nodes)
+
+    # Calculate node degree (number of connections to unvisited nodes)
+    degree = {}
+    for node in unvisited_nodes:
+        degree[node] = sum(1 for other in unvisited_nodes if distance_matrix[node][other] > 0 and node != other)
+
+    # Dynamic weight based on path density
+    avg_degree = sum(degree.values()) / total_unvisited if total_unvisited > 0 else 0
+    weight_factor = 0.7 + (0.3 * (avg_degree / (len(distance_matrix) - 1)))
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        node_degree = degree.get(node, 0)
+
+        # Path density factor
+        density_factor = node_degree / (avg_degree + 1e-6)
+
+        # Hybrid score combining distance and connectivity
+        score = -distance_to_node * (1.0 + density_factor * 0.5)
+        score += 0.3 * node_degree / total_unvisited
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

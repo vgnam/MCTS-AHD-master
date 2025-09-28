@@ -1,0 +1,36 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on inverse distance (closer nodes get higher weights)
+    weights = []
+    total_weight = 0
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance == 0:
+            weight = float('inf')  # handle zero distance case
+        else:
+            weight = 1.0 / distance
+        weights.append(weight)
+        total_weight += weight
+
+    # Normalize weights
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Introduce stochasticity: 80% chance to pick from weighted selection, 20% chance to pick a random node
+    if random.random() < 0.8:
+        # Weighted random selection
+        next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+    else:
+        # Random selection with bias towards closer nodes (but not strictly nearest)
+        # First get the 5 closest nodes, then pick randomly from them
+        nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+        candidates = nearest_neighbors[:min(5, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+
+    return next_node

@@ -1,0 +1,54 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    progress_factor = 1.0 - (remaining_count / total_nodes) ** 1.5
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_nodes
+            local_density = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.5 * avg_distance)
+        else:
+            avg_distance = 0
+            node_centrality = 0
+            local_density = 0
+
+        lookahead_depth = max(1, min(3, remaining_count // 3))
+        nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth] if remaining_nodes else []
+        avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+        immediate_weight = 0.5 - 0.3 * progress_factor
+        lookahead_weight = 0.3 + 0.5 * progress_factor
+        centrality_weight = 0.2 * (1.0 - progress_factor)
+        density_weight = 0.2 + 0.3 * progress_factor
+
+        score = (immediate_weight * immediate_distance +
+                 lookahead_weight * (immediate_distance - avg_neighbor_distance) -
+                 centrality_weight * node_centrality +
+                 density_weight * local_density)
+
+        candidates.append((node, score))
+
+    if not candidates:
+        return destination_node
+
+    min_score = min(score for _, score in candidates)
+    max_score = max(score for _, score in candidates)
+    normalized_scores = [(node, (max_score - score) / (max_score - min_score + 1e-6)) for node, score in candidates]
+
+    total_prob = sum(prob for _, prob in normalized_scores)
+    rand_val = random.random() * total_prob
+    cumulative = 0
+    for node, prob in normalized_scores:
+        cumulative += prob
+        if rand_val <= cumulative:
+            return node
+
+    return next_node

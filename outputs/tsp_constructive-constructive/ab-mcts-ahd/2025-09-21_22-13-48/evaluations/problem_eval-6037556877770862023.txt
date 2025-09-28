@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    distance_weight = 0.5 + 0.3 * (remaining_nodes / (remaining_nodes + 1))  # Adjusted decay
+    revisit_weight = 0.3 - 0.1 * (remaining_nodes / (remaining_nodes + 1))  # Adjusted decay
+
+    # Calculate exploration-exploitation factor (0 to 1)
+    exploration_factor = 1.0 - (0.5 * (remaining_nodes / (remaining_nodes + 1)))
+
+    # Node degree (number of connections)
+    node_degrees = {node: sum(1 for d in distance_matrix[node] if d > 0) for node in unvisited_nodes}
+
+    # Historical visit pattern (simplified: favor nodes with higher degree)
+    degree_weight = 0.3 * (max(node_degrees.values()) - min(node_degrees.values()) + 1)
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        revisit_penalty = 1.0 if node in unvisited_nodes else 0.0
+
+        # Long-term potential: average distance to all unvisited nodes
+        long_term_potential = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        # Combine factors with exploration factor
+        score = (distance_weight * immediate_distance +
+                 revisit_weight * revisit_penalty +
+                 exploration_factor * long_term_potential +
+                 degree_weight * (1.0 / (1.0 + node_degrees[node])))
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

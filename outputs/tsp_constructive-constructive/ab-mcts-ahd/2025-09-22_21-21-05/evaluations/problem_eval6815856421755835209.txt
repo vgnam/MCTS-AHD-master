@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, path_history=None):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    base_weight_current = 1.0 - (visited_ratio ** 2)
+    base_weight_destination = visited_ratio ** 2
+
+    # Calculate dynamic weights based on path history and centrality
+    centrality_weights = {}
+    for node in unvisited_nodes:
+        centrality = sum(1 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        centrality_weights[node] = centrality
+
+    avg_centrality = sum(centrality_weights.values()) / len(centrality_weights) if centrality_weights else 0
+    dynamic_weight_current = base_weight_current * (1 + (avg_centrality - centrality_weights.get(current_node, 0)))
+    dynamic_weight_destination = base_weight_destination * (1 + centrality_weights.get(destination_node, 0))
+
+    # Historical path influence
+    history_bonus = 0
+    if path_history and len(path_history) > 1:
+        last_step = distance_matrix[path_history[-2]][path_history[-1]]
+        history_bonus = 1 / (last_step + 1e-6)
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        centrality_score = centrality_weights[node]
+
+        # Novel scoring with dynamic weights and history influence
+        combined_score = (dynamic_weight_current * distance_to_current) + \
+                         (dynamic_weight_destination * distance_to_destination) + \
+                         (0.4 * (1 - centrality_score)) + \
+                         (0.2 * history_bonus)
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

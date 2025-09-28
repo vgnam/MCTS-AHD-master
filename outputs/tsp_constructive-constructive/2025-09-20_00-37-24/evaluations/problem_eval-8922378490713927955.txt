@@ -1,0 +1,29 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Dynamic probability threshold based on remaining nodes
+    exploration_prob = max(0.1, 0.9 * (len(unvisited_nodes) / len(distance_matrix)))
+
+    # Calculate potential connectivity score for each node
+    connectivity_scores = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        connectivity_scores[node] = total_distance
+
+    # Sort by distance and connectivity (lower score = better)
+    sorted_nodes = sorted(unvisited_nodes,
+                         key=lambda node: (distance_matrix[current_node][node], connectivity_scores[node]))
+
+    # Select based on dynamic probability
+    if random.random() < exploration_prob:
+        candidates = sorted_nodes[:min(5, len(sorted_nodes))]
+        next_node = random.choice(candidates)
+    else:
+        next_node = sorted_nodes[0]  # Always pick best option when not exploring
+
+    return next_node

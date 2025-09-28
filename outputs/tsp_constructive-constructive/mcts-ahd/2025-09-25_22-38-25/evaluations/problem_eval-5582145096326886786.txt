@@ -1,0 +1,46 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    total_unvisited = len(unvisited_nodes)
+    max_distance = max(max(row) for row in distance_matrix)
+
+    # Calculate dynamic probabilities
+    destination_prob = min(0.6 + 0.4 * (1 - math.sqrt(total_unvisited / len(distance_matrix))), 1.0)
+    explore_prob = max(0.2 - 0.1 * (1 - math.sqrt(total_unvisited / len(distance_matrix))), 0.1)
+
+    # Check for direct destination visit
+    if destination_node in unvisited_nodes and random.random() < destination_prob:
+        return destination_node
+
+    # Calculate weighted scores
+    weighted_scores = {}
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node] if destination_node in unvisited_nodes else max_distance
+        proximity_factor = 1 + 0.3 * (1 - dest_dist / max_distance)
+        weighted_scores[node] = current_dist * proximity_factor
+
+    if not weighted_scores:
+        return random.choice(unvisited_nodes)
+
+    # Dynamic proximity threshold
+    avg_distance = sum(weighted_scores.values()) / len(weighted_scores)
+    threshold = avg_distance * (0.8 + 0.2 * (1 - total_unvisited / len(distance_matrix)))
+
+    # Filter nodes based on threshold
+    candidate_nodes = [node for node in unvisited_nodes
+                     if weighted_scores[node] <= threshold]
+
+    if candidate_nodes:
+        if random.random() < explore_prob:
+            return random.choices(candidate_nodes,
+                                weights=[1/w for w in [weighted_scores[node] for node in candidate_nodes]],
+                                k=1)[0]
+        else:
+            return min(candidate_nodes, key=lambda x: weighted_scores[x])
+    else:
+        return next_node

@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        future_connectivity = sum(1 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+        lookahead_factor = sum(distance_matrix[n][destination_node] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+
+        weight_immediate = 0.7 - 0.2 * (remaining_nodes / total_nodes)
+        weight_connectivity = 0.3 + 0.2 * (remaining_nodes / total_nodes)
+        weight_lookahead = 0.1 * (1 - remaining_nodes / total_nodes)
+
+        score = (weight_immediate * (1 / (distance_to_node + 1e-6)) +
+                 weight_connectivity * future_connectivity -
+                 weight_lookahead * lookahead_factor)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

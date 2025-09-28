@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    min_cost = float('inf')
+    next_node = None
+    candidates = []
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        candidates.append((cost, node))
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        candidates.sort()
+        top_three = candidates[:3]
+        avg_top_three = sum(cost for cost, _ in top_three) / 3
+        threshold = 1.5 * avg_top_three
+
+        for cost, node in candidates:
+            if node == next_node:
+                continue
+            if cost <= threshold:
+                next_node = node
+                break
+
+    return next_node

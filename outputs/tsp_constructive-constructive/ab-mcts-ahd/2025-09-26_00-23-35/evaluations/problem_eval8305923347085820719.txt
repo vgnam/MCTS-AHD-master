@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+    total_unvisited = len(unvisited_nodes)
+
+    if not unvisited_nodes:
+        return destination_node
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        if total_unvisited == 1:
+            avg_distance = distance_matrix[node][destination_node]
+        else:
+            distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            avg_distance = sum(distances) / (total_unvisited - 1)
+            entropy = -sum((d / sum(distances)) * math.log(d / sum(distances)) for d in distances) if sum(distances) > 0 else 0
+
+        decay_factor = (total_unvisited / (total_unvisited + 1)) ** 2
+        centrality_weight = 0.5 * decay_factor * (1 + entropy)
+        score = -1.5 * distance_to_node + centrality_weight * avg_distance
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

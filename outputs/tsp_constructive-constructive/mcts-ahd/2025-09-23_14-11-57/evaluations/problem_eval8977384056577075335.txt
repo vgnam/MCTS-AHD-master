@@ -1,0 +1,53 @@
+importance scores that combine distance, regret, and a dynamic exploration bonus, where the exploration bonus is scaled by the remaining nodes and a novel "node centrality" metric (average distance to other nodes) to prioritize well-connected nodes early in the search, while the regret component gains more influence as the search progresses, with a memory penalty that dynamically adjusts based on the ratio of visited to unvisited nodes.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes
+    exploration_bonus = 1.0 + 0.5 * (1.0 - progress_ratio)
+
+    node_centrality = []
+    for node in unvisited_nodes:
+        centrality = sum(distance_matrix[node][other] for other in range(total_nodes)) / total_nodes
+        node_centrality.append(centrality)
+
+    base_distance_weight = 0.6
+    base_regret_weight = 0.3
+    base_centrality_weight = 0.1
+
+    distance_weight = base_distance_weight * (1.0 + 0.3 * progress_ratio)
+    regret_weight = base_regret_weight * (1.0 - 0.3 * progress_ratio)
+    centrality_weight = base_centrality_weight * exploration_bonus
+
+    distances = []
+    regrets = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+    memory_penalty = 0.4 * (1.0 - progress_ratio) * exploration_bonus
+
+    combined_scores = [
+        distance_weight * distance +
+        regret_weight * regret +
+        centrality_weight * centrality -
+        memory_penalty
+        for distance, regret, centrality in zip(distances, regrets, node_centrality)
+    ]
+
+    min_score = min(combined_scores)
+    selected_index = combined_scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

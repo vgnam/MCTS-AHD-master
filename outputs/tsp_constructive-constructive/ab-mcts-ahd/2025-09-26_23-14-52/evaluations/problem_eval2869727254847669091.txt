@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    progress_ratio = 1.0 - (total_unvisited / (total_unvisited + len(distance_matrix)))
+    temperature = 1.0 / (1.0 + math.exp(-10 * (progress_ratio - 0.5)))
+
+    visit_counts = {node: 0 for node in unvisited_nodes}
+    for node in unvisited_nodes:
+        visit_counts[node] = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < sum(distance_matrix[k][n] for k in unvisited_nodes) / total_unvisited)
+
+    best_score = float('-inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited
+        novelty = 1.0 / (1.0 + visit_counts[node])
+
+        exploration_weight = (1 - temperature) * 0.7 + novelty * 0.3
+        exploitation_weight = temperature * (0.6 + 0.4 * progress_ratio)
+
+        exploration_factor = exploration_weight * centrality
+        exploitation_factor = exploitation_weight * (current_distance + future_distance)
+        weighted_score = exploration_factor - exploitation_factor
+
+        if weighted_score > best_score:
+            best_score = weighted_score
+            next_node = node
+        elif weighted_score == best_score:
+            if novelty > 1.0 / (1.0 + visit_counts[next_node]):
+                next_node = node
+
+    return next_node

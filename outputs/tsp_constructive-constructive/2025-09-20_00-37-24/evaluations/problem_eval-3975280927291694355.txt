@@ -1,0 +1,35 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    min_distance = distance_matrix[current_node][nearest_neighbors[0]]
+
+    # Temperature-based stochastic selection
+    temperature = max(1.0, min_distance)  # Higher temperature for longer distances
+    cooling_factor = 0.95  # Reduces exploration over time
+
+    # Calculate selection probabilities
+    probabilities = []
+    for node in nearest_neighbors:
+        distance = distance_matrix[current_node][node]
+        # Probability inversely proportional to distance and temperature
+        prob = (1.0 / (distance + 1e-6)) ** (1.0 / temperature)
+        probabilities.append(prob)
+
+    # Normalize probabilities
+    total = sum(probabilities)
+    probabilities = [p / total for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+
+    # Apply cooling factor to temperature
+    temperature *= cooling_factor
+
+    return next_node

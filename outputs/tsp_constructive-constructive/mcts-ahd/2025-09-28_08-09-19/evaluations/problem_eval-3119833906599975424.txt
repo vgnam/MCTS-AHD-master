@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    temperature = max(0.1, 1.0 - (1 - remaining_count / total_nodes) * 0.9)
+
+    node_scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = avg_distance
+        else:
+            avg_distance = 0
+            node_centrality = 0
+
+        connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+        connectivity_factor = 1.0 + (connectivity / (total_nodes - 1)) * 0.4
+
+        lookahead_depth = min(4, remaining_count // 3) if remaining_count > 3 else 1
+        nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth] if remaining_nodes else []
+        avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+        score = (immediate_distance + 0.5 * avg_neighbor_distance) * connectivity_factor
+        normalized_score = score / (node_centrality + 1e-6)
+
+        node_scores.append((node, normalized_score))
+
+    probabilities = [math.exp(-s[1] / temperature) for s in node_scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices([s[0] for s in node_scores], weights=probabilities, k=1)[0]
+    return next_node

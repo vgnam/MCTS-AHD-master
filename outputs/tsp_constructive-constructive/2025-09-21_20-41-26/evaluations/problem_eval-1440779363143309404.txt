@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        if len(unvisited_nodes) == 1:
+            return destination_node
+        prob_dest = 0.7  # Higher probability to prioritize destination
+        if random.random() < prob_dest:
+            return destination_node
+
+    # Calculate weights based on inverse distances
+    weights = []
+    total_weight = 0
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        inv_dist = 1.0 / (distance_matrix[current_node][node] + 1e-6)  # Avoid division by zero
+        weights.append(inv_dist)
+        total_weight += inv_dist
+
+    # Normalize weights and select node probabilistically
+    if total_weight > 0:
+        normalized_weights = [w / total_weight for w in weights]
+        next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

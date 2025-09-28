@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = [n for n in unvisited_nodes if n != node]
+        weight_factor = 1.0 / len(remaining_nodes) if remaining_nodes else 1.0
+
+        if remaining_nodes:
+            best_lookahead = min(remaining_nodes, key=lambda n: distance_matrix[node][n] + distance_matrix[n][destination_node])
+            lookahead_dist = distance_matrix[node][best_lookahead] + distance_matrix[best_lookahead][destination_node]
+        else:
+            lookahead_dist = distance_matrix[node][destination_node]
+
+        normalized_score = (current_dist + weight_factor * lookahead_dist) / (1 + weight_factor)
+        return normalized_score
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

@@ -1,0 +1,35 @@
+importance of proximity to the current node and the destination based on the remaining unvisited nodes, using a harmonic mean to balance the distances, and includes a fallback to the nearest neighbor when the product-based selection is inconclusive.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if all(distance_matrix[current_node][node] >= destination_distance for node in unvisited_nodes if node != destination_node):
+            return destination_node
+
+    min_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        node_to_destination = distance_matrix[node][destination_node]
+
+        if current_to_node == 0 or node_to_destination == 0:
+            harmonic_mean = float('inf')
+        else:
+            harmonic_mean = 2 * (current_to_node * node_to_destination) / (current_to_node + node_to_destination)
+
+        weight = 1.0 / (1.0 + remaining_nodes)
+        score = weight * current_to_node + (1 - weight) * harmonic_mean
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    if next_node is None:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    return next_node

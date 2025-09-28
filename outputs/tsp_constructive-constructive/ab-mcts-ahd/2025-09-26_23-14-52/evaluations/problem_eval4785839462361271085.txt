@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    total_unvisited = len(unvisited_nodes)
+    progress_ratio = 1 - total_unvisited / (total_unvisited + 1)
+    dynamic_weight = 1 / (1 + math.exp(-10 * (progress_ratio - 0.5)))
+
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+        future_dist = distance_matrix[node][destination_node]
+
+        # Lookahead: evaluate up to 3-step paths
+        lookahead_score = 0
+        remaining_nodes = [n for n in unvisited_nodes if n != node]
+        if len(remaining_nodes) > 0:
+            next_candidates = remaining_nodes[:min(3, len(remaining_nodes))]
+            for candidate in next_candidates:
+                lookahead_score += distance_matrix[node][candidate] * (0.7 ** (next_candidates.index(candidate) + 1))
+
+        # Penalty for revisiting nodes (to discourage cycles)
+        revisit_penalty = 0.1 if node in [current_node] else 0
+
+        weighted_score = (dynamic_weight * immediate_dist +
+                         (1 - dynamic_weight) * future_dist +
+                         0.3 * lookahead_score +
+                         revisit_penalty)
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+        elif weighted_score == best_score:
+            if future_dist < distance_matrix[next_node][destination_node]:
+                next_node = node
+
+    return next_node

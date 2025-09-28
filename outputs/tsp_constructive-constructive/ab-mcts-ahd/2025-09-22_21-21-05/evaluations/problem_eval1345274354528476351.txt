@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    scores = []
+    centrality_scores = []
+
+    # Calculate centrality using harmonic mean
+    for node in unvisited_nodes:
+        sum_inv_dist = sum(1.0 / (distance_matrix[node][other] + 1e-6) for other in unvisited_nodes)
+        harmonic_mean = total_unvisited / sum_inv_dist if sum_inv_dist > 0 else 0
+        centrality_scores.append(harmonic_mean)
+
+    max_centrality = max(centrality_scores) if centrality_scores else 1.0
+
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Exponential decay of distances
+        exp_distance = math.exp(-(distance_to_current + distance_to_destination) / 100)
+
+        # Normalized centrality
+        norm_centrality = centrality_scores[i] / max_centrality if max_centrality > 0 else 0
+
+        # Combined score with dynamic weight
+        weight = 0.7 + 0.3 * (total_unvisited / len(unvisited_nodes + [current_node]))
+        score = weight * exp_distance + (1 - weight) * norm_centrality
+        scores.append(score)
+
+    # Select node with highest score (inverse probability)
+    if scores:
+        max_score = max(scores)
+        normalized_scores = [s / max_score for s in scores]
+        probabilities = [s ** 2 for s in normalized_scores]
+        total_prob = sum(probabilities)
+        probabilities = [p / total_prob for p in probabilities]
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+        return next_node
+
+    return next_node

@@ -1,0 +1,9 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, exploration_prob=0.3):
+    if not unvisited_nodes:
+        return destination_node
+    if random.random() < exploration_prob:
+        return random.choice(unvisited_nodes)
+    next_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    return next_node

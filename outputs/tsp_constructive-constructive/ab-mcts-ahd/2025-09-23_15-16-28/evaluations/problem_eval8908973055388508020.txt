@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_weighted_distance = float('inf')
+
+    total_nodes = len(unvisited_nodes) + 1
+    position_factor = (total_nodes - len(unvisited_nodes)) / total_nodes
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate node centrality (average distance to all other unvisited nodes)
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Dynamic weight adjustment based on position and centrality
+        if position_factor < 0.3:  # Early in tour
+            weight_current = 0.3
+            weight_future = 0.4
+            weight_centrality = 0.3
+        elif position_factor < 0.7:  # Middle of tour
+            weight_current = 0.4
+            weight_future = 0.3
+            weight_centrality = 0.3
+        else:  # Late in tour
+            weight_current = 0.5
+            weight_future = 0.3
+            weight_centrality = 0.2
+
+        weighted_distance = (weight_current * distance_to_current) + \
+                           (weight_future * distance_to_destination) + \
+                           (weight_centrality * centrality)
+
+        if weighted_distance < min_weighted_distance:
+            min_weighted_distance = weighted_distance
+            next_node = node
+
+    return next_node

@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    total_nodes = len(distance_matrix)
+    phase = (total_nodes - len(unvisited_nodes)) / total_nodes
+    phase_weight = 1 / (1 + 2.5 * (1 - phase))
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+
+    min_cost = min(distances)
+    radius = min_cost * (1.5 - 0.5 * phase)
+
+    candidate_nodes = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= radius]
+
+    if not candidate_nodes:
+        candidate_nodes = unvisited_nodes.copy()
+
+    node_scores = {}
+    for node in candidate_nodes:
+        cost = distance_matrix[current_node][node]
+        hub_potential = sum(distance_matrix[node]) / (total_nodes - 1)
+        cost_factor = (cost / avg_distance) ** (1 + 0.5 * phase)
+        hub_factor = (hub_potential / avg_distance) ** (1 - 0.5 * phase)
+        node_scores[node] = cost_factor + phase_weight * hub_factor
+
+    next_node = min(node_scores, key=node_scores.get)
+    return next_node

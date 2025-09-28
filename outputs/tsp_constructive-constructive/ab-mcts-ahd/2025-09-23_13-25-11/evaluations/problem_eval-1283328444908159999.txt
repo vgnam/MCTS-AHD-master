@@ -1,0 +1,50 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visit_counts=None):
+    if not unvisited_nodes:
+        return destination_node
+
+    if visit_counts is None:
+        visit_counts = {node: 0 for node in unvisited_nodes}
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        # Dynamic temperature based on remaining nodes
+        temperature = 1.0 / (1 + math.exp(-0.5 * len(remaining_nodes)))
+
+        # Immediate and future weight factors
+        weight_factor = 1 / len(remaining_nodes) if len(remaining_nodes) > 1 else 1.0
+        immediate_weight = 0.6 - 0.2 * weight_factor
+        future_weight = 1.0 - immediate_weight
+
+        # Lookahead factors
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        min_future_dist = min(distance_matrix[node][other] for other in remaining_nodes)
+        max_future_dist = max(distance_matrix[node][other] for other in remaining_nodes)
+
+        # Novelty factor based on visit counts
+        novelty_factor = 1.0 / (1 + visit_counts.get(node, 0))
+
+        # Combined score with temperature-based softmax
+        immediate_score = immediate_weight * current_dist
+        future_score = future_weight * (0.5 * avg_future_dist + 0.3 * min_future_dist + 0.2 * max_future_dist)
+        novelty_score = 0.2 * novelty_factor
+
+        # Temperature-adjusted score
+        score = immediate_score + future_score + novelty_score
+        return score / temperature
+
+    # Softmax selection to introduce probability
+    scores = [evaluate_node(node) for node in unvisited_nodes]
+    exp_scores = [math.exp(score) for score in scores]
+    sum_exp = sum(exp_scores)
+    probabilities = [exp_score / sum_exp for exp_score in exp_scores]
+
+    next_node = random.choices(list(unvisited_nodes), weights=probabilities, k=1)[0]
+    return next_node

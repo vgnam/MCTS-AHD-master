@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    min_score = float('inf')
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        avg_future_cost = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / len(unvisited_nodes) if unvisited_nodes else 0
+        weighted_score = 0.7 * current_to_node + 0.3 * avg_future_cost
+
+        if weighted_score < min_score:
+            min_score = weighted_score
+            best_node = node
+
+    return next_node

@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    weight_local = 0.6 - 0.2 * (remaining_nodes / len(distance_matrix))
+    weight_centrality = 0.3 + 0.1 * (remaining_nodes / len(distance_matrix))
+    weight_coherence = 0.4 - 0.2 * (remaining_nodes / len(distance_matrix))
+
+    scores = []
+    for node in unvisited_nodes:
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(len(distance_matrix))) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        memory_penalty = 0.1 * (node in unvisited_nodes)  # Simple memory penalty
+        score = (weight_local * local_distance) + (weight_centrality * centrality) - (weight_coherence * coherence) + memory_penalty
+        scores.append(score)
+
+    if not scores:
+        return destination_node
+
+    # Rank-based probabilistic selection
+    ranked_nodes = sorted(unvisited_nodes, key=lambda x: scores[unvisited_nodes.index(x)])
+    if len(ranked_nodes) > 1:
+        selection_prob = [1.0 / (i + 1) for i in range(len(ranked_nodes))]
+        selection_prob = [p / sum(selection_prob) for p in selection_prob]
+        next_node = np.random.choice(ranked_nodes, p=selection_prob)
+    else:
+        next_node = ranked_nodes[0]
+
+    return next_node

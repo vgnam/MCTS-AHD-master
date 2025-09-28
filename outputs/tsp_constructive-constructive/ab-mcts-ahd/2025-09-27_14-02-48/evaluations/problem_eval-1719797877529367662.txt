@@ -1,0 +1,50 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    # Initialize temperature and cooling rate
+    temperature = 100
+    cooling_rate = 0.95
+    
+    # Find k nearest neighbors
+    k = min(5, len(unvisited_nodes))
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:k]
+    
+    # Simulated annealing
+    while temperature > 1:
+        # Calculate probabilities for k nearest neighbors
+        probabilities = []
+        for neighbor in nearest_neighbors:
+            distance = distance_matrix[current_node][neighbor]
+            probability = math.exp(-distance / temperature)
+            probabilities.append(probability)
+        
+        # Normalize probabilities
+        sum_probabilities = sum(probabilities)
+        probabilities = [p / sum_probabilities for p in probabilities]
+        
+        # Choose a node based on the probabilities
+        r = random.random()
+        cumulative_probability = 0
+        for i, probability in enumerate(probabilities):
+            cumulative_probability += probability
+            if r <= cumulative_probability:
+                next_node = nearest_neighbors[i]
+                break
+        
+        # Check if the chosen node is valid
+        if next_node not in unvisited_nodes:
+            temperature *= cooling_rate
+            continue
+        
+        # Accept the chosen node
+        return next_node
+        
+        # Cool down the temperature
+        temperature *= cooling_rate
+    
+    # Return the nearest neighbor if the temperature is too low
+    return next_node

@@ -1,0 +1,7 @@
+import random
+        candidates = random.sample(unvisited_nodes, min(3, len(unvisited_nodes)))
+        next_node = max(candidates, key=lambda node: weighted_score(node))
+    else:
+        next_node = max(unvisited_nodes, key=lambda node: weighted_score(node))
+
+    return next_node

@@ -1,0 +1,36 @@
+importance, while maintaining the core balance of immediate distance, future potential, and centrality through normalized, progress-aware scoring components.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = (total_nodes - remaining_nodes) / total_nodes
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        node_centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+        node_connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < (sum(distance_matrix[node]) / total_nodes))
+
+        distance_weight = 0.4 - 0.2 * progress_factor
+        future_weight = 0.3 + 0.2 * progress_factor
+        centrality_weight = 0.3 + 0.1 * progress_factor
+
+        exploration_factor = (1 / (1 + immediate_distance)) * (remaining_nodes / total_nodes) * (node_connectivity / (total_nodes - 1))
+        path_length_factor = (1 / (1 + future_distance)) * (remaining_nodes / total_nodes)
+
+        combined_score = (distance_weight * immediate_distance) + \
+                         (future_weight * (1 / (1 + future_distance))) + \
+                         (centrality_weight * (1 / (1 + node_centrality))) - \
+                         (0.6 * exploration_factor) + \
+                         (0.4 * path_length_factor)
+
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

@@ -1,0 +1,30 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate potential candidates based on distance and heuristic "promise"
+    candidates = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Heuristic: estimate remaining path cost (simplified as sum of distances to unvisited nodes)
+        remaining_cost = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        # Weighted score: balance distance and remaining cost
+        score = 0.7 * distance + 0.3 * remaining_cost
+        candidates.append((node, score))
+
+    # Sort by score and select top 3
+    candidates.sort(key=lambda x: x[1])
+    top_candidates = [node for node, score in candidates[:min(3, len(candidates))]]
+
+    # 80% chance to pick from top 3, 20% chance to pick randomly from unvisited
+    if random.random() < 0.8:
+        next_node = random.choice(top_candidates)
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

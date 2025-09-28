@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    node_scores = []
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(unvisited_nodes) + 1
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Heuristic for long-term path potential
+        path_potential = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / remaining_nodes
+
+        # Spatial diversity penalty
+        spatial_penalty = sum(distance_matrix[node][other] for other in unvisited_nodes) / total_nodes
+
+        # Dynamic weight based on remaining nodes
+        exploration_weight = 1.0 - (remaining_nodes / total_nodes) ** 1.5
+        score = (immediate_distance * (1 - exploration_weight) +
+                path_potential * exploration_weight +
+                spatial_penalty * 0.2)
+
+        node_scores.append((node, score))
+
+    # Probabilistic selection based on scores
+    min_score = min(score for _, score in node_scores)
+    adjusted_scores = [(node, (min_score + 1) / (score + 1)) for node, score in node_scores]
+    total_weight = sum(weight for _, weight in adjusted_scores)
+
+    if total_weight == 0:
+        return unvisited_nodes[0]
+
+    rand_val = random.uniform(0, total_weight)
+    cumulative = 0
+    for node, weight in adjusted_scores:
+        cumulative += weight
+        if rand_val <= cumulative:
+            return node
+
+    return next_node

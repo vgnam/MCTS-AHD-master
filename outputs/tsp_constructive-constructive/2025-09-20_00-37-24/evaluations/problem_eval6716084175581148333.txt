@@ -1,0 +1,30 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        # Increase probability of selecting destination as unvisited nodes decrease
+        selection_prob = 0.5 + (0.5 * (1 - len(unvisited_nodes) / len(distance_matrix)))
+        if random.random() < selection_prob:
+            return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    # Calculate proximity and recency scores
+    proximity_scores = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_prox, max_prox = min(proximity_scores), max(proximity_scores)
+    normalized_prox = [(max_prox - score) / (max_prox - min_prox + 1e-10) for score in proximity_scores] if max_prox != min_prox else [1.0 for _ in proximity_scores]
+
+    # Combine proximity and randomness
+    weights = [normalized_prox[i] * 0.7 + random.random() * 0.3 for i in range(len(unvisited_nodes))]
+
+    # Select node with highest weighted score
+    next_node = unvisited_nodes[weights.index(max(weights))]
+
+    # Occasionally override with destination if it's nearby
+    if destination_node in unvisited_nodes and random.random() < 0.2:
+        dest_dist = distance_matrix[current_node][destination_node]
+        if dest_dist <= sorted(proximity_scores)[:3][-1]:
+            next_node = destination_node
+
+    return next_node

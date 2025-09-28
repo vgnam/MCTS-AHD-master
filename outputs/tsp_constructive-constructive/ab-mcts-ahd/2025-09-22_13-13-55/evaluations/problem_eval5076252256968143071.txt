@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 0.5  # Controls randomness (higher = more exploration)
+    probabilities = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        weight = (1.0 / (distance + 1e-10)) ** (1.0 / temperature)
+        probabilities.append(weight)
+        total_weight += weight
+
+    if total_weight == 0:
+        return unvisited_nodes[0]  # Fallback if all weights are zero
+
+    normalized_probs = [w / total_weight for w in probabilities]
+    selected_node = np.random.choice(unvisited_nodes, p=normalized_probs)
+
+    return next_node

@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = 1 - (remaining_nodes / total_nodes)
+    base_pressure = 0.4 + 0.6 * (1 - progress_factor)
+    temperature = 1.0 - 0.9 * progress_factor
+
+    def calculate_pheromone(node):
+        return (1.0 / (distance_matrix[current_node][node] + 1e-10)) * (1.0 / (distance_matrix[node][destination_node] + 1e-10))
+
+    def heuristic(node):
+        pheromone = calculate_pheromone(node)
+        local_cost = distance_matrix[current_node][node]
+        global_potential = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        min_cost = min(distance_matrix[current_node][n] for n in unvisited_nodes) if unvisited_nodes else 0
+        max_cost = max(distance_matrix[current_node][n] for n in unvisited_nodes) if unvisited_nodes else 0
+        regret = (local_cost - min_cost) / (max_cost - min_cost + 1e-6)
+        hub_score = (1 / (centrality + 1e-6)) * (1 + 0.1 * regret)
+        distance_penalty = (local_cost / (sum(sum(row) for row in distance_matrix) / (total_nodes ** 2) + 1e-6)) ** 2
+        hybrid_score = (0.5 * regret + 0.3 * hub_score + 0.2 * (1 / (distance_penalty + 1e-6))) * base_pressure
+        exploration_score = (0.4 * global_potential + 0.6 * pheromone) * (1 - base_pressure)
+        return hybrid_score + exploration_score
+
+    weighted_scores = [heuristic(node) for node in unvisited_nodes]
+    max_score = max(weighted_scores) if weighted_scores else 0
+    probabilities = [(score / (max_score + 1e-6)) ** (1 / temperature) for score in weighted_scores]
+    total_prob = sum(probabilities) if probabilities else 1
+    normalized_probs = [p / total_prob for p in probabilities]
+    next_node = np.random.choice(unvisited_nodes, p=normalized_probs) if unvisited_nodes else destination_node
+    return next_node

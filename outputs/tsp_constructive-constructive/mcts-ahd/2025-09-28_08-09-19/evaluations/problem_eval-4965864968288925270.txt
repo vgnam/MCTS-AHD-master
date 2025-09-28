@@ -1,0 +1,44 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    node_scores = []
+    total_score = 0.0
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Dynamic lookahead depth based on remaining nodes (up to 4 or half the remaining count)
+        lookahead_depth = min(4, remaining_count // 2) if remaining_count > 3 else 1
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+        else:
+            avg_distance = 0
+
+        # Dynamic weight adjustment: higher immediate weight for fewer remaining nodes
+        immediate_weight = 0.5 + 0.5 * (1 - 1 / (1 + remaining_count))
+        avg_weight = 1 - immediate_weight
+
+        score = immediate_weight * immediate_distance + avg_weight * avg_distance
+        normalized_score = math.exp(-score)  # Convert to probability via exponential decay
+        node_scores.append((node, normalized_score))
+        total_score += normalized_score
+
+    if total_score == 0:
+        return random.choice(list(unvisited_nodes))
+
+    # Probabilistic selection
+    rand_val = random.uniform(0, total_score)
+    cumulative = 0.0
+    for node, score in node_scores:
+        cumulative += score
+        if rand_val <= cumulative:
+            return node
+
+    return next_node

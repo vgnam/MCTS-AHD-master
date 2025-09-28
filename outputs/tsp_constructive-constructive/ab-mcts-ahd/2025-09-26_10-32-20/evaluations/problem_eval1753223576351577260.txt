@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    global_centrality = lambda node: 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+
+    # Dynamic weight adjustment based on path progress
+    current_distance = distance_matrix[current_node][destination_node]
+    max_distance = max(max(row) for row in distance_matrix)
+    progress = 1 - (current_distance / (max_distance + 1e-10))
+    weight_global = 1 / (1 + math.exp(-10 * (progress - 0.5)))  # Sigmoid transition
+    weight_local = 1 - weight_global
+
+    # Node diversity factor
+    visited_nodes = set(range(total_nodes)) - set(unvisited_nodes)
+    diversity_factor = lambda node: 1 - (sum(distance_matrix[node][v] for v in visited_nodes) / (len(visited_nodes) + 1e-10))
+
+    hybrid_score = lambda node: (weight_local * distance_matrix[current_node][node] +
+                                weight_global * global_centrality(node) +
+                                0.2 * diversity_factor(node))
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

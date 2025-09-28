@@ -1,0 +1,12 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    def score(node):
+        dist = distance_matrix[current_node][node]
+        if not unvisited_nodes:
+            return 1.0 / (dist + 1e-6)
+        avg_neighbor_dist = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        connectivity_weight = 0.1 * (1.0 / (avg_neighbor_dist + 1e-6))
+        return (1.0 / (dist + 1e-6)) * (1.0 + connectivity_weight)
+    next_node = max(unvisited_nodes, key=score)
+    return next_node

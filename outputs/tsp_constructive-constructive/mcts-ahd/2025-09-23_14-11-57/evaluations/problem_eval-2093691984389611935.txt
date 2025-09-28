@@ -1,0 +1,63 @@
+importance, while introducing a novel "risk-awareness" factor to penalize high-variance paths early in the tour.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = (total_nodes - remaining_nodes) / total_nodes
+
+    # Calculate centrality scores and statistical measures
+    centrality_scores = []
+    avg_distances = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Node centrality (average distance to all other nodes)
+        node_centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+        centrality_scores.append(node_centrality)
+        avg_distances.append(node_centrality)
+
+    max_centrality = max(centrality_scores) if centrality_scores else 1
+    avg_distance = sum(avg_distances) / len(avg_distances) if avg_distances else 1
+
+    # Calculate risk-awareness factor (standard deviation of distances)
+    risk_factors = []
+    for node in unvisited_nodes:
+        distances = distance_matrix[node]
+        risk_factor = (sum((d - avg_distance) ** 2 for d in distances) / len(distances)) ** 0.5
+        risk_factors.append(risk_factor)
+
+    max_risk = max(risk_factors) if risk_factors else 1
+
+    # Dynamic weight adjustments with risk-aware scaling
+    for i, node in enumerate(unvisited_nodes):
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        node_centrality = centrality_scores[i]
+        risk_factor = risk_factors[i]
+
+        # Non-linear weight adjustments
+        distance_weight = (1 - progress_factor) * 0.8 + 0.2 - (0.15 * (node_centrality / max_centrality))
+        future_weight = progress_factor * 0.7 + 0.3 + (0.3 * (node_centrality / max_centrality))
+
+        # Risk-aware exploration bonus
+        exploration_bonus = (1 / (1 + immediate_distance)) * (remaining_nodes / total_nodes) * (1 + (node_centrality / max_centrality)) * (1 - (risk_factor / max_risk))
+
+        # Risk-aware penalty term
+        risk_penalty = (risk_factor / max_risk) * (1 - progress_factor) * 0.5
+
+        combined_score = (distance_weight * immediate_distance) + \
+                         (future_weight * (1 / (1 + future_distance))) - \
+                         (0.5 * exploration_bonus) + \
+                         (risk_penalty * (1 + immediate_distance))
+
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

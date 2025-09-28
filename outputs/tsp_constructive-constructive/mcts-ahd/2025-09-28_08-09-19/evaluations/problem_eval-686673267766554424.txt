@@ -1,0 +1,53 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate node density for adaptive weighting
+    avg_distance = sum(sum(row) for row in distance_matrix) / (len(distance_matrix) ** 2)
+    density_factor = min(1.0, avg_distance / (sum(distance_matrix[current_node]) / len(distance_matrix)))
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = -(distance_to_current + distance_to_destination)
+        else:
+            # Centrality: harmonic mean of distances to unvisited nodes
+            centrality = (remaining_nodes - 1) / sum(1 / (distance_matrix[node][n] + 1e-10) for n in unvisited_nodes if n != node) if remaining_nodes > 1 else 0
+
+            # Connectivity: normalized by relative distances to neighbors
+            connectivity = sum(1 / (1 + distance_matrix[node][n] / distance_to_current) for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+            # Historical path influence: penalize nodes that would create long loops
+            historical_penalty = 0
+            if len(unvisited_nodes) < len(distance_matrix) // 2:
+                historical_penalty = sum(distance_matrix[node][n] for n in unvisited_nodes if distance_matrix[node][n] > 1.2 * distance_to_current) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+            # Dynamic weight adjustment
+            stage_factor = 1 - (remaining_nodes / len(distance_matrix))
+            immediate_weight = 0.4 + 0.3 * stage_factor
+            centrality_weight = 0.3 + 0.2 * stage_factor
+            connectivity_weight = 0.2 + 0.1 * stage_factor
+            penalty_weight = 0.1 * (1 + stage_factor)
+
+            # Density-adaptive penalty for nodes too close to destination
+            proximity_penalty = 0
+            if distance_to_destination < 0.5 * avg_distance:
+                proximity_penalty = penalty_weight * (distance_to_destination / (1 + distance_to_current))
+
+            # Combine scores
+            score = (immediate_weight * (-distance_to_current) +
+                     centrality_weight * centrality +
+                     connectivity_weight * connectivity -
+                     penalty_weight * (historical_penalty + proximity_penalty))
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

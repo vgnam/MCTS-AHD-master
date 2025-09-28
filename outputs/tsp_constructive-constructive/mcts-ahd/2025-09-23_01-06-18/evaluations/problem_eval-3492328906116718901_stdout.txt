@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance with progress, using a dynamic selection pressure that starts at 0.6 and decreases to 0.2, with weights for global potential (0.4), local cost (0.3), regret (0.2), and diversity (0.1) adjusted based on progress.}
+                                                                                                                                                                                                                                  ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance with progress, using a dynamic selection pressure that starts at 0.6 and decreases to 0.2, with weights for global potential (0.4), local cost (0.3), regret (0.2), and diversity (0.1) adjusted based on progress.}
+                                                                                                                                                                                                                                  ^
+SyntaxError: unmatched '}'

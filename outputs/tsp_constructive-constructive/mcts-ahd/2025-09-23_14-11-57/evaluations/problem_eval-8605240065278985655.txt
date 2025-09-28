@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = 1 / (1 + math.exp(-10 * (2 * (total_nodes - remaining_nodes) / total_nodes - 1)))
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        node_centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+        centrality_weight = (node_centrality / max(distance_matrix[node])) if max(distance_matrix[node]) != 0 else 0
+        adaptive_centrality = centrality_weight * (1 - progress_factor)
+
+        distance_weight = (1 - progress_factor) * 0.8 + 0.2 - (0.15 * adaptive_centrality)
+        future_weight = progress_factor * 0.7 + 0.3 + (0.25 * adaptive_centrality)
+
+        exploration_bonus = (1 / (1 + immediate_distance)) * (remaining_nodes / total_nodes) * (1 + adaptive_centrality)
+
+        regret_penalty = 0
+        if progress_factor > 0.6:
+            avg_future_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+            regret_penalty = max(0, (avg_future_dist - future_distance) ** 2)
+
+        combined_score = (distance_weight * immediate_distance) + \
+                         (future_weight * (1 / (1 + future_distance))) - \
+                         (0.5 * exploration_bonus) + \
+                         (0.9 * regret_penalty)
+
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

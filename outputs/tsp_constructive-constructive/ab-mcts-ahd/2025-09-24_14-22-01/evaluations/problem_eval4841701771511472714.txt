@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    min_score = float('inf')
+    next_node = None
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        estimated_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight adjustment using sigmoid function
+        weight_immediate = 1 / (1 + math.exp(-0.1 * (remaining_nodes - total_nodes/2)))
+        weight_estimated = 1 - weight_immediate
+
+        # Probabilistic penalty based on node centrality
+        centrality = sum(distance_matrix[node]) / len(distance_matrix[node])
+        penalty_factor = 1 - (centrality / max(sum(row) for row in distance_matrix))
+        penalty = penalty_factor * (remaining_nodes ** 2) * 0.01
+
+        score = (weight_immediate * immediate_distance) + \
+                (weight_estimated * estimated_distance) + \
+                (penalty * immediate_distance)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

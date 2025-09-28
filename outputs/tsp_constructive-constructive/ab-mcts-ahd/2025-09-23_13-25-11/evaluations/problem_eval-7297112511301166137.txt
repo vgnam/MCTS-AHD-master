@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    alpha = 1.0 / (1.0 + remaining_count)  # Dynamic weight adjustment
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if not unvisited_nodes - {node}:
+            return current_dist
+
+        remaining_nodes = unvisited_nodes - {node}
+        min_future_dist = min(distance_matrix[node][other] for other in remaining_nodes)
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+
+        # Weighted combination with penalty for high average distances
+        penalty = 0.1 * avg_future_dist if avg_future_dist > 2 * min_future_dist else 0
+        return alpha * current_dist + (1 - alpha) * min_future_dist + penalty
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

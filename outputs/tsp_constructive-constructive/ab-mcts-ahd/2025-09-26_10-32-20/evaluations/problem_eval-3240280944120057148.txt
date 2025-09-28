@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        # Calculate normalized distance to the node
+        norm_distance = distance_matrix[current_node][node] / max(distance_matrix[current_node][n] for n in unvisited_nodes + [current_node])
+
+        # Calculate centrality of the node (average distance to unvisited nodes)
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        # Dynamic weighting based on remaining unvisited nodes
+        remaining = len(unvisited_nodes)
+        weight = 0.5 + 0.5 * (remaining / (remaining + 1))  # Weight shifts from 0.5 to 1 as remaining nodes decrease
+
+        # Penalize nodes that disconnect the graph (if no path exists)
+        disconnected_penalty = 0
+        for n in unvisited_nodes:
+            if distance_matrix[node][n] == float('inf'):
+                disconnected_penalty += 1000  # Large penalty for disconnected nodes
+
+        return (weight * norm_distance) + ((1 - weight) * centrality) + disconnected_penalty
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

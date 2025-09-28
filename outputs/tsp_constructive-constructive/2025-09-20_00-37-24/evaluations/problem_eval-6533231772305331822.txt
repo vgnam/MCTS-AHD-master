@@ -1,0 +1,30 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate exploration factor based on remaining unvisited nodes and current path
+    exploration_factor = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+    exploration_factor = min(max(exploration_factor, 0.1), 0.9)  # Clamp between 0.1 and 0.9
+
+    # Get nearest neighbors and their distances
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    nearest_distances = [distance_matrix[current_node][node] for node in nearest_neighbors]
+
+    # Compute selection probabilities: inverse distance weighted by exploration factor
+    total_weight = 0.0
+    weights = []
+    for dist in nearest_distances:
+        weight = (1.0 / (dist + 1e-6)) * (1.0 - exploration_factor) + exploration_factor
+        weights.append(weight)
+        total_weight += weight
+
+    # Normalize weights and select node
+    normalized_weights = [w / total_weight for w in weights]
+    next_node = random.choices(nearest_neighbors, weights=normalized_weights, k=1)[0]
+
+    return next_node

@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_unvisited = len(unvisited_nodes)
+    progress_ratio = 1.0 - (total_unvisited / (total_unvisited + len(distance_matrix)))
+    candidates = []
+    for node in unvisited_nodes:
+        next_distance = distance_matrix[current_node][node]
+        if total_unvisited > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            max_distance = max(distance_matrix[node][n] for n in remaining_nodes)
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            dynamic_weight = progress_ratio
+            penalty = 0.3 * next_distance
+            total_distance = next_distance + 0.5 * max_distance + 0.2 * avg_distance + dynamic_weight * (0.5 * max_distance + 0.5 * avg_distance) - penalty
+        else:
+            total_distance = next_distance
+        candidates.append((node, total_distance))
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

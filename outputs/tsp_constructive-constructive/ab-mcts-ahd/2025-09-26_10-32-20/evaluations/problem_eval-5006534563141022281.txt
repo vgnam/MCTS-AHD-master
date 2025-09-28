@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    local_weight = 0.5 + 0.5 * (1 - remaining_ratio)
+    global_weight = 1 - local_weight
+
+    # Adaptive neighborhood exploration
+    def neighborhood_diversity(node):
+        distances = sorted([distance_matrix[node][n] for n in range(total_nodes)])
+        return sum(distances[1:4]) / 3 if len(distances) >= 4 else sum(distances) / len(distances)
+
+    # Reinforcement learning-inspired bias
+    def historical_bias(node):
+        if not hasattr(select_next_node, 'history'):
+            select_next_node.history = {}
+        select_next_node.history[node] = select_next_node.history.get(node, 0) + 1
+        return 1 / (select_next_node.history[node] + 1e-10)
+
+    # Hybrid score with dynamic weights
+    hybrid_score = lambda node: (
+        local_weight * distance_matrix[current_node][node] +
+        global_weight * (0.5 * neighborhood_diversity(node) + 0.3 * historical_bias(node) + 0.2 * (1 / (sum(distance_matrix[node][n] for n in unvisited_nodes) + 1e-10)))
+    )
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

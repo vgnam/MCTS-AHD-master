@@ -1,0 +1,4 @@
+import random
+    scores = {node: (1 / (distance_matrix[current_node][node] + 1e-10)) * random.uniform(0.5, 1.5) for node in unvisited_nodes}
+    next_node = max(scores, key=scores.get)
+    return next_node

@@ -1,0 +1,33 @@
+importance, and includes a novel coherence penalty that increases with tour length to encourage smoother transitions.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    base_weight_local = 0.6
+    base_weight_centrality = 0.25
+    base_weight_coherence = 0.15
+
+    node_importance = {}
+    for node in unvisited_nodes:
+        node_importance[node] = sum(distance_matrix[node][n] for n in range(total_nodes)) / total_nodes
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+
+        importance_factor = node_importance[node] / (sum(node_importance.values()) + 1e-10)
+
+        dynamic_weight_local = base_weight_local * (1 - progress) + 0.3 * importance_factor
+        dynamic_weight_centrality = base_weight_centrality * progress + 0.2 * importance_factor
+        dynamic_weight_coherence = base_weight_coherence * (1 + progress * 0.5)
+
+        return (dynamic_weight_local * local_distance) + (dynamic_weight_centrality * centrality) - (dynamic_weight_coherence * coherence)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    exploitation_weight = 1.0 - (visited_ratio ** 3)
+    exploration_weight = visited_ratio ** 3
+
+    best_score = float('inf')
+    next_node = None
+
+    remaining_unvisited = len(unvisited_nodes)
+    exploration_factor = (total_nodes - remaining_unvisited) / total_nodes
+    time_decay = 0.6
+
+    proximity_pressure = []
+    for node in unvisited_nodes:
+        avg_proximity = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_unvisited
+        proximity_pressure.append(avg_proximity)
+
+    avg_proximity_pressure = sum(proximity_pressure) / remaining_unvisited if remaining_unvisited > 0 else 0
+
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        centrality_score = (avg_proximity_pressure - proximity_pressure[i]) / (avg_proximity_pressure + 1e-6)
+        penalty_factor = max(0, (distance_to_current - proximity_pressure[i]) / (proximity_pressure[i] + 1e-6))
+
+        if node == destination_node:
+            distance_to_current *= (1 - exploration_factor)
+
+        combined_score = (exploitation_weight * distance_to_current) + \
+                         (exploration_weight * distance_to_destination) + \
+                         (time_decay * centrality_score) - \
+                         (0.7 * penalty_factor * distance_to_current)
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

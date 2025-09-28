@@ -1,0 +1,8 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    def connectivity_score(node):
+        remaining_connections = sum(1 for n in unvisited_nodes if n != node)
+        return distance_matrix[current_node][node] * (1 + 1 / (remaining_connections + 1))
+    next_node = min(unvisited_nodes, key=connectivity_score)
+    return next_node

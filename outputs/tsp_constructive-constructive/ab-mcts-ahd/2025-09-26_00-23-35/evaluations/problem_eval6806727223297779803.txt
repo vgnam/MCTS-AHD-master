@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        if distance_to_node == 0:
+            continue
+
+        # Adaptive centrality: higher weight when few nodes remain
+        centrality_weight = 0.6 if remaining_nodes <= 2 else 0.2
+
+        # Node significance: higher if closer to destination or more central
+        significance = 0.4 * (1 / distance_matrix[node][destination_node]) + 0.6 * (sum(1 / distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1))
+
+        # Risk-averse detour: penalize detours more aggressively when progress is slow
+        detour_penalty = 0.3 if distance_matrix[current_node][destination_node] < 1.5 * distance_to_node else 0.1
+        detour_cost = detour_penalty * (distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node])
+
+        # Dynamic proximity: higher weight early, lower weight later
+        proximity_weight = 0.8 if remaining_nodes > len(unvisited_nodes) // 2 else 0.5
+
+        score = proximity_weight * (1 / distance_to_node) + centrality_weight * significance - detour_cost
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

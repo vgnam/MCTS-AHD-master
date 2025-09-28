@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    local_weight = 0.5 + 0.5 * remaining_ratio
+    global_weight = 1 - local_weight
+
+    temperature = 0.1 + 0.9 * remaining_ratio
+    novelty_weight = 0.3 * (1 - remaining_ratio)
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        global_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        novelty = 1 / (1 + sum(1 for n in unvisited_nodes if distance_matrix[node][n] < distance_matrix[current_node][node]))
+
+        score = (local_weight * local_distance +
+                 global_weight * (0.6 * centrality + 0.4 * global_distance) +
+                 novelty_weight * novelty)
+        return score / temperature
+
+    scores = [calculate_score(node) for node in unvisited_nodes]
+    probabilities = [math.exp(-score) for score in scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

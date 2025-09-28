@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    total_unvisited = len(unvisited_nodes)
+    centrality_weight = 0.5 + 0.5 * (1 - total_unvisited / (total_unvisited + 1))  # Dynamic centrality weight
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+        penalty = max(0, immediate_distance - 2 * sum(distance_matrix[current_node][n] for n in unvisited_nodes) / total_unvisited)
+        centrality = sum(1 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes) / total_unvisited
+        cost = immediate_distance + centrality_weight * centrality + penalty - 0.2 * destination_distance
+
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+
+    return next_node

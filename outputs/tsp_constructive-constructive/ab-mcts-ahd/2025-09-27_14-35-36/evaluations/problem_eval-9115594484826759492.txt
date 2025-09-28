@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    alpha = 0.8  # weight for distance efficiency
+    beta = 0.2   # weight for destination proximity
+    epsilon = 0.1  # exploration factor
+
+    optimal_path_length = distance_matrix[current_node][destination_node]
+    
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        penalty = max(0, distance_to_node + distance_to_dest - optimal_path_length)
+        score = alpha * (1 / (distance_to_node + distance_to_dest)) + beta * (1 / (1 + penalty))
+        
+        # probabilistic exploration
+        if score >= best_score and (next_node is None or random.random() < epsilon):
+            best_score = score
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        if dest_distance < distance_matrix[current_node][next_node]:
+            next_node = destination_node
+
+    return next_node

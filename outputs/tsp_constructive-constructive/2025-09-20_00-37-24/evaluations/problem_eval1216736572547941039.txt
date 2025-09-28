@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic weights based on distance and exploration history
+    weights = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Inverse distance as base weight (closer nodes have higher weight)
+        base_weight = 1.0 / (distance + 1e-6)
+        # Introduce exploration bias: reduce weight for nodes recently visited
+        exploration_factor = 1.0 / (1.0 + math.exp(-0.5 * (len(unvisited_nodes) - unvisited_nodes.index(node))))
+        weight = base_weight * exploration_factor
+        weights.append(weight)
+        total_weight += weight
+
+    # Normalize weights and select node
+    normalized_weights = [w / total_weight for w in weights]
+    next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+
+    # Introduce occasional randomness for diversification
+    if random.random() < 0.1:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

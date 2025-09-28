@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    exploration_factor = 0.7  # Weight for farthest node selection
+    randomness_factor = 0.3    # Weight for randomness to avoid local optima
+
+    # Compute weighted scores for each unvisited node
+    scores = {}
+    for node in unvisited_nodes:
+        distance_score = distance_matrix[current_node][node]
+        centrality_score = sum(distance_matrix[node]) / len(distance_matrix[node])  # Average distance to all nodes
+        scores[node] = (exploration_factor * distance_score) - (randomness_factor * centrality_score)
+
+    # Select node with the highest score
+    next_node = max(scores, key=scores.get)
+    return next_node

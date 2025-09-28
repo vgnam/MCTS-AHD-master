@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    num_unvisited = len(unvisited_nodes)
+    exploration_weight = 0.3 * (num_unvisited ** 0.5) / (num_unvisited + 1)  # Dynamic exploration weight
+    density_threshold = 0.15 * sum(distance_matrix[0]) / len(distance_matrix)  # Density-based penalty threshold
+
+    # Precompute node densities
+    node_densities = {}
+    for node in unvisited_nodes:
+        distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        node_densities[node] = sum(d < density_threshold for d in distances) / len(distances) if distances else 0
+
+    # Calculate probabilistic scores
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / num_unvisited if num_unvisited else 0
+
+        # Density-based penalty
+        penalty = 1.5 if node_densities[node] > 0.4 else 1.0
+
+        # Combined score with exploration weight
+        score = (distance_to_current + 0.5 * distance_to_destination + exploration_weight * avg_distance_to_remaining) * penalty
+        scores.append((score, node))
+
+    # Probabilistic selection based on inverse score
+    if scores:
+        total_inverse_score = sum(1 / (s + 1e-6) for s, _ in scores)
+        rand_val = random.random() * total_inverse_score
+        cumulative = 0
+        for score, node in scores:
+            cumulative += 1 / (score + 1e-6)
+            if rand_val <= cumulative:
+                next_node = node
+                break
+
+    return next_node

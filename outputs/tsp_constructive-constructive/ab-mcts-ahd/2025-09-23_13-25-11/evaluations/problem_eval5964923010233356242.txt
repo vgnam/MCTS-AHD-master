@@ -1,0 +1,31 @@
+defined as the inverse of the average distance to all other nodes. The algorithm balances these factors adaptively, with immediate distance starting at 60% weight and decreasing linearly to 30%, while centrality and future distance weights increase proportionally. The next node is selected by minimizing a weighted sum of these three components.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+    weight_immediate = 0.6 - 0.3 * (1 - remaining_nodes / total_nodes)
+    weight_future = 0.2 + 0.2 * (1 - remaining_nodes / total_nodes)
+
+    def calculate_centrality(node):
+        if len(unvisited_nodes) == 1:
+            return 0
+        other_nodes = unvisited_nodes - {node}
+        avg_dist = sum(distance_matrix[node][other] for other in other_nodes) / len(other_nodes)
+        return 1 / avg_dist if avg_dist != 0 else 0
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        centrality = calculate_centrality(node)
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        return (weight_immediate * current_dist +
+                weight_future * avg_future_dist +
+                (1 - weight_immediate - weight_future) * centrality)
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

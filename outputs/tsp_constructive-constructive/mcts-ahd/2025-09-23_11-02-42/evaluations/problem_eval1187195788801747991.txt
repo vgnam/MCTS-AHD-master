@@ -1,0 +1,46 @@
+import math
+    import random
+
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        # Immediate distance component
+        distance_to_node = distance_matrix[current_node][node]
+        immediate_score = 1 / (distance_to_node + 1e-6)
+
+        # Lookahead component
+        lookahead_score = 0
+        if remaining_nodes > 1:
+            for next_node_candidate in unvisited_nodes:
+                if next_node_candidate != node:
+                    detour = (distance_matrix[current_node][node] +
+                              distance_matrix[node][next_node_candidate] +
+                              distance_matrix[next_node_candidate][destination_node])
+                    direct = (distance_matrix[current_node][next_node_candidate] +
+                              distance_matrix[next_node_candidate][destination_node])
+                    lookahead_score += (direct - detour) / (direct + 1e-6)
+
+        # Dynamic weights
+        weight_immediate = 0.7 if remaining_nodes > total_nodes // 2 else 0.3
+        weight_lookahead = 0.3 if remaining_nodes > total_nodes // 2 else 0.7
+
+        # Combined score with penalty for recent nodes (simplified for example)
+        penalty = 0.1 if node in unvisited_nodes[-3:] else 0  # Example penalty for recent nodes
+        score = (weight_immediate * immediate_score +
+                 weight_lookahead * lookahead_score) * (1 - penalty)
+
+        scores.append((node, score))
+
+    # Softmax selection for probabilistic choice
+    exp_scores = [math.exp(score[1]) for score in scores]
+    sum_exp_scores = sum(exp_scores)
+    probabilities = [exp_score / sum_exp_scores for exp_score in exp_scores]
+
+    selected_node = random.choices([score[0] for score in scores], weights=probabilities, k=1)[0]
+
+    return next_node

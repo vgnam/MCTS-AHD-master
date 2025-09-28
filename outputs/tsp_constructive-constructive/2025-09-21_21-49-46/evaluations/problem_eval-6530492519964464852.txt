@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    max_score = -float('inf')
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    path_length = len(unvisited_nodes) + 1
+
+    # Calculate angular momentum (directional bias)
+    if len(unvisited_nodes) < 2:
+        angular_momentum = 0.0
+    else:
+        # Sample previous direction for momentum
+        prev_node = unvisited_nodes[-1] if len(unvisited_nodes) > 1 else current_node
+        prev_dir = distance_matrix[current_node][prev_node]
+        curr_dir = distance_matrix[prev_node][destination_node]
+        angular_momentum = (curr_dir / (prev_dir + 1e-6)) * 0.5
+
+    for node in unvisited_nodes:
+        dist_current = distance_matrix[current_node][node]
+        dist_dest = distance_matrix[node][destination_node]
+
+        if dist_current == 0:
+            angular_progress = 1.0
+        else:
+            angular_progress = dist_dest / dist_current
+
+        # Novelty score: rewards alignment with momentum, penalizes disruption
+        novelty = angular_momentum * (1 - abs(angular_progress - angular_momentum))
+
+        # Weighted score combining angular progress, distance, and novelty
+        weighted_angular = angular_progress * (visited_ratio ** 2)
+        score = (weighted_angular * 0.6) + (novelty * 0.4) - (dist_current * 1.2)
+
+        # Stronger penalty for revisiting nodes
+        if node in [current_node, destination_node]:
+            score *= 0.3
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    return next_node

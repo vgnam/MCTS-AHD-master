@@ -1,0 +1,52 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    min_total_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate distance statistics for normalization
+    all_distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(all_distances) / remaining_nodes if remaining_nodes > 0 else 0
+    max_distance = max(all_distances) if remaining_nodes > 0 else 0
+    min_distance = min(all_distances) if remaining_nodes > 0 else 0
+    distance_range = max_distance - min_distance if max_distance > min_distance else 1
+
+    for node in unvisited_nodes:
+        # Proximity term (normalized)
+        distance_to_current = distance_matrix[current_node][node]
+        normalized_proximity = (distance_to_current - min_distance) / distance_range if distance_range > 0 else 0
+
+        # Destination alignment term
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Hub centrality term (density-aware)
+        hub_connections = sum(1 for other in unvisited_nodes if other != node and distance_matrix[node][other] < avg_distance)
+        hub_score = hub_connections / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+        # Dynamic weights with phase transition
+        if remaining_nodes > len(unvisited_nodes) * 0.5:  # Early phase
+            dynamic_weight_proximity = 0.6
+            dynamic_weight_hub = 0.2
+        else:  # Late phase
+            dynamic_weight_proximity = 0.3
+            dynamic_weight_hub = 0.5
+
+        # Probabilistic adjustment based on distance quantiles
+        if normalized_proximity < 0.3:  # Near nodes get bonus
+            proximity_bonus = 0.2
+        elif normalized_proximity > 0.7:  # Far nodes get penalty
+            proximity_bonus = -0.1
+        else:
+            proximity_bonus = 0
+
+        total_score = (dynamic_weight_proximity * (1 - normalized_proximity + proximity_bonus) +
+                       0.2 * (distance_to_destination / (max_distance + 1)) +
+                       dynamic_weight_hub * hub_score)
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

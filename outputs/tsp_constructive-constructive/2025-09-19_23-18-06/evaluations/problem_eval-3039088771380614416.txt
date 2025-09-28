@@ -1,0 +1,13 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    max_dist = max(distances)
+    if min_dist == max_dist:
+        weights = [1.0 / len(unvisited_nodes)] * len(unvisited_nodes)
+    else:
+        weights = [(max_dist - d + 0.1) / (max_dist - min_dist + 0.1) for d in distances]
+    weights = [w / sum(weights) for w in weights]
+    next_node = random.choices(unvisited_nodes, weights=weights, k=1)[0]
+    return next_node

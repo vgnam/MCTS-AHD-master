@@ -1,0 +1,27 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, beta=0.5):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    weights = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        dist_to_current = distance_matrix[current_node][node]
+        dist_to_dest = distance_matrix[node][destination_node]
+        combined_dist = dist_to_current + beta * dist_to_dest
+        weight = math.exp(-combined_dist)
+        weights.append(weight)
+        total_weight += weight
+        distances.append((node, combined_dist))
+
+    if total_weight == 0:
+        return min(distances, key=lambda x: x[1])[0]
+
+    probabilities = [w / total_weight for w in weights]
+    selected_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

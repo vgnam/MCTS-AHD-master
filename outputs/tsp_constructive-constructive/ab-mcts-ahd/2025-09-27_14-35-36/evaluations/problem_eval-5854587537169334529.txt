@@ -1,0 +1,32 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    unvisited_count = len(unvisited_nodes)
+    total_unvisited = unvisited_count + 1  # +1 for current node
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+
+        # Proximity factor
+        proximity_factor = 1 / (1 + distance_to_node)
+
+        # Destination pull metric
+        dest_pull = (distance_to_dest / (distance_to_node + 1)) * (unvisited_count / total_unvisited)
+
+        # Exploration term
+        exploration_term = 1 / (1 + unvisited_count) if unvisited_count > 1 else 0.5
+
+        # Combined score with weighted components
+        score = (proximity_factor * 0.4) + (dest_pull * 0.4) + (exploration_term * 0.2)
+        scores.append(score)
+
+    total_score = sum(scores)
+    normalized_scores = [s / total_score for s in scores]
+
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_scores, k=1)[0]
+    return next_node

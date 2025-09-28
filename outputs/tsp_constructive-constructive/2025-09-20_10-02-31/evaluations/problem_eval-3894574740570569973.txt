@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def average_distance(node):
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return distance_matrix[current_node][node]
+        return sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+
+    def temperature_based_weight(node, temperature=0.5):
+        if len(unvisited_nodes) % 2 == 1:
+            return distance_matrix[current_node][node]
+        else:
+            return average_distance(node) * (1 - temperature * (1 - (len(unvisited_nodes) / len(distance_matrix))))
+
+    next_node = min(unvisited_nodes, key=lambda node: temperature_based_weight(node))
+    return next_node

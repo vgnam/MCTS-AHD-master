@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+    time_decay_factor = 0.6
+    exploration_bonus = 0.4
+    coherence_weight = 0.3
+
+    # Calculate path direction vector (simplified)
+    path_vector = [destination_node[0] - current_node[0], destination_node[1] - current_node[1]] if isinstance(current_node, tuple) else [0, 0]
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        # Path coherence: alignment with overall path direction
+        node_vector = [node[0] - current_node[0], node[1] - current_node[1]] if isinstance(node, tuple) else [0, 0]
+        dot_product = path_vector[0] * node_vector[0] + path_vector[1] * node_vector[1]
+        magnitude_product = (path_vector[0]**2 + path_vector[1]**2)**0.5 * (node_vector[0]**2 + node_vector[1]**2)**0.5
+        coherence = dot_product / magnitude_product if magnitude_product else 0
+
+        # Dynamic exploration bonus based on node frequency (simplified)
+        node_frequency = 1 / (1 + len([n for n in unvisited_nodes if n == node]))  # Placeholder for actual frequency tracking
+
+        # Combined score with reinforcement learning elements
+        combined_score = (1 - time_decay_factor) * (distance_to_current + distance_to_destination) \
+                         - exploration_bonus * avg_distance_to_remaining \
+                         + coherence_weight * coherence \
+                         + node_frequency * 0.2  # Small positive reinforcement for less frequent nodes
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

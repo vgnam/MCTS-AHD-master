@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    num_unvisited = len(unvisited_nodes)
+    current_weight = 0.8 * (1 - (1 / (num_unvisited + 1)))  # Decreases as nodes are visited
+    future_weight = 1 - current_weight
+    min_weighted_score = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = min(distance_matrix[node][n] for n in unvisited_nodes if n != node) if num_unvisited > 1 else 0
+        lookahead_penalty = 0.2 * (num_unvisited - 1)  # Penalize long-term chains
+        weighted_score = current_weight * current_distance + future_weight * future_distance + lookahead_penalty
+        if weighted_score < min_weighted_score:
+            min_weighted_score = weighted_score
+            next_node = node
+    return next_node

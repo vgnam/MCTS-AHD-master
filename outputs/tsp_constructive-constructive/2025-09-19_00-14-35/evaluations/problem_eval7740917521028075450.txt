@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+    min_distance = min(distances.values())
+
+    if destination_node in unvisited_nodes:
+        if distances[destination_node] == min_distance:
+            return destination_node
+        else:
+            # Introduce probabilistic bias toward destination if it's not the closest
+            if np.random.random() < 0.3:  # 30% chance to choose destination
+                return destination_node
+
+    # Select the nearest node with a bias toward longer distances
+    weighted_distances = {node: dist + (0.1 * np.random.random()) for node, dist in distances.items()}
+    next_node = min(weighted_distances, key=weighted_distances.get)
+    return next_node

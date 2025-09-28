@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    # Calculate detour penalty for the closest node
+    if next_node is not None:
+        num_unvisited = len(unvisited_nodes)
+        detour_penalty = sum(max(0, distance_matrix[current_node][next_node] + distance_matrix[next_node][other_node] - distance_matrix[current_node][other_node]) for other_node in unvisited_nodes if other_node != next_node)
+        detour_penalty /= num_unvisited
+
+        # Prioritize destination node if it's unvisited and within a reasonable distance, considering detour penalty
+        if destination_node in unvisited_nodes:
+            destination_distance = distance_matrix[current_node][destination_node]
+            destination_detour = sum(max(0, distance_matrix[current_node][destination_node] + distance_matrix[destination_node][other_node] - distance_matrix[current_node][other_node]) for other_node in unvisited_nodes if other_node != destination_node)
+            destination_detour /= num_unvisited
+
+            if destination_distance <= min_distance * 1.5 and destination_detour <= detour_penalty:
+                next_node = destination_node
+
+    return next_node

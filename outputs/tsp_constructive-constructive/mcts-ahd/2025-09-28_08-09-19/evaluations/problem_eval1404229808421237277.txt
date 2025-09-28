@@ -1,0 +1,13 @@
+import random
+    selected_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+
+    # Dynamic weight adjustment based on historical performance
+    if next_node is not None and selected_node in unvisited_nodes:
+        if distance_matrix[current_node][selected_node] < distance_matrix[current_node][next_node]:
+            next_node = selected_node
+        else:
+            next_node = next_node if next_node in unvisited_nodes else selected_node
+    else:
+        next_node = selected_node
+
+    return next_node

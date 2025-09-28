@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    farthest_node = None
+    max_distance = -float('inf')
+
+    for node in unvisited_nodes:
+        if distance_matrix[current_node][node] > max_distance:
+            max_distance = distance_matrix[current_node][node]
+            farthest_node = node
+
+    if farthest_node is not None and len(unvisited_nodes) > 2:
+        for node in unvisited_nodes:
+            if node == farthest_node:
+                continue
+            if distance_matrix[current_node][node] > max_distance * 0.8:
+                if random.random() < 0.3:
+                    farthest_node = node
+                    break
+
+    return next_node

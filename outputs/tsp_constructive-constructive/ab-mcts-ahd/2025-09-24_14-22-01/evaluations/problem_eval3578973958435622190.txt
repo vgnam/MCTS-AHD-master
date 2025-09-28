@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        dynamic_factor = 1.0 / (remaining_nodes + 1)
+        adjusted_cost = immediate_distance * dynamic_factor
+        if adjusted_cost < min_cost:
+            min_cost = adjusted_cost
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node

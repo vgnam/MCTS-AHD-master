@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    centrality_factors = []
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            min_remaining_dist = min(distance_matrix[node][n] for n in remaining_nodes)
+            centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        else:
+            min_remaining_dist = 0
+            centrality = 0
+
+        score = current_to_node + min_remaining_dist
+        centrality_factor = 1 / (1 + centrality)
+        scores.append(score)
+        centrality_factors.append(centrality_factor)
+
+    weighted_scores = [s * c for s, c in zip(scores, centrality_factors)]
+    probabilities = [math.exp(-ws) for ws in weighted_scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_savings = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+
+        # Dynamic weight for future savings (decreases as more nodes are visited)
+        weight = 0.5 * (remaining_nodes / (remaining_nodes + 1))
+
+        # Centrality factor: node with higher degree (more connections) is slightly preferred
+        node_degree = sum(1 for d in distance_matrix[node] if d > 0)
+        centrality_bonus = -0.1 * node_degree  # Negative to reduce detours
+
+        score = immediate_distance - weight * future_savings + centrality_bonus
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

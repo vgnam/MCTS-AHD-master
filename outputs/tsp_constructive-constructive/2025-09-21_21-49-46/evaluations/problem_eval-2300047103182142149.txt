@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    max_score = -float('inf')
+    total_unvisited = len(unvisited_nodes)
+    remaining_ratio = len(unvisited_nodes) / total_unvisited
+
+    angular_weight = 0.6 + 0.2 * (1 - remaining_ratio)
+    distance_weight = 1 - angular_weight
+
+    for node in unvisited_nodes:
+        dist_current = distance_matrix[current_node][node]
+        dist_dest = distance_matrix[node][destination_node]
+
+        if dist_current == 0:
+            angular_progress = 1.0
+        else:
+            angular_progress = dist_dest / dist_current
+
+        normalized_distance = 1 / (1 + math.exp(-dist_current / max(distance_matrix[current_node])))
+        exploration_factor = 0.5 * (1 + math.cos(math.pi * remaining_ratio))
+
+        score = (angular_weight * angular_progress - distance_weight * normalized_distance) * exploration_factor
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    if len(unvisited_nodes) >= 2:
+        for node1 in unvisited_nodes:
+            for node2 in unvisited_nodes:
+                if node1 != node2:
+                    combined_dist = distance_matrix[current_node][node1] + distance_matrix[node1][node2] + distance_matrix[node2][destination_node]
+                    combined_angular = (distance_matrix[node1][destination_node] + distance_matrix[node2][destination_node]) / (distance_matrix[current_node][node1] + distance_matrix[node1][node2])
+                    combined_score = (angular_weight * combined_angular - distance_weight * combined_dist / max(distance_matrix[current_node])) * exploration_factor * 0.3
+
+                    if combined_score > max_score:
+                        max_score = combined_score
+                        next_node = node1
+
+    return next_node

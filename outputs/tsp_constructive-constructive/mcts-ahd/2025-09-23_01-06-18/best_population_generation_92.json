@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm prioritizes visiting the destination node if it's unvisited, otherwise it selects the closest unvisited node to the current node based on the distance matrix. The destination node is given higher priority than other nodes, while the closest unvisited node is chosen when the destination is already visited. The function handles edge cases where no unvisited nodes remain by returning the destination node.",
+     "thought": "The algorithm selects the next node to visit by choosing the unvisited node closest to the current node, prioritizing the destination node if it is among the unvisited nodes.",
+     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    if destination_node in unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])\n    return next_node",
+     "objective": 7.00437,
+     "other_inf": null
+}

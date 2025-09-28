@@ -1,0 +1,25 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+    
+    destination_distance = distance_matrix[current_node][destination_node]
+    threshold_distance = min_distance * 1.5  # Changed threshold multiplier
+    
+    if destination_node in unvisited_nodes and destination_distance < threshold_distance:
+        temperature = 0.8  # New temperature parameter
+        probability = 1 / (1 + math.exp((destination_distance / threshold_distance - 0.5) / temperature))
+        if random.random() < probability:  
+            next_node = destination_node
+    
+    return next_node

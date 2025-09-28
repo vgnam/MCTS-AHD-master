@@ -1,0 +1,48 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    exploration_decay = 0.5 * (total_unvisited / (total_unvisited + 1))
+    exploration_weight = 0.3 * exploration_decay
+
+    # Phase 1: Dynamic candidate scoring with adaptive weights
+    candidates = []
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        future_dist = distance_matrix[node][destination_node]
+        base_score = current_dist + 0.5 * future_dist
+
+        # Adaptive neighborhood contribution
+        neighborhood_scores = []
+        for neighbor in unvisited_nodes:
+            if neighbor != node:
+                neighborhood_scores.append(distance_matrix[node][neighbor] + distance_matrix[neighbor][destination_node])
+        avg_neighborhood = sum(neighborhood_scores) / len(neighborhood_scores) if neighborhood_scores else 0
+
+        # Dynamic weighting
+        weighted_score = base_score + exploration_weight * avg_neighborhood + random.uniform(0, 0.2)
+        candidates.append((node, weighted_score))
+
+    # Phase 2: Probabilistic selection with connectivity bias
+    if len(candidates) > 1:
+        sorted_candidates = sorted(candidates, key=lambda x: x[1])
+        top_candidates = sorted_candidates[:min(3, len(sorted_candidates))]
+
+        # Connectivity probability
+        connectivity_weights = []
+        for node, _ in top_candidates:
+            connectivity = sum(1 for neighbor in unvisited_nodes if distance_matrix[node][neighbor] < 1.2 * min(distance_matrix[node][n] for n in unvisited_nodes if n != node))
+            connectivity_weights.append(connectivity)
+
+        total_weight = sum(connectivity_weights)
+        probabilities = [w / total_weight for w in connectivity_weights]
+
+        next_node = random.choices([n for n, _ in top_candidates], weights=probabilities, k=1)[0]
+    else:
+        next_node = candidates[0][0]
+
+    return next_node

@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+    weight_future = (remaining_nodes / total_nodes) ** 2
+    weight_current = 1 - weight_future
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if not unvisited_nodes - {node}:
+            return current_dist
+        future_nodes = unvisited_nodes - {node}
+        future_dists = [distance_matrix[node][other] for other in future_nodes]
+        min_future_dist = min(future_dists)
+        mean_future_dist = sum(future_dists) / len(future_dists)
+        variance_future_dist = sum((d - mean_future_dist) ** 2 for d in future_dists) / len(future_dists)
+        normalized_variance = variance_future_dist / (mean_future_dist + 1e-6)
+        adjusted_weight = weight_future * (1 + normalized_variance)
+        return weight_current * current_dist + adjusted_weight * min_future_dist
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

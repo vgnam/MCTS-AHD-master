@@ -1,0 +1,20 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    temp = max(distances)  # Initial temperature based on maximum distance
+    cooling_rate = 0.99  # Cooling rate for temperature adjustment
+
+    # Calculate probabilities with temperature adjustment
+    probabilities = [math.exp(-d / temp) for d in distances]
+    temp *= cooling_rate  # Cool the temperature
+
+    total_probability = sum(probabilities)
+    normalized_probabilities = [p / total_probability for p in probabilities]
+
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_probabilities, k=1)[0]
+    return next_node

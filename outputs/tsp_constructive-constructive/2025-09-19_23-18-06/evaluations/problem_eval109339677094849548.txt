@@ -1,0 +1,6 @@
+import random
+        next_node = random.choices([n for n, _ in candidates], weights=probabilities, k=1)[0]
+    else:
+        next_node, _ = min(candidates, key=lambda x: x[1])
+
+    return next_node

@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    std_dev = (sum((d - avg_distance) ** 2 for d in distances) / len(distances)) ** 0.5
+    threshold = avg_distance + 0.5 * std_dev
+
+    def sigmoid(x):
+        return 1 / (1 + math.exp(-x))
+
+    nearest_score = sigmoid(-(distance_matrix[current_node][nearest_node] - avg_distance) / std_dev)
+    farthest_score = sigmoid((distance_matrix[current_node][farthest_node] - avg_distance) / std_dev)
+
+    if distance_matrix[current_node][farthest_node] > threshold:
+        next_node = farthest_node if random.random() < farthest_score else nearest_node
+    else:
+        next_node = nearest_node if random.random() < nearest_score else farthest_node
+
+    return next_node

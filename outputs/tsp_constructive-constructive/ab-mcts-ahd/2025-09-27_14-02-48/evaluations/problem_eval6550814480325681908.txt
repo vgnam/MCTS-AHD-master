@@ -1,0 +1,56 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Initialize temperature and cooling rate
+    temperature = 100
+    cooling_rate = 0.95
+
+    # Find k nearest neighbors
+    k = min(5, len(unvisited_nodes))
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:k]
+
+    # Find nearest neighbor among all unvisited nodes
+    min_distance = float('inf')
+    nearest_neighbor = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            nearest_neighbor = node
+
+    # Check if destination node is a valid choice
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+    else:
+        destination_distance = float('inf')
+
+    # Simulated annealing
+    while temperature > 1:
+        # Choose between nearest neighbors or destination node
+        if random.random() < temperature / 100:
+            # Choose a random node from nearest neighbors
+            next_node = random.choice(nearest_neighbors)
+        else:
+            # Choose between nearest neighbor and destination node
+            if destination_distance < min_distance:
+                next_node = destination_node
+            else:
+                next_node = nearest_neighbor
+
+        # Check if the chosen node is valid
+        if next_node not in unvisited_nodes:
+            temperature *= cooling_rate
+            continue
+
+        # Accept the chosen node with a certain probability
+        if next_node == destination_node or random.random() < math.exp((min_distance - distance_matrix[current_node][next_node]) / temperature):
+            return next_node
+
+        temperature *= cooling_rate
+
+    # Return the nearest neighbor if the temperature is too low
+    return next_node

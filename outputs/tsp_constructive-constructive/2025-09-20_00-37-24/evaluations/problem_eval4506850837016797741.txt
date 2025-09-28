@@ -1,0 +1,36 @@
+importance, while maintaining 90% selection from top 3 candidates and 10% randomness from nearest neighbors.}
+
+```python
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate centrality score for each node (inverse of average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        avg_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / len(unvisited_nodes)
+        centrality[node] = 1.0 / (avg_distance + 1e-6)  # Avoid division by zero
+
+    # Combine distance and centrality to score nodes
+    scored_nodes = []
+    for node in unvisited_nodes:
+        distance_score = 1.0 / (distance_matrix[current_node][node] + 1e-6)
+        total_score = 0.7 * distance_score + 0.3 * centrality[node]
+        scored_nodes.append((node, total_score))
+
+    # Sort by combined score
+    scored_nodes.sort(key=lambda x: x[1], reverse=True)
+
+    # Adaptive stochasticity: 90% chance to pick from top 3, 10% chance to pick from nearest neighbors
+    if random.random() < 0.9:
+        candidates = [node for node, _ in scored_nodes[:min(3, len(scored_nodes))]]
+        next_node = random.choice(candidates)
+    else:
+        nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

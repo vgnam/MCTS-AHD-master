@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    remaining_nodes = unvisited_nodes - {destination_node}
+    if not remaining_nodes:
+        return destination_node
+    avg_distance = sum(distance_matrix[current_node][node] for node in remaining_nodes) / len(remaining_nodes)
+    variance = sum((distance_matrix[current_node][node] - avg_distance) ** 2 for node in remaining_nodes) / len(remaining_nodes)
+    normalized_variance = variance / (avg_distance + 1e-10)
+    weight_immediate = 0.5 + 0.2 * normalized_variance
+    weight_potential = 0.2 + 0.1 * normalized_variance
+    weight_heuristic = 0.3 - 0.3 * normalized_variance
+    for node in remaining_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        heuristic_factor = (immediate_distance + potential_distance) / (avg_distance + 1e-10)
+        total_cost = weight_immediate * immediate_distance + weight_potential * potential_distance + weight_heuristic * heuristic_factor
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+    return next_node

@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    temperature = 1.0 / (1.0 + 0.5 * (total_unvisited ** 0.5))
+
+    scores = []
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Harmonic mean centrality
+        harmonic_centrality = len(unvisited_nodes) / sum(1 / (distance_matrix[node][n] + 1e-10) for n in unvisited_nodes)
+
+        # Weighted score with dynamic trade-off
+        weighted_score = (1 - temperature) * current_distance + temperature * (0.6 * harmonic_centrality + 0.4 * future_distance)
+        scores.append((node, weighted_score))
+
+    # Softmax selection with temperature
+    exp_scores = [math.exp(score / temperature) for _, score in scores]
+    probs = [exp / sum(exp_scores) for exp in exp_scores]
+    next_node = random.choices([node for node, _ in scores], weights=probs, k=1)[0]
+
+    return next_node

@@ -1,0 +1,46 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:21: RuntimeWarning: divide by zero encountered in scalar divide
+  next_candidate = min(remaining_nodes, key=lambda x: distance_matrix[current][x] * (1 + 0.1 * (distance_matrix[x][destination_node] / sum(distance_matrix[x][n] for n in remaining_nodes) if remaining_nodes else 0)))
+[*] Instance 0: 5.5979304954599485
+[*] Instance 1: 6.517794207988738
+[*] Instance 2: 7.166789673193474
+[*] Instance 3: 6.859160831539095
+[*] Instance 4: 7.02948303547452
+[*] Instance 5: 6.45314500129829
+[*] Instance 6: 7.5654118413347495
+[*] Instance 7: 6.631166364738371
+[*] Instance 8: 6.465083460717317
+[*] Instance 9: 6.9753805795511985
+[*] Instance 10: 6.853556385831891
+[*] Instance 11: 5.918739900968976
+[*] Instance 12: 6.214560391500837
+[*] Instance 13: 6.167694841504652
+[*] Instance 14: 6.916961029920574
+[*] Instance 15: 6.486257831438276
+[*] Instance 16: 7.008123352803954
+[*] Instance 17: 5.6376139652930535
+[*] Instance 18: 6.741749714365792
+[*] Instance 19: 6.62561221935851
+[*] Instance 20: 6.501367640887886
+[*] Instance 21: 6.541659802313681
+[*] Instance 22: 5.759362641996066
+[*] Instance 23: 6.341674741830021
+[*] Instance 24: 6.321679332082115
+[*] Instance 25: 6.545686544407712
+[*] Instance 26: 6.0942596687408965
+[*] Instance 27: 6.539762657033336
+[*] Instance 28: 6.275227659303856
+[*] Instance 29: 7.189861921211283
+[*] Instance 30: 6.304988424199562
+[*] Instance 31: 6.2685292283895535
+[*] Instance 32: 6.501001445580473
+[*] Instance 33: 6.4172295255307255
+[*] Instance 34: 6.306154595770772
+[*] Instance 35: 6.98827936717699
+[*] Instance 36: 7.040516402392673
+[*] Instance 37: 6.825817570936291
+[*] Instance 38: 7.404111970848936
+[*] Instance 39: 6.581732141889428
+[*] Instance 40: 6.279885986496943
+[*] Instance 41: 6.4103791678040665

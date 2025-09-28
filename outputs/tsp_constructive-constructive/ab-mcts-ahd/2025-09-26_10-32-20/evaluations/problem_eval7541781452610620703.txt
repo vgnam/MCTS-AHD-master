@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    phase_threshold = 0.5
+
+    if remaining_ratio > phase_threshold:
+        local_weight = 0.8 + 0.2 * (1 - remaining_ratio)
+        global_weight = 0.2 * (1 - remaining_ratio)
+        diversity_weight = 0.0
+    else:
+        local_weight = 0.2 * remaining_ratio
+        global_weight = 0.6 + 0.2 * remaining_ratio
+        diversity_weight = 0.2 + 0.2 * remaining_ratio
+
+    def centrality(node):
+        total_distance = sum(distance_matrix[node][n] for n in range(total_nodes))
+        normalized_distance = total_distance / (total_nodes - 1)
+        return 1 / (normalized_distance + 1e-10)
+
+    def path_diversity(node):
+        if len(unvisited_nodes) == total_nodes - 1:
+            return 1.0
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        return avg_distance / (max(distance_matrix[node]) + 1e-10)
+
+    hybrid_score = lambda node: (
+        local_weight * distance_matrix[current_node][node] +
+        global_weight * centrality(node) +
+        diversity_weight * path_diversity(node)
+    )
+
+    ranked_nodes = sorted(unvisited_nodes, key=hybrid_score)
+    if len(ranked_nodes) > 1:
+        selection_prob = [0.7 ** i for i in range(len(ranked_nodes))]
+        selection_prob = [p / sum(selection_prob) for p in selection_prob]
+        next_node = np.random.choice(ranked_nodes, p=selection_prob)
+    else:
+        next_node = ranked_nodes[0]
+
+    return next_node

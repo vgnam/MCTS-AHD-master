@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_count = len(unvisited_nodes)
+    exploration_factor = min(1.0, (remaining_count / (remaining_count + 1)) * 1.5)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        lookahead_depth = min(3, max(1, remaining_count // 3))
+        lookahead_nodes = list(unvisited_nodes - {node})
+        lookahead_distance = 0
+
+        if lookahead_nodes:
+            current = node
+            for _ in range(lookahead_depth):
+                if not lookahead_nodes:
+                    break
+                next_candidate = min(lookahead_nodes, key=lambda x: distance_matrix[current][x])
+                lookahead_distance += distance_matrix[current][next_candidate]
+                current = next_candidate
+                lookahead_nodes.remove(next_candidate)
+
+        node_centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        future_impact = sum(distance_matrix[node][n] for n in unvisited_nodes) / (len(unvisited_nodes) + 1) if unvisited_nodes else 0
+        path_diversity = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        immediate_weight = 0.6
+        lookahead_weight = 0.25 * (1.0 - exploration_factor)
+        centrality_weight = 0.1 * exploration_factor
+        path_diversity_weight = 0.05 * exploration_factor
+        future_impact_weight = 0.2 * (1.0 - exploration_factor)
+
+        penalty = 0.3 * (distance_to_destination + 0.2 * node_centrality)
+        score = (immediate_weight * immediate_distance +
+                lookahead_weight * (lookahead_distance / lookahead_depth if lookahead_depth > 0 else 0) +
+                centrality_weight * node_centrality +
+                path_diversity_weight * path_diversity +
+                future_impact_weight * future_impact) - penalty
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

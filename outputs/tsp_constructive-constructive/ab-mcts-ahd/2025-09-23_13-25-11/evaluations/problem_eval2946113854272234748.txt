@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    total_nodes = num_unvisited + 1  # Including current node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        min_future_dist = min(distance_matrix[node][other] for other in remaining_nodes)
+
+        # Sigmoid transition for exploration/exploitation balance
+        exploration_weight = 1 / (1 + 10 ** (num_unvisited / total_nodes - 0.5))
+        exploitation_weight = 1 - exploration_weight
+
+        # Normalized components
+        max_possible_dist = max(max(row) for row in distance_matrix)
+        norm_current = current_dist / max_possible_dist
+        norm_avg_future = avg_future_dist / max_possible_dist
+        norm_min_future = min_future_dist / max_possible_dist
+
+        # Weighted combination with probabilistic element
+        score = (exploration_weight * (0.7 * norm_current + 0.3 * norm_avg_future) +
+                 exploitation_weight * (0.3 * norm_current + 0.7 * norm_avg_future) +
+                 0.2 * norm_min_future)
+
+        return score
+
+    # Probabilistic selection based on normalized scores
+    scores = {node: evaluate_node(node) for node in unvisited_nodes}
+    total_score = sum(scores.values())
+    probabilities = {node: score / total_score for node, score in scores.items()}
+    next_node = random.choices(list(probabilities.keys()), weights=list(probabilities.values()), k=1)[0]
+
+    return next_node

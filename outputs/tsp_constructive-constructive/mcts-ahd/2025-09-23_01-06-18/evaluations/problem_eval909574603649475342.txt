@@ -1,0 +1,4 @@
+import math
+    import random
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

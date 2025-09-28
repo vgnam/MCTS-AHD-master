@@ -28,7 +28,8 @@ class Paras():
         self.llm_local_url = None  # your local server 'http://127.0.0.1:11012/completions'
         self.llm_api_endpoint = "chat.openai.com"
         self.llm_api_key = "Not used"  # Not used
-        self.llm_model = "gpt-3.5-turbo-1106"
+        self.llm_model = "mistral/codestral-latest"
+        self.llm_model_names = ["mistral/codestral-latest", "nvidia_nim/qwen/qwen2.5-coder-32b-instruct"]
 
         #####################
         ###  Exp settings  ###

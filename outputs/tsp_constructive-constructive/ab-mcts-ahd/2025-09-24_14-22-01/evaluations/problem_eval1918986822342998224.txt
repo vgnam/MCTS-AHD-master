@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    total_nodes = len(distance_matrix)
+    visited_nodes = total_nodes - len(unvisited_nodes)
+    exploration_factor = (visited_nodes / total_nodes) ** 1.5
+
+    # Calculate node centrality
+    centrality = [sum(1 / (distance_matrix[node][n] + 1e-6) for n in range(total_nodes)) / total_nodes for node in range(total_nodes)]
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight adjustment based on centrality
+        node_centrality = centrality[node]
+        base_weight = 0.3 + (0.7 * (len(unvisited_nodes) / (len(unvisited_nodes) + 1)))
+        weight = base_weight * (1 + node_centrality) if node_centrality > 0.5 else base_weight * (1 - node_centrality)
+
+        # Proximity bonus for central nodes when few options remain
+        proximity_bonus = 1.0
+        if len(unvisited_nodes) < total_nodes / 3:
+            proximity_bonus = 1.0 - (node_centrality / max(centrality)) * 0.3
+
+        # Dead-end avoidance: prioritize nodes with higher connectivity
+        connectivity = sum(1 for n in range(total_nodes) if distance_matrix[node][n] > 0)
+        connectivity_bonus = 1.0 + (connectivity / total_nodes) * 0.2
+
+        weighted_cost = (
+            (immediate_distance * (1 - exploration_factor) +
+             potential_distance * exploration_factor) *
+            proximity_bonus *
+            connectivity_bonus
+        )
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+
+    return next_node

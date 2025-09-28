@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 0.5 * (len(unvisited_nodes) / (len(unvisited_nodes) + 1))
+    best_score = float('-inf')
+    next_node = None
+    candidates = []
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        spatial_centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        temporal_centrality = sum(distance_matrix[n][node] for n in unvisited_nodes) / len(unvisited_nodes)
+        weighted_score = (current_distance + temperature * (spatial_centrality - future_distance)) - temporal_centrality
+
+        candidates.append((node, weighted_score))
+
+    if candidates:
+        candidates.sort(key=lambda x: x[1], reverse=True)
+        selected = candidates[0][0]
+        for node, score in candidates[1:]:
+            if score == candidates[0][1]:
+                if distance_matrix[node][destination_node] < distance_matrix[selected][destination_node]:
+                    selected = node
+        next_node = selected
+
+    return next_node

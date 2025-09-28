@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_pressure = (remaining_nodes / total_nodes) * (1 + (total_nodes - remaining_nodes) / total_nodes)
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            connectivity_score = 1 / (1 + sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1))
+            node_degree = sum(1 for n in range(total_nodes) if distance_matrix[node][n] > 0 and n != node)
+            centrality_score = node_degree / (total_nodes - 1)
+            node_significance = (connectivity_score * 0.6 + centrality_score * 0.4) * (1 - dest_dist / max(distance_matrix[node]))
+        else:
+            node_significance = 0
+
+        weight_local = 0.5 - 0.3 * exploration_pressure
+        weight_significance = 0.3 + 0.2 * exploration_pressure
+        weight_dest = -0.1 + 0.2 * (1 - exploration_pressure)
+
+        score = (weight_local * immediate_dist) + (weight_significance * node_significance) + (weight_dest * dest_dist)
+        return score
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

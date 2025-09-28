@@ -1,0 +1,5 @@
+import random
+            return random.choice(filtered)
+
+    farthest_node = candidates[-1][0]
+    return next_node

@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    time_decay_factor = 0.7
+    exploration_bonus = 0.5
+    novelty_penalty_factor = 0.3  # Increased penalty for high-cost nodes
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        # Novelty penalty: higher for nodes with higher historical costs
+        novelty_penalty = novelty_penalty_factor * (distance_to_current + distance_to_destination)
+
+        # Dynamic exploration factor: inversely proportional to remaining nodes
+        exploration_factor = exploration_bonus * (1 - len(unvisited_nodes) / len(distance_matrix))
+
+        combined_score = (distance_to_current + distance_to_destination) + time_decay_factor * avg_distance_to_remaining - exploration_factor - novelty_penalty
+
+        scores.append((node, combined_score))
+
+    # Probabilistic selection based on scores (lower scores are better)
+    if scores:
+        min_score = min(score for _, score in scores)
+        adjusted_scores = [max(0, min_score - score + 1) for _, score in scores]  # Ensure positive weights
+        total_weight = sum(adjusted_scores)
+        if total_weight > 0:
+            probabilities = [score / total_weight for score in adjusted_scores]
+            next_node = random.choices([node for node, _ in scores], weights=probabilities, k=1)[0]
+        else:
+            next_node = min(scores, key=lambda x: x[1])[0]
+    else:
+        next_node = destination_node
+
+    return next_node

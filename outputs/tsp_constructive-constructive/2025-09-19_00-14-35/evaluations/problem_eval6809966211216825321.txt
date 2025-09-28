@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node not in unvisited_nodes:
+        return min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    dest_distance = distance_matrix[current_node][destination_node]
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    priority_factor = max(0, 1 - (dest_distance / (avg_distance + 1e-10)))
+
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    nearest_distance = distance_matrix[current_node][nearest_node]
+
+    if dest_distance <= nearest_distance:
+        return destination_node
+    else:
+        prob = priority_factor * (nearest_distance / (dest_distance + 1e-10)) + 0.1 * np.random.rand()
+        if np.random.rand() < prob:
+            return destination_node
+        else:
+            return next_node

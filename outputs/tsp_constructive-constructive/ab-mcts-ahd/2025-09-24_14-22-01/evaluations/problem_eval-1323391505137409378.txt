@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    alpha = 0.4
+    beta = 0.6
+    unvisited_count = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_incentive = (total_nodes - unvisited_count) / total_nodes
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        if immediate_distance == 0 or potential_distance == 0:
+            geometric_mean = float('inf')
+        else:
+            geometric_mean = (immediate_distance * potential_distance) ** 0.5
+
+        # Calculate trajectory alignment using cosine similarity
+        vec_current = [distance_matrix[current_node][n] for n in range(total_nodes)]
+        vec_node = [distance_matrix[node][n] for n in range(total_nodes)]
+        dot_product = sum(a * b for a, b in zip(vec_current, vec_node))
+        norm_current = sum(a * a for a in vec_current) ** 0.5
+        norm_node = sum(b * b for b in vec_node) ** 0.5
+
+        if norm_current == 0 or norm_node == 0:
+            alignment = 0
+        else:
+            alignment = dot_product / (norm_current * norm_node)
+
+        weighted_cost = (geometric_mean * (1 - alpha - beta) +
+                          alignment * alpha +
+                          exploration_incentive * beta)
+
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    if next_node is None:
+        next_node = destination_node
+    return next_node

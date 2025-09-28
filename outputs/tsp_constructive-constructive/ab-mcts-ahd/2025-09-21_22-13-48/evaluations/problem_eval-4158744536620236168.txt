@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        if unvisited_nodes:
+            distances = [distance_matrix[node][other] for other in unvisited_nodes if other != node]
+            if distances:
+                avg_distance = sum(distances) / len(distances)
+                variance = sum((d - avg_distance) ** 2 for d in distances) / len(distances)
+                exploration_factor = variance * 0.1
+            else:
+                exploration_factor = 0
+        else:
+            exploration_factor = 0
+        score = immediate_distance + exploration_factor
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

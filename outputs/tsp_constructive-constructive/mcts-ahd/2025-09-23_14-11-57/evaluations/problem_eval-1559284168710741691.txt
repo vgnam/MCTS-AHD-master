@@ -1,0 +1,8 @@
+import random
+        selected_index = random.choices(range(len(scores)), weights=[1/s for s in scores], k=1)[0]
+    else:
+        min_score = min(scores)
+        selected_index = scores.index(min_score)
+
+    next_node = list(unvisited_nodes)[selected_index]
+    return next_node

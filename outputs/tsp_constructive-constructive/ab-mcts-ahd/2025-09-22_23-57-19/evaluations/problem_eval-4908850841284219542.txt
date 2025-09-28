@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    closest_node = None
+    closest_dist = float('inf')
+    farthest_node = None
+    farthest_dist = -float('inf')
+
+    for node in unvisited_nodes:
+        dist = distance_matrix[current_node][node]
+        if dist < closest_dist:
+            closest_dist = dist
+            closest_node = node
+        if dist > farthest_dist:
+            farthest_dist = dist
+            farthest_node = node
+
+    if closest_node is None or farthest_node is None:
+        return destination_node
+
+    exploration_factor = (len(unvisited_nodes) / len(distance_matrix)) ** 2
+    distance_ratio = farthest_dist / (closest_dist + 1e-10)
+
+    weighted_score = (1 - exploration_factor) * closest_dist + exploration_factor * (distance_ratio * farthest_dist)
+
+    if weighted_score < closest_dist:
+        return closest_node
+    else:
+        return next_node

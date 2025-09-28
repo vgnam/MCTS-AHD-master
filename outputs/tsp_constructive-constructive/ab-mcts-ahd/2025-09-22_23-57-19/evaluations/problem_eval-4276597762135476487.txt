@@ -1,0 +1,63 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    centrality = {}
+    distance_scores = {}
+    node_degree = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node])
+        distance_scores[node] = distance_matrix[current_node][node]
+        node_degree[node] = sum(1 for n in unvisited_nodes if distance_matrix[node][n] > 0)
+
+    temperature = 1.0 / (len(unvisited_nodes) + 1)
+    max_distance = max(distance_scores.values()) if distance_scores else 1
+    max_centrality = max(centrality.values()) if centrality else 1
+    max_degree = max(node_degree.values()) if node_degree else 1
+
+    normalized_distance = {node: (max_distance - dist) / max_distance if max_distance else 0 for node, dist in distance_scores.items()}
+    normalized_centrality = {node: cent / max_centrality if max_centrality else 0 for node, cent in centrality.items()}
+    normalized_degree = {node: deg / max_degree if max_degree else 0 for node, deg in node_degree.items()}
+
+    scores = []
+    candidates = []
+    for node in unvisited_nodes:
+        score = (1 - temperature) * normalized_distance[node] + temperature * (0.6 * normalized_centrality[node] + 0.4 * normalized_degree[node])
+        scores.append(score)
+        candidates.append(node)
+
+    if not scores:
+        return unvisited_nodes.pop()
+
+    max_score = max(scores)
+    min_score = min(scores)
+    adjusted_scores = [(score - min_score) / (max_score - min_score + 1e-10) for score in scores]
+
+    threshold = 0.7 if len(unvisited_nodes) > 4 else 0.5
+    high_score_nodes = [node for i, node in enumerate(candidates) if adjusted_scores[i] > threshold]
+
+    if high_score_nodes:
+        next_node = random.choice(high_score_nodes)
+    else:
+        next_node = candidates[adjusted_scores.index(max(adjusted_scores))]
+
+    if len(unvisited_nodes) > 3:
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            current_cost = distance_matrix[current_node][next_node]
+            if potential_cost < current_cost * (1.0 + 0.1 * temperature):
+                next_node = node
+                break
+
+    return next_node

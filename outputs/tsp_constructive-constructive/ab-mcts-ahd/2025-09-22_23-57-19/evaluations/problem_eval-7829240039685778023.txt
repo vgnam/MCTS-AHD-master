@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    total_nodes = len(distance_matrix)
+    phase_factor = (total_nodes - len(unvisited_nodes)) / total_nodes
+    proximity_weight = 1 - phase_factor
+    centrality_weight = phase_factor
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances) if distances else 0
+
+    node_scores = {}
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        centrality = sum(distance_matrix[node]) / (total_nodes - 1) if (total_nodes - 1) > 0 else 0
+        momentum = (cost / avg_distance) if avg_distance > 0 else 1
+
+        score = (proximity_weight * cost + centrality_weight * centrality) * (1 + momentum)
+
+        node_scores[node] = score
+
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+
+    if len(unvisited_nodes) > 2:
+        threshold = 1.1 * min_cost
+        candidate_nodes = [node for node, score in node_scores.items() if score <= threshold]
+
+        if candidate_nodes:
+            next_node = candidate_nodes[0]
+
+    return next_node

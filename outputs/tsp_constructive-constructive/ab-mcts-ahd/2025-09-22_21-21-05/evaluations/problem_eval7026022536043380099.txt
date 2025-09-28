@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_score = 0.0
+    memory_factor = 0.3  # Weight for historical path performance
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if not unvisited_nodes:
+            combined_score = distance_to_current + distance_to_destination
+        else:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            avg_distance_to_remaining = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes) if remaining_nodes else 0
+
+            # Centrality calculation (higher for nodes connected to more others)
+            centrality = len([n for n in distance_matrix[node] if n != node and distance_matrix[node][n] < float('inf')]) / len(unvisited_nodes)
+
+            # Historical performance (simplified as inverse of average distance)
+            historical_performance = 1 / (1 + avg_distance_to_remaining)
+
+            # Combine factors with dynamic weights
+            combined_score = (0.5 * distance_to_current + 0.3 * distance_to_destination +
+                            0.4 * centrality + memory_factor * historical_performance)
+
+        scores.append((node, combined_score))
+        total_score += combined_score
+
+    # Probabilistic selection based on normalized scores
+    if total_score == 0:
+        return unvisited_nodes[0]  # Fallback if all scores are zero
+
+    probabilities = [score / total_score for (_, score) in scores]
+    selected_index = np.random.choice(len(scores), p=probabilities)
+    return next_node

@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate weights for each candidate node
+    weights = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        # Weight is inversely proportional to the sum of distances (proximity and potential)
+        weight = 1.0 / (distance_to_current + distance_to_destination + 1e-6)  # Avoid division by zero
+        weights.append(weight)
+        total_weight += weight
+
+    # Normalize weights
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Dynamic temperature based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 / (remaining_nodes + 1))
+
+    # Apply Boltzmann distribution to select next node
+    probabilities = [math.exp(w / temperature) for w in normalized_weights]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    # Randomly select next node based on probabilities
+    next_node = numpy.random.choice(unvisited_nodes, p=probabilities)
+
+    return next_node

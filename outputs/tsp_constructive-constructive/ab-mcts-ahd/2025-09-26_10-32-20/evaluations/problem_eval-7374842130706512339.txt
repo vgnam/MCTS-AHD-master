@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1 - (remaining_nodes / total_nodes)
+
+    def sigmoid(x, k=1):
+        return 1 / (1 + math.exp(-k * x))
+
+    weight_local = 0.8 * (1 - sigmoid(progress - 0.3))
+    weight_centrality = 0.6 * sigmoid(progress - 0.5)
+    weight_coherence = 0.5 * sigmoid(abs(progress - 0.7))
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+
+        if len(unvisited_nodes) > 1:
+            prev_node = current_node
+            next_node_candidate = node
+            curvature = 0
+            for n in unvisited_nodes:
+                if n != next_node_candidate:
+                    angle = math.atan2(distance_matrix[prev_node][n] - distance_matrix[prev_node][next_node_candidate],
+                                      distance_matrix[n][next_node_candidate] - distance_matrix[prev_node][next_node_candidate])
+                    curvature += abs(angle)
+            curvature /= (len(unvisited_nodes) - 1)
+            coherence += curvature
+
+        return (weight_local * local_distance) + (weight_centrality * centrality) - (weight_coherence * coherence)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

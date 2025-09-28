@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    next_node = None
+    best_score = float('-inf')
+    current_path_length = sum(distance_matrix[current_node][node] for node in unvisited_nodes if node in unvisited_nodes)
+    total_path_length = sum(distance_matrix[n1][n2] for n1 in unvisited_nodes for n2 in unvisited_nodes if n1 != n2)
+    temperature = max(0.1, 1 - (current_path_length / (total_path_length + 1e-6)))
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        normalized_distance = distance / (current_path_length + 1e-6)
+        exploration_weight = temperature * (1 / (degree + 1))
+        exploitation_weight = (1 - temperature) * (-normalized_distance)
+        score = exploration_weight + exploitation_weight
+        if score > best_score:
+            best_score = score
+            next_node = node
+    return next_node

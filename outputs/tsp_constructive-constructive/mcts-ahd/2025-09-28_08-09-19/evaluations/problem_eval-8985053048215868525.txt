@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = 1 - (len(unvisited_nodes) / total_nodes)
+    exploration_weight = 1 - (visited_ratio ** 1.5)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        if len(unvisited_nodes) == 1:
+            avg_distance = 0
+        else:
+            avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1)
+
+        base_score = distance_to_current - 0.7 * avg_distance
+
+        if len(unvisited_nodes) > 1:
+            nearest_neighbors = sorted(unvisited_nodes, key=lambda n: distance_matrix[node][n])[:min(3, len(unvisited_nodes))]
+            avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+            connectivity_score = (0.6 * avg_distance + 0.4 * avg_neighbor_distance) * exploration_weight
+            base_score -= connectivity_score
+
+            centrality_penalty = (avg_neighbor_distance / (distance_to_current + 1e-6)) ** 1.2
+            base_score *= (1 + centrality_penalty * (1 - exploration_weight))
+
+            if len(nearest_neighbors) >= 2:
+                diversity_factor = 0.3 * (distance_matrix[node][nearest_neighbors[1]] - distance_matrix[node][nearest_neighbors[0]])
+                base_score += diversity_factor
+
+        if base_score < min_score:
+            min_score = base_score
+            next_node = node
+
+    return next_node

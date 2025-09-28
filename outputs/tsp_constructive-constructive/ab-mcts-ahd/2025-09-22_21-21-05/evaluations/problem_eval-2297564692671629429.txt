@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(distance_matrix)
+    remaining_count = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / remaining_count if remaining_count > 1 else 0
+
+        # Dynamic weight based on remaining nodes
+        weight = 0.3 * (1 - remaining_count / total_nodes)
+
+        # Connectivity penalty: penalize nodes that are poorly connected to remaining nodes
+        connectivity_penalty = 0.2 * (avg_distance_to_remaining / sum(distance_matrix[node][n] for n in range(total_nodes)) if sum(distance_matrix[node][n] for n in range(total_nodes)) > 0 else 0)
+
+        # Exploration factor with cooling schedule
+        exploration_factor = 0.1 * (remaining_count / total_nodes) * (1 - (total_nodes - remaining_count) / total_nodes)
+
+        combined_score = distance_to_current + distance_to_destination + weight * avg_distance_to_remaining + connectivity_penalty - exploration_factor
+        scores.append((node, combined_score))
+
+    # Probabilistic selection based on scores (higher probability for lower scores)
+    if scores:
+        min_score = min(score for _, score in scores)
+        max_score = max(score for _, score in scores)
+        temperature = max(0.1, 0.5 * (remaining_count / total_nodes))  # Cooling temperature
+
+        # Softmax-like probability distribution
+        exp_scores = [math.exp(-(score - min_score) / temperature) for _, score in scores]
+        total_exp = sum(exp_scores)
+        probabilities = [exp_score / total_exp for exp_score in exp_scores]
+
+        # Select node based on probabilities
+        next_node = random.choices([node for node, _ in scores], weights=probabilities, k=1)[0]
+        return next_node
+    else:
+        return next_node

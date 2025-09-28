@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    node_frequencies = {}
+    for node in unvisited_nodes:
+        node_frequencies[node] = sum(1 for row in distance_matrix if row[node] > 0)
+
+    def weighted_selection_probability(node):
+        distance = distance_matrix[current_node][node]
+        frequency = node_frequencies[node]
+        return (1 / distance) * (frequency + 1)  # +1 to avoid zero frequency
+
+    next_node = max(unvisited_nodes, key=weighted_selection_probability)
+    return next_node

@@ -1,0 +1,31 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if dest_dist == 0:
+            score = current_dist
+        else:
+            # Novelty: Non-linear penalty function based on distance ratio
+            distance_ratio = current_dist / dest_dist
+            penalty_factor = math.exp(-distance_ratio)  # Exponential decay for penalty
+            projected_path_length = current_dist + dest_dist
+            dynamic_weight = 1 + (current_dist / (projected_path_length + 1e-10)) * penalty_factor
+
+            # Score combines distance ratio and dynamic weight with a novelty term
+            novelty_term = (projected_path_length / (sum(distance_matrix[current_node]) + 1e-10)) ** 2
+            score = (distance_ratio * dynamic_weight) + novelty_term
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

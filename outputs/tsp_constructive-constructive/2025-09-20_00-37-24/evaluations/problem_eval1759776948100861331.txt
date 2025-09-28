@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic weights for each node: distance + probabilistic adjustment
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Decrease weight based on how often the node has been visited (simulated here)
+        visit_prob = 1.0 / (1.0 + math.exp(-distance))  # Sigmoid function
+        weight = distance * visit_prob
+        weights.append(weight)
+
+    # Normalize weights to form a probability distribution
+    total_weight = sum(weights)
+    if total_weight == 0:
+        probabilities = [1.0 / len(unvisited_nodes)] * len(unvisited_nodes)
+    else:
+        probabilities = [w / total_weight for w in weights]
+
+    # Choose node based on weighted probability
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    # 10% chance to override with the nearest node to ensure some exploitation
+    if random.random() < 0.1 and destination_node in unvisited_nodes:
+        next_node = destination_node
+    elif random.random() < 0.1:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    return next_node

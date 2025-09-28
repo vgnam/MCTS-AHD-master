@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    progress_factor = 1.0 - (remaining_count / total_nodes) ** 2
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        lookahead_depth = min(3, max(1, remaining_count // 3))
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_nodes
+            connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+        else:
+            avg_distance = 0
+            node_centrality = 0
+            connectivity = 0
+
+        immediate_weight = 0.7 - 0.4 * progress_factor
+        connectivity_weight = 0.3 + 0.7 * progress_factor
+        centrality_weight = 0.5 * (1.0 - progress_factor)
+        lookahead_weight = 0.2 * progress_factor
+
+        future_potential = sum(distance_matrix[node][n] for n in unvisited_nodes if distance_matrix[node][n] < 1.5 * avg_distance) / (total_nodes - 1) if (total_nodes - 1) > 0 else 0
+
+        score = immediate_weight * immediate_distance + connectivity_weight * (total_nodes - connectivity) - centrality_weight * node_centrality
+        score += lookahead_weight * future_potential
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

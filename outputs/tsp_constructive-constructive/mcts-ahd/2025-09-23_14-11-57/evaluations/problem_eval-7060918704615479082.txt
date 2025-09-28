@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_score = float('inf')
+
+    # Dynamic weighting based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    weight_proximity = 0.6 if remaining_nodes > 3 else 0.4
+    weight_efficiency = 1.0 - weight_proximity
+
+    # Calculate local density penalty
+    local_density = sum(1 for node in unvisited_nodes if distance_matrix[current_node][node] < 0.2)
+    density_penalty = 0.1 * local_density
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+        total_increase = current_to_node + node_to_dest
+
+        # Path coherence heuristic (measures alignment with overall direction)
+        if len(unvisited_nodes) > 1:
+            avg_distance = sum(distance_matrix[n1][n2] for n1 in unvisited_nodes for n2 in unvisited_nodes if n1 != n2) / (len(unvisited_nodes) * (len(unvisited_nodes) - 1))
+            coherence = abs(current_to_node - avg_distance) / (avg_distance + 1e-6)
+        else:
+            coherence = 0
+
+        # Heuristic for path efficiency
+        heuristic = sum(min(distance_matrix[node][n], distance_matrix[n][node]) for n in unvisited_nodes if n != node)
+
+        # Combined score with dynamic weights, coherence, and density penalty
+        score = (weight_proximity * current_to_node +
+                 weight_efficiency * total_increase +
+                 0.3 * heuristic +
+                 0.4 * coherence) + density_penalty
+
+        if score < best_score:
+            best_score = score
+            best_node = node
+
+    return next_node

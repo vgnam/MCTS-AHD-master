@@ -1,0 +1,35 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic bias towards destination based on remaining distance
+    remaining_distance = distance_matrix[current_node][destination_node] if destination_node in unvisited_nodes else float('inf')
+    bias_prob = min(0.5, 1.0 / (1.0 + math.exp(-0.1 * remaining_distance)))
+
+    # With bias_prob chance, prioritize destination if unvisited
+    if destination_node in unvisited_nodes and random.random() < bias_prob:
+        return destination_node
+
+    # Get nearest neighbors
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Adaptive probability based on current path quality
+    current_path_length = sum(distance_matrix[current_node][node] for node in unvisited_nodes if node in nearest_neighbors[:3])
+    exploitation_prob = min(0.9, 0.5 + 0.4 * (1.0 / (1.0 + math.exp(-0.01 * current_path_length))))
+
+    # Select node with adaptive stochasticity
+    if random.random() < exploitation_prob:
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # Avoid recently visited nodes in exploration
+        if len(unvisited_nodes) > 3:
+            candidates = [n for n in nearest_neighbors if n not in nearest_neighbors[:3]]
+            next_node = random.choice(candidates) if candidates else random.choice(nearest_neighbors)
+        else:
+            next_node = random.choice(nearest_neighbors)
+
+    return next_node

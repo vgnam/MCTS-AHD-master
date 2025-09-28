@@ -1,0 +1,55 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('inf')
+    num_unvisited = len(unvisited_nodes)
+    total_nodes = num_unvisited + 1  # includes current node
+
+    # Calculate node degrees (centrality)
+    node_degrees = {}
+    for node in unvisited_nodes:
+        degree = sum(1 for n in unvisited_nodes if n != node and distance_matrix[node][n] > 0)
+        node_degrees[node] = degree
+
+    # Adaptive weights using sigmoid function for smoother transition
+    progress_ratio = (total_nodes - num_unvisited) / total_nodes
+    weight_proximity = 0.5 * (1 - math.tanh(3 * progress_ratio - 1.5))  # Emphasizes future efficiency later
+    weight_future = 0.5 + weight_proximity
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, num_unvisited - 1)
+
+        # Hub penalty (discourage high-degree nodes early)
+        hub_penalty = 0.3 * node_degrees[node] * (1 - progress_ratio)
+
+        # Centrality bias (favor nodes with moderate connectivity)
+        centrality_bias = -0.2 * abs(node_degrees[node] - (num_unvisited / 2))
+
+        # Score calculation
+        score = (weight_proximity * distance_to_node +
+                 0.2 * distance_to_destination +
+                 weight_future * avg_future_distance +
+                 hub_penalty +
+                 centrality_bias)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    # Probabilistic selection with degree-based bias
+    if random.random() < 0.2:
+        if destination_node in unvisited_nodes:
+            next_node = destination_node
+        else:
+            # Select node with highest connectivity (20% chance)
+            if random.random() < 0.8:
+                next_node = max(unvisited_nodes, key=lambda x: node_degrees[x])
+
+    return next_node

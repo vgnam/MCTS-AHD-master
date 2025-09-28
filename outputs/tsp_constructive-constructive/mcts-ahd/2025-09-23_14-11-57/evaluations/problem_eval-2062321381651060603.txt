@@ -1,0 +1,75 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Initialize metrics
+    distances = []
+    regrets = []
+    clusterings = []
+    explorations = []
+    local_densities = []
+    momentum_terms = []
+
+    # Calculate metrics for each candidate node
+    for node in unvisited_nodes:
+        # Immediate distance
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        # Dynamic regret with scaling
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) ** 1.2 if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Neighborhood-aware clustering
+        nearby_nodes = [n for n in unvisited_nodes if n != node and distance_matrix[node][n] < 1.2 * min(distance_matrix[node])]
+        if nearby_nodes:
+            clustering = sum(distance_matrix[node][n] for n in nearby_nodes) / len(nearby_nodes)
+        else:
+            clustering = 0
+        clusterings.append(clustering)
+
+        # Probabilistic exploration bonus
+        exploration_bonus = (1 / (1 + (len(unvisited_nodes) / len(distance_matrix)) ** 0.5)) * (0.5 + 0.5 * (node % 2))
+        explorations.append(exploration_bonus)
+
+        # Density-sensitive local density
+        local_density = len([n for n in unvisited_nodes if n != node and distance_matrix[node][n] < 1.3 * min(distance_matrix[node])])
+        local_densities.append(local_density)
+
+        # Momentum term based on previous selections
+        momentum_terms.append(1 / (1 + len(unvisited_nodes) - unvisited_nodes.index(node)))
+
+    # Adaptive phase-based weights with momentum
+    phase = 1 - (len(unvisited_nodes) / len(distance_matrix))
+    exploration_progress = (len(distance_matrix) - len(unvisited_nodes)) / len(distance_matrix)
+
+    regret_weight = max(0.1, 0.9 * (1 - phase ** 1.5))
+    distance_weight = 0.3 * phase ** 0.8
+    clustering_weight = 0.2 * phase ** 2
+    exploration_weight = 0.2 * (1 - exploration_progress ** 1.2)
+    density_weight = 0.1 * phase ** 1.1
+    momentum_weight = 0.1 * (1 - phase)
+
+    # Combine weighted scores with momentum
+    scores = [
+        regret_weight * regret +
+        distance_weight * distance +
+        clustering_weight * clustering +
+        exploration_weight * exploration +
+        density_weight * density +
+        momentum_weight * momentum
+        for regret, distance, clustering, exploration, density, momentum in zip(
+            regrets, distances, clusterings, explorations, local_densities, momentum_terms
+        )
+    ]
+
+    # Select node with minimum score
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    # Dynamic weighting factor based on remaining nodes (more aggressive adjustment)
+    remaining_nodes = len(unvisited_nodes)
+    weight_factor = 0.3 + 0.4 * (remaining_nodes / (remaining_nodes + 2))  # Adjusts between 0.3 and 0.7
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+
+        # Calculate minimum distance to remaining unvisited nodes
+        min_distance_to_remaining = min(distance_matrix[node][n] for n in unvisited_nodes if n != node) if len(unvisited_nodes) > 1 else 0
+
+        # Penalty term for nodes with low minimum distances (encourages exploration)
+        penalty = 0.5 * min_distance_to_remaining
+
+        combined_score = distance_to_current + weight_factor * distance_to_dest + penalty
+
+        if combined_score < min_score:
+            min_score = combined_score
+            next_node = node
+
+    return next_node

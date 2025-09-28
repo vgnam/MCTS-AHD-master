@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_ratio = (total_nodes - remaining_nodes) / total_nodes
+    threshold = 0.5 * (1 + math.cos(math.pi * progress_ratio))  # Dynamic threshold using cosine function
+
+    best_score = float('-inf')
+    next_node = None
+    candidates = []
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Novel scoring function combining distance ratio and progress
+        distance_ratio = distance_to_destination / (distance_to_current + 1e-6)
+        score = (1 - threshold) * distance_ratio + threshold * (1 / (distance_to_current + 1e-6))
+
+        # Add probabilistic element with adaptive probability
+        if score > best_score or (score == best_score and random.random() < 0.3 * (1 - progress_ratio)):
+            best_score = score
+            next_node = node
+
+    # Multi-phase penalty for nodes too close to destination early
+    if progress_ratio < 0.3:
+        for node in unvisited_nodes:
+            avg_distance = sum(distance_matrix[destination_node]) / total_nodes
+            if distance_matrix[node][destination_node] < 0.4 * avg_distance:
+                if node == next_node:
+                    candidates = [n for n in unvisited_nodes if distance_matrix[n][destination_node] >= 0.4 * avg_distance]
+                    if candidates:
+                        next_node = candidates[0]
+
+    # Final probabilistic selection among top candidates
+    if len(unvisited_nodes) > 1:
+        top_candidates = [n for n in unvisited_nodes if distance_matrix[current_node][n] < 1.5 * distance_matrix[current_node][next_node]]
+        if len(top_candidates) > 1:
+            weights = [math.exp(-distance_matrix[current_node][n]) for n in top_candidates]
+            next_node = random.choices(top_candidates, weights=weights, k=1)[0]
+
+    return next_node

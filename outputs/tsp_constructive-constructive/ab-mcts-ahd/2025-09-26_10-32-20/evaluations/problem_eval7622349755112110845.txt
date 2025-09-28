@@ -1,0 +1,9 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining_nodes = len(unvisited_nodes)
+    decay_factor = 0.5 ** (1 / remaining_nodes)  # Non-linear decay
+    weight = max(0.2, 0.9 * decay_factor)  # Dynamic weight adjustment
+    avg_distance = sum(distance_matrix[node][destination_node] for node in unvisited_nodes) / remaining_nodes
+    next_node = min(unvisited_nodes, key=lambda node: weight * distance_matrix[current_node][node] + (1 - weight) * (distance_matrix[node][destination_node] - avg_distance))
+    return next_node

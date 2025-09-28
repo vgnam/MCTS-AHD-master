@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def node_centrality(node, unvisited):
+        if len(unvisited) <= 1:
+            return 0.0
+        remaining = unvisited - {node}
+        avg_dist = sum(distance_matrix[node][n] for n in remaining) / len(remaining)
+        return 1.0 / (avg_dist + 1e-6)
+
+    exploration_factor = 0.8 ** (10 - len(unvisited_nodes))
+    candidates = []
+
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+        centrality = node_centrality(node, unvisited_nodes)
+        weight_dist = 0.4 + 0.3 * exploration_factor
+        weight_central = 0.6 - 0.3 * exploration_factor
+        score = (weight_dist * immediate_dist +
+                 weight_central * centrality)
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

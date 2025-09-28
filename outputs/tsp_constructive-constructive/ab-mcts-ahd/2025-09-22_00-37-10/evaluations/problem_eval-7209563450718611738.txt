@@ -1,0 +1,28 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    max_distance = -float('inf')
+    candidate_nodes = []
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance > max_distance:
+            max_distance = distance
+            candidate_nodes = [node]
+        elif distance == max_distance:
+            candidate_nodes.append(node)
+
+    if len(candidate_nodes) > 1:
+        weights = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in candidate_nodes]
+        weights = [w / sum(weights) for w in weights]
+        next_node = random.choices(candidate_nodes, weights=weights, k=1)[0]
+    else:
+        next_node = candidate_nodes[0]
+
+    # Add a small bias towards the destination node
+    if destination_node in unvisited_nodes:
+        if random.random() < 0.1:  # 10% chance to override with destination
+            next_node = destination_node
+
+    return next_node

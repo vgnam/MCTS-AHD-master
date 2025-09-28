@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = remaining_nodes + 1
+
+    # Calculate temperature for softmax (decreases as progress increases)
+    temperature = max(0.1, 1.0 - (remaining_nodes / total_nodes))
+
+    # Track recently considered nodes (last 2 nodes)
+    recently_considered = set()
+    if len(unvisited_nodes) < total_nodes - 2:
+        recently_considered.add(unvisited_nodes[-2]) if len(unvisited_nodes) >= 2 else None
+        recently_considered.add(unvisited_nodes[-1]) if len(unvisited_nodes) >= 1 else None
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weight adjustment with more aggressive transition
+        weight_immediate = max(0.3, 1.2 * (remaining_nodes / total_nodes))
+        weight_long_term = 1.0 - weight_immediate
+
+        # Penalty for recently considered nodes
+        penalty = 0.2 if node in recently_considered else 0.0
+
+        # Combined score with penalty
+        score = (weight_immediate * distance_to_node + weight_long_term * distance_to_destination) - penalty
+        scores.append(score)
+
+    # Softmax selection with decreasing temperature
+    exp_scores = [math.exp(s / temperature) for s in scores]
+    sum_exp_scores = sum(exp_scores)
+    probs = [exp_score / sum_exp_scores for exp_score in exp_scores]
+
+    # Select node probabilistically
+    selected_index = numpy.random.choice(len(unvisited_nodes), p=probs)
+    next_node = unvisited_nodes[selected_index]
+
+    return next_node

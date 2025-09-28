@@ -1,0 +1,13 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def adjusted_score(node):
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        locality = 1.0 / (sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) + 1e-6) if unvisited_nodes else 1.0
+        revisit_penalty = 1.0 + 0.3 * (1.0 / (degree + 1e-6))
+        return distance * revisit_penalty * locality
+
+    next_node = min(unvisited_nodes, key=adjusted_score)
+    return next_node

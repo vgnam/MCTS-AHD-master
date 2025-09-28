@@ -1,0 +1,35 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+    temperature = 1.0 - remaining_ratio  # Higher temperature early, lower later
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        # Calculate future impact as average of nearest connections
+        future_connections = [distance_matrix[node][other] for other in remaining_nodes]
+        future_impact = sum(future_connections) / len(future_connections) if future_connections else 0
+
+        # Dynamic weight with temperature adjustment
+        dynamic_weight = 0.5 + 0.4 * remaining_ratio
+        weighted_score = dynamic_weight * current_dist + (1 - dynamic_weight) * future_impact
+
+        # Add probabilistic element with temperature
+        if temperature > 0:
+            weighted_score += random.uniform(-temperature, temperature)
+
+        return weighted_score
+
+    # Select node with lowest score (or probabilistic best)
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

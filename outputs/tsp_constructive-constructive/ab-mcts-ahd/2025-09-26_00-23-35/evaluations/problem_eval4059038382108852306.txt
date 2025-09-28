@@ -1,0 +1,48 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('-inf')
+    total_unvisited = len(unvisited_nodes)
+
+    # Dynamic temperature parameter (higher early, lower later)
+    temperature = 1.0 - 0.8 * (1 - (total_unvisited / (total_unvisited + 1)))
+
+    # Calculate average distance to all unvisited nodes
+    avg_total_distance = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / total_unvisited
+
+    # Calculate connectivity score for each node (centrality in remaining subgraph)
+    connectivity_scores = {}
+    for node in unvisited_nodes:
+        connectivity = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        connectivity_scores[node] = 1 / (1 + connectivity)  # Higher is better
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, total_unvisited - 1)
+
+        # Novel connectivity score component
+        connectivity_score = connectivity_scores[node]
+
+        # Outlier penalty (relative to average distance)
+        outlier_penalty = max(0, (distance_to_node - 2 * avg_total_distance) / avg_total_distance)
+
+        # Score with dynamic temperature and connectivity
+        score = (temperature * connectivity_score +
+                 (1 - temperature) * (1 - distance_to_node / (avg_total_distance + 1)) -
+                 0.3 * outlier_penalty)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Dynamic probability to select destination node (increases as progress nears completion)
+    destination_prob = 0.1 + 0.2 * (1 - (total_unvisited / (total_unvisited + 1)))
+    if random.random() < destination_prob and destination_node in unvisited_nodes:
+        next_node = destination_node
+
+    return next_node

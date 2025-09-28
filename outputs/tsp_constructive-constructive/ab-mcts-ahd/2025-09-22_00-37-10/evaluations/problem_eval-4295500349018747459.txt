@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    if remaining_nodes == 0:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    mean_distance = sum(distances) / remaining_nodes
+    variance = sum((d - mean_distance) ** 2 for d in distances) / remaining_nodes
+
+    # Track node visit frequencies (simulated for this example)
+    visit_frequencies = {node: 1 for node in unvisited_nodes}  # In practice, track globally
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        # Novelty factor: inverse of visit frequency (encourages exploration)
+        novelty_factor = 1.0 / (visit_frequencies[node] + 1)
+
+        # Dynamic weight: balances variance and remaining nodes
+        dynamic_weight = (1.0 / (remaining_nodes + 1)) * (1 + variance)
+
+        # Score combines distance, novelty, and lookahead with dynamic weight
+        score = -immediate_distance + novelty_factor * (1 - dynamic_weight * lookahead_distance)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

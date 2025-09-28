@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (remaining_count / (remaining_count + 1)) * 0.8)
+    lookahead_depth = min(4, max(1, remaining_count // 3))
+    scores = []
+    nodes = list(unvisited_nodes)
+
+    for node in nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = 0
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            current = node
+            for _ in range(lookahead_depth):
+                if not remaining_nodes:
+                    break
+                next_candidate = min(remaining_nodes, key=lambda x: distance_matrix[current][x])
+                lookahead_distance += distance_matrix[current][next_candidate]
+                current = next_candidate
+                remaining_nodes -= {next_candidate}
+
+        node_centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        immediate_weight = 0.4 + 0.2 * (1 - temperature)
+        lookahead_weight = 0.3 * temperature
+        centrality_weight = 0.3 * (1 - temperature)
+
+        opportunity_cost = (lookahead_distance / lookahead_depth) if lookahead_depth > 0 else 0
+        score = (immediate_weight * immediate_distance +
+                lookahead_weight * opportunity_cost +
+                centrality_weight * (0.7 * node_centrality + 0.3 * distance_to_destination))
+
+        scores.append((node, score))
+
+    probabilities = [1.0 / (1.0 + math.exp((score - min(s for _, s in scores)) / temperature)) for _, score in scores]
+    probabilities = [p / sum(probabilities) for p in probabilities]
+
+    next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+    return next_node

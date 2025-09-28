@@ -1,0 +1,33 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    scores = []
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if not unvisited_nodes:
+            centrality_penalty = 0
+        else:
+            centrality_penalty = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+        dynamic_weight = (distance_to_current + distance_to_destination) / (centrality_penalty + 1e-6)
+        combined_score = distance_to_current + distance_to_destination + dynamic_weight * centrality_penalty
+
+        candidates.append(node)
+        scores.append(combined_score)
+
+    min_score = min(scores)
+    normalized_scores = [1.0 / (score - min_score + 1e-6) for score in scores]
+
+    total_weight = sum(normalized_scores)
+    probabilities = [score / total_weight for score in normalized_scores]
+
+    next_node = random.choices(candidates, weights=probabilities, k=1)[0]
+
+    return next_node

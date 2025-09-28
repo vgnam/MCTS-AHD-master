@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def weighted_score(node):
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        next_distance = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            return next_distance / (degree + 1e-6) + 0.1 * avg_distance
+        else:
+            return next_distance / (degree + 1e-6)
+
+    next_node = min(unvisited_nodes, key=weighted_score)
+    return next_node

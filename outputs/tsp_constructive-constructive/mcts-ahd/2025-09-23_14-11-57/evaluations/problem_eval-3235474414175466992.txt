@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    future_diversities = []
+    local_densities = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = immediate_distance - second_best
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        future_diversity = sum(1 for n in unvisited_nodes if n != node and distance_matrix[node][n] < 1.5 * immediate_distance)
+        future_diversities.append(future_diversity)
+
+        nearby_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        local_density = 1 / (sum(nearby_distances) / len(nearby_distances)) if nearby_distances else 0
+        local_densities.append(local_density)
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    regret_weight = max(0.1, 0.7 * (remaining_nodes / total_nodes))
+    distance_weight = 0.3 - 0.2 * (remaining_nodes / total_nodes)
+    diversity_weight = max(0.1, 0.5 * (remaining_nodes / total_nodes))
+    density_weight = 0.2 * (1 - remaining_nodes / total_nodes)
+
+    scores = [
+        regret_weight * regret + distance_weight * distance +
+        diversity_weight * diversity + density_weight * density
+        for regret, distance, diversity, density in zip(
+            regrets, distances, future_diversities, local_densities
+        )
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

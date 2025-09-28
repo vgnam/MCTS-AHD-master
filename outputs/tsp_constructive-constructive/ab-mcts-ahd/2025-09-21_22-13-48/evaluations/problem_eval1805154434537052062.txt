@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_savings = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+
+        # Dynamic weight for future savings based on remaining nodes
+        weight = 0.5 + 0.5 * (1 - remaining_nodes / (remaining_nodes + 1))  # Adapts from 0.5 to 1.0
+
+        # Angle-based adjustment: favor nodes that align more closely with the direction to the destination
+        angle_factor = 1.0
+        if remaining_nodes > 1:
+            vec_to_node = (distance_matrix[current_node][node], distance_matrix[node][destination_node])
+            vec_to_dest = (distance_matrix[current_node][destination_node], 0)
+            dot_product = vec_to_node[0] * vec_to_dest[0] + vec_to_node[1] * vec_to_dest[1]
+            mag_node = (vec_to_node[0]**2 + vec_to_node[1]**2)**0.5
+            mag_dest = (vec_to_dest[0]**2 + vec_to_dest[1]**2)**0.5
+            if mag_node > 0 and mag_dest > 0:
+                angle_factor = 1 - (dot_product / (mag_node * mag_dest))  # Penalize detours
+
+        score = immediate_distance - weight * future_savings + angle_factor * immediate_distance
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

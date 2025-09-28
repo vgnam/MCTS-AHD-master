@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    heuristic_factor_destination = 0.5  # Higher penalty for destination
+    heuristic_factor_others = 0.2      # Lower reward for others
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            weighted_score = distance * (1 - heuristic_factor_destination)
+        else:
+            weighted_score = distance * (1 + heuristic_factor_others)
+
+        if weighted_score < min_distance:
+            min_distance = weighted_score
+            next_node = node
+
+    return next_node

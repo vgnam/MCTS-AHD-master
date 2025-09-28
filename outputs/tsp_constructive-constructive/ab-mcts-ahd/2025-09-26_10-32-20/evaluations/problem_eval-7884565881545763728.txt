@@ -1,0 +1,8 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, threshold=5.0):
+    if not unvisited_nodes:
+        return destination_node
+    candidates = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= threshold]
+    if not candidates:
+        candidates = unvisited_nodes
+    next_node = max(candidates, key=lambda node: distance_matrix[current_node][node])
+    return next_node

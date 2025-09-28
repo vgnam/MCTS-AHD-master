@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    exploration_factor = 0.7 ** (10 - len(unvisited_nodes))
+    candidates = []
+    remaining_count = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        next_distance = distance_matrix[current_node][node]
+
+        if remaining_count > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            node_degree = sum(1 for n in remaining_nodes if distance_matrix[node][n] < float('inf'))
+            detour_cost = (remaining_count / node_degree) if node_degree > 0 else 0
+
+            weight_dist = 0.5 + 0.3 * exploration_factor
+            weight_detour = 0.3 * (1 - exploration_factor)
+            total_distance = weight_dist * next_distance + weight_detour * detour_cost
+        else:
+            total_distance = next_distance
+
+        candidates.append((node, total_distance))
+
+    if exploration_factor > 0.5:
+        candidates = sorted(candidates, key=lambda x: x[1], reverse=True)[:3]
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

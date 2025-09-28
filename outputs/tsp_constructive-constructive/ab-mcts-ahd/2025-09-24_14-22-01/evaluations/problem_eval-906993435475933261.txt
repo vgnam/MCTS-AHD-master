@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_score = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        estimated_remaining_cost = sum(min(distance_matrix[node][n] for n in remaining_nodes) for n in remaining_nodes) if remaining_nodes else 0
+        composite_score = immediate_distance + 0.5 * estimated_remaining_cost
+        if composite_score < min_score:
+            min_score = composite_score
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node

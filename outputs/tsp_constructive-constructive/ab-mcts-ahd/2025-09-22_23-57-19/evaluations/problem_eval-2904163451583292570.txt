@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    # Calculate dynamic weights based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    exploration_weight = min(1.0, 0.5 + (remaining_nodes / len(distance_matrix)))
+
+    # Calculate distances and destination proximity
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    dest_proximities = [distance_matrix[node][destination_node] for node in unvisited_nodes]
+
+    # Compute hybrid cost function
+    costs = [
+        (distances[i] * (1 - exploration_weight)) +
+        (dest_proximities[i] * exploration_weight) +
+        (random.random() * exploration_weight * 100)
+        for i in range(len(unvisited_nodes))
+    ]
+
+    # Select node with minimum hybrid cost
+    next_node = unvisited_nodes[costs.index(min(costs))]
+
+    # Periodic reset for deeper exploration
+    if remaining_nodes % 5 == 0 and remaining_nodes > 5:
+        # Occasionally choose a node with higher cost but better long-term potential
+        sorted_nodes = sorted(unvisited_nodes, key=lambda x: costs[unvisited_nodes.index(x)])
+        candidate_nodes = sorted_nodes[-min(3, len(sorted_nodes)):]
+        next_node = random.choice(candidate_nodes)
+
+    return next_node

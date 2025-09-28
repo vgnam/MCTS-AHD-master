@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate centrality of each node in the remaining subgraph
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, remaining_nodes - 1)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_future_distance = centrality[node]
+
+        # Dynamic weighting based on remaining nodes
+        weight_immediate = 0.7 if remaining_nodes <= 2 else 0.4
+        weight_future = 0.3 if remaining_nodes <= 2 else 0.4
+        weight_destination = 0.2 if remaining_nodes <= 2 else 0.2
+        weight_centrality = 0.1 if remaining_nodes <= 2 else 0.2
+
+        # Lookahead: evaluate the best possible next step from this node
+        lookahead_score = float('inf')
+        for next_candidate in unvisited_nodes:
+            if next_candidate != node:
+                lookahead_distance = distance_matrix[node][next_candidate]
+                lookahead_future = centrality[next_candidate]
+                lookahead_score = min(lookahead_score, 0.6 * lookahead_distance + 0.4 * lookahead_future)
+
+        score = (weight_immediate * distance_to_node +
+                 weight_future * avg_future_distance +
+                 weight_destination * distance_to_destination +
+                 weight_centrality * (1 / (centrality[node] + 1e-6)) +
+                 0.1 * lookahead_score)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

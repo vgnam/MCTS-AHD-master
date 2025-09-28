@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    local_weight = (remaining_nodes / (remaining_nodes + 1)) ** 2  # Power function for scaling
+    global_weight = 1 - local_weight
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        return (local_weight * distance_matrix[current_node][node] +
+                global_weight * avg_distance)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

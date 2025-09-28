@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = -float('inf')
+    remaining_count = len(unvisited_nodes)
+    exploration_factor = min(1.0, (remaining_count / (remaining_count + 1)) * 0.8)
+
+    node_density = {}
+    for node in unvisited_nodes:
+        distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        node_density[node] = sum(distances) / len(distances) if distances else float('inf')
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        lookahead_depth = min(4, remaining_count // 3) if remaining_count > 3 else 1
+        remaining_nodes = unvisited_nodes - {node}
+
+        novelty_score = 0
+        if remaining_nodes:
+            farthest_node = max(remaining_nodes, key=lambda n: distance_matrix[node][n])
+            novelty_score = distance_matrix[node][farthest_node]
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = avg_distance
+        else:
+            novelty_score = 0
+            node_centrality = 0
+
+        density_weight = 1.0 / (1.0 + node_density.get(node, 1))
+        immediate_weight = 0.6 + 0.3 * exploration_factor
+        novelty_weight = 0.2 * (1.0 - exploration_factor) * density_weight
+
+        score = (immediate_weight * (1 / (1 + immediate_distance)) +
+                 novelty_weight * novelty_score +
+                 (1 - immediate_weight - novelty_weight) * (1 / (1 + distance_to_destination)))
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

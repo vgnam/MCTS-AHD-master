@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    remaining_length = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        max_distance = max(distance_to_current, distance_to_destination)
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+        centrality = sum(distance_matrix[node][n] for n in range(len(distance_matrix))) / (len(distance_matrix) - 1)
+
+        # Adaptive weights
+        weight_local = 0.7 - 0.5 * (1 - min(remaining_length, 10) / 10)
+        weight_global = 1 - weight_local
+
+        # Penalty for nodes too close to current or destination
+        penalty = 0.5 if (distance_to_current < 0.1 or distance_to_destination < 0.1) else 0
+
+        combined_score = (weight_local * (distance_to_current + distance_to_destination) +
+                          weight_global * (0.4 * centrality + 0.6 * avg_distance_to_remaining) +
+                          penalty)
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

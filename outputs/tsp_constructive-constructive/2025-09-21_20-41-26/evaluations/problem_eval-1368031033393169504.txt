@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes[0]
+
+    alpha = 0.7  # Weight for immediate distance
+    beta = 0.3   # Weight for estimated remaining distance
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_distance = distance_matrix[node][destination_node]
+        combined_score = alpha * immediate_distance + beta * remaining_distance
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

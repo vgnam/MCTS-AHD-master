@@ -1,0 +1,56 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    progress_ratio = 1 - (remaining_nodes / len(distance_matrix)) if distance_matrix else 0
+
+    # Dynamic weight adjustment with progress-aware terms
+    distance_weight = max(0.1, 0.9 - 0.4 * progress_ratio)
+    centrality_weight = min(0.9, 0.5 + 0.4 * progress_ratio)
+    penalty_weight = 0.3 + 0.2 * progress_ratio
+
+    # Calculate node centrality with path diversity consideration
+    centrality = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality[node] = total_distance / max(1, len(unvisited_nodes) - 1)
+
+    # Proximity bias: favor nodes that bridge gaps between distant clusters
+    proximity_bias = {}
+    if len(unvisited_nodes) > 2:
+        for node in unvisited_nodes:
+            max_dist = max(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+            min_dist = min(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+            proximity_bias[node] = (max_dist - min_dist) / max(1, sum(distance_matrix[node][other] for other in unvisited_nodes))
+    else:
+        proximity_bias = {node: 0 for node in unvisited_nodes}
+
+    # Penalty for nodes too close to destination (with progress-aware scaling)
+    penalty = {}
+    for node in unvisited_nodes:
+        penalty[node] = (1 / (1 + distance_matrix[node][destination_node])) * (1 + 0.5 * progress_ratio)
+
+    # Diversity bonus: reward nodes that bring more "new" connections
+    diversity_bonus = {}
+    if len(unvisited_nodes) > 1:
+        for node in unvisited_nodes:
+            unique_connections = sum(1 for other in unvisited_nodes if other != node and
+                                    distance_matrix[node][other] > 0.7 * sum(distance_matrix[node][other2] for other2 in unvisited_nodes if other2 != node) / (len(unvisited_nodes) - 1))
+            diversity_bonus[node] = unique_connections / len(unvisited_nodes)
+    else:
+        diversity_bonus = {node: 0 for node in unvisited_nodes}
+
+    # Combined multi-objective scoring
+    scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        normalized_centrality = 1 / (1 + centrality[node]) if centrality[node] != 0 else 1
+        scores[node] = (distance_weight * distance +
+                        centrality_weight * normalized_centrality +
+                        penalty_weight * penalty[node] +
+                        0.3 * proximity_bias[node] +
+                        0.2 * diversity_bonus[node])
+
+    next_node = min(scores, key=scores.get)
+    return next_node

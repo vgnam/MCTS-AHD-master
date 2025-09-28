@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    best_node = None
+    best_balance = float('inf')
+
+    for candidate in unvisited_nodes:
+        distance_to_candidate = distance_matrix[current_node][candidate]
+        remaining_nodes = unvisited_nodes - {candidate}
+
+        if not remaining_nodes:
+            balance = distance_to_candidate + distance_matrix[candidate][destination_node]
+        else:
+            subtour_lengths = []
+            visited = set()
+            for node in remaining_nodes:
+                if node not in visited:
+                    stack = [node]
+                    visited.add(node)
+                    current_subtour = 0
+                    while stack:
+                        current = stack.pop()
+                        for neighbor in remaining_nodes:
+                            if neighbor not in visited and distance_matrix[current][neighbor] > 0:
+                                visited.add(neighbor)
+                                stack.append(neighbor)
+                                current_subtour += distance_matrix[current][neighbor]
+                    if current_subtour > 0:
+                        subtour_lengths.append(current_subtour)
+
+            if subtour_lengths:
+                max_subtour = max(subtour_lengths)
+                balance = distance_to_candidate + max_subtour
+            else:
+                balance = distance_to_candidate + distance_matrix[candidate][destination_node]
+
+        if balance < best_balance or (balance == best_balance and distance_to_candidate < min_distance):
+            best_balance = balance
+            min_distance = distance_to_candidate
+            best_node = candidate
+
+    return next_node

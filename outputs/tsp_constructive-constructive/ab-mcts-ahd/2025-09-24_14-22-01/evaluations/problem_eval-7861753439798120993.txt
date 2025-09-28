@@ -1,0 +1,15 @@
+deferring immediate local optimizations, and only defaults to the destination when no other nodes are left.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    max_cost = -float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        if immediate_distance > max_cost:
+            max_cost = immediate_distance
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node

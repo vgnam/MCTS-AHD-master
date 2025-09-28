@@ -1,0 +1,35 @@
+import math
+    import random
+
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = remaining_nodes + 1
+    temperature = max(0.1, 1.0 - (remaining_nodes / total_nodes))  # Decreases over time
+
+    # Calculate node centrality (average distance to other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+
+    next_node = None
+    min_score = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        estimated_distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weighting with temperature-based exploration
+        weight = (remaining_nodes / total_nodes) ** 2
+        score = distance_to_current + (weight * estimated_distance_to_destination) - (centrality[node] * temperature)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    # Add probabilistic selection based on temperature
+    if random.random() < temperature:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

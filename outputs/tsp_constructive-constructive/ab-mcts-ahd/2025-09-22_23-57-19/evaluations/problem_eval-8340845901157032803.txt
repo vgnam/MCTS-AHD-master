@@ -1,0 +1,55 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    # Calculate dynamic threshold based on remaining nodes
+    threshold_factor = 0.5 + 0.5 * (len(unvisited_nodes) / len(distance_matrix))
+    threshold = threshold_factor * max(distance_matrix[current_node][node] for node in unvisited_nodes)
+
+    # Initialize candidates with farthest neighbor
+    candidates = []
+    max_cost = -float('inf')
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost > max_cost:
+            max_cost = cost
+            candidates = [node]
+        elif cost == max_cost:
+            candidates.append(node)
+
+    # Add nodes within dynamic threshold
+    for node in unvisited_nodes:
+        if node in candidates:
+            continue
+        cost = distance_matrix[current_node][node]
+        if cost >= threshold:
+            candidates.append(node)
+
+    # Probabilistically select from candidates
+    if candidates:
+        if len(candidates) == 1:
+            return candidates[0]
+        elif len(unvisited_nodes) > 2 and len(candidates) > 1:
+            # 20% chance to pick a random candidate
+            if random.random() < 0.2:
+                return random.choice(candidates)
+            else:
+                # Select candidate with best local gain
+                best_node = None
+                best_gain = -float('inf')
+                for node in candidates:
+                    gain = max_cost - distance_matrix[current_node][node]
+                    if gain > best_gain:
+                        best_gain = gain
+                        best_node = node
+                return best_node
+        else:
+            return random.choice(candidates)
+    else:
+        return next_node

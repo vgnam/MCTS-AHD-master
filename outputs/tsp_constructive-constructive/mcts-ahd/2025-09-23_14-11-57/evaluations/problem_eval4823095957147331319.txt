@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_score = float('inf')
+    scores = []
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            remaining_distances = [distance_matrix[node][n] for n in remaining_nodes]
+            weighted_sum = sum(d * (1.0 / (i + 1)) for i, d in enumerate(sorted(remaining_distances)))
+        else:
+            weighted_sum = 0
+
+        score = current_to_node + 0.7 * weighted_sum
+        scores.append((node, score))
+
+    if scores:
+        scores.sort(key=lambda x: x[1])
+        candidates = scores[:2]
+        selected = max(candidates, key=lambda x: -x[1]) if len(candidates) > 1 else candidates[0]
+        best_node = selected[0]
+
+    return next_node

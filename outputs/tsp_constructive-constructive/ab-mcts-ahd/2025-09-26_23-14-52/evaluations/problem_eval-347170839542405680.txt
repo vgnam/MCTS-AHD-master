@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_score = 0.0
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight adjustment based on remaining nodes and path length
+        path_length_factor = 1.0 / (remaining_nodes + 1)
+        destination_factor = 1.0 - path_length_factor
+
+        # Non-linear weighting for more nuanced balance
+        score = (path_length_factor * current_distance ** 1.2) + (destination_factor * destination_distance ** 0.8 * (1.0 + 0.5 / remaining_nodes))
+
+        scores.append((node, score))
+        total_score += score
+
+    # Normalize scores and select probabilistically
+    probabilities = [(node, score / total_score) for node, score in scores]
+    probabilities.sort(key=lambda x: x[1], reverse=True)
+
+    # Select based on cumulative probability
+    r = random.random()
+    cumulative = 0.0
+    for node, prob in probabilities:
+        cumulative += prob
+        if r <= cumulative:
+            return node
+
+    return next_node

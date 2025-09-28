@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = set(unvisited_nodes) | {current_node, destination_node}
+    num_remaining = len(remaining_nodes)
+
+    # Dynamic weights based on remaining nodes and local density
+    alpha = min(0.9, 0.2 + 0.7 * (num_remaining / len(distance_matrix)))
+    beta = 1 - alpha
+
+    # Local density factor: number of nodes within a threshold distance
+    threshold = 0.5 * sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+    local_density = sum(1 for n in unvisited_nodes if distance_matrix[current_node][n] <= threshold)
+
+    # Adjust weights based on local density
+    gamma = 0.1 * local_density / len(unvisited_nodes) if unvisited_nodes else 0
+    alpha = alpha * (1 - gamma)
+    beta = beta * (1 - gamma)
+
+    costs = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Centrality factor: average distance to all remaining nodes
+        centrality = sum(distance_matrix[node][n] for n in remaining_nodes) / num_remaining
+
+        # Novel cost function with adjusted weights
+        weighted_cost = (alpha * immediate_distance +
+                        beta * potential_distance +
+                        0.2 * centrality)
+
+        costs.append((node, weighted_cost))
+
+    # Normalize costs and select probabilistically
+    if costs:
+        max_cost = max(cost for _, cost in costs)
+        min_cost = min(cost for _, cost in costs)
+        normalized_costs = [(node, (max_cost - cost + 1e-6) / (max_cost - min_cost + 1e-6)) for node, cost in costs]
+        total = sum(cost for _, cost in normalized_costs)
+        probabilities = [cost / total for _, cost in normalized_costs]
+        next_node = random.choices([node for node, _ in normalized_costs], weights=probabilities, k=1)[0]
+    else:
+        next_node = destination_node
+
+    return next_node

@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_score = float('inf')
+    total_unvisited = len(unvisited_nodes)
+    weight = 0.5 * (1 + (total_unvisited / (total_unvisited + 1)))  # Base weight
+
+    # Calculate node density penalty
+    node_density = len(unvisited_nodes) / (len(distance_matrix) * len(distance_matrix))
+    density_penalty = 1 - node_density if node_density < 0.5 else 0.1
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        estimated_distance_to_destination = distance_matrix[node][destination_node]
+
+        # Path quality score (lower is better)
+        path_quality = (distance_to_current + estimated_distance_to_destination) * density_penalty
+
+        # Probabilistic selection factor
+        if total_unvisited > 1:
+            prob_factor = 1 / (1 + math.exp(-0.5 * (total_unvisited - len(unvisited_nodes))))
+        else:
+            prob_factor = 1
+
+        # Combined score
+        combined_score = weight * path_quality + (1 - weight) * prob_factor
+
+        if combined_score < min_score:
+            min_score = combined_score
+            next_node = node
+
+    return next_node

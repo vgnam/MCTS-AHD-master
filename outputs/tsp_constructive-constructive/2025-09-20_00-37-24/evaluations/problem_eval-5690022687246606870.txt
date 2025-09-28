@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate adaptive probabilities based on inverse distance
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    max_dist = max(distances)
+
+    # Normalize distances to [0,1] and invert (closer nodes have higher probability)
+    if min_dist == max_dist:
+        probs = [1.0 / len(unvisited_nodes)] * len(unvisited_nodes)
+    else:
+        normalized = [(max_dist - d) / (max_dist - min_dist) for d in distances]
+        total = sum(normalized)
+        probs = [p / total for p in normalized]
+
+    # Add small random perturbation to encourage exploration
+    probs = [p + random.uniform(-0.1, 0.1) for p in probs]
+    probs = [max(0, p) for p in probs]  # Ensure non-negative
+    total = sum(probs)
+    probs = [p / total for p in probs]
+
+    # Select node based on adaptive probabilities
+    next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+    return next_node

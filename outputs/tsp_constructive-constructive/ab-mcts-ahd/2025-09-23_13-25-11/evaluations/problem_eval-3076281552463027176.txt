@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+    phase_factor = 1 - (remaining_nodes / total_nodes)
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if not unvisited_nodes - {node}:
+            return current_dist
+        future_nodes = unvisited_nodes - {node}
+        avg_future_dist = sum(distance_matrix[node][other] for other in future_nodes) / len(future_nodes)
+        min_future_dist = min(distance_matrix[node][other] for other in future_nodes)
+        combined_dist = current_dist + (phase_factor * min_future_dist) + ((1 - phase_factor) * avg_future_dist)
+        return combined_dist
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

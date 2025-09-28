@@ -1,0 +1,70 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    # Calculate global statistics
+    global_avg_distance = np.mean(distance_matrix)
+    global_max_distance = np.max(distance_matrix)
+
+    # Initialize candidate scores and penalties
+    candidate_scores = []
+    candidate_nodes = []
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        # Calculate connectivity and density
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+            node_density = sum(1 for n in remaining_nodes if distance_matrix[node][n] < avg_distance * 0.8)
+        else:
+            avg_distance = 0
+            connectivity = 0
+            node_density = 0
+
+        # Dynamic weights
+        immediate_weight = 0.6 - 0.3 * visited_ratio
+        centrality_weight = 0.3 * (0.4 + 0.3 * visited_ratio)
+        density_weight = 0.1 * (0.6 + 0.2 * visited_ratio)
+
+        # Reinforcement learning inspired components
+        exploration_factor = 0.1 * (1 - visited_ratio)
+        connectivity_penalty = 1 + (0.4 * connectivity / (remaining_count + 1e-6))
+        density_penalty = 1 - (0.3 * node_density / (remaining_count + 1e-6))
+
+        # Normalized distance components
+        normalized_distance = immediate_distance / (global_max_distance + 1e-6)
+        normalized_avg_distance = avg_distance / (global_avg_distance + 1e-6)
+
+        # Calculate base score
+        base_score = (immediate_weight * (normalized_distance - normalized_avg_distance) +
+                     centrality_weight * (normalized_distance * connectivity_penalty) +
+                     density_weight * (normalized_distance * density_penalty))
+
+        # Add exploration component
+        score = base_score * (1 - exploration_factor) + exploration_factor * random.random()
+
+        candidate_scores.append(score)
+        candidate_nodes.append(node)
+
+    # Probabilistic selection based on scores
+    if candidate_scores:
+        min_score = min(candidate_scores)
+        max_score = max(candidate_scores)
+        normalized_scores = [(s - min_score) / (max_score - min_score + 1e-6) for s in candidate_scores]
+        selection_probs = [1 - s for s in normalized_scores]  # Invert to prefer lower scores
+        selection_probs = [p / sum(selection_probs) for p in selection_probs]
+        next_node = random.choices(candidate_nodes, weights=selection_probs, k=1)[0]
+    else:
+        next_node = random.choice(list(unvisited_nodes))
+
+    return next_node

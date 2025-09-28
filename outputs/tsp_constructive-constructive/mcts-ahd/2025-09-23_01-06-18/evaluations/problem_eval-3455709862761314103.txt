@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_distance == 0:
+            return destination_node
+        threshold = 1.0 + (0.5 * (1.0 - (len(unvisited_nodes) / len(distance_matrix))))
+        if remaining_distance / avg_distance <= threshold:
+            return destination_node
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+        dynamic_weight = 1.5 * (1.0 - remaining_ratio)
+
+        # Adaptive regret with path memory
+        sorted_distances = sorted(distance_matrix[current_node][other] for other in unvisited_nodes if other != node)
+        regret_term = (sorted_distances[0] + sorted_distances[1]) / 2 if len(sorted_distances) >= 2 else sorted_distances[0]
+        regret_weight = 0.3 * (1.0 - remaining_ratio)
+
+        # Predictive connectivity score
+        connectivity_score = sum(1 for other in unvisited_nodes if distance_matrix[node][other] < 1.2 * to_current)
+        centrality_bonus = sum(distance_matrix[node][other] for other in unvisited_nodes) / (len(unvisited_nodes) + 1e-6)
+        diversity_factor = 0.3 * (0.5 + 0.5 * connectivity_score / len(unvisited_nodes)) * centrality_bonus
+
+        # Dynamic path potential
+        path_potential = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / len(unvisited_nodes)
+        connectivity_factor = 1 + (0.15 * connectivity_score / len(unvisited_nodes))
+
+        # Hybrid component weighting
+        immediate_factor = to_current * dynamic_weight * connectivity_factor * (1.0 + regret_weight * regret_term)
+        long_term_factor = (to_destination + 0.7 * path_potential) * (1.0 - dynamic_weight)
+
+        return (immediate_factor + long_term_factor) - 0.8 * diversity_factor
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

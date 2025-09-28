@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 - (remaining_nodes / len(distance_matrix)) * 0.5)
+
+    # Track node popularity (simplified for this example)
+    node_popularity = {node: 1.0 for node in unvisited_nodes}
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+
+        # Calculate node centrality (average distance to all other nodes)
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / len(unvisited_nodes)
+
+        # Penalty for revisiting nodes (simplified)
+        revisit_penalty = node_popularity[node] * 0.1
+
+        # Updated weighted score
+        combined_score = (0.4 * immediate_distance +
+                          0.3 * future_potential +
+                          0.2 * centrality +
+                          0.1 * revisit_penalty)
+
+        # Apply temperature to introduce stochasticity
+        adjusted_score = combined_score * temperature
+        scores.append(adjusted_score)
+
+    # Select node with minimum score with probability proportional to score
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(max_score - s) / (max_score - min_score) for s in scores]
+
+    selected_index = normalized_scores.index(max(normalized_scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    # Update popularity for the selected node
+    node_popularity[next_node] += 1.0
+
+    return next_node

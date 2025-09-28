@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    remaining_nodes = len(unvisited_nodes) - 1 if destination_node in unvisited_nodes else len(unvisited_nodes)
+    alpha = max(0.3, 0.6 * (remaining_nodes / (remaining_nodes + 1)))
+    beta = 1 - alpha
+    penalty_factor = 1.0 if remaining_nodes < 3 else 0.8
+    min_cost = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        cycle_penalty = 0.1 * immediate_distance if node in unvisited_nodes and remaining_nodes > 2 else 0
+        total_cost = alpha * immediate_distance + beta * potential_distance + cycle_penalty
+        total_cost *= penalty_factor
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node

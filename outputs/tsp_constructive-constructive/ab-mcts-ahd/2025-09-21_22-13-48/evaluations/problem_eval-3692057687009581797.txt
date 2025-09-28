@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_weight = 1.0 - (remaining_nodes / total_nodes)  # Increases as nodes are visited
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_savings = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+
+        # Centrality factor: average distance to all other nodes
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (remaining_nodes - 1 if remaining_nodes > 1 else 1)
+
+        # Weighted score with dynamic exploration weight and centrality
+        score = immediate_distance - (exploration_weight * future_savings) + (0.3 * centrality)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

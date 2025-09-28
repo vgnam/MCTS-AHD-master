@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_combined_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_ratio = 1 - (remaining_nodes / total_nodes)
+
+    # Dynamic weight factor using sigmoid function
+    weight_factor = 1 / (1 + math.exp(-10 * (progress_ratio - 0.5)))
+
+    # Track node visit counts (simplified for this example)
+    node_visit_counts = {node: 0 for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Penalty for nodes visited multiple times
+        visit_penalty = 0.1 * node_visit_counts.get(node, 0)
+
+        combined_score = distance_to_current + weight_factor * distance_to_destination + visit_penalty
+
+        if combined_score < min_combined_score:
+            min_combined_score = combined_score
+            next_node = node
+
+    return next_node

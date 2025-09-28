@@ -1,0 +1,54 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1.0 - remaining_nodes / total_nodes
+
+    # Dynamic neighborhood density and centrality momentum
+    local_density = 1.0 / (1.0 + sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes))
+    centrality_momentum = 0.7 * (1 - abs(progress - 0.5))  # Peak at midpoint
+
+    # Reinforcement-inspired adaptive weights
+    short_term_weight = 0.4 * (1 - progress) + 0.3 * local_density
+    long_term_weight = 0.5 * progress + 0.2 * (1 - local_density)
+    neighborhood_weight = 0.3 * (1 - progress) + 0.4 * local_density
+
+    # Detour sensitivity with momentum
+    detour_sensitivity = 0.6 + 0.4 * (1 - progress) * centrality_momentum
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        global_estimate = distance_matrix[node][destination_node]
+
+        # Enhanced neighborhood score with momentum
+        if remaining_nodes > 1:
+            remaining = [n for n in unvisited_nodes if n != node]
+            neighborhood_score = 1.0 / (1.0 + sum(distance_matrix[node][n] for n in remaining) / len(remaining))
+            detour_penalty = max(0, (immediate_distance + distance_matrix[node][destination_node] - global_estimate) / global_estimate)
+            detour_penalty *= (1 + 0.5 * centrality_momentum)
+        else:
+            neighborhood_score = 0
+            detour_penalty = 0
+
+        # Hybrid scoring with momentum modulation
+        score = (short_term_weight * immediate_distance +
+                 long_term_weight * global_estimate +
+                 neighborhood_weight * (1 - neighborhood_score) +
+                 detour_sensitivity * detour_penalty)
+        scores.append(score)
+
+    # Stochastic selection with momentum-based temperature
+    temperature = 0.3 * (1 - progress) * (1 - centrality_momentum)
+    if random.random() < temperature and len(scores) > 1:
+        selected_index = random.choice([i for i in range(len(scores)) if i != scores.index(min(scores))])
+    else:
+        selected_index = scores.index(min(scores))
+
+    next_node = list(unvisited_nodes)[selected_index]
+    return next_node

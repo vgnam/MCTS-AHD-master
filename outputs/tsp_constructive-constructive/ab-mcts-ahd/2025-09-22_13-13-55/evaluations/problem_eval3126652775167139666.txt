@@ -1,0 +1,16 @@
+importance) to balance proximity and node significance, ensuring a more informed selection process.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    min_score = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Node weight could be based on degree, centrality, or other metrics
+        node_weight = len(unvisited_nodes)  # Example: using unvisited count as weight
+        score = distance * node_weight
+        if score < min_score:
+            min_score = score
+            next_node = node
+    return next_node

@@ -1,0 +1,4 @@
+[2025-09-21 22:10:47,899][root][INFO] - Workspace: D:\MCTS-AHD-master\outputs\t\2025-09-21_22-10-47
+[2025-09-21 22:10:47,899][root][INFO] - Project Root: D:\MCTS-AHD-master
+[2025-09-21 22:10:47,900][root][INFO] - Using LLM: mistral/codestral-latest
+[2025-09-21 22:10:47,900][root][INFO] - Using Algorithm: ab-mcts-ahd

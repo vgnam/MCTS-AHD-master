@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    min_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+
+        # Find the nearest unvisited node from this candidate
+        nearest_unvisited = min(unvisited_nodes, key=lambda n: distance_matrix[node][n] if n != node else float('inf'))
+        nearest_distance = distance_matrix[node][nearest_unvisited] if nearest_unvisited != node else 0
+
+        # Average distance to all other unvisited nodes
+        avg_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+
+        # Combine metrics for a balanced score
+        score = current_distance + nearest_distance + avg_distance
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

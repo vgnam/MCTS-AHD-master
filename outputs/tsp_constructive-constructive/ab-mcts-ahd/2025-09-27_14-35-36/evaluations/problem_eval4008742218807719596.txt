@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+
+        # Dynamic penalty for long detours
+        detour_penalty = max(0, (distance_to_node + distance_to_dest) - distance_matrix[current_node][destination_node])
+
+        # Heuristic that balances immediate distance and future savings
+        score = (1 / (1 + distance_to_node)) * (distance_to_dest / (1 + detour_penalty))
+
+        # Reinforcement for nodes visited in previous steps (simplified)
+        if node in unvisited_nodes:
+            score *= 1.1
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Special case for destination if it's unvisited and significantly closer
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        if dest_distance < distance_matrix[current_node][next_node] * 0.7:
+            next_node = destination_node
+
+    return next_node

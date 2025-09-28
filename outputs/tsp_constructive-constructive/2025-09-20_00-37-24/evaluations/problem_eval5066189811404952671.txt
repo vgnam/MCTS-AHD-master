@@ -1,0 +1,38 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Calculate probabilities based on inverse distance and exploration factor
+    distances = np.array([distance_matrix[current_node][node] for node in unvisited_nodes])
+    inv_distances = 1.0 / (distances + 1e-6)  # Avoid division by zero
+
+    # Exploration factor: penalize recently visited nodes
+    exploration_factor = np.ones(len(unvisited_nodes))
+    for i, node in enumerate(unvisited_nodes):
+        if node in visited_nodes:  # Assuming visited_nodes is accessible (would need to be passed or tracked)
+            exploration_factor[i] *= 0.5  # Reduce probability for revisiting
+
+    # Combine factors and normalize
+    probabilities = inv_distances * exploration_factor
+    probabilities /= probabilities.sum()
+
+    # Dynamic selection: 80% chance to pick from top 50% by probability, 20% chance to pick from remaining
+    if random.random() < 0.8:
+        top_indices = np.argsort(probabilities)[-int(len(probabilities)/2):]
+        candidates = [unvisited_nodes[i] for i in top_indices]
+    else:
+        candidates = unvisited_nodes
+
+    # Occasionally introduce a long-range jump (10% chance)
+    if random.random() < 0.1:
+        return random.choice(unvisited_nodes)
+
+    # Select based on adjusted probabilities
+    next_node = random.choices(candidates, weights=probabilities, k=1)[0]
+    return next_node

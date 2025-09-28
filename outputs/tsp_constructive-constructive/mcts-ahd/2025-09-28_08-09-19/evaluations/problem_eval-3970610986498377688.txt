@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    exploration_progress = 1.0 - (remaining_count / total_nodes)
+    visited_ratio = exploration_progress
+
+    path_memory = set()
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = avg_distance
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+        else:
+            avg_distance = 0
+            node_centrality = 0
+            connectivity = 0
+
+        lookahead_depth = min(3, remaining_count // 3) if remaining_count > 2 else 1
+        nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth] if remaining_nodes else []
+        avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+        immediate_weight = 0.5 - 0.1 * exploration_progress
+        lookahead_weight = 0.4 * (1.0 - exploration_progress)
+        centrality_weight = 0.7 * (1.0 - lookahead_weight)
+        penalty_weight = 0.5 * (1 - visited_ratio)
+
+        score = immediate_weight * immediate_distance + lookahead_weight * avg_neighbor_distance - centrality_weight * node_centrality
+        penalty = 1 + (0.5 * node_centrality / (immediate_distance + 1e-6)) * penalty_weight
+        connectivity_bonus = 0.3 * (connectivity / (total_nodes - 1)) if (total_nodes - 1) > 0 else 0
+        score *= penalty * (1 + connectivity_bonus)
+
+        if (current_node, node) in path_memory or (node, current_node) in path_memory:
+            score *= 1.3
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+        if immediate_distance > 1.5 * avg_distance:
+            path_memory.add((current_node, node))
+
+    return next_node

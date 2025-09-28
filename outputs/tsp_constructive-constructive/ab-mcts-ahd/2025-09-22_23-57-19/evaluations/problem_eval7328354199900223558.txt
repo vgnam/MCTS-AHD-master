@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    temperature = 0.5  # Controls randomness (higher = more exploration)
+    weights = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        degree = len(unvisited_nodes) - 1  # Simplified node degree proxy
+        weight = (1 / (distance + 1e-6)) ** (1 + temperature) * (degree + 1)
+        weights.append(weight)
+        total_weight += weight
+
+    if total_weight == 0:
+        return random.choice(unvisited_nodes)
+
+    probabilities = [w / total_weight for w in weights]
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

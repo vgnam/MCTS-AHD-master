@@ -1,0 +1,58 @@
+[
+     {
+          "algorithm": "The algorithm implements a **nearest-neighbor heuristic** for TSP, prioritizing the closest unvisited node to the current node to minimize incremental path length. It iteratively selects the next node by comparing distances in the distance matrix, ensuring efficiency by focusing on local optimality. The function handles edge cases (e.g., no unvisited nodes) and returns the destination node when all nodes are visited.",
+          "thought": "The algorithm selects the next node to visit by choosing the unvisited node closest to the current node, aiming to minimize the total path length in a constructive heuristic approach for the TSP.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    min_distance = float('inf')\n    next_node = None\n    for node in unvisited_nodes:\n        distance = distance_matrix[current_node][node]\n        if distance < min_distance:\n            min_distance = distance\n            next_node = node\n    return next_node",
+          "objective": 7.00437,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm balances local and global considerations by prioritizing immediate distances (80%) over average future distances (20%) to select the next node, ensuring both short-term efficiency and long-term potential. The `local_distance` (current node to candidate) is weighted heavily, while `global_potential` (average distance from candidate to remaining unvisited nodes) is weighted lightly, favoring immediate proximity while acknowledging broader connectivity. The structure iterates through unvisited nodes, computes a weighted score, and selects the node with the minimal score.",
+          "thought": "The new algorithm combines the nearest-neighbor approach of No.2 with the global potential consideration of No.1, using a weighted balance (80% local distance, 20% global potential) to select the next node, aiming to minimize both immediate and future path lengths.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    min_score = float('inf')\n    next_node = None\n    for node in unvisited_nodes:\n        local_distance = distance_matrix[current_node][node]\n        global_potential = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0\n        score = 0.8 * local_distance + 0.2 * global_potential\n        if score < min_score:\n            min_score = score\n            next_node = node\n    return next_node",
+          "objective": 7.42825,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm modifies the nearest-neighbor heuristic by combining local (distance from current node) and global (distance to destination) considerations, prioritizing local proximity (70% weight) over global proximity (30% weight) in node selection. It iteratively evaluates unvisited nodes using a weighted sum of distances, choosing the one with the lowest combined score. The `alpha` and `beta` parameters (0.7 and 0.3) explicitly encode this bias, ensuring the tour balances immediate proximity with long-term efficiency.",
+          "thought": "The new algorithm modifies the nearest-neighbor heuristic by incorporating a bias towards nodes closer to the destination, blending local and global optimality by adjusting the selection criterion with a weighted sum of distances to the current node and the destination.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    min_score = float('inf')\n    next_node = None\n    alpha = 0.7  # Weight for current node distance\n    beta = 0.3   # Weight for destination distance\n    for node in unvisited_nodes:\n        score = (alpha * distance_matrix[current_node][node] +\n                 beta * distance_matrix[node][destination_node])\n        if score < min_score:\n            min_score = score\n            next_node = node\n    return next_node",
+          "objective": 7.43323,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by prioritizing those that minimize the product of the distance from the current node and the distance to the destination, balancing local and global optimality while avoiding long-distance combinations. It iterates through unvisited nodes, computes the score for each, and selects the node with the smallest score. The distance matrix is central to calculating these scores, with the destination node acting as a reference for global path considerations.",
+          "thought": "The new algorithm prioritizes nodes that minimize the product of distances from the current node and to the destination node, balancing local and global optimality while avoiding long-distance combinations that could lead to suboptimal paths.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    min_score = float('inf')\n    next_node = None\n    for node in unvisited_nodes:\n        score = distance_matrix[current_node][node] * distance_matrix[node][destination_node]\n        if score < min_score:\n            min_score = score\n            next_node = node\n    return next_node",
+          "objective": 7.46224,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm selects the next node by balancing local distance (70% weight) and global potential (30% weight), where global potential is the average distance of unvisited nodes to the destination. It prioritizes minimizing immediate travel distance while considering future path feasibility. The `score` is computed as a weighted sum, and the node with the lowest score is chosen.",
+          "thought": "This algorithm selects the next node by balancing local distance and global potential using a weighted sum of the distance to the current node and the average distance of unvisited nodes to the destination, ensuring a more holistic view of the path's future impact.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    min_score = float('inf')\n    next_node = None\n    for node in unvisited_nodes:\n        local_distance = distance_matrix[current_node][node]\n        global_potential = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0\n        score = 0.7 * local_distance + 0.3 * global_potential\n        if score < min_score:\n            min_score = score\n            next_node = node\n    return next_node",
+          "objective": 7.60743,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm uses a greedy heuristic to select the next node by prioritizing nodes that minimize the sum of distances from the current node and to the destination node, balancing local and global optimality. The `score` variable combines these two distances, ensuring the next node is chosen to reduce both immediate travel cost and future distance to the destination. The function iterates through unvisited nodes, updating the best candidate based on the computed score.",
+          "thought": "The new algorithm uses a greedy approach that prioritizes nodes with the smallest sum of distances to the current node and the destination node, balancing local and global optimality to minimize total path length.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    min_score = float('inf')\n    next_node = None\n    for node in unvisited_nodes:\n        score = distance_matrix[current_node][node] + distance_matrix[node][destination_node]\n        if score < min_score:\n            min_score = score\n            next_node = node\n    return next_node",
+          "objective": 7.99477,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The algorithm modifies the nearest-neighbor heuristic by balancing proximity (70% weight) with path smoothness (30% weight), where smoothness is approximated by angular deviation (difference in distances to current and destination nodes). It prioritizes shorter distances while slightly favoring nodes that maintain a more direct path toward the destination, dynamically selecting the next node based on this weighted score. The heuristic factor is normalized by the current distance to ensure consistency.",
+          "thought": "The new algorithm modifies the nearest-neighbor heuristic by incorporating a weighted combination of distance and a heuristic factor (e.g., angular deviation from the current path direction) to balance proximity and path smoothness, dynamically adjusting node selection based on both local and global path considerations.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    min_score = float('inf')\n    next_node = None\n    for node in unvisited_nodes:\n        distance = distance_matrix[current_node][node]\n        # Heuristic factor: angular deviation from current path direction (simplified)\n        heuristic_factor = abs(distance_matrix[current_node][node] - distance_matrix[node][destination_node]) / distance_matrix[current_node][destination_node] if distance_matrix[current_node][destination_node] != 0 else 0\n        # Weighted score: 70% distance, 30% heuristic\n        score = 0.7 * distance + 0.3 * heuristic_factor\n        if score < min_score:\n            min_score = score\n            next_node = node\n    return next_node",
+          "objective": 10.35623,
+          "other_inf": null
+     },
+     {
+          "algorithm": "The farthest-neighbor heuristic for TSP selects the unvisited node farthest from the current node to prioritize exploration of distant regions, potentially improving global path optimality. The algorithm iterates through unvisited nodes, comparing distances from the current node, and selects the one with the maximum distance. If no unvisited nodes remain, it returns the destination node. The design prioritizes distance maximization while efficiently handling edge cases.",
+          "thought": "The new algorithm implements a farthest-neighbor heuristic for TSP, selecting the unvisited node farthest from the current node to promote exploration of distant regions and potentially improve global path optimality.",
+          "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    max_distance = -float('inf')\n    next_node = None\n    for node in unvisited_nodes:\n        distance = distance_matrix[current_node][node]\n        if distance > max_distance:\n            max_distance = distance\n            next_node = node\n    return next_node",
+          "objective": 36.64594,
+          "other_inf": null
+     }
+]

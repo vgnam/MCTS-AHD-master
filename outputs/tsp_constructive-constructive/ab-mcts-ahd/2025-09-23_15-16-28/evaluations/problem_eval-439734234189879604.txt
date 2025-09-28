@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - remaining_nodes / total_nodes
+
+    # Adaptive temperature parameter (decays over time)
+    temperature = 1 - progress
+
+    # Calculate heuristic values for each node
+    heuristics = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate centrality
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Dynamic weight adjustment
+        weight_current = max(0.3, 0.5 - 0.3 * progress)
+        weight_destination = max(0.3, 0.4 + 0.3 * progress)
+        weight_centrality = 0.3
+
+        heuristic = (weight_current * distance_to_current +
+                    weight_destination * distance_to_destination +
+                    weight_centrality * centrality)
+        heuristics.append((node, heuristic))
+
+    # Normalize heuristics to probabilities
+    min_heuristic = min(h for _, h in heuristics)
+    max_heuristic = max(h for _, h in heuristics)
+    normalized_heuristics = [(node, (h - min_heuristic) / (max_heuristic - min_heuristic + 1e-6)) for node, h in heuristics]
+
+    # Apply temperature to probabilities
+    exp_heuristics = [(node, math.exp(-h / temperature)) for node, h in normalized_heuristics]
+    total_exp = sum(h for _, h in exp_heuristics)
+    probabilities = [(node, h / total_exp) for node, h in exp_heuristics]
+
+    # Select node based on probabilities
+    r = random.random()
+    cumulative_prob = 0.0
+    for node, prob in probabilities:
+        cumulative_prob += prob
+        if r <= cumulative_prob:
+            return node
+
+    return next_node

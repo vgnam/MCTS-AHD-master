@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+
+    # Dynamic local-global balance using sigmoid transition
+    def sigmoid(x):
+        return 1 / (1 + math.exp(-x))
+
+    local_weight = sigmoid(10 * (remaining_ratio - 0.5))  # Early: high local, late: high global
+    global_weight = 1 - local_weight
+
+    # Path diversity factor based on previously visited nodes
+    visited_nodes = set(range(total_nodes)) - set(unvisited_nodes)
+    diversity_factor = sum(1 for node in unvisited_nodes if node in visited_nodes) / (len(visited_nodes) + 1e-10)
+
+    # Adaptive revisit penalty
+    revisit_counts = {node: sum(1 for n in visited_nodes if distance_matrix[node][n] == distance_matrix[current_node][n])
+                      for node in unvisited_nodes}
+    max_revisit = max(revisit_counts.values(), default=0)
+    revisit_penalty = 0.5 * (max_revisit / (max_revisit + 1e-10)) * (1 - remaining_ratio)
+
+    def centrality(node):
+        return 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+
+    hybrid_score = lambda node: (
+        local_weight * distance_matrix[current_node][node] +
+        global_weight * centrality(node) +
+        diversity_factor * (1 - centrality(node)) +  # Encourage less central nodes when diversity is low
+        revisit_penalty * revisit_counts[node]
+    )
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

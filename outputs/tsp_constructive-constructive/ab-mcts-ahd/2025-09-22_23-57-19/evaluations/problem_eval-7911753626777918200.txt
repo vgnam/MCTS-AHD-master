@@ -1,0 +1,14 @@
+import random
+    next_node = random.choices(
+        list(probabilities.keys()),
+        weights=list(probabilities.values()),
+        k=1
+    )[0]
+
+    # Final check for minimum cost if only a few nodes remain
+    if len(unvisited_nodes) <= 3:
+        min_node = min(unvisited_nodes, key=lambda x: distance_matrix[current_node][x])
+        if distance_matrix[current_node][min_node] < distance_matrix[current_node][next_node] * 0.8:
+            next_node = min_node
+
+    return next_node

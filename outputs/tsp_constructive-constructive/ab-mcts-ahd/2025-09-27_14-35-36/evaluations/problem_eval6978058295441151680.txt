@@ -1,0 +1,21 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    local_density = [sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1) for node in unvisited_nodes]
+
+    weights = []
+    for i, node in enumerate(unvisited_nodes):
+        distance_factor = math.exp(-distance_matrix[current_node][node] / (avg_distance * 2))
+        density_factor = 1 / (1 + math.exp(-(local_density[i] - avg_distance) / (avg_distance * 0.5)))
+        weight = distance_factor * density_factor
+        weights.append(weight)
+
+    total_weight = sum(weights)
+    normalized_weights = [weight / total_weight for weight in weights]
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_weights, k=1)[0]
+    return next_node

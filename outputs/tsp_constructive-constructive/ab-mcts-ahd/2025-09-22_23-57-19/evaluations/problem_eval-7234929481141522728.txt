@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    if not distances:
+        return unvisited_nodes.pop()
+
+    harmonic_mean = len(distances) / sum(1 / d for d in distances if d != 0)
+
+    min_cost = min(distances)
+    min_node = unvisited_nodes[distances.index(min_cost)]
+
+    if len(unvisited_nodes) > 2 and harmonic_mean > 0:
+        candidates = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= harmonic_mean * 1.8]
+        if candidates and min_node in candidates:
+            if random.random() < 0.3:
+                return min_node
+            else:
+                return random.choice(candidates)
+        elif candidates:
+            return random.choice(candidates)
+
+    return next_node

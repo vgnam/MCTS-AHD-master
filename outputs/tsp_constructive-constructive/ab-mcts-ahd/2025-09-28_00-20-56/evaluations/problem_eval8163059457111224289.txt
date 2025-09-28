@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 2:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            best_lookahead = min(remaining_nodes, key=lambda n: distance_matrix[node][n] + min(
+                distance_matrix[n][k] + distance_matrix[k][destination_node] for k in remaining_nodes if k != n))
+            lookahead_dist = distance_matrix[node][best_lookahead] + min(
+                distance_matrix[best_lookahead][k] + distance_matrix[k][destination_node] for k in remaining_nodes if k != best_lookahead)
+            adjusted_distance = distance * (1 + 0.2 * (lookahead_dist / (distance + lookahead_dist)))
+        else:
+            adjusted_distance = distance
+
+        if adjusted_distance < min_distance:
+            min_distance = adjusted_distance
+            next_node = node
+
+    # Prioritize destination node if it's unvisited and within a reasonable distance
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance <= min_distance * 1.5:  # Threshold to balance proximity and destination
+            next_node = destination_node
+
+    return next_node

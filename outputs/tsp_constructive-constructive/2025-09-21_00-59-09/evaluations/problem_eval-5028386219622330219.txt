@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    min_score = float('inf')
+    next_node = None
+
+    # Dynamic weights based on remaining nodes
+    w_current = 1.0 if remaining_nodes > 2 else 0.7
+    w_dest = 0.5 if remaining_nodes > 2 else 0.8
+    w_centroid = 0.3 if remaining_nodes > 2 else 0.5
+
+    # Compute centroid and direction vector
+    if unvisited_nodes:
+        centroid_x = sum(distance_matrix[destination_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        dir_vector = distance_matrix[current_node][destination_node]
+    else:
+        centroid_x = 0
+        dir_vector = 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        centroid_penalty = abs(distance_matrix[node][destination_node] - centroid_x)
+
+        # Angular deviation penalty
+        if current_node != node:
+            vec_current = distance_matrix[current_node][node]
+            vec_next = distance_matrix[node][destination_node]
+            angle_penalty = abs(vec_current - vec_next) / max(vec_current, vec_next, 1e-6)
+        else:
+            angle_penalty = 0
+
+        # Normalized weighted score
+        norm_distance = distance_to_current / max(distance_matrix[current_node][n] for n in unvisited_nodes if n != current_node)
+        norm_dest = distance_to_dest / max(distance_matrix[n][destination_node] for n in unvisited_nodes)
+        norm_centroid = centroid_penalty / max(centroid_penalty for n in unvisited_nodes)
+
+        score = (w_current * norm_distance +
+                 w_dest * norm_dest +
+                 w_centroid * norm_centroid +
+                 0.2 * angle_penalty)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

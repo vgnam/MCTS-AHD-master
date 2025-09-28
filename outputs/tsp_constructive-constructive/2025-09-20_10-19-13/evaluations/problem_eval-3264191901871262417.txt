@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=0.5):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate weights for each unvisited node (inverse of distance)
+    weights = [1 / (distance_matrix[current_node][node] + 1e-10) for node in unvisited_nodes]
+
+    # Apply softmax with temperature to get probabilities
+    exp_weights = [math.exp(w / temperature) for w in weights]
+    sum_exp = sum(exp_weights)
+    probabilities = [e / sum_exp for e in exp_weights]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

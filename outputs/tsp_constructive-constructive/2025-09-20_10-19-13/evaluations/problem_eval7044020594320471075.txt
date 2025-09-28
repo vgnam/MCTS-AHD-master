@@ -1,0 +1,9 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    penalties = {node: 1.0 for node in unvisited_nodes}
+    for node in unvisited_nodes:
+        if node in distance_matrix.get('history', {}):
+            penalties[node] *= (1.0 + distance_matrix['history'][node] * 0.1)
+    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] * penalties[node])
+    return next_node

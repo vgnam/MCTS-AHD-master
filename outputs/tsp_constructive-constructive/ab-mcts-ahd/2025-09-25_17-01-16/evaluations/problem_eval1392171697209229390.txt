@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = remaining_nodes + 1
+    weight = remaining_nodes / total_nodes
+    penalty = {node: 0 for node in unvisited_nodes}
+
+    # Calculate centrality (average distance to all other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][other] for other in unvisited_nodes) / (total_nodes - 1)
+
+    # Calculate novelty factor (inverse of how many times node has been visited)
+    novelty = {node: 1.0 / (1 + penalty.get(node, 0)) for node in unvisited_nodes}
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+
+        # Score combines current distance, weighted destination distance, centrality, and novelty
+        score = -current_distance + weight * destination_distance + 0.5 * centrality[node] + 0.3 * novelty[node] - penalty[node]
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    if next_node is not None:
+        penalty[next_node] += 0.1
+
+    return next_node

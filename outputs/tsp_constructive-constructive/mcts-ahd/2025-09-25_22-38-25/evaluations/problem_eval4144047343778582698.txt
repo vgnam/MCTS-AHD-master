@@ -1,0 +1,37 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Dynamic temperature based on remaining nodes and distance to destination
+    remaining_nodes = len(unvisited_nodes)
+    if destination_node in unvisited_nodes:
+        distance_to_destination = distance_matrix[current_node][destination_node]
+        temperature = 0.5 + 0.5 * (1 - distance_to_destination / max(distance_matrix[current_node][node] for node in unvisited_nodes))
+    else:
+        temperature = 0.3  # Lower temperature if destination is already visited
+
+    if destination_node in unvisited_nodes and random.random() < temperature:
+        return destination_node
+
+    # Weighted selection based on distance and exploration factor
+    weights = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            weights.append(1.0)  # High weight for destination if not selected
+        else:
+            distance = distance_matrix[current_node][node]
+            exploration_factor = math.exp(-distance / (2 * max(distance_matrix[current_node][node] for node in unvisited_nodes)))
+            weights.append(exploration_factor)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    if total_weight == 0:
+        return random.choice(unvisited_nodes)
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Select node based on weighted probabilities
+    next_node = random.choices(unvisited_nodes, weights=normalized_weights, k=1)[0]
+    return next_node

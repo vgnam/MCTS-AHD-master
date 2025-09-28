@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining_nodes = len(unvisited_nodes)
+    node_selection_history = {}
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / remaining_nodes
+        weight = 1.0 / (remaining_nodes + 1)
+        diversity_penalty = node_selection_history.get(node, 0) * 0.1  # Penalize frequently selected nodes
+        return distance_matrix[current_node][node] + weight * avg_distance + diversity_penalty
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    node_selection_history[next_node] = node_selection_history.get(next_node, 0) + 1
+    return next_node

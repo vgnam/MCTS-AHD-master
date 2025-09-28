@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    base_weight_local = 0.5
+    base_weight_centrality = 0.3
+    base_weight_coherence = 0.2
+
+    # Dynamic weight adjustment based on remaining nodes
+    weight_local = base_weight_local * (1 - 0.3 * (remaining_nodes / len(distance_matrix)))
+    weight_centrality = base_weight_centrality * (1 + 0.2 * (remaining_nodes / len(distance_matrix)))
+    weight_coherence = base_weight_coherence * (1 - 0.1 * (remaining_nodes / len(distance_matrix)))
+
+    # Historical selection pattern reinforcement
+    selection_history = {}
+    for node in unvisited_nodes:
+        selection_history[node] = 1 / (sum(distance_matrix[node][n] for n in range(len(distance_matrix))) + 1e-10)
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        centrality = selection_history[node]
+        coherence = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        return (weight_local * local_distance) + (weight_centrality * centrality) - (weight_coherence * coherence)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

@@ -1,0 +1,22 @@
+importance scoring mechanisms.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    candidates = []
+    n = len(distance_matrix)
+    for node in unvisited_nodes:
+        next_distance = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            centrality = sum(distance_matrix[node]) / n
+            path_diversity = len(remaining_nodes) / (sum(distance_matrix[node][n] for n in remaining_nodes) + 1e-6)
+            adaptive_weight = 1.0 / (1.0 + 2.0 * (len(remaining_nodes) / n))
+            penalty_factor = 0.3 * (centrality / (max(distance_matrix[current_node]) + 1e-6))
+            normalized_distance = next_distance / (sum(distance_matrix[current_node]) / n + 1e-6)
+            importance_score = (0.6 * normalized_distance + 0.4 * path_diversity) * adaptive_weight - penalty_factor
+        else:
+            importance_score = next_distance
+        candidates.append((node, importance_score))
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

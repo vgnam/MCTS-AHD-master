@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    max_score = -float('inf')
+    total_nodes = len(unvisited_nodes) + 1  # +1 for current_node if needed
+    exploration_factor = 1 - (len(unvisited_nodes) / total_nodes)  # Higher when fewer nodes left
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        total_remaining_distance = sum(distance_matrix[node][n] for n in remaining_nodes) if remaining_nodes else 0
+        avg_remaining_distance = total_remaining_distance / len(remaining_nodes) if remaining_nodes else 0
+
+        # Penalty for nodes far from current path
+        path_coherence_penalty = distance_matrix[current_node][node] * exploration_factor
+        savings = avg_remaining_distance - path_coherence_penalty
+        score = savings * (1 + exploration_factor)  # Emphasize savings with exploration
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    return next_node

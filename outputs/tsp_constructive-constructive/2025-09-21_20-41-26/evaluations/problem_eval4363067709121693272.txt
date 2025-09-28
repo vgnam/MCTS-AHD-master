@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes and len(unvisited_nodes) > 1:
+        if np.random.rand() < 0.7:  # 70% chance to pick destination if unvisited
+            return destination_node
+    candidates = []
+    weights = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            weight = 0.3 * (1 / (distance + 1e-6))  # Lower weight if destination not chosen
+        else:
+            weight = np.random.rand() * (1 / (distance + 1e-6))  # Random factor for exploration
+        candidates.append(node)
+        weights.append(weight)
+    if not candidates:
+        return destination_node if destination_node in unvisited_nodes else None
+    return next_node

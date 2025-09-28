@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm prioritizes selecting the unvisited node closest to the current node (using the distance matrix) to minimize travel distance, with a fallback to the destination node if no unvisited nodes remain. The `current_node` and `unvisited_nodes` are central inputs, while `destination_node` is only used as a fallback. The code efficiently leverages the `min` function with a lambda to find the nearest neighbor, ensuring greedy optimization.",
+     "thought": "The algorithm selects the next node to visit by prioritizing the unvisited node with the shortest distance from the current node, with a fallback to the destination node if no unvisited nodes remain, ensuring the path is constructed efficiently.",
+     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])\n    return next_node",
+     "objective": 7.00437,
+     "other_inf": null
+}

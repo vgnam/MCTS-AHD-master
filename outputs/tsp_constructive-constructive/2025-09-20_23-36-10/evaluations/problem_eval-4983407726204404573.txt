@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_score = -float('inf')
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        dest_distance = distance_matrix[node][destination_node]
+
+        if current_distance == 0:
+            continue
+
+        # Novel heuristic: weighted combination of destination distance and current distance
+        # with dynamic adjustment based on remaining unvisited nodes
+        remaining_nodes = len(unvisited_nodes)
+        weight = 0.5 + (0.5 * (remaining_nodes - 1) / (len(distance_matrix) - 1))  # Adjusts weight based on progress
+
+        score = (weight * dest_distance) - ((1 - weight) * current_distance)
+
+        if score > best_score:
+            best_score = score
+            best_node = node
+
+    return next_node

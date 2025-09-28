@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate exploration factor (increases as more nodes remain)
+    exploration_factor = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+
+    # Compute weighted scores for each unvisited node
+    scores = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Weighted score: balance between distance and exploration factor
+        score = (1 - exploration_factor) * distance + exploration_factor * (1 / (distance + 1e-6))
+        scores.append((node, score))
+
+    # Sort by score (lower is better)
+    scores.sort(key=lambda x: x[1])
+    candidates = [node for node, _ in scores[:min(3, len(scores))]]
+
+    # Dynamic probability: higher exploration factor increases randomness
+    if random.random() < 0.7 + 0.3 * exploration_factor:  # 70-100% chance based on exploration
+        next_node = random.choice(candidates)
+    else:
+        # Randomly select from all unvisited with a bias towards lower scores
+        weights = [1 / (score + 1e-6) for _, score in scores]
+        next_node = random.choices(unvisited_nodes, weights=weights, k=1)[0]
+
+    return next_node

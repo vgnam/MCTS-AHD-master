@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate node degrees (number of connections)
+    node_degrees = {node: sum(1 for d in distance_matrix[node] if d > 0) for node in unvisited_nodes}
+
+    # Calculate weights combining distance and node degree
+    def weight(node):
+        distance = distance_matrix[current_node][node]
+        degree = node_degrees[node]
+        return distance * (1 + 0.1 * degree)  # Degree has a multiplicative effect
+
+    # Sort by weighted score
+    weighted_neighbors = sorted(unvisited_nodes, key=lambda node: weight(node))
+
+    # Dynamic probability based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    prob_threshold = 0.7 if remaining_nodes > 5 else 0.9  # Higher threshold when few nodes remain
+
+    if random.random() < prob_threshold:  # Higher chance to pick from top 3 when many nodes remain
+        candidates = weighted_neighbors[:min(3, len(weighted_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        # When few nodes remain, consider all with probability inversely proportional to their weight
+        weights = [1 / (weight(node) + 1) for node in weighted_neighbors]
+        next_node = random.choices(weighted_neighbors, weights=weights, k=1)[0]
+
+    return next_node

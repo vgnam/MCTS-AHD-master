@@ -1,0 +1,13 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_score = float('inf')
+    next_node = None
+    proximity_factor = distance_matrix[current_node][destination_node] / max(sum(distance_matrix[current_node]) for row in distance_matrix)
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        estimated_distance = distance_matrix[node][destination_node]
+        penalty = 1 + (1 - proximity_factor) * (node in unvisited_nodes)
+        score = (2 - proximity_factor) * immediate_distance + (1 + proximity_factor) * estimated_distance * penalty
+        if score < min_score:
+            min_score = score
+            next_node = node
+    return next_node

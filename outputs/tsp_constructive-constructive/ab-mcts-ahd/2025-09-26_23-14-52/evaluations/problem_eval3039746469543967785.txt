@@ -1,0 +1,43 @@
+importance via a combined centrality metric (60% degree, 40% path), and employs a distance-weighted probability distribution for candidate selection, where nodes with higher centrality and shorter distances are favored more aggressively.}
+
+import math
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    exploration_factor = math.tanh(0.3 * (total_unvisited - 5))
+    best_score = float('-inf')
+    candidates = []
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        degree_centrality = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < float('inf')) / total_unvisited
+        path_centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited
+        combined_centrality = 0.6 * degree_centrality + 0.4 * path_centrality
+
+        exploration_score = exploration_factor * combined_centrality
+        exploitation_score = (1 - exploration_factor) * (0.7 * current_distance + 0.3 * future_distance)
+        weighted_score = exploration_score - exploitation_score
+
+        if weighted_score > best_score:
+            best_score = weighted_score
+            candidates = [node]
+        elif weighted_score == best_score:
+            candidates.append(node)
+
+    if len(candidates) > 1:
+        distance_weights = [1 / (distance_matrix[current_node][node] + 1e-6) for node in candidates]
+        centrality_weights = [sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited for node in candidates]
+        combined_weights = [0.7 * d + 0.3 * c for d, c in zip(distance_weights, centrality_weights)]
+        total_weight = sum(combined_weights)
+        selection_prob = [w / total_weight for w in combined_weights]
+        next_node = random.choices(candidates, weights=selection_prob, k=1)[0]
+    else:
+        next_node = candidates[0]
+
+    return next_node

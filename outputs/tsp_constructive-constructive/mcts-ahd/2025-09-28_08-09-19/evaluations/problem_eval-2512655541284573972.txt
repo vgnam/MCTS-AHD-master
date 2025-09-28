@@ -1,0 +1,8 @@
+import random
+    next_node = random.choices(
+        population=list(selection_probabilities.keys()),
+        weights=list(selection_probabilities.values()),
+        k=1
+    )[0]
+
+    return next_node

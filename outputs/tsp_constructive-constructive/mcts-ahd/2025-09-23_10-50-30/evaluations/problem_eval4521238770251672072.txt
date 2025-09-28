@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = -float('inf')
+    max_lookahead_depth = min(3, len(unvisited_nodes))  # Dynamic lookahead depth
+
+    for node in unvisited_nodes:
+        immediate_score = -distance_matrix[current_node][node]
+
+        # Adaptive lookahead: consider multiple paths probabilistically
+        remaining_nodes = unvisited_nodes - {node}
+        lookahead_score = 0
+        if remaining_nodes:
+            # Sample a subset of remaining nodes for lookahead
+            sample_size = min(max_lookahead_depth, len(remaining_nodes))
+            sampled_nodes = random.sample(list(remaining_nodes), sample_size)
+
+            # Weighted lookahead with penalty for revisiting nodes
+            for next_node_candidate in sampled_nodes:
+                lookahead_score += -distance_matrix[node][next_node_candidate] * (0.8 ** sampled_nodes.index(next_node_candidate))
+
+        # Dynamic weight based on remaining nodes
+        weight = 0.3 + 0.4 * (len(unvisited_nodes) / len(distance_matrix))
+        total_score = immediate_score + weight * lookahead_score
+
+        if total_score > best_score:
+            best_score = total_score
+            next_node = node
+
+    return next_node

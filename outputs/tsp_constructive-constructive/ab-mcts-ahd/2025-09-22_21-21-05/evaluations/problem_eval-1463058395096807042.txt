@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+    total_nodes = len(distance_matrix)
+    remaining_count = len(unvisited_nodes)
+
+    # Memory-based centrality adjustment
+    centrality_memory = [sum(distance_matrix[i][j] for j in range(total_nodes)) for i in range(total_nodes)]
+    normalized_centrality = [c / sum(centrality_memory) for c in centrality_memory]
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Local density estimation: k-nearest neighbors average distance
+        k = max(1, int(0.3 * remaining_count))
+        nearest_neighbors = sorted([distance_matrix[node][n] for n in unvisited_nodes if n != node], key=lambda x: x)[:k]
+        local_density = sum(nearest_neighbors) / k if nearest_neighbors else 0
+
+        # Dynamic exploration-exploitation weight
+        exploration_weight = 0.5 * (1 - (remaining_count / total_nodes)) + 0.2 * (1 - (remaining_count / total_nodes)**2)
+        exploitation_weight = 1 - exploration_weight
+
+        # Adaptive distance weighting
+        distance_weight = 0.7 - 0.3 * (remaining_count / total_nodes)
+        weighted_distance = distance_weight * distance_to_current + (1 - distance_weight) * distance_to_destination
+
+        # Memory-adjusted centrality
+        adjusted_centrality = normalized_centrality[node] * (1 + 0.1 * (remaining_count / total_nodes))
+
+        # Penalty for skipped nodes (quadratic increase)
+        penalty = 0.2 * (total_nodes - remaining_count)**2
+
+        # Combined score with hybrid selection
+        combined_score = (exploitation_weight * weighted_distance +
+                         exploration_weight * (adjusted_centrality + local_density) -
+                         penalty)
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

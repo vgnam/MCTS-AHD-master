@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    remaining_distance = distance_matrix[current_node][destination_node]
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / total_unvisited
+
+    # Temperature parameter decreases as iterations progress
+    temperature = 1.0 - (total_unvisited / (total_unvisited + 1))
+
+    # Dynamic weight factor based on temperature
+    weight_factor = 0.5 + 0.5 * (1 - temperature) if remaining_distance > avg_distance else 0.5 - 0.5 * temperature
+
+    # Dynamic penalty based on visit frequency
+    visit_penalty = {node: 0.1 * (1.0 / (total_unvisited + 1)) for node in unvisited_nodes}
+
+    next_node = min(unvisited_nodes, key=lambda node: (
+        weight_factor * distance_matrix[current_node][node] +
+        (1 - weight_factor) * distance_matrix[node][destination_node] +
+        visit_penalty[node]
+    ))
+
+    return next_node

@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    # Adaptive neighborhood scaling with probabilistic selection
+    base_size = max(1, int(2 + 3 * (1 - exploration_factor)))
+    neighborhood_size = min(base_size, len(unvisited_nodes))
+    candidates = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:neighborhood_size]
+
+    # Time-varying exploration pressure
+    exploration_pressure = (1 - exploration_factor) ** 1.5
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        # Entropy-based connectivity score
+        if remaining_nodes > 1:
+            remaining_dists = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            mean_dist = sum(remaining_dists) / (remaining_nodes - 1)
+            probs = [max(1e-10, 1 - (d - mean_dist) / (max(remaining_dists) - min(remaining_dists) + 1e-10)) for d in remaining_dists]
+            entropy = -sum(p * math.log(p) for p in probs)
+        else:
+            entropy = 0
+
+        # Dynamic weight adjustment with exploration pressure
+        weight_dist = 0.4 - 0.2 * exploration_pressure
+        weight_connectivity = 0.3 + 0.4 * exploration_pressure
+        weight_penalty = 0.3 + 0.4 * (1 - exploration_pressure)
+
+        return (weight_dist * current_dist +
+                weight_connectivity * (1 - entropy) -
+                weight_penalty * (dest_dist ** (1 + 0.3 * exploration_pressure)))
+
+    # Probabilistic selection with temperature-based exploration
+    temperatures = [math.exp(-evaluate_node(node) / (0.5 + 0.5 * exploration_pressure)) for node in candidates]
+    probs = [t / sum(temperatures) for t in temperatures]
+    next_node = random.choices(candidates, weights=probs, k=1)[0]
+
+    return next_node

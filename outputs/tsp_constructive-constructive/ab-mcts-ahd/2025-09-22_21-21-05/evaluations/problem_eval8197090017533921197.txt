@@ -1,0 +1,46 @@
+importance scores, dynamic distance normalization, and a probabilistic selection mechanism that balances exploitation (minimizing immediate distances) with exploration (prioritizing less visited nodes), while using a novel scoring equation that combines normalized distances with a penalty for revisits and an exploration bonus to guide the path construction.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_count = len(unvisited_nodes)
+
+    # Precompute node importance scores
+    node_scores = {}
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Normalize distances
+        max_distance = max(max(row) for row in distance_matrix)
+        normalized_d2c = distance_to_current / max_distance
+        normalized_d2d = distance_to_destination / max_distance
+
+        # Dynamic weight based on remaining nodes
+        weight = 0.1 + 0.7 * (1 - remaining_count / total_nodes)
+
+        # Penalty for revisiting nodes that were skipped
+        penalty = 0.2 * (total_nodes - remaining_count) / total_nodes
+
+        # Exploration bonus
+        exploration_bonus = 0.3 * (total_nodes - remaining_count) / total_nodes
+
+        # Combined score with novel equation
+        score = (0.5 * normalized_d2c + 0.3 * normalized_d2d) + weight * (normalized_d2c + normalized_d2d) - penalty + exploration_bonus
+        node_scores[node] = score
+
+    # Probabilistic selection based on scores
+    if node_scores:
+        min_score = min(node_scores.values())
+        adjusted_scores = {node: min_score - score for node, score in node_scores.items()}  # Invert to prefer lower scores
+        total_adjusted = sum(adjusted_scores.values())
+        probabilities = {node: score / total_adjusted for node, score in adjusted_scores.items()}
+
+        import random
+        next_node = random.choices(list(probabilities.keys()), weights=list(probabilities.values()), k=1)[0]
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

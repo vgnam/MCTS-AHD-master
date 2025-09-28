@@ -1,0 +1,37 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Initialize reinforcement scores if not present
+    if not hasattr(select_next_node, 'scores'):
+        select_next_node.scores = {node: random.random() for node in unvisited_nodes}
+
+    # Update scores based on recent performance (simplified)
+    for node in unvisited_nodes:
+        if node in select_next_node.scores:
+            select_next_node.scores[node] = 0.9 * select_next_node.scores[node] + 0.1 * distance_matrix[current_node][node]
+
+    # Get nodes sorted by reinforcement score (higher is better)
+    scored_nodes = sorted(unvisited_nodes, key=lambda node: -select_next_node.scores[node])
+
+    # 70% chance to pick from top 3 by score, 20% chance to pick from nearest 3, 10% random
+    choice = random.random()
+    if choice < 0.7:
+        candidates = scored_nodes[:min(3, len(scored_nodes))]
+    elif choice < 0.9:
+        nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+    else:
+        candidates = unvisited_nodes
+
+    next_node = random.choice(candidates)
+
+    # Update score for the selected node (reward for selection)
+    if next_node in select_next_node.scores:
+        select_next_node.scores[next_node] = min(1.0, select_next_node.scores[next_node] * 1.1)
+
+    return next_node

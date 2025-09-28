@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    # Precompute distances and sort nodes by cost
+    distances = [(node, distance_matrix[current_node][node]) for node in unvisited_nodes]
+    distances.sort(key=lambda x: x[1])
+    sorted_nodes = [node for node, _ in distances]
+    sorted_costs = [cost for _, cost in distances]
+
+    min_cost = sorted_costs[0]
+    avg_cost = sum(sorted_costs) / len(sorted_costs)
+
+    # Dynamic threshold: prioritize lower-ranked nodes with higher probability
+    threshold_rank = min(3, len(sorted_nodes) - 1)  # Cap threshold rank
+    threshold_cost = sorted_costs[threshold_rank]
+
+    # Calculate selection probabilities (exponential decay)
+    probabilities = []
+    total_weight = 0.0
+    for i in range(len(sorted_nodes)):
+        weight = math.exp(-i * 0.5)  # Decay factor
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    probabilities = [p / total_weight for p in probabilities]
+
+    # Select node with probabilistic threshold
+    rand_val = random.random()
+    cumulative_prob = 0.0
+    for i, node in enumerate(sorted_nodes):
+        cumulative_prob += probabilities[i]
+        if rand_val <= cumulative_prob and sorted_costs[i] <= threshold_cost:
+            return node
+
+    # Fallback to nearest neighbor if no node meets criteria
+    return next_node

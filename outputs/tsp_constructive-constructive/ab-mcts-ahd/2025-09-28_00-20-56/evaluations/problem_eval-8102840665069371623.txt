@@ -1,0 +1,34 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+
+        if len(unvisited_nodes) > 2:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            best_lookahead = None
+            best_lookahead_score = float('inf')
+
+            for n1 in remaining_nodes:
+                for n2 in [n for n in remaining_nodes if n != n1]:
+                    score = distance_matrix[node][n1] + distance_matrix[n1][n2] + distance_matrix[n2][destination_node]
+                    if score < best_lookahead_score:
+                        best_lookahead_score = score
+                        best_lookahead = n1
+            lookahead_dist = best_lookahead_score if best_lookahead is not None else distance_matrix[node][destination_node]
+        else:
+            lookahead_dist = distance_matrix[node][destination_node]
+
+        # Dynamic weight based on remaining nodes
+        weight = 0.3 if len(unvisited_nodes) > 5 else 0.7
+        return immediate_dist + weight * lookahead_dist
+
+    # Softmax-based probabilistic selection
+    scores = [evaluate_node(node) for node in unvisited_nodes]
+    max_score = max(scores)
+    exp_scores = [math.exp((max_score - score) / (max_score + 1e-10)) for score in scores]
+    probs = [exp / sum(exp_scores) for exp in exp_scores]
+    next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+
+    return next_node

@@ -1,0 +1,34 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on immediate distance and estimated future impact
+    weights = []
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+        # Estimate future impact by considering average distance to remaining nodes
+        if len(unvisited_nodes) > 1:
+            future_dist = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1)
+        else:
+            future_dist = 0
+        # Weight is inverse of combined distance (smaller distances get higher weights)
+        combined_dist = immediate_dist + 0.3 * future_dist  # 0.3 is a tunable parameter
+        weights.append(1.0 / combined_dist if combined_dist > 0 else 1e6)
+
+    # Normalize weights to form a probability distribution
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    # Select node based on weighted probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    # Occasionally (10% chance) pick a random node for diversity
+    if random.random() < 0.1:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

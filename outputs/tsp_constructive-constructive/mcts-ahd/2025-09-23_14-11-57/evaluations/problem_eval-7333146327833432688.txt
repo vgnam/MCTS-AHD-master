@@ -1,0 +1,55 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    penalties = []
+    node_degrees = []
+    progress = 1 - len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+
+    remaining_nodes = len(unvisited_nodes)
+    base_immediate_weight = 0.4
+    base_future_weight = 0.6
+    stage_factor = (1.0 / (1.0 + 0.2 * remaining_nodes)) ** 1.5
+
+    immediate_weight = base_immediate_weight * (1.0 - stage_factor)
+    future_weight = base_future_weight * (1.0 + stage_factor)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) ** 1.2 if distance_matrix[current_node][node] > second_best else 0
+            remaining_nodes_after = [n for n in unvisited_nodes if n != node]
+            penalty = (sum(distance_matrix[current_node][n] for n in remaining_nodes_after) / len(remaining_nodes_after)) ** 1.8 if progress > 0.6 else 0
+            degree = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes)
+        else:
+            regret = 0
+            penalty = 0
+            degree = 0
+        regrets.append(regret)
+        penalties.append(penalty)
+        node_degrees.append(degree)
+
+    total_nodes = len(distance_matrix)
+    regret_weight = max(0.2, 0.7 * (remaining_nodes / total_nodes))
+    distance_weight = 1.0 - regret_weight
+    degree_weight = min(0.3, 0.2 * progress)
+
+    scores = [
+        immediate_weight * distance_weight * distance +
+        future_weight * regret_weight * regret +
+        degree_weight * degree +
+        penalty
+        for distance, regret, degree, penalty in zip(distances, regrets, node_degrees, penalties)
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        # Calculate centrality: average distance to all unvisited nodes
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / remaining_nodes
+
+        # Dynamic weight: time-decaying factor for centrality
+        time_decay = 1.0 / (1.0 + remaining_nodes)
+        weight_immediate = 0.6  # Higher priority for immediate distance
+        weight_lookahead = 0.3  # Moderate priority for lookahead
+        weight_centrality = 0.1 * time_decay  # Decaying priority for centrality
+
+        # Score combines immediate, lookahead, and centrality with dynamic weights
+        score = (weight_immediate * immediate_distance +
+                 weight_lookahead * lookahead_distance +
+                 weight_centrality * centrality)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

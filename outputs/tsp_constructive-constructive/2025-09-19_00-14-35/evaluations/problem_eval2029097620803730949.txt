@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if len(unvisited_nodes) == 1:
+        return next(iter(unvisited_nodes))
+
+    total_nodes = len(unvisited_nodes) + 1
+    connectivity_weight = (total_nodes - len(unvisited_nodes)) / total_nodes
+    exploration_factor = 1.0 / (len(unvisited_nodes) + 1)
+    promise_factor = 1.0 - exploration_factor
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_dists = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(remaining_dists) / (len(unvisited_nodes) - 1)
+            min_remaining_dist = min(remaining_dists)
+            promise = promise_factor * (0.7 * avg_remaining_dist + 0.3 * min_remaining_dist)
+
+            # Connectivity score: higher for nodes with more local connections
+            k = min(3, len(unvisited_nodes) - 1)
+            sorted_dists = sorted(remaining_dists)
+            connectivity_score = sum(sorted_dists[:k]) / k if k > 0 else 0
+        else:
+            promise = 0
+            connectivity_score = 0
+
+        total_score = current_dist + exploration_factor * promise + connectivity_weight * connectivity_score
+        return total_score
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

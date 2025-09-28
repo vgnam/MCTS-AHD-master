@@ -1,0 +1,14 @@
+import random
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_weights, k=1)[0]
+
+    threshold_factor = 1.0 - (0.5 * (len(unvisited_nodes) / len(distance_matrix)))
+    if random.random() < threshold_factor and len(unvisited_nodes) > 2:
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            if potential_cost < max_distance * 0.7:
+                next_node = node
+                break
+
+    return next_node

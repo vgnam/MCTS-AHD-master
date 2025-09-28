@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = -float('inf')
+
+    # Adaptive weight based on historical performance and connectivity
+    remaining_nodes = len(unvisited_nodes)
+    base_weight = 0.6 if remaining_nodes > 1 else 0.8
+    connectivity_factor = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    weight = base_weight * (1 + connectivity_factor / (sum(distance_matrix[0]) / len(distance_matrix[0])))
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Hybrid scoring: weighted Euclidean + probabilistic component
+        euclidean_score = weight * distance_to_current + (1 - weight) * distance_to_destination
+        probabilistic_component = 1 / (1 + distance_to_destination)  # Prefer nodes closer to destination
+
+        # Final score combines both components
+        score = 0.6 * euclidean_score + 0.4 * probabilistic_component
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

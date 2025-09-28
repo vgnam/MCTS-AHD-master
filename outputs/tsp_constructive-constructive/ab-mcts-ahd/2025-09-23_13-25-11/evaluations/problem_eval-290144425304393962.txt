@@ -1,0 +1,20 @@
+importance" factor derived from the average of all pairwise distances from the node to others.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_nodes = len(distance_matrix)
+    remaining_count = len(unvisited_nodes)
+    ratio = remaining_count / total_nodes
+    weight_immediate = 1 / (1 + math.exp(-10 * (ratio - 0.5)))
+    weight_future = 1 - weight_immediate
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        node_importance = sum(distance_matrix[node][other] for other in range(total_nodes)) / total_nodes
+        return weight_immediate * current_dist + weight_future * avg_future_dist + 0.1 * node_importance
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

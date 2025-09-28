@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    candidates = []
+    total_weight = 0.0
+    temperature = max(1.0, len(unvisited_nodes) / 10.0)
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        heuristic = 1.0 / (1.0 + cost)
+        weight = (heuristic ** (1.0 / temperature)) * (1.0 / (1.0 + abs(len(candidates) - len(unvisited_nodes) / 2.0)))
+        candidates.append((node, weight))
+        total_weight += weight
+
+    if not candidates:
+        return unvisited_nodes.pop()
+
+    normalized_weights = [w / total_weight for (_, w) in candidates]
+    selected_idx = np.random.choice(len(candidates), p=normalized_weights)
+    next_node = candidates[selected_idx][0]
+
+    return next_node

@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+    total_nodes = len(distance_matrix)
+    unvisited_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        hub_score = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        dynamic_weight = 0.6 - 0.3 * unvisited_ratio
+        historical_weight = 0.1 * (1 - unvisited_ratio)
+        total_score = (dynamic_weight * distance_to_current +
+                       0.3 * distance_to_destination +
+                       0.2 * hub_score +
+                       historical_weight * (distance_to_current / (distance_to_destination + 1e-6)))
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

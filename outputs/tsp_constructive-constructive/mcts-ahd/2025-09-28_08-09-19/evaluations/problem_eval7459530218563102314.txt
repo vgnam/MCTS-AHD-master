@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    # Calculate node density for adaptive weights
+    total_possible_edges = remaining_nodes * (remaining_nodes - 1) / 2 if remaining_nodes > 1 else 0
+    actual_edges = sum(1 for u in unvisited_nodes for v in unvisited_nodes if u != v and distance_matrix[u][v] > 0) / 2
+    density_factor = actual_edges / total_possible_edges if total_possible_edges > 0 else 0
+
+    # Dynamic decay factor for penalties
+    decay_factor = 0.8 ** (1 / (remaining_nodes + 1))
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = -distance_to_current - distance_to_destination
+        else:
+            # Reinforcement learning inspired scoring
+            centrality = 1.0 / (sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)) if remaining_nodes > 1 else 0
+            connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.5 * distance_to_current) / remaining_nodes
+
+            # Adaptive weights
+            immediate_weight = 0.5 + 0.3 * density_factor
+            centrality_weight = 0.2 * (1 - density_factor)
+            connectivity_weight = 0.3 * (1 - density_factor)
+
+            # Dynamic penalty with decay
+            penalty_weight = 0.5 * decay_factor
+            penalty = penalty_weight * (distance_to_destination / (1.0 + distance_to_current)) if distance_to_current > 0 else 0
+
+            # Reinforcement learning inspired score
+            score = (immediate_weight * (-distance_to_current) +
+                     centrality_weight * centrality +
+                     connectivity_weight * connectivity) - penalty
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

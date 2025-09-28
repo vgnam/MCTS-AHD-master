@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Centrality based on average distance to all unvisited nodes
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes) / len(unvisited_nodes)
+
+        # Dynamic weights: higher centrality weight in early stages, lower in later stages
+        centrality_weight = 0.3 * (1 - (remaining_nodes / len(distance_matrix)))
+
+        # Penalty for nodes that were previously considered but not selected (simulated here by a random factor)
+        penalty = 0.1 * (1 - (remaining_nodes / len(distance_matrix))) * (0.5 - hash(node) % 1)  # Simulated dynamic penalty
+
+        total_score = (distance_to_current * 0.4) + (centrality * centrality_weight) + (distance_to_destination * 0.3) + penalty
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

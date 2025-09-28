@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_distance = float('inf')
+    dest_distance = distance_matrix[current_node][destination_node]
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    if next_node != destination_node and remaining_nodes > 1:
+        temperature = 1.0 / (1 + remaining_nodes)
+        nearest_prob = np.exp(-min_distance / temperature)
+        dest_prob = np.exp(-dest_distance / temperature)
+        total_prob = nearest_prob + dest_prob
+        prob_nearest = nearest_prob / total_prob
+        prob_dest = dest_prob / total_prob
+
+        regret_penalty = 1.0 if min_distance > 1.5 * dest_distance else 0.8
+        adjusted_prob_dest = prob_dest * regret_penalty
+
+        if np.random.rand() < adjusted_prob_dest:
+            next_node = destination_node
+
+    return next_node

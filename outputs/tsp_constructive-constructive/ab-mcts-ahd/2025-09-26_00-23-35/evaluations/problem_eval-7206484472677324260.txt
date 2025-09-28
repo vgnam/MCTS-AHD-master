@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    total_unvisited = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Fixed weight prioritizing centrality
+        weight = 0.7
+        # Dynamic penalty factor based on remaining nodes
+        penalty_factor = 1.0 if total_unvisited > 10 else 0.5 if total_unvisited > 5 else 0.2
+        penalty = max(0, distance_to_node - penalty_factor * avg_distance)
+
+        score = weight * avg_distance + distance_to_node + penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    # Ensure destination is chosen last if it's the only remaining node
+    if total_unvisited == 1 and destination_node in unvisited_nodes:
+        next_node = destination_node
+
+    return next_node

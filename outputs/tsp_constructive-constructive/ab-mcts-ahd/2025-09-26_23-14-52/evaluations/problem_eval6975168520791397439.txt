@@ -1,0 +1,6 @@
+import choices
+        probabilities = [max(0, s - min(scores) + 1e-6) for s in scores]
+        probabilities = [p / sum(probabilities) for p in probabilities]
+        next_node = choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

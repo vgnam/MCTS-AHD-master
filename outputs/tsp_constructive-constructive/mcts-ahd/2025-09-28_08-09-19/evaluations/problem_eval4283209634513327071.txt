@@ -1,0 +1,55 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    node_scores = []
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    exploration_progress = 1.0 - (remaining_count / total_nodes)
+    exploration_factor = 0.5 + 0.5 * exploration_progress
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        neighborhood_size = min(5, remaining_count)
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            neighborhood_nodes = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:neighborhood_size]
+            neighborhood_centrality = sum(distance_matrix[node][n] for n in neighborhood_nodes) / neighborhood_size
+            global_centrality = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+        else:
+            neighborhood_centrality = 0
+            global_centrality = 0
+
+        connectivity_threshold = 1.0 + (0.3 * exploration_progress)
+        connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < connectivity_threshold * neighborhood_centrality)
+        connectivity_factor = 1.0 + (connectivity / (total_nodes - 1)) * 0.5
+
+        distance_weight = 0.5 * (1.0 - exploration_factor)
+        centrality_weight = 0.4 * exploration_factor
+        connectivity_weight = 0.3 * connectivity_factor
+
+        score = (distance_weight * immediate_distance) + (centrality_weight * neighborhood_centrality) - (connectivity_weight * global_centrality)
+        normalized_score = score / (1 + immediate_distance + neighborhood_centrality + global_centrality)
+
+        node_scores.append((node, normalized_score))
+
+    if not node_scores:
+        return destination_node
+
+    probabilities = [1.0 - score for _, score in node_scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    selected_node = None
+    cumulative_prob = 0.0
+    rand_val = random.random()
+
+    for node, prob in zip([node for node, _ in node_scores], probabilities):
+        cumulative_prob += prob
+        if rand_val <= cumulative_prob:
+            selected_node = node
+            break
+
+    return next_node

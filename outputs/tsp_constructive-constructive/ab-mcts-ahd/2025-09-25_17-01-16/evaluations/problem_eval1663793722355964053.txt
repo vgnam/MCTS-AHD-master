@@ -1,0 +1,29 @@
+import math
+    import random
+
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 / (1.0 + math.exp(-0.1 * remaining_nodes))
+    alpha = 0.5 * (1 + (remaining_nodes / (remaining_nodes + 1)))
+
+    node_scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        penalty = 1.0 if node in unvisited_nodes and node != destination_node else 0.0
+        score = distance_to_current + alpha * distance_to_destination + penalty * distance_to_current
+        node_scores.append((node, score))
+
+    # Softmax selection
+    scores = [score for (_, score) in node_scores]
+    max_score = max(scores)
+    exp_scores = [math.exp((max_score - score) / temperature) for score in scores]
+    sum_exp = sum(exp_scores)
+    probs = [exp / sum_exp for exp in exp_scores]
+
+    # Select node based on probabilities
+    next_node = random.choices([node for (node, _) in node_scores], weights=probs, k=1)[0]
+
+    return next_node

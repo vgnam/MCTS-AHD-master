@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        if not unvisited_nodes:
+            return local_distance
+
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        remaining_nodes = len(unvisited_nodes)
+
+        # Dynamic weighting based on remaining nodes (sigmoid function)
+        weight = 1 / (1 + math.exp(-0.1 * (remaining_nodes - 10)))
+
+        # Penalty for nodes too far from current node
+        penalty = max(0, local_distance - 1.5 * avg_distance)
+
+        return local_distance + weight * avg_distance + penalty
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

@@ -1,0 +1,39 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 100
+    cooling_rate = 0.95
+    max_iterations = 1000
+
+    for _ in range(max_iterations):
+        # Find k-nearest neighbors
+        k = min(5, len(unvisited_nodes))
+        nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:k]
+
+        # Calculate the probability for each nearest neighbor
+        probabilities = []
+        for neighbor in nearest_neighbors:
+            distance = distance_matrix[current_node][neighbor]
+            probability = math.exp(-distance / temperature)
+            if neighbor == destination_node:
+                probability *= 2  # Give higher priority to destination node
+            probabilities.append(probability)
+
+        # Normalize the probabilities
+        probabilities = [p / sum(probabilities) for p in probabilities]
+
+        # Select the next node based on the probabilities
+        next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+
+        # Check if the chosen node is valid
+        if next_node in unvisited_nodes:
+            return next_node
+
+        temperature *= cooling_rate
+
+    # Return a random unvisited node if the temperature is too low
+    return next_node

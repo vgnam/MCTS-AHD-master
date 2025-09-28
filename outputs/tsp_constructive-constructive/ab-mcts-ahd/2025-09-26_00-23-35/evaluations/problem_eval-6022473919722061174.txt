@@ -1,0 +1,35 @@
+importance as unvisited nodes decrease) with probabilistic selection and centrality penalty, similar to No.1, but uses a weighted scoring system like No.2, where proximity is inversely proportional to distance and centrality is proportional to average distance, penalizing nodes with high variance.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = -float('inf')
+    num_unvisited = len(unvisited_nodes)
+
+    # Dynamic weights (higher proximity early, increasing centrality later)
+    proximity_weight = 1.5 * (1 + (1 - num_unvisited / len(distance_matrix)) * 0.5)
+    centrality_weight = 0.5 * (1 - (num_unvisited / (num_unvisited + 1)))
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance_to_dest = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+        distances_to_others = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        variance = sum((d - avg_distance_to_dest) ** 2 for d in distances_to_others) / max(1, len(distances_to_others))
+
+        # Centrality penalty (lower variance is better)
+        centrality_penalty = -0.3 * variance
+
+        # Score with dynamic weights and centrality penalty
+        score = -proximity_weight * distance_to_node + centrality_weight * avg_distance_to_dest + centrality_penalty
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # 20% chance to select destination node if not already selected
+    if random.random() < 0.2 and destination_node in unvisited_nodes:
+        next_node = destination_node
+
+    return next_node

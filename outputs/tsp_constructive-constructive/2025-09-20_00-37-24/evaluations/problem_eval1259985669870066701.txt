@@ -1,0 +1,28 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Adaptive candidate selection: more candidates when fewer unvisited nodes remain
+    exploration_factor = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+    candidate_count = min(max(1, int(3 + exploration_factor * 5)), len(nearest_neighbors))
+
+    # Distance-based probability: closer nodes are more likely, but with some randomness
+    max_distance = distance_matrix[current_node][nearest_neighbors[-1]]
+    probabilities = [math.exp(-distance_matrix[current_node][node] / max_distance) for node in nearest_neighbors[:candidate_count]]
+    probabilities = [p / sum(probabilities) for p in probabilities]
+
+    if random.random() < 0.9:  # 90% chance to pick from biased candidates
+        next_node = random.choices(nearest_neighbors[:candidate_count], weights=probabilities, k=1)[0]
+    else:  # 10% chance to pick from all unvisited with inverse distance weighting
+        inv_distances = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes]
+        inv_distances = [d / sum(inv_distances) for d in inv_distances]
+        next_node = random.choices(unvisited_nodes, weights=inv_distances, k=1)[0]
+
+    return next_node

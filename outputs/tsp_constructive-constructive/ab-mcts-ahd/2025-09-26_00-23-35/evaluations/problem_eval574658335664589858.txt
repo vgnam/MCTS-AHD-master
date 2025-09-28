@@ -1,0 +1,45 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('-inf')
+    num_unvisited = len(unvisited_nodes)
+
+    # Dynamic weights
+    exploration_weight = 0.5 * (1 - math.exp(-0.1 * num_unvisited))
+    exploitation_weight = 0.5 * math.exp(-0.1 * num_unvisited)
+    destination_bias = 0.2 * (1 - (num_unvisited / (num_unvisited + 5)))
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, num_unvisited - 1)
+
+        # Novelty score: penalize frequently visited nodes and reward rare ones
+        novelty_score = -0.3 * (1 - (1 / (1 + math.exp(-(num_unvisited - 5)))))
+
+        # Centrality score: reward nodes with lower average distance
+        centrality_score = -0.4 * avg_future_distance
+
+        # Score calculation
+        score = (exploration_weight * distance_to_node +
+                 exploitation_weight * (distance_to_node + avg_future_distance) +
+                 destination_bias * distance_to_destination +
+                 centrality_score +
+                 novelty_score)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Probabilistic destination selection with scaling bias
+    if (destination_node in unvisited_nodes and
+        random.random() < destination_bias * 2 and
+        num_unvisited > 3):
+        next_node = destination_node
+
+    return next_node

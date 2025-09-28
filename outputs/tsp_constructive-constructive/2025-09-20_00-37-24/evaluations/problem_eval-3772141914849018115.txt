@@ -1,0 +1,26 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic exploration factor based on remaining unvisited nodes
+    exploration_factor = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+    exploration_threshold = 0.7 * (1 - exploration_factor)  # Higher threshold as more nodes are visited
+
+    if random.random() < exploration_threshold:  # Higher chance to explore as more nodes are visited
+        # Weighted selection: closer nodes have higher probability
+        weights = [math.exp(-distance_matrix[current_node][node]) for node in nearest_neighbors]
+        total_weight = sum(weights)
+        probabilities = [w / total_weight for w in weights]
+        next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+    else:  # Exploit the nearest nodes
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+
+    return next_node

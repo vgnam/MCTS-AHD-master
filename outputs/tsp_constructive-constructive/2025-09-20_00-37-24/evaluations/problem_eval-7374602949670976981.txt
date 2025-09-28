@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, visited_history=None):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    if visited_history is None:
+        visited_history = {}
+
+    # Calculate scores for each unvisited node
+    scores = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Penalize revisited nodes more heavily as temperature decreases
+        revisit_penalty = visited_history.get(node, 0) * (1.0 / (1.0 + math.exp(-temperature)))
+        # Combine distance and revisit penalty with exploration factor
+        score = (1.0 / (1.0 + distance)) - revisit_penalty + (random.random() * temperature)
+        scores.append((node, score))
+
+    # Select node with highest score
+    next_node = max(scores, key=lambda x: x[1])[0]
+
+    # Update visited history
+    visited_history[next_node] = visited_history.get(next_node, 0) + 1
+
+    return next_node

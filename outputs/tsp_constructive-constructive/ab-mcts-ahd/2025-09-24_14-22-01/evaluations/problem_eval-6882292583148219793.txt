@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    best_score = float('inf')
+    next_node = None
+    total_nodes = len(distance_matrix)
+    visited_nodes = total_nodes - len(unvisited_nodes)
+    progress_ratio = visited_nodes / total_nodes if total_nodes > 0 else 0
+    weight = 0.3 + 0.7 * (1 - progress_ratio)  # Emphasize long-term when progress is slow
+    max_distance = max(max(row) for row in distance_matrix)
+    avg_distance_to_dest = sum(distance_matrix[node][destination_node] for node in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        scaled_destination_score = distance_to_destination / (avg_distance_to_dest + 1e-6)  # Avoid division by zero
+        revisit_penalty = 0.5 * (1 if node == destination_node else 0)  # Penalize revisiting destination
+        normalized_score = (distance_to_node + weight * scaled_destination_score + revisit_penalty) / max_distance
+        if normalized_score < best_score:
+            best_score = normalized_score
+            next_node = node
+    return next_node

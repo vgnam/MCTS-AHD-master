@@ -33,7 +33,7 @@ class MCTS:
     def __init__(self, root_answer):
         self.exploration_constant_0 = 0.1 # Paramter \lambda_0
         self.alpha = 0.5 # Paramter \alpha
-        self.max_depth = 10
+        self.max_depth = 20
         self.epsilon = 1e-10
         self.discount_factor = 1 # constant as 1
         self.q_min = 0

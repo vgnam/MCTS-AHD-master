@@ -1,0 +1,28 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic probability: higher chance to pick nearest when many unvisited nodes remain
+    exploration_prob = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+    exploration_prob = max(0.1, min(0.9, exploration_prob))  # Clamp between 10% and 90%
+
+    if random.random() < exploration_prob:
+        # Exploitation: prioritize nearest neighbors with decreasing probability
+        selection_prob = [math.exp(-i) for i in range(len(nearest_neighbors))]
+        selection_prob = [p / sum(selection_prob) for p in selection_prob]
+        next_node = random.choices(nearest_neighbors, weights=selection_prob, k=1)[0]
+    else:
+        # Exploration: pick a node with inverse distance probability (farther nodes more likely)
+        inverse_distances = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in nearest_neighbors]
+        inverse_distances = [d / sum(inverse_distances) for d in inverse_distances]
+        next_node = random.choices(nearest_neighbors, weights=inverse_distances, k=1)[0]
+
+    return next_node

@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+
+    # Dynamic weight based on remaining nodes
+    remaining_count = len(unvisited_nodes)
+    dynamic_weight = max(0.1, 0.5 * (1 - remaining_count / (remaining_count + 1)))
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = 0
+
+        # Limited-depth lookahead (2 steps ahead)
+        remaining_nodes = unvisited_nodes - {node}
+        if remaining_nodes:
+            next_candidates = remaining_nodes.copy()
+            next_candidate = min(next_candidates, key=lambda x: distance_matrix[node][x])
+            lookahead_distance = distance_matrix[node][next_candidate]
+
+        score = immediate_distance + dynamic_weight * lookahead_distance
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,7 @@
+{
+     "algorithm": "The algorithm selects the next node by prioritizing the destination node if it's unvisited and closest to the current node, otherwise choosing the nearest unvisited node from the distance matrix. It ensures the destination is visited last if it's the closest, otherwise proceeds greedily. The code handles edge cases (empty unvisited nodes) and efficiently checks distances using the distance matrix.",
+     "thought": "The algorithm selects the next node to visit by choosing the closest unvisited node to the current node, prioritizing the destination node if it is the closest and unvisited, otherwise selecting the nearest unvisited node from the distance matrix.",
+     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n\n    if destination_node in unvisited_nodes:\n        min_distance = distance_matrix[current_node][destination_node]\n        next_node = destination_node\n    else:\n        min_distance = float('inf')\n        next_node = None\n\n    for node in unvisited_nodes:\n        if node != destination_node and distance_matrix[current_node][node] < min_distance:\n            min_distance = distance_matrix[current_node][node]\n            next_node = node\n\n    return next_node",
+     "objective": 7.00437,
+     "other_inf": null
+}

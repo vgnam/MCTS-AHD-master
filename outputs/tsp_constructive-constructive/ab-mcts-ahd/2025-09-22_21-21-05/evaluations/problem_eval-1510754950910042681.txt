@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visit_frequency=None):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    exploration_factor = 1 / (1 + math.exp(-0.5 * (remaining_nodes - 5)))  # Sigmoid-based adaptive factor
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        novelty_term = 0
+        if visit_frequency and node in visit_frequency:
+            novelty_term = 1 / (1 + visit_frequency[node])  # Discourage revisiting frequent nodes
+
+        combined_score = (exploration_factor * distance_to_current) + \
+                         ((1 - exploration_factor) * distance_to_destination) + \
+                         (0.2 * novelty_term)
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

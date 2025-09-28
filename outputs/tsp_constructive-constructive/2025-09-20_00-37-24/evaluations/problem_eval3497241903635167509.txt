@@ -1,0 +1,24 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate proximity weights (inverse distance)
+    proximity_weights = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes]
+
+    # Simulate historical visit frequencies (higher for nodes visited more often in past solutions)
+    visit_frequencies = [random.uniform(0.1, 1.0) for _ in unvisited_nodes]  # Placeholder for actual memory
+
+    # Combine proximity and frequency into a weighted probability distribution
+    combined_weights = [prox * freq for prox, freq in zip(proximity_weights, visit_frequencies)]
+    total_weight = sum(combined_weights)
+    probabilities = [w / total_weight for w in combined_weights]
+
+    # Select node based on the weighted probabilities
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+
+    return next_node

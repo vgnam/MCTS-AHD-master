@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_unvisited = len(unvisited_nodes)
+    candidates = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        if total_unvisited > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            locality = np.exp(-avg_distance / (avg_distance + 1e-6))
+        else:
+            avg_distance = 0.0
+            locality = 1.0
+        dynamic_weight = 1.0 / (1.0 + np.exp(-0.1 * (total_unvisited - 10)))
+        degree_penalty = np.exp(-degree / (degree + 1e-6))
+        score = (distance * (1.0 + 0.5 * degree_penalty * locality) +
+                 dynamic_weight * avg_distance * (1.0 - degree_penalty))
+        candidates.append((node, score))
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

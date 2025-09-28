@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    exploration_pressure = 1.0 - (remaining_count / total_nodes) ** 2
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Dynamic centrality calculation with exploration pressure scaling
+        remaining_nodes = unvisited_nodes - {node}
+        if remaining_nodes:
+            distances = [distance_matrix[node][n] for n in remaining_nodes]
+            node_centrality = sum(distances) / len(distances)
+            centrality_variance = sum((d - node_centrality) ** 2 for d in distances) / len(distances)
+            exploration_scaling = 1.0 + (exploration_pressure * 0.5)
+            adjusted_centrality = node_centrality * exploration_scaling
+        else:
+            adjusted_centrality = 0
+
+        # Hierarchical distance clustering
+        distance_clusters = {}
+        for n in unvisited_nodes:
+            cluster_key = int(distance_matrix[node][n] // (max(1, remaining_count) * 0.3))
+            distance_clusters[cluster_key] = distance_clusters.get(cluster_key, 0) + 1
+        cluster_entropy = -sum((count / remaining_count) * math.log(count / remaining_count + 1e-10)
+                              for count in distance_clusters.values())
+
+        # Path entropy weighting
+        path_entropy_weight = 0.3 * (1.0 - exploration_pressure) * cluster_entropy
+
+        # Adaptive weight balancing
+        immediate_weight = 0.5 - 0.2 * exploration_pressure
+        centrality_weight = 0.4 * (1.0 - immediate_weight) * (1.0 + path_entropy_weight)
+        distance_weight = 1.0 - immediate_weight - centrality_weight
+
+        # Novel score calculation
+        score = (immediate_weight * immediate_distance +
+                centrality_weight * adjusted_centrality +
+                distance_weight * sum(distance_matrix[node][n] for n in remaining_nodes if remaining_nodes) / max(1, len(remaining_nodes)))
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

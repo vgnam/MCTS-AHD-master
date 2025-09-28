@@ -1,0 +1,29 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, iteration=0, max_iterations=100):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate distances and angles
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    angles = []
+    for node in unvisited_nodes:
+        if current_node == 0:
+            vec1 = (0, 0)
+        else:
+            vec1 = (distance_matrix[current_node][0], distance_matrix[current_node][0])  # Simplified angle calculation
+        vec2 = (distance_matrix[node][0], distance_matrix[node][0])
+        angle = math.atan2(vec2[1], vec2[0]) - math.atan2(vec1[1], vec1[0])
+        angles.append(abs(angle))
+
+    # Dynamic temperature adjustment
+    temp = temperature * (1 - iteration / max_iterations)
+
+    # Combine distance and angle with temperature
+    combined_scores = [(1 / (d + 1)) * (1 / (a + 1)) ** (1 / temp) for d, a in zip(distances, angles)]
+    total_score = sum(combined_scores)
+    normalized_scores = [s / total_score for s in combined_scores]
+
+    next_node = random.choices(list(unvisited_nodes), weights=normalized_scores, k=1)[0]
+    return next_node

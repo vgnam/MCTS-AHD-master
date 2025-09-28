@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weighted scores for each unvisited node
+    scores = {}
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Heuristic: estimate the node's contribution to the total tour length
+        # by considering the average distance to other unvisited nodes
+        avg_future_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes) - 1)
+        # Weighted score: prioritize both immediate distance and future potential
+        scores[node] = 0.7 * distance + 0.3 * avg_future_distance
+
+    # Select node with the lowest score (balancing immediate distance and future potential)
+    next_node = min(scores, key=scores.get)
+
+    # Introduce stochasticity: sometimes pick a random node to diversify
+    if random.random() < 0.2:  # 20% chance to pick randomly
+        next_node = random.choice(list(unvisited_nodes))
+
+    return next_node

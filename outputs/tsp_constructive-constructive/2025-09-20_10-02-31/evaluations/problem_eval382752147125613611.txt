@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def min_max_distance(node):
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return distance_matrix[current_node][node]
+        return max(distance_matrix[node][n] for n in remaining_nodes)
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 1 else 0
+
+    local_score = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    global_score = min(unvisited_nodes, key=min_max_distance)
+
+    local_cost = distance_matrix[current_node][local_score]
+    global_cost = min_max_distance(global_score)
+
+    threshold = 0.25 * (local_cost + global_cost)
+
+    if remaining_ratio > 0.5:
+        next_node = local_score if local_cost <= threshold else global_score
+    else:
+        next_node = global_score if global_cost <= threshold else local_score
+
+    return next_node

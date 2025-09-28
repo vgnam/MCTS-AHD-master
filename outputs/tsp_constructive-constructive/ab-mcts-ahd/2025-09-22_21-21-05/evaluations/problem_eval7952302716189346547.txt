@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('-inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if not unvisited_nodes:
+            remaining_potential = 0
+        else:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            if not remaining_nodes:
+                remaining_potential = 0
+            else:
+                remaining_potential = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+
+        avg_distance_to_remaining = remaining_potential
+        normalized_potential = avg_distance_to_remaining / (sum(distance_matrix[node][n] for n in unvisited_nodes) + 1e-6) if unvisited_nodes else 0
+
+        density_factor = len([n for n in unvisited_nodes if distance_matrix[node][n] <= 1.2 * avg_distance_to_remaining]) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        exploration_weight = 0.7 if len(unvisited_nodes) > 3 else 0.3
+        exploitation_weight = 1 - exploration_weight
+
+        combined_score = (exploitation_weight * (distance_to_current + distance_to_destination) * (1 - 0.4 * normalized_potential) +
+                          exploration_weight * (0.6 * density_factor + 0.4 * (1 / (1 + avg_distance_to_remaining))))
+
+        if combined_score > best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

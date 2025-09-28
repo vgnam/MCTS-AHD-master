@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    total_nodes = num_unvisited + 1  # +1 for current_node
+    weight_factor = (num_unvisited / total_nodes) ** 2  # Stronger weighting for current distance when few nodes remain
+
+    best_score = float('inf')
+    next_node = None
+
+    # Calculate average distances for normalization
+    avg_current_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / num_unvisited
+    avg_future_distance = sum(distance_matrix[node][destination_node] for node in unvisited_nodes) / num_unvisited
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Normalize distances and apply dynamic weighting
+        normalized_current = current_distance / avg_current_distance if avg_current_distance > 0 else 0
+        normalized_future = future_distance / avg_future_distance if avg_future_distance > 0 else 0
+        weighted_score = (1.0 - weight_factor) * normalized_current + weight_factor * normalized_future
+
+        # Additional heuristic: penalize nodes that are outliers in distance
+        distance_ratio = current_distance / future_distance if future_distance > 0 else 1.0
+        if distance_ratio > 2.0 or distance_ratio < 0.5:
+            weighted_score *= 1.2  # Apply penalty
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+        elif weighted_score == best_score:
+            if current_distance < distance_matrix[current_node][next_node]:
+                next_node = node
+
+    return next_node

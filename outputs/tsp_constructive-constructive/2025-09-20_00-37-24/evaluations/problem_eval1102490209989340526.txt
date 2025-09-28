@@ -1,0 +1,28 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate probabilities inversely proportional to distance
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_distance = min(distances)
+    max_distance = max(distances)
+
+    # Avoid division by zero and normalize probabilities
+    normalized_distances = [(max_distance - d + 1e-6) / (max_distance - min_distance + 1e-6) for d in distances]
+    probabilities = [d / sum(normalized_distances) for d in normalized_distances]
+
+    # Introduce stochasticity: 90% chance to pick from top 3 nearest, 10% chance to pick randomly
+    if random.random() < 0.9:
+        # Select from top 3 nearest based on inverse distance weights
+        weighted_indices = np.random.choice(range(len(unvisited_nodes)), size=3, p=probabilities, replace=False)
+        candidates = [unvisited_nodes[i] for i in weighted_indices]
+        next_node = random.choice(candidates)
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

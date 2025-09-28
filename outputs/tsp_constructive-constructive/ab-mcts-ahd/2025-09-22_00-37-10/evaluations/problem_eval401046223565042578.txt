@@ -1,0 +1,31 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_distance = float('inf')
+    threshold = 1.2  # Dynamic threshold multiplier for candidate selection
+    candidate_nodes = []
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+        if distance <= threshold * min_distance:
+            candidate_nodes.append(node)
+
+    if not candidate_nodes:
+        return random.choice(unvisited_nodes)
+
+    # Calculate centrality weights (inverse of total distance to all other nodes)
+    centrality_weights = []
+    for node in candidate_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in range(len(distance_matrix)))
+        centrality_weights.append(1.0 / (total_distance + 1e-6))
+
+    # Combine distance and centrality weights
+    distance_weights = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in candidate_nodes]
+    combined_weights = [d * c for d, c in zip(distance_weights, centrality_weights)]
+    combined_weights = [w / sum(combined_weights) for w in combined_weights]
+
+    next_node = random.choices(candidate_nodes, weights=combined_weights, k=1)[0]
+    return next_node

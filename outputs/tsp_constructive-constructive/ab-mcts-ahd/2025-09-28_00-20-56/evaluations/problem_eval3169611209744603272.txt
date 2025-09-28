@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate inverse distances for probability weighting
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    inv_distances = [1.0 / (d + 1e-10) for d in distances]  # Avoid division by zero
+
+    # Calculate average distance and dynamic threshold
+    avg_distance = sum(distances) / len(distances) if distances else 0
+    threshold_factor = 1.0 + (1.0 / (len(unvisited_nodes) + 1))  # Adjust threshold based on remaining nodes
+
+    # Apply destination bias if within dynamic threshold
+    if destination_node in unvisited_nodes:
+        dest_dist = distance_matrix[current_node][destination_node]
+        if dest_dist <= avg_distance * threshold_factor:
+            inv_distances[unvisited_nodes.index(destination_node)] *= 2.0  # Double the weight for destination
+
+    # Normalize probabilities and select node
+    total_weight = sum(inv_distances)
+    probabilities = [w / total_weight for w in inv_distances]
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

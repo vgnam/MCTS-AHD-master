@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - remaining_nodes / total_nodes
+    temperature = max(0.1, 0.9 - 0.8 * progress)
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        local_density = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * min(distance_matrix[node][m] for m in unvisited_nodes if m != n)) if remaining_nodes > 1 else 0
+        predictive_quality = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / len(unvisited_nodes)
+        diversity_score = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        centrality = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.1 * min(distance_matrix[node][m] for m in unvisited_nodes if m != n)) if remaining_nodes > 1 else 0
+
+        weighted_score = (0.5 - 0.3 * progress) * immediate_cost + (0.3 + 0.4 * progress) * local_density + (0.2 * progress) * predictive_quality - (0.1 * (1 - progress)) * diversity_score + 0.1 * centrality
+        return weighted_score
+
+    scores = [heuristic(node) for node in unvisited_nodes]
+    probabilities = [math.exp(score / temperature) for score in scores]
+    total_prob = sum(probabilities)
+    normalized_probs = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(unvisited_nodes, weights=normalized_probs, k=1)[0]
+    return next_node

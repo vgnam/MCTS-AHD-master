@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    centrality = sum(1 / (distance_matrix[current_node][node] + 1e-6) for node in unvisited_nodes) / len(unvisited_nodes)
+    avg_unvisited_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+
+    weights = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            weights.append(0.0)
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        exploration_factor = (avg_unvisited_distance - immediate_distance) / (avg_unvisited_distance + 1e-6)
+        weighted_exploration = exploration_factor * (1 - centrality)
+
+        # Inverse distance for probability weighting
+        prob_weight = (1 / (immediate_distance + 1e-6)) * (0.5 + 0.5 * (1 - potential_distance / (sum(distance_matrix[node]) + 1e-6))) + weighted_exploration
+        weights.append(prob_weight)
+
+    # Normalize weights to form a probability distribution
+    total_weight = sum(weights)
+    if total_weight == 0:
+        total_weight = 1e-6
+    prob_distribution = [w / total_weight for w in weights]
+
+    # Select next node based on probability
+    next_node = np.random.choice(unvisited_nodes, p=prob_distribution)
+    return next_node

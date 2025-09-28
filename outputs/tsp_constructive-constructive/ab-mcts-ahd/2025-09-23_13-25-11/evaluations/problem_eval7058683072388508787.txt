@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+
+        # Calculate adaptability: difference between current distance and maximum future distance
+        max_future_dist = max(distance_matrix[node][other] for other in remaining_nodes)
+        adaptability = current_dist - max_future_dist
+
+        # Calculate centrality: average distance to remaining nodes
+        centrality = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+
+        # Dynamic weight adjustment based on remaining nodes and historical performance
+        remaining_ratio = len(remaining_nodes) / len(unvisited_nodes)
+        exploration_weight = 0.3 * remaining_ratio + 0.7 * (1 - remaining_ratio)  # Favor exploration as nodes decrease
+
+        # Reinforcement learning-inspired adjustment
+        if len(remaining_nodes) > len(unvisited_nodes) / 2:
+            exploration_weight *= 0.8  # More exploitation in early stages
+        else:
+            exploration_weight *= 1.2  # More exploration in later stages
+
+        # Probabilistic component to escape local optima
+        if len(remaining_nodes) < 3:
+            exploration_weight *= 1.5  # Increase exploration when very few nodes remain
+
+        return (1 - exploration_weight) * current_dist + exploration_weight * (adaptability + 0.5 * centrality)
+
+    # Select node with minimum score, with a small probability to choose randomly
+    if len(unvisited_nodes) > 1 and random.random() < 0.1:  # 10% chance to explore
+        next_node = random.choice(list(unvisited_nodes))
+    else:
+        next_node = min(unvisited_nodes, key=evaluate_node)
+
+    return next_node

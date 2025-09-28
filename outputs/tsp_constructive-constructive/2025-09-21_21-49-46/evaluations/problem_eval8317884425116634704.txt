@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, visit_history=None):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+    remaining_nodes = len(unvisited_nodes)
+    dest_weight = 1.0 + (1.0 / (remaining_nodes + 1))  # Dynamic weight based on remaining nodes
+    visit_history = visit_history if visit_history else {}
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_dest = distance_matrix[node][destination_node]
+        visit_penalty = visit_history.get(node, 0) * distance_to_dest  # Penalize frequently visited nodes
+        combined_score = distance_to_current + dest_weight * distance_to_dest + visit_penalty
+
+        if combined_score < min_score:
+            min_score = combined_score
+            next_node = node
+
+    return next_node

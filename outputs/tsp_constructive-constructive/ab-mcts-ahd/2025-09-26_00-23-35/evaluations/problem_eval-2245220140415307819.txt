@@ -1,0 +1,35 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('inf')
+    num_unvisited = len(unvisited_nodes)
+
+    # Fixed weights: 70% proximity, 30% centrality
+    weight_proximity = 0.7
+    weight_centrality = 0.3
+
+    # Centrality of current node
+    current_centrality = sum(distance_matrix[current_node]) / len(distance_matrix[current_node])
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+
+        # Centrality of candidate node
+        node_centrality = sum(distance_matrix[node]) / len(distance_matrix[node])
+
+        # Score with fixed weights and centrality bias
+        score = weight_proximity * distance_to_node + weight_centrality * node_centrality
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    # 15% chance to select a random unvisited node
+    if random.random() < 0.15:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

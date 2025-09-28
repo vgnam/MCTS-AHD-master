@@ -1,0 +1,55 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    # Calculate node density for dynamic weight adjustment
+    avg_distance = sum(sum(row) for row in distance_matrix) / (total_nodes * (total_nodes - 1))
+    node_density = 1.0 / (1.0 + avg_distance)
+
+    # Calculate proximity pressure (increases with exploration)
+    proximity_pressure = exploration_factor * (1.0 / (1.0 + sum(distance_matrix[current_node][n] for n in unvisited_nodes) / remaining_nodes))
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            # Centrality momentum: favors nodes that have been visited more frequently
+            centrality_momentum = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < avg_distance) / (remaining_nodes - 1)
+
+            # Adaptive connectivity score with density consideration
+            connectivity_score = (1.0 / (1.0 + sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1))) * node_density
+
+            # Dynamic threshold adjustment
+            threshold = 0.5 + 0.3 * exploration_factor
+        else:
+            connectivity_score = 0
+            centrality_momentum = 0
+            threshold = 0.5
+
+        # Adaptive weights with proximity pressure and momentum
+        weight_local = 0.3 - 0.1 * exploration_factor + 0.2 * proximity_pressure
+        weight_connectivity = 0.4 + 0.2 * exploration_factor - 0.1 * proximity_pressure
+        weight_dest = -0.2 + 0.1 * (1 - exploration_factor) + 0.2 * proximity_pressure
+        weight_momentum = 0.1 * exploration_factor + 0.2 * centrality_momentum
+
+        # Score with dynamic threshold consideration
+        score = (weight_local * immediate_dist +
+                 weight_connectivity * connectivity_score +
+                 weight_dest * dest_dist +
+                 weight_momentum * centrality_momentum)
+
+        # Apply threshold-based adjustment
+        if score > threshold:
+            score *= 1.2  # Boost high-quality candidates
+        else:
+            score *= 0.8  # Penalize low-quality candidates
+
+        return score
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

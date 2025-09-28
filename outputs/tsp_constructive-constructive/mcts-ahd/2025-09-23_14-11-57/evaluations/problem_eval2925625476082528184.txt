@@ -1,0 +1,54 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = (total_nodes - remaining_nodes) / total_nodes
+
+    # Enhanced centrality calculation (combines local and global connectivity)
+    centrality_scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Local centrality (average distance to neighbors)
+        local_centrality = sum(distance_matrix[node]) / (total_nodes - 1)
+
+        # Global centrality (betweenness-like measure)
+        global_centrality = sum(1 / (distance_matrix[node][other] + 1e-6) for other in unvisited_nodes if other != node)
+
+        # Combined centrality with non-linear scaling
+        node_centrality = (local_centrality * 0.6) + (global_centrality * 0.4)
+        normalized_centrality = node_centrality / (sum(distance_matrix[node]) / (total_nodes - 1) + 1e-6)
+
+        # Dynamic weight adjustment with exploration factor
+        exploration_factor = (1 - progress_factor) * 0.5 + 0.5
+        distance_weight = (1 - exploration_factor) * 0.8 + 0.2
+        future_weight = exploration_factor * 0.7 + 0.3
+
+        # Opportunity cost penalty (discourages suboptimal choices)
+        opportunity_cost = (immediate_distance + future_distance) / (sum(distance_matrix[node]) + 1e-6)
+
+        # Combined score with probabilistic selection component
+        combined_score = (distance_weight * immediate_distance) + \
+                        (future_weight * future_distance) + \
+                        (0.3 * opportunity_cost) - \
+                        (exploration_factor * normalized_centrality)
+
+        scores.append(combined_score)
+
+    # Probabilistic selection based on scores
+    min_score = min(scores)
+    max_score = max(scores)
+    if max_score == min_score:
+        probabilities = [1.0 / len(scores)] * len(scores)
+    else:
+        normalized_scores = [(max_score - s) / (max_score - min_score) for s in scores]
+        probabilities = [s / sum(normalized_scores) for s in normalized_scores]
+
+    selected_index = numpy.random.choice(len(scores), p=probabilities)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

@@ -1,0 +1,36 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        # Bias selection toward destination when it's far away
+        dest_distance = distance_matrix[current_node][destination_node]
+        if dest_distance > sum(distance_matrix[current_node]) / len(unvisited_nodes) * 0.7:
+            return destination_node
+
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    top_k = min(3, len(nearest_neighbors))
+
+    # Dynamic probability: higher chance to pick near nodes if destination is close
+    if destination_node in unvisited_nodes:
+        dest_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node]) / len(unvisited_nodes)
+        prob_threshold = max(0.5, min(0.9, 1 - (dest_distance / avg_distance)))
+    else:
+        prob_threshold = 0.7
+
+    if random.random() < prob_threshold:
+        candidates = nearest_neighbors[:top_k]
+        next_node = random.choice(candidates)
+    else:
+        # Explore with decreasing probability as neighbors get closer
+        explore_prob = 0.2 * (1 - min(1, len(unvisited_nodes) / len(distance_matrix)))
+        if random.random() < explore_prob:
+            next_node = random.choice(nearest_neighbors[top_k:]) if top_k < len(nearest_neighbors) else random.choice(nearest_neighbors)
+        else:
+            next_node = random.choice(nearest_neighbors[:top_k])
+
+    return next_node

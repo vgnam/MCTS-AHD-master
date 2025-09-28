@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate base probabilities using inverse distance (greedy preference)
+    distances = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+    min_dist = min(distances.values())
+    max_dist = max(distances.values())
+    normalized_distances = {node: (max_dist - dist + 1e-6) / (max_dist - min_dist + 1e-6) for node, dist in distances.items()}
+
+    # Add dynamic destination bias based on unvisited nodes count
+    remaining = len(unvisited_nodes)
+    bias_factor = 1.0 / (1.0 + remaining)  # Higher bias when fewer nodes remain
+    normalized_distances[destination_node] = bias_factor
+
+    # Select node with probability proportional to normalized scores
+    total_score = sum(normalized_distances.values())
+    probabilities = {node: score / total_score for node, score in normalized_distances.items()}
+    next_node = random.choices(list(probabilities.keys()), weights=list(probabilities.values()), k=1)[0]
+
+    return next_node

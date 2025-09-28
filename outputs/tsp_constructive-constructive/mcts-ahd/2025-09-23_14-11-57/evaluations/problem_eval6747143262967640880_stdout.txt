@@ -1,0 +1,12 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 20, in select_next_node
+    diversity_weights = [0.3 * (d / max_diversity) for d in path_diversity]
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 20, in <listcomp>
+    diversity_weights = [0.3 * (d / max_diversity) for d in path_diversity]
+ZeroDivisionError: division by zero

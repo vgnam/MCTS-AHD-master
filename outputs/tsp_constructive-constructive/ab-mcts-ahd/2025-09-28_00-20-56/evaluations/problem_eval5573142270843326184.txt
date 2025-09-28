@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate distances to all unvisited nodes
+    distances = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+    min_distance = min(distances.values())
+    closest_node = min(distances, key=distances.get)
+
+    # Calculate dynamic threshold based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    threshold_factor = 1.0 + (1.0 / remaining_nodes)  # Increases as remaining nodes decrease
+    avg_distance = sum(distances.values()) / remaining_nodes if remaining_nodes else 0
+    dynamic_threshold = avg_distance * threshold_factor
+
+    # Probabilistic selection: closer nodes have higher probability, but destination has exponential priority
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance <= dynamic_threshold:
+            # Exponential priority for destination as remaining nodes decrease
+            priority = 2.0 ** (-remaining_nodes / 10.0)  # Adjustable exponent
+            if random.random() < priority:
+                return destination_node
+
+    # Select closest node with probability inversely proportional to distance
+    selection_probability = min_distance / (min_distance + sum(distances.values()) - min_distance)
+    if random.random() < selection_probability:
+        return closest_node
+    else:
+        # Randomly select another node with lower probability
+        return next_node

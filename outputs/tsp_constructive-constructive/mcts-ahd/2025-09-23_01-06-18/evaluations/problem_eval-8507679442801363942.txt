@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    proximity_weight = 0.6 + 0.2 * (remaining_nodes / (remaining_nodes + 1))
+    detour_weight = 0.2 + 0.4 * (1 / (remaining_nodes + 1))
+
+    centrality = {node: sum(distance_matrix[node][j] for j in unvisited_nodes) / remaining_nodes for node in unvisited_nodes}
+    avg_unvisited_distance = sum(distance_matrix[current_node][i] for i in unvisited_nodes) / remaining_nodes
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        detour_cost = to_destination - distance_matrix[current_node][destination_node]
+        centrality_factor = 1 - (centrality[node] / max(centrality.values())) if max(centrality.values()) != 0 else 0
+        weighted_value = proximity_weight * to_current + detour_weight * detour_cost * centrality_factor
+        return weighted_value
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

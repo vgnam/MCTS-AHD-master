@@ -1,0 +1,24 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+    base_prob = 0.2 + 0.6 * remaining_ratio  # Probability of nearest-neighbor selection
+
+    # Calculate node popularity (inverse of average distance to all other nodes)
+    def popularity(node):
+        return 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+
+    # Calculate probabilistic farthest-insertion score
+    farthest_score = lambda node: distance_matrix[node][destination_node] * popularity(node)
+
+    # Select next node with probabilistic combination
+    if random.random() < base_prob:
+        # Prefer nearest neighbor with popularity boost
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] / (1 + 0.5 * popularity(node)))
+    else:
+        # Consider farthest insertion with popularity
+        next_node = max(unvisited_nodes, key=farthest_score)
+
+    return next_node

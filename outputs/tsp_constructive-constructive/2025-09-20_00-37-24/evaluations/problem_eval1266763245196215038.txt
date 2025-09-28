@@ -1,0 +1,33 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if destination_node in unvisited_nodes:
+        # Dynamic bias towards destination: higher probability as unvisited nodes decrease
+        bias_probability = 0.5 + (0.5 * (1 - len(unvisited_nodes) / len(distance_matrix)))
+        if random.random() < bias_probability:
+            return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate attractiveness: inverse of distance plus random factor
+    attractiveness = []
+    for node in nearest_neighbors:
+        distance = distance_matrix[current_node][node]
+        if distance == 0:
+            distance = 1e-6  # Avoid division by zero
+        random_factor = random.uniform(0.1, 0.5)
+        attractiveness.append((1 / distance) + random_factor)
+
+    # Select node based on attractiveness (weighted random choice)
+    total_attractiveness = sum(attractiveness)
+    if total_attractiveness == 0:
+        next_node = random.choice(nearest_neighbors)
+    else:
+        probabilities = [a / total_attractiveness for a in attractiveness]
+        next_node = random.choices(nearest_neighbors, weights=probabilities, k=1)[0]
+
+    return next_node

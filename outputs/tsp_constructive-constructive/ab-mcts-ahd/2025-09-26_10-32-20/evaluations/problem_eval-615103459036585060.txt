@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    progress = 1 - (len(unvisited_nodes) / total_nodes)
+    weight_factor = 1 / (1 + math.exp(-10 * (progress - 0.5)))
+
+    def calculate_weight(node):
+        local_dist = distance_matrix[current_node][node]
+        avg_dist = sum(distance_matrix[node]) / total_nodes
+        penalty = 0.1 if node in unvisited_nodes and node != destination_node else 0
+        return (1 - weight_factor) * local_dist + weight_factor * avg_dist + penalty
+
+    next_node = min(unvisited_nodes, key=calculate_weight)
+    return next_node

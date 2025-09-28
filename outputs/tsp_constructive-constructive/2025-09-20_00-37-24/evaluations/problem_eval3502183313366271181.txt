@@ -1,0 +1,31 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Priority to destination if unvisited
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Temperature-based exploration/exploitation trade-off
+    temperature = len(unvisited_nodes) / len(distance_matrix)
+    exploration_prob = max(0.1, min(0.9, temperature))
+
+    # Calculate nearest neighbors
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic candidate selection based on temperature
+    if random.random() < exploration_prob:
+        # Exploration: pick from a broader range of neighbors
+        candidate_range = min(5, len(nearest_neighbors))
+        candidates = nearest_neighbors[:candidate_range]
+        weights = [math.exp(-distance_matrix[current_node][node] / temperature) for node in candidates]
+        next_node = random.choices(candidates, weights=weights, k=1)[0]
+    else:
+        # Exploitation: pick from top 2 nearest neighbors
+        candidates = nearest_neighbors[:min(2, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+
+    return next_node

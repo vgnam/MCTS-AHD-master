@@ -1,0 +1,26 @@
+import math
+    import random
+    remaining_nodes = len(unvisited_nodes)
+    if remaining_nodes == 0:
+        return destination_node
+    temperature = 1.0 / (1 + remaining_nodes)  # Cools as nodes are visited
+    node_costs = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            node_costs.append((node, float('inf')))
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        weight = 0.5 * (1 + (remaining_nodes / (remaining_nodes + 1)))  # Dynamic weight
+        weighted_cost = immediate_distance + weight * potential_distance
+        node_costs.append((node, weighted_cost))
+    # Softmax selection with temperature
+    costs = [cost for (node, cost) in node_costs]
+    max_cost = max(costs)
+    min_cost = min(costs)
+    normalized_costs = [(max_cost - cost + 1e-10) / (max_cost - min_cost + 1e-10) for cost in costs]
+    probs = [math.exp(nc / temperature) for nc in normalized_costs]
+    prob_sum = sum(probs)
+    probs = [p / prob_sum for p in probs]
+    next_node = random.choices([node for (node, cost) in node_costs], weights=probs, k=1)[0]
+    return next_node

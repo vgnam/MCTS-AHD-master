@@ -1,0 +1,2221 @@
+[2025-09-21 20:41:26,486][root][INFO] - Workspace: D:\MCTS-AHD-master\outputs\tsp_constructive-constructive\2025-09-21_20-41-26
+[2025-09-21 20:41:26,486][root][INFO] - Project Root: D:\MCTS-AHD-master
+[2025-09-21 20:41:26,486][root][INFO] - Using LLM: mistral/codestral-latest
+[2025-09-21 20:41:26,487][root][INFO] - Using Algorithm: ab-mcts-ahd
+[2025-09-21 20:41:30,335][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:31,716][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:31,734][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:31,737][root][INFO] - LLM usage: prompt_tokens = 163, completion_tokens = 140
+[2025-09-21 20:41:31,739][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:32,777][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:32,778][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:32,780][root][INFO] - LLM usage: prompt_tokens = 490, completion_tokens = 223
+[2025-09-21 20:41:32,781][root][INFO] - Iteration 0: Running Code -8798657481392866468
+[2025-09-21 20:41:33,268][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:41:33,355][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:41:33,356][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:36,919][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:36,923][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:36,930][root][INFO] - LLM usage: prompt_tokens = 911, completion_tokens = 458
+[2025-09-21 20:41:36,932][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:37,819][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:37,823][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:37,825][root][INFO] - LLM usage: prompt_tokens = 1338, completion_tokens = 538
+[2025-09-21 20:41:37,825][root][INFO] - Iteration 0: Running Code 1948923322136780740
+[2025-09-21 20:41:38,324][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:41:38,400][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:41:38,400][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:39,460][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:39,462][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:39,463][root][INFO] - LLM usage: prompt_tokens = 1759, completion_tokens = 676
+[2025-09-21 20:41:39,464][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:40,782][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:40,785][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:40,786][root][INFO] - LLM usage: prompt_tokens = 2089, completion_tokens = 787
+[2025-09-21 20:41:40,787][root][INFO] - Iteration 0: Running Code 5554564923092358752
+[2025-09-21 20:41:41,277][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:41:41,362][root][INFO] - Iteration 0, response_id 0: Objective value: 7.99477320543647
+[2025-09-21 20:41:41,363][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:42,957][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:42,961][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:42,963][root][INFO] - LLM usage: prompt_tokens = 2774, completion_tokens = 978
+[2025-09-21 20:41:42,963][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:44,266][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:44,271][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:44,273][root][INFO] - LLM usage: prompt_tokens = 3148, completion_tokens = 1082
+[2025-09-21 20:41:44,273][root][INFO] - Iteration 0: Running Code 6639953119655097576
+[2025-09-21 20:41:44,780][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:41:44,828][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:41:44,829][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:46,161][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:46,166][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:46,173][root][INFO] - LLM usage: prompt_tokens = 3833, completion_tokens = 1270
+[2025-09-21 20:41:46,175][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:47,443][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:47,447][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:47,449][root][INFO] - LLM usage: prompt_tokens = 4213, completion_tokens = 1366
+[2025-09-21 20:41:47,449][root][INFO] - Iteration 0: Running Code 5945041850024574294
+[2025-09-21 20:41:47,956][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:41:48,366][root][INFO] - Iteration 0, response_id 0: Objective value: 9.505858306032728
+[2025-09-21 20:41:48,367][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:49,777][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:49,783][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:49,791][root][INFO] - LLM usage: prompt_tokens = 5167, completion_tokens = 1561
+[2025-09-21 20:41:49,793][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:50,868][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:50,869][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:50,871][root][INFO] - LLM usage: prompt_tokens = 5554, completion_tokens = 1643
+[2025-09-21 20:41:50,872][root][INFO] - Iteration 0: Running Code 5466722190746474900
+[2025-09-21 20:41:51,418][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:41:51,827][root][INFO] - Iteration 0, response_id 0: Objective value: 7.5775299422672795
+[2025-09-21 20:41:51,828][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:53,085][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:53,087][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:53,089][root][INFO] - LLM usage: prompt_tokens = 6242, completion_tokens = 1803
+[2025-09-21 20:41:53,089][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:54,063][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:54,068][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:54,074][root][INFO] - LLM usage: prompt_tokens = 6594, completion_tokens = 1890
+[2025-09-21 20:41:54,076][root][INFO] - Iteration 0: Running Code 5731352085149223442
+[2025-09-21 20:41:54,603][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:41:54,686][root][INFO] - Iteration 0, response_id 0: Objective value: 7.99477320543647
+[2025-09-21 20:41:54,687][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:56,477][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:56,482][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:56,488][root][INFO] - LLM usage: prompt_tokens = 6994, completion_tokens = 2117
+[2025-09-21 20:41:56,490][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:57,581][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:57,586][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:57,592][root][INFO] - LLM usage: prompt_tokens = 7408, completion_tokens = 2212
+[2025-09-21 20:41:57,594][root][INFO] - Iteration 0: Running Code 2686603684907213735
+[2025-09-21 20:41:58,090][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:41:58,128][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:41:58,129][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:41:59,405][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:41:59,409][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:41:59,414][root][INFO] - LLM usage: prompt_tokens = 7808, completion_tokens = 2385
+[2025-09-21 20:41:59,415][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:01,657][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:01,659][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:01,660][root][INFO] - LLM usage: prompt_tokens = 8173, completion_tokens = 2476
+[2025-09-21 20:42:01,661][root][INFO] - Iteration 0: Running Code 7592742591682195523
+[2025-09-21 20:42:02,154][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:02,259][root][INFO] - Iteration 0, response_id 0: Objective value: 7.433225728768652
+[2025-09-21 20:42:02,260][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:03,444][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:03,449][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:03,454][root][INFO] - LLM usage: prompt_tokens = 8554, completion_tokens = 2623
+[2025-09-21 20:42:03,456][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:04,583][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:04,585][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:04,587][root][INFO] - LLM usage: prompt_tokens = 8888, completion_tokens = 2713
+[2025-09-21 20:42:04,588][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:42:05,089][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:05,158][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:42:05,246][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:06,800][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:06,805][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:06,812][root][INFO] - LLM usage: prompt_tokens = 9584, completion_tokens = 2905
+[2025-09-21 20:42:06,814][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:07,837][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:07,840][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:07,842][root][INFO] - LLM usage: prompt_tokens = 9968, completion_tokens = 2982
+[2025-09-21 20:42:07,842][root][INFO] - Iteration 0: Running Code 5999137305983801454
+[2025-09-21 20:42:08,327][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:08,727][root][INFO] - Iteration 0, response_id 0: Objective value: 6.768518684949898
+[2025-09-21 20:42:08,728][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:10,721][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:10,725][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:10,732][root][INFO] - LLM usage: prompt_tokens = 10368, completion_tokens = 3237
+[2025-09-21 20:42:10,734][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:11,868][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:11,873][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:11,879][root][INFO] - LLM usage: prompt_tokens = 10810, completion_tokens = 3322
+[2025-09-21 20:42:11,881][root][INFO] - Iteration 0: Running Code -7763136447764054969
+[2025-09-21 20:42:12,364][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:12,453][root][INFO] - Iteration 0, response_id 0: Objective value: 8.029326027261845
+[2025-09-21 20:42:12,454][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:14,365][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:14,368][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:14,370][root][INFO] - LLM usage: prompt_tokens = 11191, completion_tokens = 3464
+[2025-09-21 20:42:14,371][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:15,419][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:15,422][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:15,424][root][INFO] - LLM usage: prompt_tokens = 11525, completion_tokens = 3544
+[2025-09-21 20:42:15,425][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:42:15,902][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:15,969][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:42:16,056][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:17,611][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:17,612][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:17,615][root][INFO] - LLM usage: prompt_tokens = 12209, completion_tokens = 3733
+[2025-09-21 20:42:17,616][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:18,810][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:18,815][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:18,821][root][INFO] - LLM usage: prompt_tokens = 12590, completion_tokens = 3817
+[2025-09-21 20:42:18,823][root][INFO] - Iteration 0: Running Code -78360059989555007
+[2025-09-21 20:42:19,340][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:19,788][root][INFO] - Iteration 0, response_id 0: Objective value: 6.844054379027048
+[2025-09-21 20:42:19,789][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:21,115][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:21,116][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:21,118][root][INFO] - LLM usage: prompt_tokens = 12990, completion_tokens = 3987
+[2025-09-21 20:42:21,119][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:22,337][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:22,342][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:22,348][root][INFO] - LLM usage: prompt_tokens = 13347, completion_tokens = 4066
+[2025-09-21 20:42:22,349][root][INFO] - Iteration 0: Running Code 6918051429873225708
+[2025-09-21 20:42:22,828][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:22,897][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:42:22,898][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:24,236][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:24,240][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:24,246][root][INFO] - LLM usage: prompt_tokens = 13728, completion_tokens = 4212
+[2025-09-21 20:42:24,247][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:25,367][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:25,369][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:25,371][root][INFO] - LLM usage: prompt_tokens = 14061, completion_tokens = 4306
+[2025-09-21 20:42:25,371][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:42:25,868][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:25,937][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:42:26,024][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:27,139][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:27,143][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:27,150][root][INFO] - LLM usage: prompt_tokens = 14749, completion_tokens = 4471
+[2025-09-21 20:42:27,152][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:29,822][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:29,825][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:29,827][root][INFO] - LLM usage: prompt_tokens = 15106, completion_tokens = 4596
+[2025-09-21 20:42:29,827][root][INFO] - Iteration 0: Running Code 5731352085149223442
+[2025-09-21 20:42:30,332][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:30,416][root][INFO] - Iteration 0, response_id 0: Objective value: 7.99477320543647
+[2025-09-21 20:42:30,418][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:31,619][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:31,623][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:31,625][root][INFO] - LLM usage: prompt_tokens = 15506, completion_tokens = 4757
+[2025-09-21 20:42:31,625][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:32,822][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:32,823][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:32,826][root][INFO] - LLM usage: prompt_tokens = 15859, completion_tokens = 4849
+[2025-09-21 20:42:32,827][root][INFO] - Iteration 0: Running Code -6964288043441341534
+[2025-09-21 20:42:33,448][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:33,544][root][INFO] - Iteration 0, response_id 0: Objective value: 7.433225728768652
+[2025-09-21 20:42:33,545][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:34,583][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:34,584][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:34,586][root][INFO] - LLM usage: prompt_tokens = 16240, completion_tokens = 4995
+[2025-09-21 20:42:34,586][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:35,536][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:35,540][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:35,542][root][INFO] - LLM usage: prompt_tokens = 16573, completion_tokens = 5084
+[2025-09-21 20:42:35,542][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:42:36,038][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:36,109][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:42:36,200][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:38,657][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:38,658][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:38,660][root][INFO] - LLM usage: prompt_tokens = 17328, completion_tokens = 5377
+[2025-09-21 20:42:38,661][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:39,778][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:39,782][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:39,783][root][INFO] - LLM usage: prompt_tokens = 17808, completion_tokens = 5478
+[2025-09-21 20:42:39,784][root][INFO] - Iteration 0: Running Code -7561039501340839669
+[2025-09-21 20:42:40,262][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:40,344][root][INFO] - Iteration 0, response_id 0: Objective value: 7.865655800301916
+[2025-09-21 20:42:40,345][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:42,019][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:42,023][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:42,028][root][INFO] - LLM usage: prompt_tokens = 18208, completion_tokens = 5758
+[2025-09-21 20:42:42,029][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:43,093][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:43,095][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:43,098][root][INFO] - LLM usage: prompt_tokens = 18680, completion_tokens = 5837
+[2025-09-21 20:42:43,099][root][INFO] - Iteration 0: Running Code -1440779363143309404
+[2025-09-21 20:42:43,659][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:43,696][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:42:43,697][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:46,666][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:46,670][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:46,672][root][INFO] - LLM usage: prompt_tokens = 19080, completion_tokens = 6026
+[2025-09-21 20:42:46,673][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:51,045][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:51,046][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:51,049][root][INFO] - LLM usage: prompt_tokens = 19461, completion_tokens = 6112
+[2025-09-21 20:42:51,050][root][INFO] - Iteration 0: Running Code 148622287049749736
+[2025-09-21 20:42:51,683][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:51,778][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:42:51,779][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:52,809][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:52,812][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:52,814][root][INFO] - LLM usage: prompt_tokens = 19842, completion_tokens = 6253
+[2025-09-21 20:42:52,814][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:53,848][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:53,849][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:53,852][root][INFO] - LLM usage: prompt_tokens = 20175, completion_tokens = 6357
+[2025-09-21 20:42:53,852][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:42:54,345][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:54,425][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:42:54,516][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:55,922][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:55,924][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:55,926][root][INFO] - LLM usage: prompt_tokens = 20974, completion_tokens = 6649
+[2025-09-21 20:42:55,927][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:57,183][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:57,186][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:57,189][root][INFO] - LLM usage: prompt_tokens = 21453, completion_tokens = 6783
+[2025-09-21 20:42:57,190][root][INFO] - Iteration 0: Running Code 4883366556402290387
+[2025-09-21 20:42:57,684][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:42:57,761][root][INFO] - Iteration 0, response_id 0: Objective value: 7.527485245901646
+[2025-09-21 20:42:57,762][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:42:59,704][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:42:59,707][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:42:59,710][root][INFO] - LLM usage: prompt_tokens = 21853, completion_tokens = 7128
+[2025-09-21 20:42:59,711][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:00,763][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:00,767][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:00,773][root][INFO] - LLM usage: prompt_tokens = 22385, completion_tokens = 7195
+[2025-09-21 20:43:00,774][root][INFO] - Iteration 0: Running Code -8466022431626520874
+[2025-09-21 20:43:01,277][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:01,381][root][INFO] - Iteration 0, response_id 0: Objective value: 19.591103414918557
+[2025-09-21 20:43:01,383][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:02,690][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:02,694][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:02,700][root][INFO] - LLM usage: prompt_tokens = 22766, completion_tokens = 7384
+[2025-09-21 20:43:02,702][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:03,752][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:03,753][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:03,755][root][INFO] - LLM usage: prompt_tokens = 23142, completion_tokens = 7473
+[2025-09-21 20:43:03,755][root][INFO] - Iteration 0: Running Code -2006848586281992480
+[2025-09-21 20:43:04,248][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:04,294][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:43:04,294][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:05,480][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:05,481][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:05,483][root][INFO] - LLM usage: prompt_tokens = 23523, completion_tokens = 7610
+[2025-09-21 20:43:05,484][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:06,540][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:06,541][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:06,543][root][INFO] - LLM usage: prompt_tokens = 23852, completion_tokens = 7707
+[2025-09-21 20:43:06,543][root][INFO] - Iteration 0: Running Code 5397195674826694697
+[2025-09-21 20:43:07,030][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:07,097][root][INFO] - Iteration 0, response_id 0: Objective value: 36.645936399521986
+[2025-09-21 20:43:07,182][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:08,601][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:08,606][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:08,614][root][INFO] - LLM usage: prompt_tokens = 24651, completion_tokens = 8001
+[2025-09-21 20:43:08,615][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:09,665][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:09,669][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:09,675][root][INFO] - LLM usage: prompt_tokens = 25132, completion_tokens = 8109
+[2025-09-21 20:43:09,678][root][INFO] - Iteration 0: Running Code -5346571544307650912
+[2025-09-21 20:43:10,288][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:10,365][root][INFO] - Iteration 0, response_id 0: Objective value: 7.373170914821315
+[2025-09-21 20:43:10,366][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:12,199][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:12,203][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:12,210][root][INFO] - LLM usage: prompt_tokens = 25532, completion_tokens = 8418
+[2025-09-21 20:43:12,212][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:13,172][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:13,173][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:13,176][root][INFO] - LLM usage: prompt_tokens = 26033, completion_tokens = 8488
+[2025-09-21 20:43:13,177][root][INFO] - Iteration 0: Running Code 1190659609027521919
+[2025-09-21 20:43:13,682][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:14,252][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:43:14,253][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:15,325][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:15,330][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:15,336][root][INFO] - LLM usage: prompt_tokens = 26414, completion_tokens = 8634
+[2025-09-21 20:43:15,338][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:16,341][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:16,346][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:16,352][root][INFO] - LLM usage: prompt_tokens = 26747, completion_tokens = 8719
+[2025-09-21 20:43:16,353][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:43:16,834][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:16,903][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:43:16,989][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:18,203][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:18,206][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:18,211][root][INFO] - LLM usage: prompt_tokens = 27502, completion_tokens = 8908
+[2025-09-21 20:43:18,212][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:19,235][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:19,239][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:19,245][root][INFO] - LLM usage: prompt_tokens = 27878, completion_tokens = 9000
+[2025-09-21 20:43:19,247][root][INFO] - Iteration 0: Running Code -2508933997297328272
+[2025-09-21 20:43:19,718][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:19,808][root][INFO] - Iteration 0, response_id 0: Objective value: 8.209933587389887
+[2025-09-21 20:43:19,809][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:21,226][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:21,228][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:21,233][root][INFO] - LLM usage: prompt_tokens = 28278, completion_tokens = 9205
+[2025-09-21 20:43:21,233][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:22,295][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:22,296][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:22,298][root][INFO] - LLM usage: prompt_tokens = 28675, completion_tokens = 9280
+[2025-09-21 20:43:22,298][root][INFO] - Iteration 0: Running Code -378636609699975283
+[2025-09-21 20:43:22,828][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:22,897][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:43:22,898][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:23,987][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:23,988][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:23,991][root][INFO] - LLM usage: prompt_tokens = 29056, completion_tokens = 9419
+[2025-09-21 20:43:23,992][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:25,065][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:25,067][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:25,068][root][INFO] - LLM usage: prompt_tokens = 29382, completion_tokens = 9504
+[2025-09-21 20:43:25,069][root][INFO] - Iteration 0: Running Code -2793509884840346636
+[2025-09-21 20:43:25,572][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:25,620][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:43:25,620][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:29,570][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:29,572][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:29,574][root][INFO] - LLM usage: prompt_tokens = 29763, completion_tokens = 9656
+[2025-09-21 20:43:29,575][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:30,772][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:30,776][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:30,778][root][INFO] - LLM usage: prompt_tokens = 30102, completion_tokens = 9743
+[2025-09-21 20:43:30,778][root][INFO] - Iteration 0: Running Code 3891859412050476277
+[2025-09-21 20:43:31,359][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:31,450][root][INFO] - Iteration 0, response_id 0: Objective value: 36.645936399521986
+[2025-09-21 20:43:31,539][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:32,603][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:32,605][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:32,607][root][INFO] - LLM usage: prompt_tokens = 30790, completion_tokens = 9895
+[2025-09-21 20:43:32,608][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:33,543][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:33,545][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:33,546][root][INFO] - LLM usage: prompt_tokens = 31134, completion_tokens = 9977
+[2025-09-21 20:43:33,547][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:34,788][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:34,792][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:34,800][root][INFO] - LLM usage: prompt_tokens = 31830, completion_tokens = 10179
+[2025-09-21 20:43:34,802][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:36,506][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:36,507][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:36,509][root][INFO] - LLM usage: prompt_tokens = 32224, completion_tokens = 10269
+[2025-09-21 20:43:36,509][root][INFO] - Iteration 0: Running Code -3066909475302373421
+[2025-09-21 20:43:37,134][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:37,676][root][INFO] - Iteration 0, response_id 0: Objective value: 7.5775299422672795
+[2025-09-21 20:43:37,678][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:39,003][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:39,007][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:39,014][root][INFO] - LLM usage: prompt_tokens = 32624, completion_tokens = 10476
+[2025-09-21 20:43:39,016][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:40,215][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:40,217][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:40,221][root][INFO] - LLM usage: prompt_tokens = 33023, completion_tokens = 10570
+[2025-09-21 20:43:40,223][root][INFO] - Iteration 0: Running Code -7413425549827374043
+[2025-09-21 20:43:40,816][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:40,908][root][INFO] - Iteration 0, response_id 0: Objective value: 7.452660871023785
+[2025-09-21 20:43:40,909][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:42,132][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:42,136][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:42,141][root][INFO] - LLM usage: prompt_tokens = 33404, completion_tokens = 10746
+[2025-09-21 20:43:42,142][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:43,232][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:43,233][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:43,234][root][INFO] - LLM usage: prompt_tokens = 33772, completion_tokens = 10858
+[2025-09-21 20:43:43,235][root][INFO] - Iteration 0: Running Code 1356417512482812
+[2025-09-21 20:43:43,744][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:43,784][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:43:43,785][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:44,779][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:44,780][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:44,782][root][INFO] - LLM usage: prompt_tokens = 34153, completion_tokens = 10999
+[2025-09-21 20:43:44,783][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:45,578][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:45,580][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:45,581][root][INFO] - LLM usage: prompt_tokens = 34486, completion_tokens = 11066
+[2025-09-21 20:43:45,583][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:43:46,317][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:46,385][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:43:46,472][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:47,600][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:47,602][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:47,604][root][INFO] - LLM usage: prompt_tokens = 35212, completion_tokens = 11248
+[2025-09-21 20:43:47,605][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:48,547][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:48,548][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:48,549][root][INFO] - LLM usage: prompt_tokens = 35586, completion_tokens = 11335
+[2025-09-21 20:43:48,550][root][INFO] - Iteration 0: Running Code 4549232083614231450
+[2025-09-21 20:43:49,043][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:49,136][root][INFO] - Iteration 0, response_id 0: Objective value: 7.371917516346499
+[2025-09-21 20:43:49,137][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:50,712][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:50,714][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:50,717][root][INFO] - LLM usage: prompt_tokens = 35986, completion_tokens = 11535
+[2025-09-21 20:43:50,718][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:51,779][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:51,782][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:51,784][root][INFO] - LLM usage: prompt_tokens = 36378, completion_tokens = 11622
+[2025-09-21 20:43:51,785][root][INFO] - Iteration 0: Running Code 4120202260666805055
+[2025-09-21 20:43:52,307][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:53,050][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:43:53,052][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:54,053][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:54,055][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:54,056][root][INFO] - LLM usage: prompt_tokens = 36759, completion_tokens = 11763
+[2025-09-21 20:43:54,057][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:54,983][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:54,984][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:54,986][root][INFO] - LLM usage: prompt_tokens = 37092, completion_tokens = 11850
+[2025-09-21 20:43:54,986][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:43:55,544][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:43:55,672][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:43:55,788][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:58,807][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:58,813][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:58,819][root][INFO] - LLM usage: prompt_tokens = 37788, completion_tokens = 12032
+[2025-09-21 20:43:58,820][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:43:59,700][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:43:59,701][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:43:59,703][root][INFO] - LLM usage: prompt_tokens = 38162, completion_tokens = 12108
+[2025-09-21 20:43:59,703][root][INFO] - Iteration 0: Running Code 461197353312238939
+[2025-09-21 20:44:00,247][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:00,653][root][INFO] - Iteration 0, response_id 0: Objective value: 7.831227913880664
+[2025-09-21 20:44:00,655][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:02,223][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:02,225][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:02,227][root][INFO] - LLM usage: prompt_tokens = 38562, completion_tokens = 12342
+[2025-09-21 20:44:02,228][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:03,172][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:03,174][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:03,178][root][INFO] - LLM usage: prompt_tokens = 38988, completion_tokens = 12426
+[2025-09-21 20:44:03,180][root][INFO] - Iteration 0: Running Code -8102153814762594974
+[2025-09-21 20:44:03,719][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:03,796][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:44:03,797][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:04,859][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:04,860][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:04,862][root][INFO] - LLM usage: prompt_tokens = 39369, completion_tokens = 12574
+[2025-09-21 20:44:04,863][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:05,833][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:05,835][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:05,837][root][INFO] - LLM usage: prompt_tokens = 39704, completion_tokens = 12659
+[2025-09-21 20:44:05,838][root][INFO] - Iteration 0: Running Code 3891859412050476277
+[2025-09-21 20:44:06,337][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:06,414][root][INFO] - Iteration 0, response_id 0: Objective value: 36.645936399521986
+[2025-09-21 20:44:06,504][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:07,614][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:07,615][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:07,617][root][INFO] - LLM usage: prompt_tokens = 40382, completion_tokens = 12831
+[2025-09-21 20:44:07,618][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:08,534][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:08,535][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:08,537][root][INFO] - LLM usage: prompt_tokens = 40746, completion_tokens = 12911
+[2025-09-21 20:44:08,537][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:10,320][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:10,321][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:10,323][root][INFO] - LLM usage: prompt_tokens = 41578, completion_tokens = 13191
+[2025-09-21 20:44:10,324][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:11,372][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:11,374][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:11,378][root][INFO] - LLM usage: prompt_tokens = 42050, completion_tokens = 13280
+[2025-09-21 20:44:11,381][root][INFO] - Iteration 0: Running Code 5202713241837596667
+[2025-09-21 20:44:11,917][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:12,000][root][INFO] - Iteration 0, response_id 0: Objective value: 7.063375119330361
+[2025-09-21 20:44:12,001][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:13,426][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:13,427][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:13,429][root][INFO] - LLM usage: prompt_tokens = 42450, completion_tokens = 13474
+[2025-09-21 20:44:13,430][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:14,466][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:14,467][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:14,469][root][INFO] - LLM usage: prompt_tokens = 42830, completion_tokens = 13557
+[2025-09-21 20:44:14,470][root][INFO] - Iteration 0: Running Code -3060167511834647745
+[2025-09-21 20:44:14,970][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:15,010][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:44:15,010][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:16,338][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:16,339][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:16,342][root][INFO] - LLM usage: prompt_tokens = 43230, completion_tokens = 13750
+[2025-09-21 20:44:16,342][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:20,638][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:20,639][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:20,641][root][INFO] - LLM usage: prompt_tokens = 43615, completion_tokens = 13851
+[2025-09-21 20:44:20,641][root][INFO] - Iteration 0: Running Code -133997193325656802
+[2025-09-21 20:44:21,156][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:21,259][root][INFO] - Iteration 0, response_id 0: Objective value: 7.433225728768652
+[2025-09-21 20:44:21,260][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:22,425][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:22,427][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:22,430][root][INFO] - LLM usage: prompt_tokens = 43996, completion_tokens = 13986
+[2025-09-21 20:44:22,430][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:23,289][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:23,291][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:23,292][root][INFO] - LLM usage: prompt_tokens = 44323, completion_tokens = 14048
+[2025-09-21 20:44:23,293][root][INFO] - Iteration 0: Running Code 2281883434930098818
+[2025-09-21 20:44:23,805][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:23,878][root][INFO] - Iteration 0, response_id 0: Objective value: 36.645936399521986
+[2025-09-21 20:44:23,973][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:25,573][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:25,578][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:25,580][root][INFO] - LLM usage: prompt_tokens = 45129, completion_tokens = 14311
+[2025-09-21 20:44:25,582][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:26,701][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:26,705][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:26,708][root][INFO] - LLM usage: prompt_tokens = 45579, completion_tokens = 14409
+[2025-09-21 20:44:26,709][root][INFO] - Iteration 0: Running Code 3936167406211998817
+[2025-09-21 20:44:27,211][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:27,289][root][INFO] - Iteration 0, response_id 0: Objective value: 7.465212427712887
+[2025-09-21 20:44:27,290][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:28,733][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:28,734][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:28,736][root][INFO] - LLM usage: prompt_tokens = 45979, completion_tokens = 14622
+[2025-09-21 20:44:28,737][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:29,731][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:29,734][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:29,738][root][INFO] - LLM usage: prompt_tokens = 46379, completion_tokens = 14701
+[2025-09-21 20:44:29,739][root][INFO] - Iteration 0: Running Code -1368031033393169504
+[2025-09-21 20:44:30,327][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:30,368][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:44:30,369][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:32,133][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:32,134][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:32,136][root][INFO] - LLM usage: prompt_tokens = 46779, completion_tokens = 14946
+[2025-09-21 20:44:32,136][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:33,249][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:33,251][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:33,254][root][INFO] - LLM usage: prompt_tokens = 47076, completion_tokens = 15031
+[2025-09-21 20:44:33,255][root][INFO] - Iteration 0: Running Code 6396033463322234320
+[2025-09-21 20:44:33,785][root][INFO] - Iteration -1: Code Run -1 execution error!
+[2025-09-21 20:44:33,824][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:44:33,824][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:35,579][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:35,581][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:35,583][root][INFO] - LLM usage: prompt_tokens = 47476, completion_tokens = 15295
+[2025-09-21 20:44:35,583][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:36,590][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:36,592][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:36,595][root][INFO] - LLM usage: prompt_tokens = 47932, completion_tokens = 15384
+[2025-09-21 20:44:36,596][root][INFO] - Iteration 0: Running Code -4589495269081031814
+[2025-09-21 20:44:37,107][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:37,151][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:44:37,151][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:38,315][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:38,316][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:38,318][root][INFO] - LLM usage: prompt_tokens = 48313, completion_tokens = 15545
+[2025-09-21 20:44:38,319][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:39,354][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:39,357][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:39,360][root][INFO] - LLM usage: prompt_tokens = 48652, completion_tokens = 15641
+[2025-09-21 20:44:39,362][root][INFO] - Iteration 0: Running Code 4232383567783181121
+[2025-09-21 20:44:39,879][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:39,920][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:44:39,921][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:41,084][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:41,086][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:41,088][root][INFO] - LLM usage: prompt_tokens = 49033, completion_tokens = 15798
+[2025-09-21 20:44:41,088][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:42,024][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:42,026][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:42,027][root][INFO] - LLM usage: prompt_tokens = 49377, completion_tokens = 15878
+[2025-09-21 20:44:42,028][root][INFO] - Iteration 0: Running Code 5397195674826694697
+[2025-09-21 20:44:42,517][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:42,590][root][INFO] - Iteration 0, response_id 0: Objective value: 36.645936399521986
+[2025-09-21 20:44:42,680][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:45,857][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:45,859][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:45,861][root][INFO] - LLM usage: prompt_tokens = 50068, completion_tokens = 16065
+[2025-09-21 20:44:45,862][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:46,747][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:46,748][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:46,751][root][INFO] - LLM usage: prompt_tokens = 50447, completion_tokens = 16133
+[2025-09-21 20:44:46,752][root][INFO] - Iteration 0: Running Code -1069144699990748773
+[2025-09-21 20:44:47,263][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:47,362][root][INFO] - Iteration 0, response_id 0: Objective value: 7.433225728768652
+[2025-09-21 20:44:47,364][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:49,299][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:49,301][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:49,304][root][INFO] - LLM usage: prompt_tokens = 50847, completion_tokens = 16444
+[2025-09-21 20:44:49,305][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:50,559][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:50,563][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:50,565][root][INFO] - LLM usage: prompt_tokens = 51125, completion_tokens = 16537
+[2025-09-21 20:44:50,566][root][INFO] - Iteration 0: Running Code -376452305193299443
+[2025-09-21 20:44:51,068][root][INFO] - Iteration -1: Code Run -1 execution error!
+[2025-09-21 20:44:51,113][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:44:51,113][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:52,958][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:52,960][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:52,964][root][INFO] - LLM usage: prompt_tokens = 51525, completion_tokens = 16843
+[2025-09-21 20:44:52,965][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:54,137][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:54,139][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:54,140][root][INFO] - LLM usage: prompt_tokens = 52023, completion_tokens = 16947
+[2025-09-21 20:44:54,141][root][INFO] - Iteration 0: Running Code -6162875597031761885
+[2025-09-21 20:44:54,667][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:54,741][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:44:54,742][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:55,770][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:55,771][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:55,773][root][INFO] - LLM usage: prompt_tokens = 52404, completion_tokens = 17093
+[2025-09-21 20:44:55,774][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:56,666][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:56,669][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:56,673][root][INFO] - LLM usage: prompt_tokens = 52737, completion_tokens = 17180
+[2025-09-21 20:44:56,674][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:44:57,195][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:44:57,268][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:44:57,358][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:58,614][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:58,616][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:58,618][root][INFO] - LLM usage: prompt_tokens = 53435, completion_tokens = 17365
+[2025-09-21 20:44:58,619][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:44:59,801][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:44:59,802][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:44:59,804][root][INFO] - LLM usage: prompt_tokens = 53812, completion_tokens = 17456
+[2025-09-21 20:44:59,804][root][INFO] - Iteration 0: Running Code 2342461466328552139
+[2025-09-21 20:45:00,322][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:00,434][root][INFO] - Iteration 0, response_id 0: Objective value: 7.332838896893797
+[2025-09-21 20:45:00,435][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:02,505][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:02,506][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:02,508][root][INFO] - LLM usage: prompt_tokens = 54212, completion_tokens = 17779
+[2025-09-21 20:45:02,509][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:03,693][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:03,694][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:03,696][root][INFO] - LLM usage: prompt_tokens = 54727, completion_tokens = 17864
+[2025-09-21 20:45:03,697][root][INFO] - Iteration 0: Running Code 1462667090173554447
+[2025-09-21 20:45:04,205][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:04,256][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:45:04,257][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:05,931][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:05,934][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:05,936][root][INFO] - LLM usage: prompt_tokens = 55127, completion_tokens = 18094
+[2025-09-21 20:45:05,937][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:07,156][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:07,158][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:07,161][root][INFO] - LLM usage: prompt_tokens = 55549, completion_tokens = 18201
+[2025-09-21 20:45:07,161][root][INFO] - Iteration 0: Running Code -3827312432004442228
+[2025-09-21 20:45:07,659][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:07,734][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:45:07,735][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:09,431][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:09,433][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:09,434][root][INFO] - LLM usage: prompt_tokens = 55930, completion_tokens = 18347
+[2025-09-21 20:45:09,435][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:10,444][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:10,445][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:10,447][root][INFO] - LLM usage: prompt_tokens = 56263, completion_tokens = 18444
+[2025-09-21 20:45:10,448][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:45:10,943][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:11,016][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:45:11,108][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:12,395][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:12,397][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:12,401][root][INFO] - LLM usage: prompt_tokens = 56947, completion_tokens = 18630
+[2025-09-21 20:45:12,402][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:13,193][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:13,194][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:13,196][root][INFO] - LLM usage: prompt_tokens = 57325, completion_tokens = 18690
+[2025-09-21 20:45:13,196][root][INFO] - Iteration 0: Running Code 8839431260878249693
+[2025-09-21 20:45:13,730][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:14,145][root][INFO] - Iteration 0, response_id 0: Objective value: 7.342166157460419
+[2025-09-21 20:45:14,147][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:15,378][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:15,382][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:15,384][root][INFO] - LLM usage: prompt_tokens = 57725, completion_tokens = 18875
+[2025-09-21 20:45:15,385][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:16,415][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:16,417][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:16,419][root][INFO] - LLM usage: prompt_tokens = 58102, completion_tokens = 18951
+[2025-09-21 20:45:16,420][root][INFO] - Iteration 0: Running Code 81923772963302129
+[2025-09-21 20:45:16,933][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:17,016][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:45:17,017][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:18,110][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:18,111][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:18,113][root][INFO] - LLM usage: prompt_tokens = 58483, completion_tokens = 19098
+[2025-09-21 20:45:18,113][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:20,620][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:20,625][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:20,631][root][INFO] - LLM usage: prompt_tokens = 58817, completion_tokens = 19195
+[2025-09-21 20:45:20,633][root][INFO] - Iteration 0: Running Code -1784444545575252698
+[2025-09-21 20:45:21,156][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:21,228][root][INFO] - Iteration 0, response_id 0: Objective value: 36.645936399521986
+[2025-09-21 20:45:21,322][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:22,716][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:22,719][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:22,722][root][INFO] - LLM usage: prompt_tokens = 59604, completion_tokens = 19475
+[2025-09-21 20:45:22,723][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:23,938][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:23,939][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:23,941][root][INFO] - LLM usage: prompt_tokens = 60071, completion_tokens = 19573
+[2025-09-21 20:45:23,942][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:25,382][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:25,383][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:25,385][root][INFO] - LLM usage: prompt_tokens = 60858, completion_tokens = 19830
+[2025-09-21 20:45:25,385][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:26,697][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:26,698][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:26,699][root][INFO] - LLM usage: prompt_tokens = 61307, completion_tokens = 19937
+[2025-09-21 20:45:26,700][root][INFO] - Iteration 0: Running Code -4235880204152770639
+[2025-09-21 20:45:27,219][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:27,306][root][INFO] - Iteration 0, response_id 0: Objective value: 7.214592756491784
+[2025-09-21 20:45:27,308][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:28,958][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:28,962][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:28,964][root][INFO] - LLM usage: prompt_tokens = 61707, completion_tokens = 20183
+[2025-09-21 20:45:28,964][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:29,921][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:29,922][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:29,924][root][INFO] - LLM usage: prompt_tokens = 62145, completion_tokens = 20251
+[2025-09-21 20:45:29,925][root][INFO] - Iteration 0: Running Code 7159178626452320770
+[2025-09-21 20:45:30,432][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:30,519][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:45:30,520][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:31,558][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:31,559][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:31,560][root][INFO] - LLM usage: prompt_tokens = 62526, completion_tokens = 20392
+[2025-09-21 20:45:31,561][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:32,459][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:32,460][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:32,462][root][INFO] - LLM usage: prompt_tokens = 62859, completion_tokens = 20480
+[2025-09-21 20:45:32,462][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:45:32,979][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:33,055][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:45:33,156][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:34,441][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:34,443][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:34,445][root][INFO] - LLM usage: prompt_tokens = 63550, completion_tokens = 20691
+[2025-09-21 20:45:34,445][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:35,393][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:35,394][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:35,396][root][INFO] - LLM usage: prompt_tokens = 63915, completion_tokens = 20777
+[2025-09-21 20:45:35,396][root][INFO] - Iteration 0: Running Code 4147199472939397746
+[2025-09-21 20:45:35,926][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:36,030][root][INFO] - Iteration 0, response_id 0: Objective value: 7.251084126633403
+[2025-09-21 20:45:36,039][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:37,953][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:37,954][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:37,956][root][INFO] - LLM usage: prompt_tokens = 64315, completion_tokens = 21123
+[2025-09-21 20:45:37,956][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:38,886][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:38,887][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:38,889][root][INFO] - LLM usage: prompt_tokens = 64849, completion_tokens = 21201
+[2025-09-21 20:45:38,890][root][INFO] - Iteration 0: Running Code -8798027289816613502
+[2025-09-21 20:45:39,411][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:39,460][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:45:39,461][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:41,080][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:41,082][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:41,084][root][INFO] - LLM usage: prompt_tokens = 65249, completion_tokens = 21473
+[2025-09-21 20:45:41,085][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:42,035][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:42,037][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:42,038][root][INFO] - LLM usage: prompt_tokens = 65713, completion_tokens = 21554
+[2025-09-21 20:45:42,039][root][INFO] - Iteration 0: Running Code -775105976028522370
+[2025-09-21 20:45:42,550][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:42,650][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:45:42,665][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:43,703][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:43,704][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:43,706][root][INFO] - LLM usage: prompt_tokens = 66094, completion_tokens = 21706
+[2025-09-21 20:45:43,707][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:44,692][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:44,693][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:44,695][root][INFO] - LLM usage: prompt_tokens = 66433, completion_tokens = 21796
+[2025-09-21 20:45:44,696][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:45:45,193][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:45,263][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:45:45,371][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:46,814][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:46,815][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:46,818][root][INFO] - LLM usage: prompt_tokens = 67220, completion_tokens = 22059
+[2025-09-21 20:45:46,818][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:48,145][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:48,146][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:48,149][root][INFO] - LLM usage: prompt_tokens = 67670, completion_tokens = 22165
+[2025-09-21 20:45:48,150][root][INFO] - Iteration 0: Running Code -4992602229064821978
+[2025-09-21 20:45:48,669][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:48,750][root][INFO] - Iteration 0, response_id 0: Objective value: 7.085908295307802
+[2025-09-21 20:45:48,756][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:50,768][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:50,769][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:50,771][root][INFO] - LLM usage: prompt_tokens = 68070, completion_tokens = 22352
+[2025-09-21 20:45:50,771][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:52,425][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:52,427][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:52,429][root][INFO] - LLM usage: prompt_tokens = 68449, completion_tokens = 22421
+[2025-09-21 20:45:52,430][root][INFO] - Iteration 0: Running Code -6515223497292232695
+[2025-09-21 20:45:52,927][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:53,021][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:45:53,024][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:55,092][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:55,093][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:55,094][root][INFO] - LLM usage: prompt_tokens = 68830, completion_tokens = 22573
+[2025-09-21 20:45:55,095][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:56,516][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:56,517][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:56,519][root][INFO] - LLM usage: prompt_tokens = 69169, completion_tokens = 22679
+[2025-09-21 20:45:56,519][root][INFO] - Iteration 0: Running Code 2281883434930098818
+[2025-09-21 20:45:57,027][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:45:57,100][root][INFO] - Iteration 0, response_id 0: Objective value: 36.645936399521986
+[2025-09-21 20:45:57,201][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:45:59,015][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:45:59,017][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:45:59,021][root][INFO] - LLM usage: prompt_tokens = 69948, completion_tokens = 22924
+[2025-09-21 20:45:59,022][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:00,495][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:00,497][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:00,498][root][INFO] - LLM usage: prompt_tokens = 70373, completion_tokens = 23012
+[2025-09-21 20:46:00,499][root][INFO] - Iteration 0: Running Code 7085675756759791007
+[2025-09-21 20:46:00,996][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:01,037][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:46:01,037][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:02,634][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:02,635][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:02,637][root][INFO] - LLM usage: prompt_tokens = 71153, completion_tokens = 23276
+[2025-09-21 20:46:02,638][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:03,840][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:03,842][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:03,845][root][INFO] - LLM usage: prompt_tokens = 71604, completion_tokens = 23368
+[2025-09-21 20:46:03,846][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:05,199][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:05,201][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:05,203][root][INFO] - LLM usage: prompt_tokens = 72271, completion_tokens = 23539
+[2025-09-21 20:46:05,203][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:06,374][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:06,376][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:06,377][root][INFO] - LLM usage: prompt_tokens = 72634, completion_tokens = 23629
+[2025-09-21 20:46:06,378][root][INFO] - Iteration 0: Running Code 1060002607912347889
+[2025-09-21 20:46:06,878][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:07,300][root][INFO] - Iteration 0, response_id 0: Objective value: 7.308242386942819
+[2025-09-21 20:46:07,314][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:09,010][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:09,013][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:09,016][root][INFO] - LLM usage: prompt_tokens = 73034, completion_tokens = 23876
+[2025-09-21 20:46:09,017][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:10,207][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:10,208][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:10,211][root][INFO] - LLM usage: prompt_tokens = 73473, completion_tokens = 23951
+[2025-09-21 20:46:10,212][root][INFO] - Iteration 0: Running Code 5375409817167571430
+[2025-09-21 20:46:10,706][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:10,807][root][INFO] - Iteration 0, response_id 0: Objective value: 7.433225728768652
+[2025-09-21 20:46:10,819][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:11,879][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:11,880][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:11,882][root][INFO] - LLM usage: prompt_tokens = 73854, completion_tokens = 24098
+[2025-09-21 20:46:11,883][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:12,868][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:12,870][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:12,872][root][INFO] - LLM usage: prompt_tokens = 74193, completion_tokens = 24186
+[2025-09-21 20:46:12,873][root][INFO] - Iteration 0: Running Code 3955109507740186365
+[2025-09-21 20:46:13,377][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:13,454][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:46:13,547][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:15,056][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:15,058][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:15,060][root][INFO] - LLM usage: prompt_tokens = 74980, completion_tokens = 24442
+[2025-09-21 20:46:15,061][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:16,312][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:16,314][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:16,315][root][INFO] - LLM usage: prompt_tokens = 75428, completion_tokens = 24554
+[2025-09-21 20:46:16,316][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:17,772][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:17,774][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:17,776][root][INFO] - LLM usage: prompt_tokens = 76119, completion_tokens = 24723
+[2025-09-21 20:46:17,777][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:19,088][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:19,091][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:19,094][root][INFO] - LLM usage: prompt_tokens = 76480, completion_tokens = 24820
+[2025-09-21 20:46:19,095][root][INFO] - Iteration 0: Running Code -9152078811985545718
+[2025-09-21 20:46:19,597][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:20,040][root][INFO] - Iteration 0, response_id 0: Objective value: 7.1893753743052
+[2025-09-21 20:46:20,044][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:21,538][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:21,539][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:21,541][root][INFO] - LLM usage: prompt_tokens = 76880, completion_tokens = 25035
+[2025-09-21 20:46:21,542][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:23,136][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:23,137][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:23,139][root][INFO] - LLM usage: prompt_tokens = 77278, completion_tokens = 25134
+[2025-09-21 20:46:23,140][root][INFO] - Iteration 0: Running Code 2284908078106663405
+[2025-09-21 20:46:23,663][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:23,751][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:46:23,765][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:24,855][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:24,856][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:24,858][root][INFO] - LLM usage: prompt_tokens = 77659, completion_tokens = 25282
+[2025-09-21 20:46:24,859][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:25,948][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:25,949][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:25,952][root][INFO] - LLM usage: prompt_tokens = 77994, completion_tokens = 25364
+[2025-09-21 20:46:25,952][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:46:26,475][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:26,547][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:46:26,644][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:27,803][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:27,805][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:27,808][root][INFO] - LLM usage: prompt_tokens = 78684, completion_tokens = 25550
+[2025-09-21 20:46:27,808][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:28,908][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:28,912][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:28,914][root][INFO] - LLM usage: prompt_tokens = 79062, completion_tokens = 25626
+[2025-09-21 20:46:28,914][root][INFO] - Iteration 0: Running Code -1069144699990748773
+[2025-09-21 20:46:29,417][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:29,522][root][INFO] - Iteration 0, response_id 0: Objective value: 7.433225728768652
+[2025-09-21 20:46:29,529][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:30,916][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:30,917][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:30,919][root][INFO] - LLM usage: prompt_tokens = 79462, completion_tokens = 25826
+[2025-09-21 20:46:30,920][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:32,002][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:32,003][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:32,005][root][INFO] - LLM usage: prompt_tokens = 79854, completion_tokens = 25904
+[2025-09-21 20:46:32,005][root][INFO] - Iteration 0: Running Code 6763866410815842096
+[2025-09-21 20:46:32,558][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:32,630][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:46:32,640][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:33,816][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:33,817][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:33,819][root][INFO] - LLM usage: prompt_tokens = 80235, completion_tokens = 26061
+[2025-09-21 20:46:33,819][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:34,689][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:34,690][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:34,692][root][INFO] - LLM usage: prompt_tokens = 80579, completion_tokens = 26141
+[2025-09-21 20:46:34,692][root][INFO] - Iteration 0: Running Code 2281883434930098818
+[2025-09-21 20:46:35,211][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:35,291][root][INFO] - Iteration 0, response_id 0: Objective value: 36.645936399521986
+[2025-09-21 20:46:35,389][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:36,495][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:36,499][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:36,501][root][INFO] - LLM usage: prompt_tokens = 81269, completion_tokens = 26327
+[2025-09-21 20:46:36,501][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:37,418][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:37,420][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:37,422][root][INFO] - LLM usage: prompt_tokens = 81647, completion_tokens = 26406
+[2025-09-21 20:46:37,423][root][INFO] - Iteration 0: Running Code -1069144699990748773
+[2025-09-21 20:46:37,936][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:38,034][root][INFO] - Iteration 0, response_id 0: Objective value: 7.433225728768652
+[2025-09-21 20:46:38,044][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:39,583][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:39,586][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:39,591][root][INFO] - LLM usage: prompt_tokens = 82047, completion_tokens = 26641
+[2025-09-21 20:46:39,591][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:40,657][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:40,658][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:40,659][root][INFO] - LLM usage: prompt_tokens = 82474, completion_tokens = 26733
+[2025-09-21 20:46:40,660][root][INFO] - Iteration 0: Running Code -1045978701762683719
+[2025-09-21 20:46:41,175][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:41,260][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:46:41,262][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:42,269][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:42,270][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:42,272][root][INFO] - LLM usage: prompt_tokens = 82855, completion_tokens = 26880
+[2025-09-21 20:46:42,272][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:43,189][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:43,191][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:43,192][root][INFO] - LLM usage: prompt_tokens = 83189, completion_tokens = 26960
+[2025-09-21 20:46:43,193][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:46:43,728][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:43,810][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:46:43,911][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:45,211][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:45,213][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:45,215][root][INFO] - LLM usage: prompt_tokens = 83887, completion_tokens = 27154
+[2025-09-21 20:46:45,216][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:46,307][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:46,308][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:46,310][root][INFO] - LLM usage: prompt_tokens = 84273, completion_tokens = 27243
+[2025-09-21 20:46:46,311][root][INFO] - Iteration 0: Running Code 7592742591682195523
+[2025-09-21 20:46:46,822][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:46,930][root][INFO] - Iteration 0, response_id 0: Objective value: 7.433225728768652
+[2025-09-21 20:46:46,945][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:48,886][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:48,887][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:48,889][root][INFO] - LLM usage: prompt_tokens = 84673, completion_tokens = 27482
+[2025-09-21 20:46:48,889][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:49,949][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:49,951][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:49,953][root][INFO] - LLM usage: prompt_tokens = 85099, completion_tokens = 27565
+[2025-09-21 20:46:49,954][root][INFO] - Iteration 0: Running Code -4537573632058849522
+[2025-09-21 20:46:50,508][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:50,618][root][INFO] - Iteration 0, response_id 0: Objective value: 19.398061834130015
+[2025-09-21 20:46:50,635][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:51,811][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:51,812][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:51,814][root][INFO] - LLM usage: prompt_tokens = 85480, completion_tokens = 27716
+[2025-09-21 20:46:51,814][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:52,753][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:52,755][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:52,757][root][INFO] - LLM usage: prompt_tokens = 85818, completion_tokens = 27795
+[2025-09-21 20:46:52,757][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:46:53,263][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:53,351][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:46:53,451][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:54,649][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:54,651][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:54,653][root][INFO] - LLM usage: prompt_tokens = 86509, completion_tokens = 27987
+[2025-09-21 20:46:54,654][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:55,709][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:55,710][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:55,713][root][INFO] - LLM usage: prompt_tokens = 86893, completion_tokens = 28092
+[2025-09-21 20:46:55,714][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:57,054][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:57,055][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:57,057][root][INFO] - LLM usage: prompt_tokens = 87672, completion_tokens = 28336
+[2025-09-21 20:46:57,058][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:46:58,177][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:46:58,178][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:46:58,181][root][INFO] - LLM usage: prompt_tokens = 88108, completion_tokens = 28427
+[2025-09-21 20:46:58,182][root][INFO] - Iteration 0: Running Code 7875861358587759902
+[2025-09-21 20:46:58,715][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:46:58,795][root][INFO] - Iteration 0, response_id 0: Objective value: 7.023308453233964
+[2025-09-21 20:46:58,804][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:00,463][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:00,464][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:00,466][root][INFO] - LLM usage: prompt_tokens = 88508, completion_tokens = 28713
+[2025-09-21 20:47:00,466][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:01,803][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:01,804][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:01,805][root][INFO] - LLM usage: prompt_tokens = 88986, completion_tokens = 28824
+[2025-09-21 20:47:01,807][root][INFO] - Iteration 0: Running Code -3719779071539175305
+[2025-09-21 20:47:02,312][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:02,352][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:47:02,352][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:03,995][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:03,996][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:03,998][root][INFO] - LLM usage: prompt_tokens = 89386, completion_tokens = 29042
+[2025-09-21 20:47:03,999][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:05,014][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:05,016][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:05,017][root][INFO] - LLM usage: prompt_tokens = 89796, completion_tokens = 29123
+[2025-09-21 20:47:05,018][root][INFO] - Iteration 0: Running Code -4242771490693573553
+[2025-09-21 20:47:05,532][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:05,641][root][INFO] - Iteration 0, response_id 0: Objective value: 7.433225728768652
+[2025-09-21 20:47:05,646][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:06,763][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:06,764][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:06,767][root][INFO] - LLM usage: prompt_tokens = 90177, completion_tokens = 29270
+[2025-09-21 20:47:06,767][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:07,924][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:07,925][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:07,927][root][INFO] - LLM usage: prompt_tokens = 90511, completion_tokens = 29390
+[2025-09-21 20:47:07,927][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:47:08,451][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:08,523][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:47:08,630][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:10,117][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:10,119][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:10,122][root][INFO] - LLM usage: prompt_tokens = 91291, completion_tokens = 29650
+[2025-09-21 20:47:10,122][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:12,202][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:12,204][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:12,205][root][INFO] - LLM usage: prompt_tokens = 91738, completion_tokens = 29734
+[2025-09-21 20:47:12,206][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:13,966][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:13,968][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:13,971][root][INFO] - LLM usage: prompt_tokens = 92517, completion_tokens = 29985
+[2025-09-21 20:47:13,972][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:15,114][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:15,115][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:15,116][root][INFO] - LLM usage: prompt_tokens = 92960, completion_tokens = 30057
+[2025-09-21 20:47:15,117][root][INFO] - Iteration 0: Running Code -4992602229064821978
+[2025-09-21 20:47:15,625][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:15,712][root][INFO] - Iteration 0, response_id 0: Objective value: 7.050695146118654
+[2025-09-21 20:47:15,712][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:16,993][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:16,995][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:16,998][root][INFO] - LLM usage: prompt_tokens = 93664, completion_tokens = 30237
+[2025-09-21 20:47:16,998][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:17,953][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:17,954][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:17,956][root][INFO] - LLM usage: prompt_tokens = 94036, completion_tokens = 30308
+[2025-09-21 20:47:17,956][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:19,395][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:19,396][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:19,398][root][INFO] - LLM usage: prompt_tokens = 94815, completion_tokens = 30553
+[2025-09-21 20:47:19,399][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:20,597][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:20,598][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:20,600][root][INFO] - LLM usage: prompt_tokens = 95252, completion_tokens = 30646
+[2025-09-21 20:47:20,601][root][INFO] - Iteration 0: Running Code -4992602229064821978
+[2025-09-21 20:47:21,115][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:21,207][root][INFO] - Iteration 0, response_id 0: Objective value: 7.075724678192852
+[2025-09-21 20:47:21,209][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:23,153][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:23,154][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:23,156][root][INFO] - LLM usage: prompt_tokens = 96016, completion_tokens = 30904
+[2025-09-21 20:47:23,157][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:24,301][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:24,303][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:24,305][root][INFO] - LLM usage: prompt_tokens = 96466, completion_tokens = 31033
+[2025-09-21 20:47:24,306][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:26,341][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:26,343][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:26,345][root][INFO] - LLM usage: prompt_tokens = 97170, completion_tokens = 31223
+[2025-09-21 20:47:26,345][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:27,590][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:27,592][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:27,593][root][INFO] - LLM usage: prompt_tokens = 97552, completion_tokens = 31308
+[2025-09-21 20:47:27,594][root][INFO] - Iteration 0: Running Code 8839431260878249693
+[2025-09-21 20:47:28,120][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:28,556][root][INFO] - Iteration 0, response_id 0: Objective value: 7.342166157460419
+[2025-09-21 20:47:28,571][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:30,332][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:30,333][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:30,335][root][INFO] - LLM usage: prompt_tokens = 97952, completion_tokens = 31580
+[2025-09-21 20:47:30,336][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:31,622][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:31,623][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:31,625][root][INFO] - LLM usage: prompt_tokens = 98398, completion_tokens = 31683
+[2025-09-21 20:47:31,625][root][INFO] - Iteration 0: Running Code 4363067709121693272
+[2025-09-21 20:47:32,155][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:32,197][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:47:32,198][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:33,908][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:33,909][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:33,911][root][INFO] - LLM usage: prompt_tokens = 98798, completion_tokens = 31889
+[2025-09-21 20:47:33,911][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:35,433][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:35,434][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:35,436][root][INFO] - LLM usage: prompt_tokens = 99191, completion_tokens = 31953
+[2025-09-21 20:47:35,436][root][INFO] - Iteration 0: Running Code -1418756880508702572
+[2025-09-21 20:47:35,945][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:35,988][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:47:35,989][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:37,595][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:37,596][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:37,598][root][INFO] - LLM usage: prompt_tokens = 99591, completion_tokens = 32137
+[2025-09-21 20:47:37,598][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:38,649][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:38,652][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:38,658][root][INFO] - LLM usage: prompt_tokens = 99967, completion_tokens = 32222
+[2025-09-21 20:47:38,659][root][INFO] - Iteration 0: Running Code -1306832051994776900
+[2025-09-21 20:47:39,183][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:39,223][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:47:39,224][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:40,337][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:40,339][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:40,341][root][INFO] - LLM usage: prompt_tokens = 100348, completion_tokens = 32369
+[2025-09-21 20:47:40,342][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:41,242][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:41,243][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:41,245][root][INFO] - LLM usage: prompt_tokens = 100682, completion_tokens = 32442
+[2025-09-21 20:47:41,245][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:47:41,795][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:41,870][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:47:41,975][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:43,577][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:43,578][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:43,580][root][INFO] - LLM usage: prompt_tokens = 101462, completion_tokens = 32682
+[2025-09-21 20:47:43,580][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:44,725][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:44,726][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:44,728][root][INFO] - LLM usage: prompt_tokens = 101894, completion_tokens = 32778
+[2025-09-21 20:47:44,728][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:45,909][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:45,910][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:45,912][root][INFO] - LLM usage: prompt_tokens = 102585, completion_tokens = 32958
+[2025-09-21 20:47:45,913][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:47,072][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:47,074][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:47,076][root][INFO] - LLM usage: prompt_tokens = 102957, completion_tokens = 33052
+[2025-09-21 20:47:47,077][root][INFO] - Iteration 0: Running Code -6314976975462449943
+[2025-09-21 20:47:47,614][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:48,051][root][INFO] - Iteration 0, response_id 0: Objective value: 6.926143750396679
+[2025-09-21 20:47:48,061][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:49,859][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:49,860][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:49,862][root][INFO] - LLM usage: prompt_tokens = 103357, completion_tokens = 33378
+[2025-09-21 20:47:49,863][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:50,954][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:50,956][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:50,957][root][INFO] - LLM usage: prompt_tokens = 103709, completion_tokens = 33474
+[2025-09-21 20:47:50,958][root][INFO] - Iteration 0: Running Code -8128381627682817417
+[2025-09-21 20:47:51,451][root][INFO] - Iteration -1: Code Run -1 execution error!
+[2025-09-21 20:47:51,489][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:47:51,490][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:53,147][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:53,148][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:53,150][root][INFO] - LLM usage: prompt_tokens = 104109, completion_tokens = 33686
+[2025-09-21 20:47:53,151][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:54,485][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:54,489][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:54,494][root][INFO] - LLM usage: prompt_tokens = 104504, completion_tokens = 33769
+[2025-09-21 20:47:54,497][root][INFO] - Iteration 0: Running Code -2052453881585571940
+[2025-09-21 20:47:55,019][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:55,128][root][INFO] - Iteration 0, response_id 0: Objective value: 7.418937460701402
+[2025-09-21 20:47:55,130][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:56,571][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:56,573][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:56,575][root][INFO] - LLM usage: prompt_tokens = 104885, completion_tokens = 33915
+[2025-09-21 20:47:56,575][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:47:58,646][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:47:58,647][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:47:58,649][root][INFO] - LLM usage: prompt_tokens = 105218, completion_tokens = 34009
+[2025-09-21 20:47:58,650][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:47:59,146][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:47:59,215][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:47:59,316][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:01,270][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:01,271][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:01,274][root][INFO] - LLM usage: prompt_tokens = 105982, completion_tokens = 34261
+[2025-09-21 20:48:01,275][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:02,569][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:02,570][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:02,572][root][INFO] - LLM usage: prompt_tokens = 106421, completion_tokens = 34368
+[2025-09-21 20:48:02,573][root][INFO] - Iteration 0: Running Code 8786069024301984105
+[2025-09-21 20:48:03,067][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:03,142][root][INFO] - Iteration 0, response_id 0: Objective value: 7.008317931000448
+[2025-09-21 20:48:03,156][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:06,806][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:06,811][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:06,814][root][INFO] - LLM usage: prompt_tokens = 106821, completion_tokens = 34602
+[2025-09-21 20:48:06,815][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:08,103][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:08,104][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:08,106][root][INFO] - LLM usage: prompt_tokens = 107247, completion_tokens = 34680
+[2025-09-21 20:48:08,107][root][INFO] - Iteration 0: Running Code 1777434981311595498
+[2025-09-21 20:48:08,630][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:08,669][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:48:08,669][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:11,805][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:11,807][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:11,809][root][INFO] - LLM usage: prompt_tokens = 107647, completion_tokens = 34902
+[2025-09-21 20:48:11,810][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:13,254][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:13,255][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:13,257][root][INFO] - LLM usage: prompt_tokens = 108056, completion_tokens = 35004
+[2025-09-21 20:48:13,258][root][INFO] - Iteration 0: Running Code -2989578571986780858
+[2025-09-21 20:48:13,779][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:13,833][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:48:13,834][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:15,473][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:15,474][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:15,476][root][INFO] - LLM usage: prompt_tokens = 108456, completion_tokens = 35213
+[2025-09-21 20:48:15,477][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:16,848][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:16,850][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:16,851][root][INFO] - LLM usage: prompt_tokens = 108857, completion_tokens = 35290
+[2025-09-21 20:48:16,852][root][INFO] - Iteration 0: Running Code 2052517521924510629
+[2025-09-21 20:48:17,338][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:17,412][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:48:17,430][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:19,041][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:19,043][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:19,045][root][INFO] - LLM usage: prompt_tokens = 109238, completion_tokens = 35440
+[2025-09-21 20:48:19,045][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:20,241][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:20,242][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:20,245][root][INFO] - LLM usage: prompt_tokens = 109575, completion_tokens = 35555
+[2025-09-21 20:48:20,245][root][INFO] - Iteration 0: Running Code 3891859412050476277
+[2025-09-21 20:48:20,730][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:20,799][root][INFO] - Iteration 0, response_id 0: Objective value: 36.645936399521986
+[2025-09-21 20:48:20,902][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:22,246][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:22,247][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:22,250][root][INFO] - LLM usage: prompt_tokens = 110259, completion_tokens = 35751
+[2025-09-21 20:48:22,250][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:23,336][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:23,337][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:23,339][root][INFO] - LLM usage: prompt_tokens = 110647, completion_tokens = 35834
+[2025-09-21 20:48:23,340][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:25,642][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:25,643][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:25,645][root][INFO] - LLM usage: prompt_tokens = 111348, completion_tokens = 36002
+[2025-09-21 20:48:25,646][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:28,906][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:28,907][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:28,909][root][INFO] - LLM usage: prompt_tokens = 111708, completion_tokens = 36088
+[2025-09-21 20:48:28,910][root][INFO] - Iteration 0: Running Code -78360059989555007
+[2025-09-21 20:48:29,424][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:29,835][root][INFO] - Iteration 0, response_id 0: Objective value: 6.844054379027048
+[2025-09-21 20:48:29,836][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:31,556][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:31,558][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:31,560][root][INFO] - LLM usage: prompt_tokens = 112472, completion_tokens = 36358
+[2025-09-21 20:48:31,560][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:32,850][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:32,852][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:32,854][root][INFO] - LLM usage: prompt_tokens = 112934, completion_tokens = 36442
+[2025-09-21 20:48:32,854][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:34,354][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:34,355][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:34,357][root][INFO] - LLM usage: prompt_tokens = 113698, completion_tokens = 36694
+[2025-09-21 20:48:34,358][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:35,529][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:35,530][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:35,532][root][INFO] - LLM usage: prompt_tokens = 114142, completion_tokens = 36800
+[2025-09-21 20:48:35,533][root][INFO] - Iteration 0: Running Code 9222063970817991959
+[2025-09-21 20:48:36,047][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:36,121][root][INFO] - Iteration 0, response_id 0: Objective value: 7.045800168410993
+[2025-09-21 20:48:36,134][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:37,828][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:37,829][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:37,830][root][INFO] - LLM usage: prompt_tokens = 114542, completion_tokens = 37013
+[2025-09-21 20:48:37,831][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:39,019][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:39,020][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:39,022][root][INFO] - LLM usage: prompt_tokens = 114947, completion_tokens = 37115
+[2025-09-21 20:48:39,023][root][INFO] - Iteration 0: Running Code -4222920014937814267
+[2025-09-21 20:48:39,533][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:39,624][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:48:39,634][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:40,778][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:40,779][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:40,781][root][INFO] - LLM usage: prompt_tokens = 115328, completion_tokens = 37252
+[2025-09-21 20:48:40,781][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:41,899][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:41,915][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:41,917][root][INFO] - LLM usage: prompt_tokens = 115652, completion_tokens = 37331
+[2025-09-21 20:48:41,917][root][INFO] - Iteration 0: Running Code -2752210892818173861
+[2025-09-21 20:48:42,416][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:42,491][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:48:42,614][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:43,925][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:43,926][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:43,928][root][INFO] - LLM usage: prompt_tokens = 116343, completion_tokens = 37510
+[2025-09-21 20:48:43,928][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:45,190][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:45,191][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:45,193][root][INFO] - LLM usage: prompt_tokens = 116714, completion_tokens = 37598
+[2025-09-21 20:48:45,193][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:46,681][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:46,683][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:46,685][root][INFO] - LLM usage: prompt_tokens = 117478, completion_tokens = 37876
+[2025-09-21 20:48:46,685][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:48,318][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:48,319][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:48,321][root][INFO] - LLM usage: prompt_tokens = 117943, completion_tokens = 37958
+[2025-09-21 20:48:48,321][root][INFO] - Iteration 0: Running Code 7875861358587759902
+[2025-09-21 20:48:48,857][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:48,932][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0361398696713815
+[2025-09-21 20:48:48,933][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:50,191][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:50,193][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:50,194][root][INFO] - LLM usage: prompt_tokens = 118644, completion_tokens = 38141
+[2025-09-21 20:48:50,195][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:51,232][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:51,233][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:51,235][root][INFO] - LLM usage: prompt_tokens = 119019, completion_tokens = 38227
+[2025-09-21 20:48:51,236][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:52,751][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:52,752][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:52,754][root][INFO] - LLM usage: prompt_tokens = 119798, completion_tokens = 38481
+[2025-09-21 20:48:52,755][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:53,875][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:53,877][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:53,878][root][INFO] - LLM usage: prompt_tokens = 120239, completion_tokens = 38562
+[2025-09-21 20:48:53,879][root][INFO] - Iteration 0: Running Code 9222063970817991959
+[2025-09-21 20:48:54,414][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:54,497][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0508999216920625
+[2025-09-21 20:48:54,498][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:55,881][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:55,882][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:55,884][root][INFO] - LLM usage: prompt_tokens = 121018, completion_tokens = 38785
+[2025-09-21 20:48:55,885][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:56,921][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:56,922][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:56,925][root][INFO] - LLM usage: prompt_tokens = 121433, completion_tokens = 38871
+[2025-09-21 20:48:56,925][root][INFO] - Iteration 0: Running Code 8371985642635744156
+[2025-09-21 20:48:57,432][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:48:57,473][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:48:57,474][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:58,818][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:58,820][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:58,821][root][INFO] - LLM usage: prompt_tokens = 121833, completion_tokens = 39048
+[2025-09-21 20:48:58,822][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:48:59,868][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:48:59,869][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:48:59,871][root][INFO] - LLM usage: prompt_tokens = 122202, completion_tokens = 39137
+[2025-09-21 20:48:59,872][root][INFO] - Iteration 0: Running Code -9141004664361717105
+[2025-09-21 20:49:00,382][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:00,466][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:49:00,482][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:01,543][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:01,545][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:01,546][root][INFO] - LLM usage: prompt_tokens = 122583, completion_tokens = 39287
+[2025-09-21 20:49:01,547][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:02,593][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:02,594][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:02,596][root][INFO] - LLM usage: prompt_tokens = 122920, completion_tokens = 39390
+[2025-09-21 20:49:02,597][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:49:03,102][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:03,173][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:49:03,286][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:04,890][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:04,891][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:04,893][root][INFO] - LLM usage: prompt_tokens = 123699, completion_tokens = 39651
+[2025-09-21 20:49:04,893][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:05,957][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:05,959][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:05,961][root][INFO] - LLM usage: prompt_tokens = 124147, completion_tokens = 39739
+[2025-09-21 20:49:05,961][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:07,554][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:07,555][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:07,557][root][INFO] - LLM usage: prompt_tokens = 124926, completion_tokens = 39996
+[2025-09-21 20:49:07,558][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:08,814][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:08,815][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:08,817][root][INFO] - LLM usage: prompt_tokens = 125375, completion_tokens = 40089
+[2025-09-21 20:49:08,818][root][INFO] - Iteration 0: Running Code 5995846156299406838
+[2025-09-21 20:49:09,328][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:09,370][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:49:09,371][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:10,997][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:10,999][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:11,001][root][INFO] - LLM usage: prompt_tokens = 126162, completion_tokens = 40379
+[2025-09-21 20:49:11,002][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:12,027][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:12,028][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:12,030][root][INFO] - LLM usage: prompt_tokens = 126639, completion_tokens = 40468
+[2025-09-21 20:49:12,030][root][INFO] - Iteration 0: Running Code 637336667662649059
+[2025-09-21 20:49:12,541][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:12,621][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0953687102811935
+[2025-09-21 20:49:12,623][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:13,961][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:13,962][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:13,964][root][INFO] - LLM usage: prompt_tokens = 127039, completion_tokens = 40638
+[2025-09-21 20:49:13,964][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:15,002][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:15,003][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:15,005][root][INFO] - LLM usage: prompt_tokens = 127401, completion_tokens = 40724
+[2025-09-21 20:49:15,005][root][INFO] - Iteration 0: Running Code 3475658438111939774
+[2025-09-21 20:49:15,536][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:15,581][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:49:15,582][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:17,089][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:17,090][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:17,093][root][INFO] - LLM usage: prompt_tokens = 127801, completion_tokens = 40969
+[2025-09-21 20:49:17,093][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:18,229][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:18,233][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:18,235][root][INFO] - LLM usage: prompt_tokens = 128229, completion_tokens = 41054
+[2025-09-21 20:49:18,236][root][INFO] - Iteration 0: Running Code 7558113259153959981
+[2025-09-21 20:49:18,758][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:18,796][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:49:18,796][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:20,004][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:20,006][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:20,009][root][INFO] - LLM usage: prompt_tokens = 128629, completion_tokens = 41231
+[2025-09-21 20:49:20,010][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:20,977][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:20,979][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:20,981][root][INFO] - LLM usage: prompt_tokens = 128998, completion_tokens = 41316
+[2025-09-21 20:49:20,981][root][INFO] - Iteration 0: Running Code -5693477195005686664
+[2025-09-21 20:49:21,499][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:21,538][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:49:21,539][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:22,717][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:22,719][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:22,721][root][INFO] - LLM usage: prompt_tokens = 129379, completion_tokens = 41463
+[2025-09-21 20:49:22,721][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:23,526][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:23,530][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:23,534][root][INFO] - LLM usage: prompt_tokens = 129718, completion_tokens = 41531
+[2025-09-21 20:49:23,535][root][INFO] - Iteration 0: Running Code 3955109507740186365
+[2025-09-21 20:49:24,046][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:24,120][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:49:24,230][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:25,566][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:25,567][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:25,569][root][INFO] - LLM usage: prompt_tokens = 130402, completion_tokens = 41721
+[2025-09-21 20:49:25,569][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:26,461][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:26,465][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:26,469][root][INFO] - LLM usage: prompt_tokens = 130784, completion_tokens = 41802
+[2025-09-21 20:49:26,470][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:28,053][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:28,054][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:28,056][root][INFO] - LLM usage: prompt_tokens = 131571, completion_tokens = 42078
+[2025-09-21 20:49:28,057][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:29,396][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:29,399][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:29,400][root][INFO] - LLM usage: prompt_tokens = 132034, completion_tokens = 42198
+[2025-09-21 20:49:29,401][root][INFO] - Iteration 0: Running Code -4235880204152770639
+[2025-09-21 20:49:29,929][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:30,008][root][INFO] - Iteration 0, response_id 0: Objective value: 7.050094364488453
+[2025-09-21 20:49:30,025][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:31,612][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:31,616][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:31,618][root][INFO] - LLM usage: prompt_tokens = 132434, completion_tokens = 42438
+[2025-09-21 20:49:31,618][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:32,645][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:32,649][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:32,652][root][INFO] - LLM usage: prompt_tokens = 132857, completion_tokens = 42527
+[2025-09-21 20:49:32,653][root][INFO] - Iteration 0: Running Code -7445476981111328742
+[2025-09-21 20:49:33,165][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:33,267][root][INFO] - Iteration 0, response_id 0: Objective value: 7.433225728768652
+[2025-09-21 20:49:33,281][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:34,378][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:34,379][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:34,382][root][INFO] - LLM usage: prompt_tokens = 133238, completion_tokens = 42678
+[2025-09-21 20:49:34,383][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:35,349][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:35,351][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:35,354][root][INFO] - LLM usage: prompt_tokens = 133581, completion_tokens = 42779
+[2025-09-21 20:49:35,355][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:49:35,853][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:35,925][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:49:36,031][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:37,439][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:37,441][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:37,443][root][INFO] - LLM usage: prompt_tokens = 134345, completion_tokens = 43031
+[2025-09-21 20:49:37,444][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:38,832][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:38,835][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:38,838][root][INFO] - LLM usage: prompt_tokens = 134789, completion_tokens = 43132
+[2025-09-21 20:49:38,838][root][INFO] - Iteration 0: Running Code -7825815965574811911
+[2025-09-21 20:49:39,341][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:39,418][root][INFO] - Iteration 0, response_id 0: Objective value: 7.105553137267703
+[2025-09-21 20:49:39,431][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:41,237][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:41,239][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:41,241][root][INFO] - LLM usage: prompt_tokens = 135189, completion_tokens = 43386
+[2025-09-21 20:49:41,241][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:42,368][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:42,369][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:42,371][root][INFO] - LLM usage: prompt_tokens = 135617, completion_tokens = 43446
+[2025-09-21 20:49:42,372][root][INFO] - Iteration 0: Running Code 7238386700433549419
+[2025-09-21 20:49:42,871][root][INFO] - Iteration -1: Code Run -1 execution error!
+[2025-09-21 20:49:42,911][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:49:42,911][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:44,410][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:44,411][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:44,413][root][INFO] - LLM usage: prompt_tokens = 136017, completion_tokens = 43627
+[2025-09-21 20:49:44,414][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:45,335][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:45,337][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:45,338][root][INFO] - LLM usage: prompt_tokens = 136390, completion_tokens = 43693
+[2025-09-21 20:49:45,339][root][INFO] - Iteration 0: Running Code -7119487291105383380
+[2025-09-21 20:49:45,831][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:45,928][root][INFO] - Iteration 0, response_id 0: Objective value: 7.371917516346499
+[2025-09-21 20:49:45,931][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:47,200][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:47,201][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:47,203][root][INFO] - LLM usage: prompt_tokens = 136771, completion_tokens = 43897
+[2025-09-21 20:49:47,203][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:48,138][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:48,140][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:48,142][root][INFO] - LLM usage: prompt_tokens = 137162, completion_tokens = 43972
+[2025-09-21 20:49:48,143][root][INFO] - Iteration 0: Running Code 392031244260331222
+[2025-09-21 20:49:48,656][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:48,729][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:49:48,857][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:50,021][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:50,023][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:50,026][root][INFO] - LLM usage: prompt_tokens = 137846, completion_tokens = 44165
+[2025-09-21 20:49:50,027][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:50,911][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:50,913][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:50,914][root][INFO] - LLM usage: prompt_tokens = 138231, completion_tokens = 44251
+[2025-09-21 20:49:50,915][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:52,217][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:52,219][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:52,222][root][INFO] - LLM usage: prompt_tokens = 139010, completion_tokens = 44501
+[2025-09-21 20:49:52,222][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:53,511][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:53,513][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:53,515][root][INFO] - LLM usage: prompt_tokens = 139447, completion_tokens = 44624
+[2025-09-21 20:49:53,518][root][INFO] - Iteration 0: Running Code -1579697150965958454
+[2025-09-21 20:49:54,026][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:54,101][root][INFO] - Iteration 0, response_id 0: Objective value: 7.056609777973705
+[2025-09-21 20:49:54,115][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:55,688][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:55,690][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:55,691][root][INFO] - LLM usage: prompt_tokens = 139847, completion_tokens = 44872
+[2025-09-21 20:49:55,692][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:56,676][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:56,678][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:56,681][root][INFO] - LLM usage: prompt_tokens = 140287, completion_tokens = 44956
+[2025-09-21 20:49:56,682][root][INFO] - Iteration 0: Running Code 2888041911038639565
+[2025-09-21 20:49:57,182][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:49:57,226][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:49:57,227][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:49:58,764][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:49:58,765][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:49:58,767][root][INFO] - LLM usage: prompt_tokens = 140687, completion_tokens = 45193
+[2025-09-21 20:49:58,768][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:00,078][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:00,080][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:00,081][root][INFO] - LLM usage: prompt_tokens = 141111, completion_tokens = 45271
+[2025-09-21 20:50:00,082][root][INFO] - Iteration 0: Running Code -1035055299154500770
+[2025-09-21 20:50:00,600][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:00,707][root][INFO] - Iteration 0, response_id 0: Objective value: 7.433225728768652
+[2025-09-21 20:50:00,712][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:01,722][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:01,723][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:01,726][root][INFO] - LLM usage: prompt_tokens = 141492, completion_tokens = 45417
+[2025-09-21 20:50:01,726][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:02,680][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:02,682][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:02,685][root][INFO] - LLM usage: prompt_tokens = 141825, completion_tokens = 45521
+[2025-09-21 20:50:02,687][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:50:03,175][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:03,246][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:50:03,363][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:04,789][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:04,790][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:04,792][root][INFO] - LLM usage: prompt_tokens = 142516, completion_tokens = 45692
+[2025-09-21 20:50:04,793][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:05,972][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:05,973][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:05,975][root][INFO] - LLM usage: prompt_tokens = 142879, completion_tokens = 45766
+[2025-09-21 20:50:05,976][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:07,357][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:07,358][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:07,360][root][INFO] - LLM usage: prompt_tokens = 143675, completion_tokens = 46024
+[2025-09-21 20:50:07,361][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:08,426][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:08,427][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:08,430][root][INFO] - LLM usage: prompt_tokens = 144120, completion_tokens = 46101
+[2025-09-21 20:50:08,430][root][INFO] - Iteration 0: Running Code 4133044404105793322
+[2025-09-21 20:50:08,925][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:08,999][root][INFO] - Iteration 0, response_id 0: Objective value: 7.000053619288321
+[2025-09-21 20:50:09,006][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:10,410][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:10,411][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:10,413][root][INFO] - LLM usage: prompt_tokens = 144520, completion_tokens = 46283
+[2025-09-21 20:50:10,414][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:11,506][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:11,507][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:11,509][root][INFO] - LLM usage: prompt_tokens = 144889, completion_tokens = 46381
+[2025-09-21 20:50:11,510][root][INFO] - Iteration 0: Running Code 6621341387702768877
+[2025-09-21 20:50:12,004][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:12,041][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:50:12,042][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:13,723][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:13,724][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:13,726][root][INFO] - LLM usage: prompt_tokens = 145289, completion_tokens = 46620
+[2025-09-21 20:50:13,727][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:15,257][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:15,258][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:15,261][root][INFO] - LLM usage: prompt_tokens = 145720, completion_tokens = 46718
+[2025-09-21 20:50:15,262][root][INFO] - Iteration 0: Running Code -7152574941113851074
+[2025-09-21 20:50:15,760][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:15,861][root][INFO] - Iteration 0, response_id 0: Objective value: 9.88353609158735
+[2025-09-21 20:50:15,874][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:17,081][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:17,083][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:17,083][root][INFO] - LLM usage: prompt_tokens = 146101, completion_tokens = 46864
+[2025-09-21 20:50:17,085][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:17,969][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:17,971][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:17,973][root][INFO] - LLM usage: prompt_tokens = 146434, completion_tokens = 46947
+[2025-09-21 20:50:17,973][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:50:18,489][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:18,560][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:50:18,671][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:20,202][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:20,204][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:20,206][root][INFO] - LLM usage: prompt_tokens = 147184, completion_tokens = 47204
+[2025-09-21 20:50:20,207][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:21,286][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:21,287][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:21,289][root][INFO] - LLM usage: prompt_tokens = 147633, completion_tokens = 47314
+[2025-09-21 20:50:21,290][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:22,457][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:22,459][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:22,462][root][INFO] - LLM usage: prompt_tokens = 148324, completion_tokens = 47485
+[2025-09-21 20:50:22,462][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:23,328][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:23,329][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:23,331][root][INFO] - LLM usage: prompt_tokens = 148687, completion_tokens = 47543
+[2025-09-21 20:50:23,331][root][INFO] - Iteration 0: Running Code -9152078811985545718
+[2025-09-21 20:50:23,841][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:24,233][root][INFO] - Iteration 0, response_id 0: Objective value: 7.1893753743052
+[2025-09-21 20:50:24,250][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:26,055][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:26,056][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:26,058][root][INFO] - LLM usage: prompt_tokens = 149087, completion_tokens = 47777
+[2025-09-21 20:50:26,059][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:27,090][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:27,092][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:27,094][root][INFO] - LLM usage: prompt_tokens = 149513, completion_tokens = 47862
+[2025-09-21 20:50:27,095][root][INFO] - Iteration 0: Running Code -4448921324578810338
+[2025-09-21 20:50:27,588][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:27,626][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:50:27,627][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:29,739][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:29,742][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:29,745][root][INFO] - LLM usage: prompt_tokens = 149913, completion_tokens = 48153
+[2025-09-21 20:50:29,746][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:30,843][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:30,844][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:30,847][root][INFO] - LLM usage: prompt_tokens = 150391, completion_tokens = 48260
+[2025-09-21 20:50:30,848][root][INFO] - Iteration 0: Running Code -5406545771652436633
+[2025-09-21 20:50:31,387][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:31,428][root][INFO] - Iteration 0, response_id 0: Objective value: inf
+[2025-09-21 20:50:31,428][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:32,920][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:32,922][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:32,925][root][INFO] - LLM usage: prompt_tokens = 150791, completion_tokens = 48490
+[2025-09-21 20:50:32,925][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:34,000][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:34,002][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:34,005][root][INFO] - LLM usage: prompt_tokens = 151204, completion_tokens = 48580
+[2025-09-21 20:50:34,006][root][INFO] - Iteration 0: Running Code -5081950371157469931
+[2025-09-21 20:50:34,498][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:34,595][root][INFO] - Iteration 0, response_id 0: Objective value: 7.371917516346499
+[2025-09-21 20:50:34,597][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:35,606][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:35,608][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:35,610][root][INFO] - LLM usage: prompt_tokens = 151585, completion_tokens = 48715
+[2025-09-21 20:50:35,610][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:37,601][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:37,603][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:37,605][root][INFO] - LLM usage: prompt_tokens = 151907, completion_tokens = 48779
+[2025-09-21 20:50:37,605][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:50:38,117][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:38,185][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:50:38,294][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:39,569][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:39,570][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:39,573][root][INFO] - LLM usage: prompt_tokens = 152598, completion_tokens = 48973
+[2025-09-21 20:50:39,573][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:40,548][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:40,549][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:40,552][root][INFO] - LLM usage: prompt_tokens = 152984, completion_tokens = 49033
+[2025-09-21 20:50:40,552][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:41,747][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:41,749][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:41,752][root][INFO] - LLM usage: prompt_tokens = 153675, completion_tokens = 49221
+[2025-09-21 20:50:41,752][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:42,821][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:42,822][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:42,824][root][INFO] - LLM usage: prompt_tokens = 154055, completion_tokens = 49315
+[2025-09-21 20:50:42,825][root][INFO] - Iteration 0: Running Code 5999137305983801454
+[2025-09-21 20:50:43,327][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:43,742][root][INFO] - Iteration 0, response_id 0: Objective value: 6.768518684949898
+[2025-09-21 20:50:43,743][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:44,866][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:44,868][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:44,870][root][INFO] - LLM usage: prompt_tokens = 154746, completion_tokens = 49513
+[2025-09-21 20:50:44,871][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:45,722][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:45,723][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:45,726][root][INFO] - LLM usage: prompt_tokens = 155131, completion_tokens = 49594
+[2025-09-21 20:50:45,726][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:47,011][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:47,012][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:47,014][root][INFO] - LLM usage: prompt_tokens = 155895, completion_tokens = 49857
+[2025-09-21 20:50:47,015][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:48,024][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:48,026][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:48,029][root][INFO] - LLM usage: prompt_tokens = 156350, completion_tokens = 49959
+[2025-09-21 20:50:48,030][root][INFO] - Iteration 0: Running Code 9222063970817991959
+[2025-09-21 20:50:48,568][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:48,657][root][INFO] - Iteration 0, response_id 0: Objective value: 6.977467847147437
+[2025-09-21 20:50:48,658][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:50,094][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:50,095][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:50,097][root][INFO] - LLM usage: prompt_tokens = 157130, completion_tokens = 50208
+[2025-09-21 20:50:50,098][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:51,135][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:51,137][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:51,138][root][INFO] - LLM usage: prompt_tokens = 157566, completion_tokens = 50302
+[2025-09-21 20:50:51,139][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:52,462][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:52,464][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:52,468][root][INFO] - LLM usage: prompt_tokens = 158316, completion_tokens = 50572
+[2025-09-21 20:50:52,469][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:53,628][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:53,629][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:53,631][root][INFO] - LLM usage: prompt_tokens = 158773, completion_tokens = 50697
+[2025-09-21 20:50:53,632][root][INFO] - Iteration 0: Running Code 4133044404105793322
+[2025-09-21 20:50:54,146][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:54,221][root][INFO] - Iteration 0, response_id 0: Objective value: 7.1148079094494925
+[2025-09-21 20:50:54,221][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:55,544][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:55,545][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:55,547][root][INFO] - LLM usage: prompt_tokens = 159173, completion_tokens = 50895
+[2025-09-21 20:50:55,547][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:56,691][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:56,692][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:56,694][root][INFO] - LLM usage: prompt_tokens = 159563, completion_tokens = 50991
+[2025-09-21 20:50:56,694][root][INFO] - Iteration 0: Running Code 686065767987469062
+[2025-09-21 20:50:57,207][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:50:57,308][root][INFO] - Iteration 0, response_id 0: Objective value: 7.452660871023785
+[2025-09-21 20:50:57,314][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:58,400][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:58,403][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:58,406][root][INFO] - LLM usage: prompt_tokens = 159944, completion_tokens = 51144
+[2025-09-21 20:50:58,407][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:50:59,659][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:50:59,660][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:50:59,664][root][INFO] - LLM usage: prompt_tokens = 160284, completion_tokens = 51252
+[2025-09-21 20:50:59,667][root][INFO] - Iteration 0: Running Code 1095681479635658902
+[2025-09-21 20:51:00,424][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:51:00,501][root][INFO] - Iteration 0, response_id 0: Objective value: 7.0043697989867315
+[2025-09-21 20:51:00,609][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:51:02,124][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:51:02,125][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:51:02,127][root][INFO] - LLM usage: prompt_tokens = 161077, completion_tokens = 51496
+[2025-09-21 20:51:02,128][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:51:03,362][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:51:03,363][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:51:03,365][root][INFO] - LLM usage: prompt_tokens = 161508, completion_tokens = 51600
+[2025-09-21 20:51:03,366][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:51:04,656][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:51:04,659][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:51:04,662][root][INFO] - LLM usage: prompt_tokens = 162272, completion_tokens = 51857
+[2025-09-21 20:51:04,663][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:51:05,777][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:51:05,778][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:51:05,781][root][INFO] - LLM usage: prompt_tokens = 162716, completion_tokens = 51986
+[2025-09-21 20:51:05,781][root][INFO] - Iteration 0: Running Code 9222063970817991959
+[2025-09-21 20:51:06,542][root][INFO] - Iteration -1: Code Run -1 successful!
+[2025-09-21 20:51:06,663][root][INFO] - Iteration 0, response_id 0: Objective value: 7.058678356921704
+[2025-09-21 20:51:06,664][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:51:08,215][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:51:08,216][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:51:08,220][root][INFO] - LLM usage: prompt_tokens = 163466, completion_tokens = 52257
+[2025-09-21 20:51:08,220][LiteLLM][INFO] - 
+LiteLLM completion() model= codestral-latest; provider = mistral
+[2025-09-21 20:51:09,242][httpx][INFO] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-09-21 20:51:09,243][LiteLLM][INFO] - Wrapper: Completed Call, calling success_handler
+[2025-09-21 20:51:09,245][root][INFO] - LLM usage: prompt_tokens = 163924, completion_tokens = 52362
+[2025-09-21 20:51:09,245][root][INFO] - Iteration 0: Running Code -7825815965574811911

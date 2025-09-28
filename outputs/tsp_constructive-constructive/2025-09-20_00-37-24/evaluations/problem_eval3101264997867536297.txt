@@ -1,0 +1,30 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic probability to prioritize destination based on remaining distance
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        total_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes)
+        prob_destination = min(0.9, 0.5 + 0.4 * (1 - remaining_distance / total_distance))  # Dynamic bias
+        if random.random() < prob_destination:
+            return destination_node
+
+    # Temperature-based neighborhood size and exploration
+    temperature = len(unvisited_nodes) / len(distance_matrix)
+    neighborhood_size = max(1, int(3 + 2 * temperature))  # Adaptive neighborhood
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    candidates = nearest_neighbors[:min(neighborhood_size, len(nearest_neighbors))]
+
+    # Temperature-based exploration probability
+    explore_prob = 0.1 * (1 + temperature)
+    if random.random() < explore_prob:
+        next_node = random.choice(nearest_neighbors)
+    else:
+        next_node = random.choice(candidates)
+
+    return next_node

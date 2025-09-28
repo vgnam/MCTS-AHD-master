@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    min_cost = float('inf')
+    next_node = None
+    node_costs = {}
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        node_costs[node] = cost
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        current_tour_length = sum(distance_matrix[current_node][node] for node in unvisited_nodes)
+        exploration_threshold = 1.0 + 0.5 * (current_tour_length / (len(unvisited_nodes) * min_cost))
+
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            weighted_cost = 0.7 * potential_cost + 0.3 * node_costs[node]
+
+            if weighted_cost < exploration_threshold * min_cost:
+                if random.random() < 0.3:
+                    next_node = node
+                    break
+
+    return next_node

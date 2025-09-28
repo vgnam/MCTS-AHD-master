@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    best_score = float('inf')
+    next_node = None
+    node_selection_counts = {}
+
+    # Initialize or update selection counts (simulating reinforcement learning)
+    for node in unvisited_nodes:
+        node_selection_counts[node] = node_selection_counts.get(node, 0)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate centrality with historical bias
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+        centrality = 1 / (avg_distance_to_remaining + 1e-6)
+
+        # Dynamic weight combining progress, centrality, and historical performance
+        progress_weight = (total_unvisited - 1) / total_unvisited
+        centrality_weight = 0.5 * progress_weight
+        historical_weight = 0.5 * (1 - progress_weight)
+        weighted_centrality = centrality_weight * centrality
+
+        # Historical performance factor (simulated reinforcement)
+        historical_factor = 1 / (node_selection_counts[node] + 1)
+
+        # Path efficiency with local search
+        local_search_radius = 3
+        nearby_nodes = [n for n in unvisited_nodes if distance_matrix[node][n] <= local_search_radius and n != node]
+        local_density = len(nearby_nodes) / local_search_radius if local_search_radius > 0 else 0
+
+        combined_score = (distance_to_current + distance_to_destination) + weighted_centrality - historical_factor + local_density
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    # Update selection count for the chosen node
+    if next_node is not None:
+        node_selection_counts[next_node] += 1
+
+    return next_node

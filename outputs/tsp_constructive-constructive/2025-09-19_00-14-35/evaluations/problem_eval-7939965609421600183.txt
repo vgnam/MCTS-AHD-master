@@ -1,0 +1,33 @@
+importance metric that combines local proximity, connectivity, and destination alignment, while using a probabilistic selection mechanism to balance exploration and exploitation, with the exploration factor now being a function of both remaining nodes and proximity to the destination.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = (remaining_nodes / total_nodes) * (1 + distance_matrix[current_node][destination_node] / max(max(row) for row in distance_matrix))
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            connectivity_score = sum(1 / (1 + distance_matrix[node][n]) for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+        else:
+            connectivity_score = 0
+
+        proximity_weight = 0.4 * (1 - exploration_factor)
+        connectivity_weight = 0.4 * exploration_factor
+        alignment_weight = 0.2 * (1 - dest_dist / max(max(row) for row in distance_matrix))
+
+        return (proximity_weight * current_dist) + (connectivity_weight * connectivity_score) + (alignment_weight * dest_dist)
+
+    scores = [evaluate_node(node) for node in unvisited_nodes]
+    normalized_scores = [1.0 / (1.0 + score) for score in scores]
+    sum_scores = sum(normalized_scores)
+    probabilities = [score / sum_scores for score in normalized_scores]
+
+    import random
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

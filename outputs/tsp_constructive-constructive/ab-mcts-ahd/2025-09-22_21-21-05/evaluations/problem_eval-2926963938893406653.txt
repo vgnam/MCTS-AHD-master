@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    total_nodes = len(distance_matrix)
+    remaining_unvisited = len(unvisited_nodes)
+
+    if not unvisited_nodes:
+        return destination_node
+
+    destination_bias = (1 - (remaining_unvisited / total_nodes)) ** 2
+    exploration_factor = 1 - destination_bias
+
+    next_node = None
+    min_score = float('inf')
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            adjusted_distance = distance * (1 - destination_bias)
+        else:
+            adjusted_distance = distance * (1 + exploration_factor * (distance / sum(distance_matrix[current_node][n] for n in unvisited_nodes if n != destination_node)))
+
+        score = adjusted_distance * (1 + 0.1 * (total_nodes - remaining_unvisited) / total_nodes)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

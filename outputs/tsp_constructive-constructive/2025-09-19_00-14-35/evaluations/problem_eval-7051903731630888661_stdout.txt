@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance" metric derived from cumulative distances and a temperature-modulated randomness factor. It prioritizes nodes closest to the current position and destination, but also considers long-term connectivity via the importance metric, with exploration controlled by a cooling temperature and a probabilistic selection mechanism.}
+              ^
+SyntaxError: unterminated string literal (detected at line 1)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance" metric derived from cumulative distances and a temperature-modulated randomness factor. It prioritizes nodes closest to the current position and destination, but also considers long-term connectivity via the importance metric, with exploration controlled by a cooling temperature and a probabilistic selection mechanism.}
+              ^
+SyntaxError: unterminated string literal (detected at line 1)

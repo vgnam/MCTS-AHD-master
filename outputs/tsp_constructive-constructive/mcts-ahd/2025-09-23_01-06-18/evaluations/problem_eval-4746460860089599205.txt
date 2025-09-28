@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = (1 - (remaining_nodes / total_nodes)) ** 2
+    exploration_weight = 0.6 * (1 - progress_factor)
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        future_cost = distance_matrix[node][destination_node]
+
+        # Adaptive regret with sigmoid modulation
+        min_cost = min(distance_matrix[current_node][n] for n in unvisited_nodes)
+        max_cost = max(distance_matrix[current_node][n] for n in unvisited_nodes)
+        regret = (immediate_cost - min_cost) / (max_cost - min_cost + 1e-6)
+        regret_modulator = 1 / (1 + np.exp(-5 * (progress_factor - 0.5)))
+        regret_scaled = regret * regret_modulator
+
+        # Locality term: favor nodes near current cluster
+        cluster_center = sum(unvisited_nodes) / len(unvisited_nodes)
+        locality = abs(node - cluster_center) / max(1e-6, max(unvisited_nodes) - min(unvisited_nodes))
+
+        return (exploration_weight * immediate_cost +
+                (1 - exploration_weight) * future_cost +
+                0.3 * regret_scaled -
+                0.15 * locality)
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

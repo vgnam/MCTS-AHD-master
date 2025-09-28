@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes and len(unvisited_nodes) > 1:
+        if len(unvisited_nodes) == 2:
+            return destination_node
+        else:
+            rand_val = random.random()
+            if rand_val < 0.7:  # 70% chance to pick destination if unvisited
+                return destination_node
+    min_score = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        distance = distance_matrix[current_node][node]
+        random_factor = random.uniform(0.5, 1.5)  # Randomness to encourage exploration
+        score = distance * random_factor
+        if score < min_score:
+            min_score = score
+            next_node = node
+    return next_node

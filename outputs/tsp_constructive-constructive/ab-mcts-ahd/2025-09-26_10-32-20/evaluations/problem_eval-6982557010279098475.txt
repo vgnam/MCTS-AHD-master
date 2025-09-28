@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Adaptive weight balancing with phase-dependent factors
+    progress = 1 - (len(unvisited_nodes) / len(distance_matrix))
+    local_weight = 0.5 * (0.7 ** progress)
+    global_weight = 0.3 * (1.2 ** progress)
+    centrality_weight = 0.6 * (0.9 ** progress)
+
+    # Exponential recency penalty based on visit frequency
+    visit_frequency = [0] * len(distance_matrix)
+    for i in range(len(distance_matrix)):
+        if i != current_node and i not in unvisited_nodes:
+            visit_frequency[i] += 1
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        global_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        centrality = 1 / (sum(distance_matrix[node][n] for n in range(len(distance_matrix))) + 1e-10)
+        recency_penalty = 0.1 * (2 ** visit_frequency[node])
+        return (local_weight * local_distance +
+                global_weight * global_distance +
+                centrality_weight * centrality +
+                recency_penalty)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

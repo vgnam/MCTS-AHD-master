@@ -1,0 +1,54 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Calculate entropy and adaptive weights
+    avg_distance = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / remaining_nodes
+    entropy = 1 - (avg_distance / max(sum(row) for row in distance_matrix) if max(sum(row) for row in distance_matrix) != 0 else 1)
+
+    # Dynamic weight adjustment with novel reinforcement factor
+    base_weight = 0.5 * (1 - entropy) + 0.3 * (remaining_nodes / total_nodes)
+    reinforcement_factor = 0.2 * (1 - entropy) + 0.1 * (1 - remaining_nodes / total_nodes)
+
+    weight_local = 0.4 * base_weight + 0.1 * reinforcement_factor
+    weight_centrality = 0.3 * base_weight + 0.2 * reinforcement_factor
+    weight_coherence = 0.5 * base_weight + 0.3 * reinforcement_factor
+
+    # Memory of historically good nodes
+    memory = {}
+    for node in unvisited_nodes:
+        local = distance_matrix[current_node][node]
+        central = 1 / (sum(distance_matrix[node][n] for n in range(total_nodes)) + 1e-10)
+        cohere = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1 if remaining_nodes > 1 else 1)
+        memory[node] = (local, central, cohere)
+
+    def calculate_score(node):
+        local, central, cohere = memory[node]
+
+        # Novel adaptive scoring with reinforcement learning elements
+        local_term = weight_local * (local / (1 + entropy * 0.5))
+        central_term = weight_centrality * (central * (1 + entropy * 0.3))
+        cohere_term = weight_coherence * (cohere / (1 + entropy * 0.4))
+
+        # Add reinforcement learning component
+        if node in memory:
+            historical_performance = 1 / (1 + sum(memory[node]) * 0.1)
+            return local_term + central_term - cohere_term + historical_performance * reinforcement_factor
+        return local_term + central_term - cohere_term
+
+    # Probabilistic selection with adaptive temperature
+    scores = [calculate_score(node) for node in unvisited_nodes]
+    min_score = min(scores)
+    max_score = max(scores)
+    normalized_scores = [(score - min_score) / (max_score - min_score + 1e-10) for score in scores]
+
+    temperature = 1 - entropy * 0.7
+    probabilities = [math.exp(-s / temperature) for s in normalized_scores]
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

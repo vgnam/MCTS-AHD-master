@@ -1,0 +1,10 @@
+import random
+        next_node = random.choices(
+            list(normalized_probs.keys()),
+            weights=list(normalized_probs.values()),
+            k=1
+        )[0]
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

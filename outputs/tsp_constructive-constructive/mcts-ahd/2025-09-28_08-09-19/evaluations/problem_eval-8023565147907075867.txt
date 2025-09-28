@@ -1,0 +1,68 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    scores = []
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = remaining_nodes + 1
+
+    # Calculate dynamic threshold based on local density
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / remaining_nodes if remaining_nodes > 0 else 0
+    variance = sum((d - avg_distance) ** 2 for d in distances) / remaining_nodes if remaining_nodes > 0 else 0
+    std_dev = variance ** 0.5
+    proximity_threshold = avg_distance + 0.75 * std_dev
+
+    # Precompute node features
+    node_features = {}
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        # Local connectivity: count neighbors within dynamic threshold
+        local_connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] <= proximity_threshold)
+
+        # Average remaining distance excluding self
+        remaining_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        avg_remaining_distance = sum(remaining_distances) / (remaining_nodes - 1) if remaining_nodes > 1 else 0
+
+        node_features[node] = {
+            'distance': distance_to_current,
+            'connectivity': local_connectivity,
+            'avg_remaining': avg_remaining_distance
+        }
+
+    # Normalize features and compute weighted score
+    max_distance = max(f['distance'] for f in node_features.values()) if node_features else 1
+    max_connectivity = max(f['connectivity'] for f in node_features.values()) if node_features else 1
+    max_avg_remaining = max(f['avg_remaining'] for f in node_features.values()) if node_features else 1
+
+    for node, features in node_features.items():
+        # Normalized features
+        norm_distance = features['distance'] / max_distance if max_distance > 0 else 0
+        norm_connectivity = features['connectivity'] / max_connectivity if max_connectivity > 0 else 0
+        norm_avg_remaining = features['avg_remaining'] / max_avg_remaining if max_avg_remaining > 0 else 0
+
+        # Adaptive weight for connectivity based on local density
+        connectivity_weight = 1.0 + 0.5 * (1 - norm_connectivity)
+
+        # Efficiency penalty: higher penalty for nodes increasing average remaining distance
+        efficiency_penalty = 1.0 + 0.5 * norm_avg_remaining
+
+        # Combined score with adaptive weights
+        score = (0.6 * norm_distance + 0.3 * connectivity_weight * norm_connectivity) * efficiency_penalty
+        scores.append((node, score))
+
+    # Probabilistic selection based on normalized scores
+    if scores:
+        min_score = min(score for _, score in scores)
+        max_score = max(score for _, score in scores)
+        score_range = max_score - min_score if max_score != min_score else 1
+
+        # Inverse probability: lower scores have higher selection chance
+        probabilities = [(min_score - score + score_range) / (score_range * len(scores)) for _, score in scores]
+        probabilities = [p / sum(probabilities) for p in probabilities]
+
+        next_node = random.choices([node for node, _ in scores], weights=probabilities, k=1)[0]
+
+    return next_node

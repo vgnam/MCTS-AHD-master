@@ -1,0 +1,5 @@
+import random
+        selected = random.choice(best_candidates)
+        return selected[0]
+    else:
+        return next_node

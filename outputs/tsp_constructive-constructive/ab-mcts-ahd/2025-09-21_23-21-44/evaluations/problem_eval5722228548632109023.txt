@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    min_score = float('inf')
+    next_node = None
+    alpha = 0.7  # Weight for immediate proximity (distance to current node)
+    beta = 0.3   # Weight for long-term proximity (distance to destination)
+    gamma = 0.1  # Weight for average distance to unvisited nodes
+    total_unvisited = len(unvisited_nodes)
+    if total_unvisited == 0:
+        total_unvisited = 1  # Avoid division by zero
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / total_unvisited
+    for node in unvisited_nodes:
+        distance_current = distance_matrix[current_node][node]
+        distance_destination = distance_matrix[node][destination_node]
+        score = (alpha * distance_current) + (beta * distance_destination) + (gamma * avg_distance)
+        if score < min_score:
+            min_score = score
+            next_node = node
+    return next_node

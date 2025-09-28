@@ -1,0 +1,22 @@
+import math
+    import random
+
+    temperature = max(1.0, len(unvisited_nodes) / 3.0)
+    next_node = None
+    best_prob = 0.0
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance == 0:
+            prob = 1.0
+        else:
+            prob = math.exp(-distance / temperature)
+
+        if prob > best_prob:
+            best_prob = prob
+            next_node = node
+
+    if random.random() < 0.1 * temperature:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

@@ -1,0 +1,46 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    temperature = math.exp(-0.5 * total_unvisited)
+
+    best_score = float('-inf')
+    next_node = None
+    node_scores = {}
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Adaptive weights based on remaining nodes
+        local_weight = 1.0 - 0.3 * (total_unvisited / (total_unvisited + 1))
+        global_weight = 0.3 + 0.7 * (total_unvisited / (total_unvisited + 1))
+
+        # Temperature-based exploration
+        exploration_term = temperature * random.uniform(0, 1)
+
+        # Reinforcement learning-inspired reward
+        reward = -current_distance - global_weight * future_distance + exploration_term
+        node_scores[node] = reward
+
+        if reward > best_score:
+            best_score = reward
+            next_node = node
+
+    # Probabilistic selection based on scores
+    if len(unvisited_nodes) > 1:
+        max_score = max(node_scores.values())
+        min_score = min(node_scores.values())
+        score_range = max_score - min_score if max_score != min_score else 1
+
+        # Normalize scores to probabilities
+        probabilities = [(node_scores[node] - min_score) / score_range for node in unvisited_nodes]
+        probabilities = [p / sum(probabilities) for p in probabilities]
+
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

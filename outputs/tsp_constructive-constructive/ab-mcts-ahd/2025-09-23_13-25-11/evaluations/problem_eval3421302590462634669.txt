@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+    temperature = remaining_ratio * 10  # Higher when more nodes remain
+
+    def heuristic(node):
+        current_dist = distance_matrix[current_node][node]
+        future_dist = distance_matrix[node][destination_node]
+        penalty = 1.0 if node == current_node else 0.0
+        dynamic_weight = 1.0 - 0.5 * remaining_ratio
+        historical_bias = 1.0 / (1.0 + penalty)  # Favor nodes not recently visited
+        return (current_dist + dynamic_weight * future_dist) * historical_bias
+
+    scores = {node: heuristic(node) for node in unvisited_nodes}
+    min_score, max_score = min(scores.values()), max(scores.values())
+    normalized_scores = {node: (max_score - score + 1) / (max_score - min_score + 1) for node, score in scores.items()}
+
+    # Probabilistic selection with temperature
+    exp_scores = {node: math.exp(score / temperature) for node, score in normalized_scores.items()}
+    total_exp = sum(exp_scores.values())
+    probabilities = {node: exp_score / total_exp for node, exp_score in exp_scores.items()}
+
+    next_node = random.choices(list(probabilities.keys()), weights=list(probabilities.values()), k=1)[0]
+    return next_node

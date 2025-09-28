@@ -1,0 +1,56 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    lookahead_depth = min(5, max(2, remaining_count // 2))
+    exploration_rate = min(0.3, 0.1 + (1.0 - remaining_count / len(unvisited_nodes)) * 0.2)
+
+    node_scores = {}
+    node_exploration = {}
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        # Enhanced connectivity metric
+        direct_connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.2 * immediate_distance)
+        transitive_connectivity = sum(1 for n in remaining_nodes for m in remaining_nodes
+                                     if n != m and distance_matrix[node][n] + distance_matrix[n][m] < 1.5 * immediate_distance)
+
+        connectivity_score = (direct_connectivity * 0.7 + transitive_connectivity * 0.3) / remaining_count
+
+        # Dynamic deviation penalty
+        distance_variance = sum((distance_matrix[current_node][n] - immediate_distance) ** 2 for n in unvisited_nodes) / remaining_count
+        deviation_penalty = (immediate_distance - distance_variance) * (1.0 + remaining_count / len(unvisited_nodes))
+
+        # Novelty factor with temporal component
+        novelty_factor = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes) if remaining_nodes else 0
+        novelty_factor *= (1.0 + (remaining_count / len(unvisited_nodes)) * 0.5)
+
+        # Composite score calculation
+        base_score = 0.3 * immediate_distance + 0.3 * connectivity_score + 0.2 * deviation_penalty - 0.2 * novelty_factor
+        exploration_bonus = 1.0 + (1.0 - immediate_distance / sum(distance_matrix[current_node])) * exploration_rate
+
+        node_scores[node] = base_score * exploration_bonus
+        node_exploration[node] = 1.0 / (1.0 + immediate_distance)  # Higher for closer nodes
+
+        total_weight += node_scores[node] * node_exploration[node]
+
+    if not node_scores:
+        return unvisited_nodes.pop()
+
+    # Probabilistic selection with reinforcement learning elements
+    selection_prob = {node: (node_scores[node] * node_exploration[node] / total_weight) for node in node_scores}
+    cumulative_prob = 0.0
+    rand_val = random.random()
+    selected_node = None
+
+    for node in selection_prob:
+        cumulative_prob += selection_prob[node]
+        if rand_val <= cumulative_prob:
+            selected_node = node
+            break
+
+    return next_node

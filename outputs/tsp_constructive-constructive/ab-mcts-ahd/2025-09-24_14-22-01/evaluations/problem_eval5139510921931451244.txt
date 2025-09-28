@@ -1,0 +1,10 @@
+import random
+    candidates = [node for node in unvisited_nodes if node != destination_node]
+    if not candidates:
+        return destination_node
+    distances = [distance_matrix[current_node][node] for node in candidates]
+    min_distance = min(distances)
+    min_nodes = [candidates[i] for i, d in enumerate(distances) if d == min_distance]
+    if len(min_nodes) > 1 and random.random() < 0.2:
+        return random.choice(min_nodes)
+    return next_node

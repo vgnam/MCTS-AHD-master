@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of proximity, destination closeness, and centroid alignment based on the remaining path length, ensuring a balance between immediate progress and long-term efficiency. It also incorporates a local search component to refine the selection by evaluating small detours that may lead to better overall paths.}
+                                                                                                                                                                                                                                                                                                                               ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of proximity, destination closeness, and centroid alignment based on the remaining path length, ensuring a balance between immediate progress and long-term efficiency. It also incorporates a local search component to refine the selection by evaluating small detours that may lead to better overall paths.}
+                                                                                                                                                                                                                                                                                                                               ^
+SyntaxError: unmatched '}'

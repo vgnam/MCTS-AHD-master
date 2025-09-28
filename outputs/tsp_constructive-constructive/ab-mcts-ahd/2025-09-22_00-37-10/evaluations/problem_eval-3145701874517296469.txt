@@ -1,0 +1,29 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    candidate_nodes = []
+    max_utility = -float('inf')
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if destination_node is not None:
+            dest_distance = distance_matrix[node][destination_node]
+            utility = dest_distance / (distance + 1e-6)
+        else:
+            utility = -distance
+
+        if utility > max_utility:
+            max_utility = utility
+            candidate_nodes = [node]
+        elif utility == max_utility:
+            candidate_nodes.append(node)
+
+    if len(candidate_nodes) > 1:
+        weights = [1.0 / (distance_matrix[current_node][node] + 1e-6) for node in candidate_nodes]
+        weights = [w / sum(weights) for w in weights]
+        next_node = random.choices(candidate_nodes, weights=weights, k=1)[0]
+    else:
+        next_node = candidate_nodes[0]
+
+    return next_node

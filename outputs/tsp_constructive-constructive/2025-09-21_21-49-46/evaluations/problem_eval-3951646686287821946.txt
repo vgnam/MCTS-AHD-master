@@ -1,0 +1,11 @@
+import random
+    next_node = random.choices(list(probabilities.keys()), weights=probabilities.values(), k=1)[0]
+
+    # Prioritize destination_node if it's unvisited and closer than the nearest node
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        min_distance = min(distances.values())
+        if destination_distance < min_distance:
+            next_node = destination_node
+
+    return next_node

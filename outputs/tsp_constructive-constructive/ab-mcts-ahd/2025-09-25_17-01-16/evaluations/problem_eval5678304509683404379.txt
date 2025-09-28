@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+
+    # Calculate dynamic weight based on remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    if remaining_nodes == 0:
+        return destination_node
+
+    # Sigmoid function to adjust weight dynamically
+    weight = 1 / (1 + math.exp(-(remaining_nodes - 5)))  # Adjusts weight based on remaining nodes
+    weight = max(0.3, min(0.7, weight))  # Clamp between 0.3 and 0.7
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+        score = (1 - weight) * current_distance + weight * destination_distance
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

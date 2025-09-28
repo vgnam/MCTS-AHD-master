@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(unvisited_nodes) + 1
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic neighborhood weight based on exploration diversity
+        exploration_weight = 0.5 + 0.5 * (remaining_nodes / total_nodes) ** 1.5
+
+        # Angular deviation bias: favors nodes that deviate significantly from current path
+        if current_node != destination_node:
+            prev_distance = distance_matrix[destination_node][current_node]
+            angular_bias = (distance_to_current + distance_to_destination) / (prev_distance + 1e-6)
+        else:
+            angular_bias = 1.0
+
+        # Probabilistic global perspective
+        global_factor = (distance_to_destination ** 0.8) / (remaining_nodes ** 0.3)
+
+        # Combined score with novel mechanisms
+        score = (-distance_to_current * exploration_weight) + (global_factor * angular_bias)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

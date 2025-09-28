@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_distance == 0:
+            return destination_node
+        threshold = 1.2 + (0.8 - (len(unvisited_nodes) / len(distance_matrix)))
+        if remaining_distance / avg_distance <= threshold:
+            return destination_node
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+        progress_factor = 1 - remaining_ratio
+        weight = 2.0 - 1.5 * progress_factor
+        global_potential = (to_destination + sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)) / (len(unvisited_nodes) + 1)
+        regret_term = max(distance_matrix[current_node][other] - to_current for other in unvisited_nodes) if unvisited_nodes else 0
+        diversity_bonus = sum(distance_matrix[node][other] for other in unvisited_nodes) / (len(unvisited_nodes) + 1e-6)
+        centrality_score = sum(1 / (distance_matrix[node][other] + 1e-6) for other in unvisited_nodes) / len(unvisited_nodes)
+        memory_bonus = 0.0 if not hasattr(select_next_node, 'memory') else (0.4 if node in select_next_node.memory else 0.0)
+        return (to_current * weight + global_potential * (1.0 - weight) + 0.6 * regret_term) - 0.4 * diversity_bonus + 0.5 * centrality_score + memory_bonus
+
+    if not hasattr(select_next_node, 'memory'):
+        select_next_node.memory = set()
+
+    candidates = sorted(unvisited_nodes, key=heuristic)[:3]
+    if len(candidates) > 1:
+        next_node = candidates[np.random.choice(len(candidates), p=[0.6, 0.3, 0.1])]
+    else:
+        next_node = candidates[0]
+
+    select_next_node.memory.add(next_node)
+    return next_node

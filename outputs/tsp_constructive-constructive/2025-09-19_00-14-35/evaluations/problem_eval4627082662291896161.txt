@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_pressure = (remaining_nodes / total_nodes) ** 2
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            lookahead_horizon = max(1, int(remaining_nodes ** 0.5))
+            lookahead_nodes = [n for n in unvisited_nodes if n != node][:lookahead_horizon]
+            lookahead_distances = [distance_matrix[node][n] for n in lookahead_nodes]
+
+            if lookahead_distances:
+                avg_lookahead = sum(lookahead_distances) / len(lookahead_distances)
+                max_lookahead = max(lookahead_distances)
+                centrality_score = sum(distance_matrix[node]) / len(distance_matrix[node])
+            else:
+                avg_lookahead = max_lookahead = centrality_score = 0
+
+            weight_immediate = 0.4 + 0.4 * (1 - exploration_pressure)
+            weight_lookahead = 0.3 * exploration_pressure
+            weight_centrality = 0.2 * exploration_pressure
+            weight_destination = 0.1 + 0.3 * (1 - exploration_pressure)
+
+            score = (weight_immediate * immediate_dist) + \
+                   (weight_lookahead * (0.7 * avg_lookahead + 0.3 * max_lookahead)) + \
+                   (weight_centrality * centrality_score) + \
+                   (weight_destination * dest_dist)
+        else:
+            score = immediate_dist + 0.5 * dest_dist
+
+        return score
+
+    candidates = unvisited_nodes
+    if len(candidates) > 3 and exploration_pressure > 0.3:
+        candidates = candidates[:max(2, int(len(candidates) * (1 - exploration_pressure)))]
+
+    next_node = min(candidates, key=lambda node: evaluate_node(node))
+    return next_node

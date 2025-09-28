@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    for node in unvisited_nodes:
+        base_cost = distance_matrix[current_node][node]
+        improvement_factor = 1.0
+        if len(unvisited_nodes) > 1:
+            avg_cost = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (len(unvisited_nodes) - 1)
+            improvement_factor = avg_cost / base_cost if base_cost > 0 else 1.0
+        dynamic_threshold = 1.2 - (0.1 * (len(unvisited_nodes) / (len(unvisited_nodes) + 1)))
+        cost_benefit = base_cost * (1.0 - 0.1 * (1.0 / (1.0 + improvement_factor)))
+        candidates.append((node, cost_benefit, dynamic_threshold))
+
+    candidates.sort(key=lambda x: x[1])
+    selected = None
+    for node, cost, threshold in candidates:
+        if cost <= threshold:
+            selected = node
+            break
+
+    if selected is None:
+        selected = candidates[0][0] if candidates else unvisited_nodes.pop()
+
+    return next_node

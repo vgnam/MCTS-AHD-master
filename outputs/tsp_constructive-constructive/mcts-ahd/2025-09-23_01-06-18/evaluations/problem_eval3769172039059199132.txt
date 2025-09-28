@@ -1,0 +1,43 @@
+importance.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        if avg_distance == 0:
+            return destination_node
+        threshold = 1.0 + (1.0 - (len(unvisited_nodes) / len(distance_matrix)))
+        if remaining_distance / avg_distance <= threshold:
+            return destination_node
+
+    def heuristic(node):
+        to_current = distance_matrix[current_node][node]
+        to_destination = distance_matrix[node][destination_node]
+        remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+
+        # Adaptive regret weighting
+        sorted_distances = sorted(distance_matrix[current_node][other] for other in unvisited_nodes)
+        regret_weight = 0.4 * (1.0 - remaining_ratio) + 0.1 * (0.5 if len(sorted_distances) > 1 else 0)
+        regret_term = (sorted_distances[0] + sorted_distances[1]) / 2 if len(sorted_distances) > 1 else sorted_distances[0]
+
+        # Dynamic connectivity scoring
+        connectivity_threshold = 1.2 * to_current
+        local_connectivity = sum(1 for other in unvisited_nodes if distance_matrix[node][other] < connectivity_threshold)
+        connectivity_score = (local_connectivity / len(unvisited_nodes)) ** 0.7
+
+        # Predictive path evaluation
+        predictive_factor = sum(sorted(distance_matrix[node][other] for other in unvisited_nodes)[:2]) / 2
+        path_potential = (to_current + predictive_factor) * (1.0 - 0.3 * connectivity_score)
+
+        # Hybrid scoring mechanism
+        immediate_score = to_current * (1.0 + regret_weight * regret_term)
+        long_term_score = (to_destination + predictive_factor) * (0.8 + 0.4 * connectivity_score)
+        centrality_bonus = connectivity_score * sum(1 for other in unvisited_nodes if distance_matrix[node][other] < connectivity_threshold)
+
+        return immediate_score + long_term_score - centrality_bonus
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

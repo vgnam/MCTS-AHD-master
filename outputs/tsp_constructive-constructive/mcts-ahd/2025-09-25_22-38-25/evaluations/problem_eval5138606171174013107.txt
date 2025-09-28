@@ -1,0 +1,26 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = (total_nodes - remaining_nodes) / total_nodes
+
+    if destination_node in unvisited_nodes:
+        dest_prob = 0.5 + 0.5 * (1 - progress)
+        if random.random() < dest_prob:
+            return destination_node
+
+    distances = [(node, distance_matrix[current_node][node]) for node in unvisited_nodes]
+    distances.sort(key=lambda x: x[1])
+
+    min_distance = distances[0][1]
+    threshold = min_distance * (1.1 + 0.2 * progress)
+
+    nearby_nodes = [node for node, dist in distances if dist <= threshold]
+    if nearby_nodes:
+        return random.choice(nearby_nodes)
+
+    return next_node

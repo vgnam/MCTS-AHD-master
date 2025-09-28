@@ -1,0 +1,29 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes and len(unvisited_nodes) > 1:
+        # Probabilistic selection: destination has higher probability
+        if random.random() < 0.7:  # 70% chance to pick destination
+            return destination_node
+
+    # Calculate probabilities for unvisited nodes based on inverse distance
+    probabilities = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue  # already handled
+        distance = distance_matrix[current_node][node]
+        weight = 1.0 / (distance + 1e-6)  # avoid division by zero
+        probabilities.append((node, weight))
+        total_weight += weight
+
+    if not probabilities:
+        return destination_node if destination_node in unvisited_nodes else unvisited_nodes[0]
+
+    # Normalize probabilities
+    normalized_probs = [weight / total_weight for (node, weight) in probabilities]
+    nodes = [node for (node, weight) in probabilities]
+
+    # Select node based on weighted probability
+    next_node = random.choices(nodes, weights=normalized_probs, k=1)[0]
+    return next_node

@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    max_score = -float('inf')
+    total_nodes = len(unvisited_nodes) + 1  # +1 for the current node
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+
+    for node in unvisited_nodes:
+        dist_current = distance_matrix[current_node][node]
+        dist_dest = distance_matrix[node][destination_node]
+
+        if dist_current == 0:
+            angular_progress = 1.0
+        else:
+            angular_progress = dist_dest / dist_current
+
+        # Dynamic weight for angular progress
+        weighted_angular = angular_progress * visited_ratio
+        score = weighted_angular - dist_current
+
+        # Penalty for revisiting nodes (simulated here by a simple multiplier)
+        if node in [current_node, destination_node]:  # Placeholder for historical data
+            score *= 0.7
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    return next_node

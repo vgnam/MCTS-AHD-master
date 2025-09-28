@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, iteration=0):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate probabilities based on distances and temperature
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    max_dist = max(distances)
+
+    if max_dist == min_dist:
+        probabilities = [1.0 / len(unvisited_nodes)] * len(unvisited_nodes)
+    else:
+        # Normalize distances and apply temperature scaling
+        normalized = [(max_dist - d) / (max_dist - min_dist) for d in distances]
+        probabilities = [np.exp(n / temperature) for n in normalized]
+        total = sum(probabilities)
+        probabilities = [p / total for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+
+    # Adjust temperature for next iteration (simulated annealing)
+    temperature = max(0.1, temperature * 0.99)
+
+    return next_node

@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    stage_factor = 1.0 / (1.0 + 0.1 * remaining_nodes)
+    immediate_weight = 0.6 * (1.0 - stage_factor)
+    future_weight = 0.4 * (1.0 + stage_factor)
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = 0
+
+        if remaining_nodes > 1:
+            next_nodes = [n for n in unvisited_nodes if n != node]
+            future_potential = min(distance_matrix[node][n] + distance_matrix[n][destination_node] for n in next_nodes)
+
+        penalty = 0.2 * (1.0 / (immediate_distance + 1e-6))
+        combined_score = immediate_weight * immediate_distance + future_weight * future_potential - penalty
+        scores.append(combined_score)
+
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

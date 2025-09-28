@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    temperature = 1.0 / (1.0 + remaining_count)  # Decays as remaining nodes decrease
+
+    scores = []
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        total_remaining_distance = sum(distance_matrix[node][n] for n in remaining_nodes) if remaining_nodes else 0
+        avg_remaining_distance = total_remaining_distance / len(remaining_nodes) if remaining_nodes else 0
+
+        # Adaptive penalty term with temperature
+        penalty_term = (distance_to_node ** 2) * (1.0 - temperature)
+        score = (avg_remaining_distance - distance_to_node) - penalty_term
+        scores.append((node, score))
+
+    # Probabilistic selection with softmax
+    exp_scores = [math.exp(score / temperature) for _, score in scores]
+    total_exp = sum(exp_scores)
+    probs = [exp / total_exp for exp in exp_scores]
+
+    next_node = random.choices([node for node, _ in scores], weights=probs, k=1)[0]
+    return next_node

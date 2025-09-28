@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            min_remaining_distance = min(distance_matrix[node][n] for n in remaining_nodes)
+            avg_remaining_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+
+            # Compute centrality based on MST of remaining nodes
+            if len(remaining_nodes) > 1:
+                mst_edges = []
+                for i in range(len(remaining_nodes)):
+                    for j in range(i + 1, len(remaining_nodes)):
+                        mst_edges.append((distance_matrix[remaining_nodes[i]][remaining_nodes[j]], i, j))
+                mst_edges.sort()
+                parent = list(range(len(remaining_nodes)))
+                def find(u):
+                    while parent[u] != u:
+                        parent[u] = parent[parent[u]]
+                        u = parent[u]
+                    return u
+                mst_weight = 0
+                for w, u, v in mst_edges:
+                    root_u = find(u)
+                    root_v = find(v)
+                    if root_u != root_v:
+                        parent[root_v] = root_u
+                        mst_weight += w
+                centrality = mst_weight / len(remaining_nodes) if len(remaining_nodes) > 0 else 0
+            else:
+                centrality = 0
+
+            dynamic_penalty_weight = 1.0 / (len(unvisited_nodes) ** 0.5)
+            penalty = max(0, (current_distance - 2 * min_remaining_distance) / (avg_remaining_distance + 1e-6))
+            score = (current_distance + 0.3 * min_remaining_distance + 0.2 * centrality) * (1 + dynamic_penalty_weight * penalty) - 0.1 * avg_remaining_distance
+        else:
+            score = current_distance
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

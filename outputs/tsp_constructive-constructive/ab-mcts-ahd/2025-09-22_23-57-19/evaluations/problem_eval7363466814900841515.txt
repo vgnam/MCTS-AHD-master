@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = []
+    nodes = []
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        distances.append(cost)
+        nodes.append(node)
+
+    if not distances:
+        return unvisited_nodes.pop()
+
+    min_dist = min(distances)
+    max_dist = max(distances)
+    dist_range = max_dist - min_dist if max_dist != min_dist else 1
+
+    probabilities = []
+    for dist in distances:
+        normalized_dist = (dist - min_dist) / dist_range
+        prob = 1 - normalized_dist
+        probabilities.append(prob)
+
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    dynamic_threshold = 0.5 if len(unvisited_nodes) < 3 else 0.3
+    selected_nodes = [node for node, prob in zip(nodes, probabilities) if prob >= dynamic_threshold]
+
+    if selected_nodes:
+        selected_node = max(selected_nodes, key=lambda x: distance_matrix[current_node][x])
+    else:
+        selected_node = max(nodes, key=lambda x: distance_matrix[current_node][x])
+
+    return next_node

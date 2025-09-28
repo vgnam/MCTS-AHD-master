@@ -1,0 +1,21 @@
+import random
+    selected_idx = random.choices(range(len(candidates)), weights=probabilities)[0]
+    next_node = candidates[selected_idx][0]
+
+    # Lookahead mechanism for longer paths
+    if len(unvisited_nodes) > 3 and random.random() < 0.3:
+        lookahead_nodes = [node for node in unvisited_nodes if node != next_node]
+        if lookahead_nodes:
+            lookahead_scores = []
+            for node in lookahead_nodes:
+                distance = distance_matrix[current_node][node]
+                next_distance = distance_matrix[node][next_node]
+                heuristic = distance_matrix[next_node][destination_node]
+                score = distance + next_distance + temperature * heuristic
+                lookahead_scores.append((node, score))
+
+            lookahead_scores.sort(key=lambda x: x[1])
+            if lookahead_scores and lookahead_scores[0][1] < candidates[selected_idx][1] * 1.1:
+                next_node = lookahead_scores[0][0]
+
+    return next_node

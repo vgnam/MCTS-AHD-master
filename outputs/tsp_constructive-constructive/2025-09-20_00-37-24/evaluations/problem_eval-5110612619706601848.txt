@@ -1,0 +1,28 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate weights based on distance and inverse visit frequency (simulated)
+    visit_frequencies = {node: random.uniform(0.1, 1.0) for node in unvisited_nodes}  # Simulated visit frequencies
+    weights = [
+        (1 / distance_matrix[current_node][node]) * (1 / visit_frequencies[node])
+        for node in unvisited_nodes
+    ]
+
+    # Normalize weights to form a probability distribution
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    # Introduce stochasticity: 80% chance to pick from top 3 weighted nodes, 20% chance to pick randomly
+    if random.random() < 0.8:
+        sorted_nodes = sorted(unvisited_nodes, key=lambda node: probabilities[unvisited_nodes.index(node)], reverse=True)
+        candidates = sorted_nodes[:min(3, len(sorted_nodes))]
+        next_node = random.choices(candidates, weights=probabilities[:len(candidates)])[0]
+    else:
+        next_node = random.choices(unvisited_nodes, weights=probabilities)[0]
+
+    return next_node

@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    ratio = remaining_nodes / total_nodes if total_nodes > 0 else 0
+
+    # Dynamic exploration factor with temperature adjustment
+    temperature = 1 - (1 - ratio) ** 2
+    exploration_factor = temperature * (1 - ratio)
+
+    # Calculate centrality and distance scores
+    centrality = {}
+    distance_scores = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node])
+        distance_scores[node] = distance_matrix[current_node][node]
+
+    # Normalize scores
+    max_distance = max(distance_scores.values()) if distance_scores else 1
+    max_centrality = max(centrality.values()) if centrality else 1
+
+    normalized_distance = {node: dist / max_distance if max_distance else 0 for node, dist in distance_scores.items()}
+    normalized_centrality = {node: cent / max_centrality if max_centrality else 0 for node, cent in centrality.items()}
+
+    # Combine scores with dynamic weight adjustment
+    best_score = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        # Temperature-adjusted score
+        score = (1 - exploration_factor) * normalized_distance[node] + exploration_factor * normalized_centrality[node]
+        score *= (1 + (1 - temperature) * 0.5)  # Additional temperature-based adjustment
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

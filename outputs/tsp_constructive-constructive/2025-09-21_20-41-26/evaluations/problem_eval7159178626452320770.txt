@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes and len(unvisited_nodes) > 1:
+        # Calculate the probability of selecting the destination based on remaining nodes
+        remaining_nodes = len(unvisited_nodes) - 1
+        probability = 1 / (1 + remaining_nodes * 0.5)  # Higher probability as fewer nodes remain
+        if random.random() < probability:
+            return destination_node
+
+    min_distance = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        # Adjust distance based on remaining unvisited nodes to encourage exploration
+        adjusted_distance = distance * (1 + 0.1 * len(unvisited_nodes))
+        if adjusted_distance < min_distance:
+            min_distance = adjusted_distance
+            next_node = node
+    return next_node

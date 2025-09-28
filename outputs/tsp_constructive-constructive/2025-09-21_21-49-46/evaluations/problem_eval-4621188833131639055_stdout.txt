@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of angular progress and distance based on the current phase of the tour (early vs. late) and incorporates a penalty for revisiting recently visited nodes to avoid cycles. It selects the next node by maximizing a score that combines a phase-dependent weighted sum of angular progress and distance, with a recency penalty.}
+                                                                                                                                                                                                                                                                                                                                               ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance of angular progress and distance based on the current phase of the tour (early vs. late) and incorporates a penalty for revisiting recently visited nodes to avoid cycles. It selects the next node by maximizing a score that combines a phase-dependent weighted sum of angular progress and distance, with a recency penalty.}
+                                                                                                                                                                                                                                                                                                                                               ^
+SyntaxError: unmatched '}'

@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if distance_to_destination == 0:
+            score = distance_to_node
+        else:
+            # Lookahead: evaluate the next possible step after the current node
+            lookahead_score = float('inf')
+            for next_candidate in unvisited_nodes:
+                if next_candidate != node:
+                    lookahead_distance = distance_matrix[node][next_candidate]
+                    lookahead_to_destination = distance_matrix[next_candidate][destination_node]
+                    candidate_score = lookahead_distance + lookahead_to_destination
+                    if candidate_score < lookahead_score:
+                        lookahead_score = candidate_score
+
+            # Combine immediate and lookahead scores with a balance factor
+            balance_factor = 0.7  # More weight on immediate step
+            score = (balance_factor * distance_to_node) + ((1 - balance_factor) * lookahead_score)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

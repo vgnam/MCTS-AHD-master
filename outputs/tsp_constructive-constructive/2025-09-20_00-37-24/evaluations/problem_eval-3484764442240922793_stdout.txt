@@ -1,0 +1,23 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\numpy\core\fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+C:\Users\user\AppData\Local\Programs\Python\Python310\lib\site-packages\numpy\core\_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+[*] Instance 0: 11.9200947062338
+[*] Instance 1: 13.8418913270764
+[*] Instance 2: 11.700771427271233
+[*] Instance 3: 12.15062114016604
+[*] Instance 4: 12.179700502745353
+[*] Instance 5: 11.713770260689577
+[*] Instance 6: 12.940240486173629
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 30, in select_next_node
+    next_node = random.choice(high_score_nodes) if high_score_nodes else random.choice(unvisited_nodes)
+  File "C:\Users\user\AppData\Local\Programs\Python\Python310\lib\random.py", line 378, in choice
+    return seq[self._randbelow(len(seq))]
+TypeError: 'set' object is not subscriptable

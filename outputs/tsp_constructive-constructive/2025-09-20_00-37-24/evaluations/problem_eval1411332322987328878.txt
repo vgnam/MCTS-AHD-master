@@ -1,0 +1,24 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic candidate selection based on remaining unvisited nodes
+    remaining_nodes = len(unvisited_nodes)
+    candidate_count = max(1, min(5, math.ceil(remaining_nodes * 0.3)))
+
+    # Temperature-based probabilistic selection
+    temperature = max(0.1, 1.0 - (remaining_nodes / len(distance_matrix)))
+    if random.random() < temperature:
+        candidates = nearest_neighbors[:candidate_count]
+        next_node = random.choice(candidates)
+    else:
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

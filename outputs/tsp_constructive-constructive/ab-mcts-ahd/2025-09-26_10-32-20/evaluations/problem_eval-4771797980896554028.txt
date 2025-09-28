@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        local_distance = distance_matrix[current_node][node]
+        global_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        remaining_nodes = len(unvisited_nodes)
+
+        # Dynamic weight using sigmoid function for smoother transition
+        weight_factor = 1 / (1 + math.exp(-(remaining_nodes - 5)))
+
+        # Add penalty for nodes that have been visited before in this path
+        penalty = 0
+        if hasattr(select_next_node, 'visited_history'):
+            penalty = sum(distance_matrix[current_node][n] for n in select_next_node.visited_history if n in unvisited_nodes) / (len(select_next_node.visited_history) + 1)
+
+        return (1 - weight_factor) * local_distance + weight_factor * global_distance + penalty
+
+    # Track visited nodes to apply penalty
+    if not hasattr(select_next_node, 'visited_history'):
+        select_next_node.visited_history = set()
+    select_next_node.visited_history.add(current_node)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

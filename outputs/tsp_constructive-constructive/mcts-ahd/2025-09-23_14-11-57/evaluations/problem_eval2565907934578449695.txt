@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = (total_nodes - remaining_nodes) / total_nodes
+    adjusted_progress = 1 - (1 - progress_factor) ** 3  # Stronger non-linear scaling
+
+    # Calculate node centrality and historical momentum
+    node_centralities = []
+    node_momenta = []
+    for node in unvisited_nodes:
+        # Centrality: average distance to all other nodes
+        centrality = sum(distance_matrix[node][other] for other in range(total_nodes)) / (total_nodes - 1)
+        node_centralities.append(centrality)
+
+        # Momentum: historical visits (simplified as inverse of centrality)
+        momentum = 1 / (1 + centrality) if node != destination_node else 0
+        node_momenta.append(momentum)
+
+    for i, node in enumerate(unvisited_nodes):
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight adjustment with stronger progress influence
+        distance_weight = (1 - adjusted_progress) ** 2 * 0.8 + 0.2
+        future_weight = adjusted_progress ** 1.5 * 0.7 + 0.3
+        centrality_weight = 0.3 * (1 - adjusted_progress ** 1.2)
+        momentum_weight = 0.15 * adjusted_progress
+
+        # Novel exploration bonus combining centrality and momentum
+        exploration_bonus = (1 / (1 + immediate_distance)) * \
+                           (remaining_nodes / total_nodes) * \
+                           (1 / (1 + node_centralities[i])) * \
+                           (1 + node_momenta[i])
+
+        combined_score = (distance_weight * immediate_distance) + \
+                         (future_weight * (1 / (1 + future_distance))) + \
+                         (centrality_weight * node_centralities[i]) + \
+                         (momentum_weight * node_momenta[i]) - \
+                         (0.5 * exploration_bonus)
+
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_node]
+
+    return next_node

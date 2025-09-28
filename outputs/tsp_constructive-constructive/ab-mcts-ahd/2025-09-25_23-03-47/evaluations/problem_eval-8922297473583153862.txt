@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    temperature = 1.0
+    cooling_rate = 0.99
+    min_temp = 0.01
+
+    def evaluate_candidate(candidate):
+        if not unvisited_nodes - {candidate}:
+            return distance_matrix[current_node][candidate] + distance_matrix[candidate][destination_node]
+        next_candidate = min(unvisited_nodes - {candidate}, key=lambda x: distance_matrix[candidate][x])
+        return distance_matrix[current_node][candidate] + distance_matrix[candidate][next_candidate]
+
+    candidates = list(unvisited_nodes)
+    best_candidate = min(candidates, key=evaluate_candidate)
+    best_score = evaluate_candidate(best_candidate)
+
+    while temperature > min_temp:
+        candidate = random.choice(candidates)
+        candidate_score = evaluate_candidate(candidate)
+
+        if candidate_score < best_score or random.random() < math.exp((best_score - candidate_score) / temperature):
+            best_candidate = candidate
+            best_score = candidate_score
+
+        temperature *= cooling_rate
+
+    return next_node

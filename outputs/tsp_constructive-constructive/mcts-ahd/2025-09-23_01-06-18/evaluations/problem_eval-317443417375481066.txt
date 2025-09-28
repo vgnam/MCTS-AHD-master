@@ -1,0 +1,12 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        if len(unvisited_nodes) == 1:
+            return destination_node
+        dest_weight = 1.0 / len(unvisited_nodes)
+        nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+        nearest_weight = 1.0 - dest_weight
+        prob = dest_weight + nearest_weight * (1.0 - distance_matrix[current_node][nearest_node] / sum(distance_matrix[current_node][node] for node in unvisited_nodes))
+        return destination_node if random.random() < prob else nearest_node
+    return next_node

@@ -1,0 +1,18 @@
+import numpy as np
+    candidates = []
+    weights = []
+    remaining_nodes = len(unvisited_nodes)
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        foresighted_distance = distance_matrix[node][destination_node]
+        dynamic_weight = 0.5 + 0.5 * np.tanh(remaining_nodes / 10)
+        weighted_cost = dynamic_weight * immediate_distance + (1 - dynamic_weight) * foresighted_distance
+        candidates.append(node)
+        weights.append(1 / (weighted_cost + 1e-6))
+    if not candidates:
+        return destination_node
+    probabilities = np.array(weights) / np.sum(weights)
+    next_node = np.random.choice(candidates, p=probabilities)
+    return next_node

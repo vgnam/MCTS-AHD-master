@@ -1,0 +1,46 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    total_weight = 0.0
+    remaining_count = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = 0
+
+        # Dynamic lookahead depth with decay factor
+        decay_factor = 0.9
+        max_depth = min(3, max(1, int(remaining_count * decay_factor)))
+        lookahead_depth = min(max_depth, remaining_count - 1) if remaining_count > 1 else 1
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            current = node
+            for _ in range(lookahead_depth):
+                if not remaining_nodes:
+                    break
+                next_candidate = min(remaining_nodes, key=lambda x: distance_matrix[current][x])
+                lookahead_distance += distance_matrix[current][next_candidate]
+                current = next_candidate
+                remaining_nodes -= {next_candidate}
+
+        # Weighted score with adaptive weights
+        alpha = 0.5 + 0.1 * (1 - remaining_count / len(unvisited_nodes))  # Increase immediate weight as nodes deplete
+        score = alpha * immediate_distance + (1 - alpha) * (lookahead_distance / lookahead_depth if lookahead_depth > 0 else 0)
+        weight = 1.0 / (score + 1e-6)  # Inverse score to favor lower scores
+        candidates.append((node, weight))
+        total_weight += weight
+
+    # Probabilistic selection
+    if total_weight > 0:
+        r = random.random() * total_weight
+        cumulative_weight = 0.0
+        for node, weight in candidates:
+            cumulative_weight += weight
+            if r <= cumulative_weight:
+                return node
+
+    # Fallback to greedy if weights are zero or invalid
+    return next_node

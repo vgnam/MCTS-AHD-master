@@ -1,0 +1,6 @@
+import random
+        next_node, _ = random.choice(candidates)
+    else:
+        next_node, _ = min(candidates, key=lambda x: x[1])
+
+    return next_node

@@ -1,0 +1,41 @@
+default to robust choices (random or nearest).
+4. Balance global and local perspectives with thresholds (30% or 20%).
+
+**Design idea:**
+{The new algorithm combines farthest-neighbor exploration with nearest-neighbor efficiency, using a dynamic threshold that adapts based on the remaining unvisited nodes, to balance global and local perspectives while occasionally exploring slightly farther nodes to avoid local optima.}
+
+**Implementation:**
+```python
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    max_cost = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost > max_cost:
+            max_cost = cost
+            next_node = node
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        threshold = 0.7 if len(unvisited_nodes) > 4 else 0.5
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][next_node]
+            if potential_cost > max_cost * threshold:
+                next_node = node
+                break
+
+    return next_node

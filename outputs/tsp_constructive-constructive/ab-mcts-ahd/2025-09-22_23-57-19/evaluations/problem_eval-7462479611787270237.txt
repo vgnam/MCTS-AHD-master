@@ -1,0 +1,42 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+
+    max_distance = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        if distance_matrix[current_node][node] > max_distance:
+            max_distance = distance_matrix[current_node][node]
+            next_node = node
+
+    if len(unvisited_nodes) > 2:
+        centrality = {node: sum(distance_matrix[node]) for node in unvisited_nodes}
+        max_centrality = max(centrality.values()) if centrality else 1
+        normalized_centrality = {node: cent / max_centrality if max_centrality else 0 for node, cent in centrality.items()}
+
+        exploration_factor = 1.0 / (len(unvisited_nodes) + 1)
+        max_distance_normalized = max(distances) if distances else 1
+        normalized_distance = {node: (max_distance_normalized - dist) / max_distance_normalized if max_distance_normalized else 0 for node, dist in zip(unvisited_nodes, distances)}
+
+        best_score = -float('inf')
+        candidate_node = None
+
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            score = (1 - exploration_factor) * normalized_distance[node] + exploration_factor * normalized_centrality[node]
+            if score > best_score:
+                best_score = score
+                candidate_node = node
+
+        if candidate_node and distance_matrix[current_node][candidate_node] < avg_distance * 1.3:
+            next_node = candidate_node
+
+    return next_node

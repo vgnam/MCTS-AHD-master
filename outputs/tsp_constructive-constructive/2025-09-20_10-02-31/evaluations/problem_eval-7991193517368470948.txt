@@ -1,0 +1,27 @@
+defaulting to local when few nodes remain and global when many remain, while alternating the decision when the ratio is balanced.}
+
+```python
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 1 else 0
+
+    def min_max_distance(node):
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return distance_matrix[current_node][node]
+        return max(distance_matrix[node][n] for n in remaining_nodes)
+
+    if remaining_ratio > 0.5:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    elif remaining_ratio < 0.5:
+        next_node = min(unvisited_nodes, key=min_max_distance)
+    else:
+        if len(unvisited_nodes) % 2 == 1:
+            next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+        else:
+            next_node = min(unvisited_nodes, key=min_max_distance)
+
+    return next_node

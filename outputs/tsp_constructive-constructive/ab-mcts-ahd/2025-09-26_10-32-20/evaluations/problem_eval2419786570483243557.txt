@@ -1,0 +1,46 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    exploration_weight = 0.5 * (1 - visited_ratio)
+    exploitation_weight = 0.3 * visited_ratio
+    memory_weight = 0.2
+
+    if not hasattr(select_next_node, 'node_history'):
+        select_next_node.node_history = {node: 0 for node in unvisited_nodes}
+    if not hasattr(select_next_node, 'recent_selections'):
+        select_next_node.recent_selections = []
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        distances_to_unvisited = [distance_matrix[node][n] for n in unvisited_nodes]
+        avg_distance = sum(distances_to_unvisited) / len(unvisited_nodes)
+        variance = sum((d - avg_distance) ** 2 for d in distances_to_unvisited) / len(unvisited_nodes)
+
+        exploration_bonus = exploration_weight * (1 / (1 + select_next_node.node_history.get(node, 0)))
+        exploitation_reward = exploitation_weight * (1 / (1 + avg_distance))
+
+        memory_bonus = 0
+        if select_next_node.recent_selections:
+            recent_avg_distance = sum(distance_matrix[prev][node] for prev in select_next_node.recent_selections) / len(select_next_node.recent_selections)
+            memory_bonus = memory_weight * (1 / (1 + recent_avg_distance))
+
+        return exploration_bonus + exploitation_reward + memory_bonus
+
+    scores = {node: calculate_score(node) for node in unvisited_nodes}
+    total_score = sum(scores.values())
+    probabilities = {node: score / total_score for node, score in scores.items()}
+    next_node = random.choices(list(probabilities.keys()), weights=probabilities.values(), k=1)[0]
+
+    select_next_node.node_history[next_node] = select_next_node.node_history.get(next_node, 0) + 1
+    select_next_node.recent_selections.append(next_node)
+    if len(select_next_node.recent_selections) > 3:
+        select_next_node.recent_selections.pop(0)
+
+    return next_node

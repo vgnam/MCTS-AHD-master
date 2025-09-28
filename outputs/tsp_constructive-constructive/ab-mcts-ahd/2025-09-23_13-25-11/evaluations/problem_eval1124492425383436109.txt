@@ -1,0 +1,27 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Initialize historical selection counts (simulated for demonstration)
+    historical_counts = {node: 0 for node in unvisited_nodes}
+    historical_counts.update({current_node: 1})  # Assume current_node was selected once
+
+    def heuristic_score(node):
+        # Base distance: current_node → next_node
+        base_distance = distance_matrix[current_node][node]
+
+        # Heuristic lookahead: next_node → destination_node
+        lookahead_distance = distance_matrix[node][destination_node]
+
+        # Penalty term: discourages frequently selected nodes
+        penalty = historical_counts[node] * 0.1  # Adjust weight as needed
+
+        # Dynamic weight: balances penalty and lookahead based on remaining nodes
+        remaining_nodes = len(unvisited_nodes)
+        dynamic_weight = 0.3 if remaining_nodes > 5 else 0.7  # Higher weight for fewer remaining nodes
+
+        # Combined score: base + dynamic_weight * (lookahead - penalty)
+        return base_distance + dynamic_weight * (lookahead_distance - penalty)
+
+    next_node = min(unvisited_nodes, key=heuristic_score)
+    return next_node

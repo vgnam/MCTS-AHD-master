@@ -1,0 +1,48 @@
+importance in the remaining graph.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+    num_unvisited = len(unvisited_nodes)
+    if num_unvisited == 0:
+        return destination_node
+
+    # Adaptive weight balancing with historical performance influence
+    base_weight = 0.5 + 0.5 * (num_unvisited / (num_unvisited + 1))
+    weight_proximity = base_weight * (0.6 + 0.2 * (num_unvisited / len(distance_matrix)))
+    weight_centrality = 1 - weight_proximity
+
+    # Historical performance tracking (simplified for this example)
+    if not hasattr(select_next_node, 'history'):
+        select_next_node.history = []
+    if len(select_next_node.history) > 10:
+        select_next_node.history.pop(0)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+
+        # Novel centrality metric combining variance and skewness
+        distances_to_others = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        avg_distance = sum(distances_to_others) / max(1, len(distances_to_others))
+        variance = sum((d - avg_distance) ** 2 for d in distances_to_others) / max(1, len(distances_to_others))
+        skewness = sum((d - avg_distance) ** 3 for d in distances_to_others) / max(1, len(distances_to_others)) ** 1.5
+        centrality_score = avg_distance - (variance * 0.7 + abs(skewness) * 0.3)
+
+        # Historical performance adjustment
+        if select_next_node.history:
+            avg_history = sum(select_next_node.history) / len(select_next_node.history)
+            proximity_factor = 1 + (0.2 if distance_to_node < avg_history else -0.2)
+        else:
+            proximity_factor = 1
+
+        score = -weight_proximity * (distance_to_node * proximity_factor) + weight_centrality * centrality_score
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    # Update history with the chosen distance
+    if next_node is not None:
+        select_next_node.history.append(distance_matrix[current_node][next_node])
+
+    return next_node

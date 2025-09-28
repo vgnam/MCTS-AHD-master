@@ -1,0 +1,40 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Calculate entropy and path momentum
+    avg_distance = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / remaining_nodes if unvisited_nodes else 0
+    max_total_distance = max(sum(row) for row in distance_matrix) if distance_matrix else 0
+    entropy_factor = 1 - (avg_distance / max_total_distance) if max_total_distance != 0 else 1
+
+    # Path momentum calculation
+    if len(distance_matrix) > 1:
+        prev_node = current_node - 1 if current_node > 0 else len(distance_matrix) - 1
+        path_momentum = -distance_matrix[prev_node][current_node] / max_total_distance if max_total_distance != 0 else 0
+    else:
+        path_momentum = 0
+
+    # Dynamic weight adjustment
+    weight_coherence = 0.5 * (1 - entropy_factor) + 0.3 * (remaining_nodes / total_nodes) + 0.2 * path_momentum
+    weight_local = 0.3 * entropy_factor + 0.2 * (remaining_nodes / total_nodes) + 0.3 * path_momentum
+    weight_global = 0.4 * (1 - entropy_factor) + 0.1 * (remaining_nodes / total_nodes)
+
+    def calculate_score(node):
+        local_distance = distance_matrix[current_node][node]
+        global_distance = sum(distance_matrix[node][n] for n in unvisited_nodes) / remaining_nodes if remaining_nodes > 0 else 0
+        weight_factor = 1 - math.log(remaining_nodes + 1) / (math.log(remaining_nodes + 1) + 1)  # Logarithmic scaling
+
+        # Hybrid scoring with momentum and adaptive scaling
+        local_term = weight_local * (local_distance / (1 + entropy_factor)) * (1 - 0.5 * path_momentum)
+        global_term = weight_global * (global_distance * (1 + entropy_factor)) * (1 + 0.3 * path_momentum)
+        coherence_term = weight_coherence * (global_distance / (1 + entropy_factor)) * (1 + 0.7 * path_momentum)
+
+        return (1 - weight_factor) * local_term + weight_factor * (global_term - coherence_term)
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        # Calculate node density in neighborhood
+        neighborhood_density = len([n for n in remaining_nodes if distance_matrix[node][n] < current_dist * 1.5]) / len(remaining_nodes)
+
+        # Calculate average future distance with density adjustment
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        adjusted_future_dist = avg_future_dist * (1 + neighborhood_density * 0.3)
+
+        # Dynamic weight with reinforcement learning-inspired adjustment
+        base_weight = 0.5 + 0.4 * remaining_ratio
+        weight_adjustment = 0.1 * (1 - neighborhood_density)  # More adjustment when less dense
+        dynamic_weight = max(0.3, min(0.7, base_weight + weight_adjustment))
+
+        # Add path history consideration (simplified)
+        if hasattr(select_next_node, 'path_history'):
+            select_next_node.path_history.append((current_node, node))
+            if len(select_next_node.path_history) > 5:
+                select_next_node.path_history.pop(0)
+            recent_dist = sum(d[1] for d in select_next_node.path_history) / len(select_next_node.path_history)
+            dynamic_weight = (dynamic_weight * 2 + (current_dist / recent_dist) * 0.2) / 2.2
+        else:
+            select_next_node.path_history = []
+
+        return dynamic_weight * current_dist + (1 - dynamic_weight) * adjusted_future_dist
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

@@ -1,0 +1,45 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = remaining_nodes + 1
+
+    if not unvisited_nodes:
+        return destination_node
+
+    # Compute centroid of unvisited nodes
+    centroid = [0.0] * len(distance_matrix)
+    for node in unvisited_nodes:
+        for i in range(len(distance_matrix)):
+            centroid[i] += distance_matrix[node][i]
+    centroid = [x / len(unvisited_nodes) for x in centroid]
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if remaining_nodes == 1:
+            score = distance_to_node + distance_to_destination
+        else:
+            direct_distance = distance_matrix[current_node][destination_node]
+            detour_ratio = direct_distance / (distance_to_node + distance_to_destination)
+            detour_penalty = (1.0 - detour_ratio) * direct_distance
+
+            # Centrality-based detour scaling
+            centrality = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_nodes
+            scaled_detour_penalty = detour_penalty * (1 + (centrality / direct_distance))
+
+            # Centroid-based heuristic bonus
+            centroid_distance = sum(abs(distance_matrix[node][i] - centroid[i]) for i in range(len(distance_matrix)))
+            heuristic_bonus = direct_distance - centroid_distance
+
+            # Dynamic score adjustment
+            score = distance_to_node + scaled_detour_penalty - 0.05 * heuristic_bonus
+            if remaining_nodes / total_nodes < 0.5:
+                score *= 0.9
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

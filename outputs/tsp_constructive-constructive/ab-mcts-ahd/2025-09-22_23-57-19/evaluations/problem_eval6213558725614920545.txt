@@ -1,0 +1,53 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+
+    if next_node is None:
+        return unvisited_nodes.pop()
+
+    if len(unvisited_nodes) > 2:
+        candidates = []
+        for node in unvisited_nodes:
+            if node == next_node:
+                continue
+            cost = distance_matrix[current_node][node]
+            candidates.append((node, cost))
+
+        if candidates:
+            candidates.sort(key=lambda x: x[1])
+            progress = 1.0 - (len(unvisited_nodes) / len(distance_matrix))
+            threshold_scale = 1.0 / (1.0 + math.exp(-10 * (progress - 0.5)))
+            threshold = min_cost * (1.0 + threshold_scale * 2.0)
+
+            weighted_candidates = []
+            for node, cost in candidates:
+                if cost <= threshold:
+                    weight = 1.0 / cost if cost > 0 else float('inf')
+                    weighted_candidates.append((node, weight))
+
+            if weighted_candidates:
+                total_weight = sum(weight for _, weight in weighted_candidates)
+                rand_val = random.random() * total_weight
+                cumulative_weight = 0.0
+                for node, weight in weighted_candidates:
+                    cumulative_weight += weight
+                    if rand_val <= cumulative_weight:
+                        next_node = node
+                        break
+
+    return next_node

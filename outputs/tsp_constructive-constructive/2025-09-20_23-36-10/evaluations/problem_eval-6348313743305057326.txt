@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    max_score = -float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        if node == current_node:
+            continue
+
+        current_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if current_dist == 0:
+            continue
+
+        # Normalize distances to avoid bias
+        normalized_current = current_dist / max(distance_matrix[current_node])
+        normalized_dest = dest_dist / max(distance_matrix[node])
+
+        # Weighted score: prioritize nodes closer to current while making progress toward destination
+        score = 0.6 * (1 - normalized_current) + 0.4 * (1 - normalized_dest)
+
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    return next_node

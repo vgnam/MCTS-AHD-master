@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        max_distance = max(distance_to_current, distance_to_destination)
+
+        # Calculate centrality bias: average distance to all other nodes
+        centrality = sum(distance_matrix[node][other] for other in range(total_nodes)) / total_nodes
+        bias = 1 - (centrality / (sum(distance_matrix[0]) / total_nodes))  # Normalize by average centrality
+
+        # Dynamic weight based on remaining nodes and centrality
+        weight = (remaining_nodes / (remaining_nodes + 1)) * (0.5 + 0.5 * bias)
+
+        # Novel scoring equation: prioritize balanced distances with centrality consideration
+        score = weight * max_distance + (1 - weight) * (distance_to_current + distance_to_destination) * (1 + bias)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

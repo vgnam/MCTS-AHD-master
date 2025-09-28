@@ -1,0 +1,48 @@
+importance, using a weighted sum of local proximity, global connectivity, and path diversity, with penalties for revisiting nodes and rewards for exploring less-connected regions. It employs a multi-phase selection process with depth-limited lookahead, where weights are adjusted based on path progress and node centrality, while incorporating a novel "exploration bonus" for nodes with high potential connectivity.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = 1 - (len(unvisited_nodes) / total_nodes)
+
+    # Dynamic weight adjustments
+    proximity_weight = 0.5 + 0.2 * (1 - visited_ratio)
+    connectivity_weight = 0.4 * (1 - visited_ratio)
+    diversity_weight = 0.3 * visited_ratio
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        # Node centrality and connectivity
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = avg_distance
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.5 * avg_distance)
+            exploration_bonus = len(remaining_nodes) / (connectivity + 1)
+        else:
+            avg_distance = 0
+            node_centrality = 0
+            connectivity = 0
+            exploration_bonus = 0
+
+        # Multi-phase selection
+        phase1_score = proximity_weight * (immediate_distance - avg_distance)
+        phase2_score = connectivity_weight * (connectivity * node_centrality)
+        phase3_score = diversity_weight * exploration_bonus
+
+        # Dynamic penalty for revisiting
+        revisit_penalty = 1 + 0.4 * (1 - visited_ratio) * (len(unvisited_nodes) / total_nodes)
+
+        # Combine scores with adaptive weights
+        score = (phase1_score + phase2_score + phase3_score) * revisit_penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

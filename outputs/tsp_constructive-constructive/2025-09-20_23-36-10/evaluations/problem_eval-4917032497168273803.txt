@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    max_score = -float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+        if distance == 0:
+            continue
+
+        # Dynamic weight factor: prioritize nodes that are closer to the destination relative to their distance from the current node
+        # Exponential weighting to amplify the effect of proximity to the destination
+        weight = (1 / distance) * (destination_distance ** 2)
+        if weight > max_score:
+            max_score = weight
+            next_node = node
+    return next_node

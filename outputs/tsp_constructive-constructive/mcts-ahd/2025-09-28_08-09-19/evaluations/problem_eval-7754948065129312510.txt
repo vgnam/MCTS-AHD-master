@@ -1,0 +1,41 @@
+importance and exponentially increase centrality and penalty weights as progress advances, incorporating lookahead up to 5 steps to estimate future connectivity while scaling penalties with node density and progress.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.3 * avg_distance)
+        else:
+            avg_distance = 0
+            connectivity = 0
+
+        connectivity_factor = 1.0 + (connectivity / remaining_count) * 0.5
+        lookahead_depth = min(5, remaining_count // 2) if remaining_count > 4 else 1
+        nearest_neighbors = sorted(remaining_nodes, key=lambda n: distance_matrix[node][n])[:lookahead_depth] if remaining_nodes else []
+        avg_neighbor_distance = sum(distance_matrix[node][n] for n in nearest_neighbors) / len(nearest_neighbors) if nearest_neighbors else 0
+
+        immediate_weight = 0.5 - 0.3 * visited_ratio
+        centrality_weight = 0.3 * (1.0 - (remaining_count / total_nodes) ** 2.5)
+        penalty_weight = 0.2 * (1 - visited_ratio ** 3)
+
+        score = immediate_weight * (immediate_distance - avg_distance) + centrality_weight * (immediate_distance * connectivity_factor)
+        penalty = 1 + (0.8 * avg_neighbor_distance / (immediate_distance + 1e-6)) * (1 - visited_ratio ** 3)
+        score *= penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

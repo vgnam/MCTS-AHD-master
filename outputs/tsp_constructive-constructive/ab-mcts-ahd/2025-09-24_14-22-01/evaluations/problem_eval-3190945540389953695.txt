@@ -1,0 +1,31 @@
+import math
+    import random
+    next_node = None
+    exploration_weight = 0.4
+    remaining_nodes = len(unvisited_nodes)
+    temperature = 1.0 / (1 + remaining_nodes)
+
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        local_connectivity = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / max(1, len(unvisited_nodes) - 1)
+        dynamic_weight = (1 - exploration_weight) * math.exp(-immediate_distance * temperature) + exploration_weight * math.exp(-potential_distance * temperature)
+        weighted_cost = dynamic_weight * (1 - 0.2 * (local_connectivity / max(distance_matrix[node]))) if unvisited_nodes else 0
+
+        candidates.append((node, weighted_cost))
+
+    if not candidates:
+        return destination_node
+
+    candidates.sort(key=lambda x: x[1])
+    selected = candidates[0][0]
+    if random.random() < temperature:
+        selected = random.choice(candidates[:min(3, len(candidates))])[0]
+
+    return next_node

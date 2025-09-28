@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            distances = [distance_matrix[node][n] for n in remaining_nodes]
+            avg_distance = sum(distances) / len(distances)
+            median_distance = sorted(distances)[len(distances)//2]
+            connectivity = sum(1 for d in distances if d < median_distance * 1.2)
+            node_density = sum(1 for d in distances if d < median_distance * 0.6)
+            variance = sum((d - avg_distance) ** 2 for d in distances) / len(distances)
+        else:
+            avg_distance = 0
+            median_distance = 0
+            connectivity = 0
+            node_density = 0
+            variance = 0
+
+        connectivity_factor = 1.0 + (connectivity / (remaining_count + 1e-6)) * 0.3
+        density_factor = 1.0 + (node_density / (remaining_count + 1e-6)) * 0.4
+        variance_factor = 1.0 + (variance / (avg_distance ** 2 + 1e-6)) * 0.2
+
+        immediate_weight = 0.6 - 0.2 * visited_ratio
+        centrality_weight = 0.3 * (0.6 + 0.3 * visited_ratio)
+        density_weight = 0.1 * (0.5 + 0.4 * visited_ratio)
+
+        score = immediate_weight * (immediate_distance - avg_distance) + centrality_weight * (immediate_distance * connectivity_factor) + density_weight * (immediate_distance * density_factor)
+        score *= variance_factor
+
+        penalty = 1 + (0.6 * connectivity_factor / (1 + variance_factor)) * (1 - visited_ratio)
+        score *= penalty
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

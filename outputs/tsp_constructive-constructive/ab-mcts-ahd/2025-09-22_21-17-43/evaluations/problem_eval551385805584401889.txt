@@ -1,0 +1,9 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    def max_distance(node):
+        if not unvisited_nodes:
+            return 0
+        return max(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+    next_node = min(unvisited_nodes, key=lambda node: max_distance(node))
+    return next_node

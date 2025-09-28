@@ -1,0 +1,15 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            connectivity_potential = len(remaining_nodes) / sum(1 / distance_matrix[node][n] for n in remaining_nodes)
+            return 0.7 * immediate_dist + 0.3 * connectivity_potential
+        else:
+            return immediate_dist
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

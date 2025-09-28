@@ -1,0 +1,20 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    min_cost = float('inf')
+    next_node = None
+    scaling_factor = 0.5 + 0.5 * (len(unvisited_nodes) / len(distance_matrix)) * (1 - (distance_matrix[current_node][destination_node] / max(max(row) for row in distance_matrix)))
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        scaled_cost = immediate_distance + scaling_factor * potential_distance
+        if immediate_distance > 1.5 * distance_matrix[current_node][destination_node]:
+            scaled_cost *= 1.2
+        if potential_distance < 0.5 * distance_matrix[current_node][destination_node]:
+            scaled_cost *= 1.1
+        if scaled_cost < min_cost:
+            min_cost = scaled_cost
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node

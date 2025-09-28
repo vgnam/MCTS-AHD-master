@@ -1,0 +1,30 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=0.5):
+    if not unvisited_nodes:
+        return destination_node
+
+    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    farthest_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    nearest_dist = distance_matrix[current_node][nearest_node]
+    farthest_dist = distance_matrix[current_node][farthest_node]
+
+    if len(unvisited_nodes) > 1:
+        remaining_unvisited = [n for n in unvisited_nodes if n != nearest_node]
+        nearest_remaining = min(remaining_unvisited, key=lambda n: distance_matrix[nearest_node][n])
+        exploration_factor = len(unvisited_nodes) / (len(unvisited_nodes) + sum(distance_matrix[current_node][n] for n in unvisited_nodes))
+        nearest_score = nearest_dist * 0.7 + distance_matrix[nearest_node][nearest_remaining] * 0.3 * exploration_factor
+        farthest_score = farthest_dist * 0.7 + distance_matrix[farthest_node][nearest_remaining] * 0.3 * exploration_factor
+        dynamic_threshold = 1.5 * (1 + math.exp(-(farthest_score - nearest_score) / 100))
+
+        if farthest_score < dynamic_threshold * nearest_score:
+            prob_farthest = 1 / (1 + math.exp(-(farthest_score - nearest_score) / temperature))
+            next_node = farthest_node if random.random() < prob_farthest else nearest_node
+        else:
+            next_node = nearest_node
+    else:
+        next_node = nearest_node
+
+    return next_node

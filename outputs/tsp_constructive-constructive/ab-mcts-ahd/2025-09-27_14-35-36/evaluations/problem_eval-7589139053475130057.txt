@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+    dest_distance = distance_matrix[current_node][destination_node]
+    weighted_dest_distance = dest_distance / (avg_distance + 1e-9)  # Adding a small epsilon to avoid division by zero
+
+    next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] * (1 - weighted_dest_distance * 0.2))
+
+    if destination_node in unvisited_nodes and weighted_dest_distance < 0.4:
+        next_node = destination_node
+
+    return next_node

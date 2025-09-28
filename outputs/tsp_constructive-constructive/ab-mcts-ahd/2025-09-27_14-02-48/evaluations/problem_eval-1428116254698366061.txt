@@ -1,0 +1,52 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+    remaining_count = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        remaining_nodes = unvisited_nodes - {node}
+
+        if destination_node in remaining_nodes:
+            remaining_nodes.remove(destination_node)
+
+        local_cost = distance_matrix[current_node][node]
+        global_cost = 0
+
+        if remaining_nodes:
+            for next_node_candidate in remaining_nodes:
+                global_cost += distance_matrix[node][next_node_candidate]
+            global_cost += distance_matrix[next_node_candidate][destination_node]
+        else:
+            global_cost = distance_matrix[node][destination_node]
+
+        destination_proximity = 1.0 - (distance_matrix[node][destination_node] / max(max(distance_matrix)))
+
+        if remaining_count > 1:
+            scaling_factor = 1.0 + (0.15 * (remaining_count - 1) * destination_proximity)
+        else:
+            scaling_factor = 1.0
+
+        score = (local_cost * 0.7) + (global_cost * 0.3) * scaling_factor
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    if destination_node in unvisited_nodes:
+        destination_score = distance_matrix[current_node][destination_node]
+
+        if remaining_count > 1:
+            remaining_nodes = unvisited_nodes - {destination_node}
+            for node in remaining_nodes:
+                destination_score += distance_matrix[destination_node][node]
+            destination_score += distance_matrix[node][current_node]
+
+        destination_score *= (1.0 + 0.1 * (remaining_count - 1))
+
+        if destination_score < min_score:
+            next_node = destination_node
+
+    return next_node

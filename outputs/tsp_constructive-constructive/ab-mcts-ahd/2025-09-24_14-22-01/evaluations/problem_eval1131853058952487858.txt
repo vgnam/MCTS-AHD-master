@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    max_relative_cost = -float('inf')
+    next_node = None
+    total_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes if node != destination_node)
+    avg_distance = total_distance / len(unvisited_nodes) if unvisited_nodes else 0
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        relative_cost = immediate_distance / avg_distance if avg_distance != 0 else immediate_distance
+        if relative_cost > max_relative_cost:
+            max_relative_cost = relative_cost
+            next_node = node
+    if next_node is None:
+        next_node = destination_node
+    return next_node

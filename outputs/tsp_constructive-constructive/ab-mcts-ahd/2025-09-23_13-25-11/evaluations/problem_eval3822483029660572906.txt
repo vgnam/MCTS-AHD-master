@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    remaining_nodes = unvisited_nodes.copy()
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+
+        # Calculate average future distance
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+
+        # Calculate centrality factor: average distance to all remaining nodes
+        centrality_factor = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+
+        # Dynamic weights based on remaining nodes
+        weight_current = max(0.2, 0.6 * (total_unvisited / (total_unvisited + 1)))
+        weight_future = 1 - weight_current
+
+        # Novel mechanism: blend weighted distance with centrality factor
+        combined_score = (weight_current * current_dist + weight_future * avg_future_dist) * (1 + 0.3 * (centrality_factor / avg_future_dist))
+
+        return combined_score
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

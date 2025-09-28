@@ -1,0 +1,55 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    exploration_rate = max(0.1, 0.5 * (total_unvisited / (total_unvisited + 1)))
+    diversity_factor = 0.3 * (1 - exploration_rate)
+
+    # Historical tracking (simplified for example)
+    historical_scores = {}  # In practice, this would be maintained externally
+    visit_counts = {}  # Track how often nodes are selected
+
+    candidate_scores = []
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Base score with adaptive weights
+        base_score = (1 - exploration_rate) * current_distance + exploration_rate * future_distance
+
+        # Diversity adjustment: penalize frequently visited nodes
+        visit_count = visit_counts.get(node, 0)
+        diversity_adjustment = diversity_factor * visit_count
+        adjusted_score = base_score + diversity_adjustment
+
+        # Reinforcement learning-inspired score adjustment
+        if node in historical_scores:
+            adjusted_score *= (1 - 0.2 * math.exp(-historical_scores[node]))
+
+        candidate_scores.append((node, adjusted_score, future_distance))
+
+    # Probabilistic selection based on scores
+    if len(candidate_scores) > 1:
+        # Normalize scores to probabilities
+        min_score = min(score for _, score, _ in candidate_scores)
+        scores = [min_score / score for _, score, _ in candidate_scores]
+        total = sum(scores)
+        probabilities = [score / total for score in scores]
+
+        # Select node with probability proportional to score
+        next_node = random.choices(
+            [node for node, _, _ in candidate_scores],
+            weights=probabilities,
+            k=1
+        )[0]
+    else:
+        next_node = candidate_scores[0][0]
+
+    # Update visit counts (simplified)
+    visit_counts[next_node] = visit_counts.get(next_node, 0) + 1
+
+    return next_node

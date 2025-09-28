@@ -1,0 +1,62 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    num_unvisited = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    # Dynamic weights based on tour progress
+    progress_ratio = (total_nodes - num_unvisited) / total_nodes
+    weight_proximity = 0.5 * (1 - 0.3 * progress_ratio)
+    weight_future = 0.3 * (0.3 + 0.4 * progress_ratio)
+    weight_detour = 0.2 * (1 - 0.1 * progress_ratio)
+    weight_angular = 0.1 * progress_ratio
+
+    for node in unvisited_nodes:
+        # Proximity factor
+        distance_to_node = distance_matrix[current_node][node]
+
+        # Future efficiency factor
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, num_unvisited - 1)
+
+        # Detour cost factor
+        detour_cost = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+
+        # Angular penalty (discourages sharp turns)
+        if num_unvisited > 2:
+            prev_node = current_node
+            next_next_node = min(unvisited_nodes, key=lambda n: distance_matrix[node][n])
+            angle = calculate_angle(prev_node, node, next_next_node, distance_matrix)
+            angular_penalty = 0.2 * (angle / math.pi) if angle > math.pi/2 else 0
+        else:
+            angular_penalty = 0
+
+        # Node centrality factor (encourages visiting central nodes earlier)
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / (num_unvisited * max(1, num_unvisited - 1))
+
+        # Combined score
+        score = (weight_proximity * distance_to_node +
+                 weight_future * avg_future_distance +
+                 weight_detour * detour_cost +
+                 weight_angular * angular_penalty +
+                 0.1 * centrality)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node
+
+def calculate_angle(a, b, c, distance_matrix):
+    # Calculate angle between vectors ba and bc using dot product
+    ba = [distance_matrix[a][b], 0]
+    bc = [distance_matrix[b][c], 0]
+    dot_product = ba[0] * bc[0] + ba[1] * bc[1]
+    magnitude_ba = math.sqrt(ba[0]**2 + ba[1]**2)
+    magnitude_bc = math.sqrt(bc[0]**2 + bc[1]**2)
+    if magnitude_ba == 0 or magnitude_bc == 0:
+        return 0
+    cos_angle = dot_product / (magnitude_ba * magnitude_bc)
+    angle = math.acos(min(1, max(-1, cos_angle)))
+    return next_node

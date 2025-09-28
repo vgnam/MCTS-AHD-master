@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_ratio = len(unvisited_nodes) / total_nodes
+
+    # Calculate current node's centrality (average distance to all other nodes)
+    current_centrality = sum(distance_matrix[current_node][n] for n in unvisited_nodes) / total_nodes
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, len(unvisited_nodes) - 1)
+
+        # Node's centrality (average distance to all other nodes)
+        node_centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_nodes
+
+        # Dynamic weights based on centrality and remaining ratio
+        if remaining_ratio > 0.5:
+            weight_proximity = 0.6
+            weight_future = 0.4
+            centrality_penalty = 0.2 * node_centrality
+        else:
+            weight_proximity = 0.4
+            weight_future = 0.6
+            centrality_penalty = 0.1 * node_centrality
+
+        # Density bonus: higher bonus when fewer nodes remain
+        density_bonus = 0.3 * (1 - remaining_ratio)
+
+        # Combined score: proximity, future efficiency, centrality penalty, and density bonus
+        score = (weight_proximity * distance_to_node +
+                 weight_future * avg_future_distance +
+                 centrality_penalty -
+                 density_bonus)
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

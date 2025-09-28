@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    decay_rate = 0.9
+    immediate_weight = 0.5 * (decay_rate ** remaining_nodes)
+    prob_weight = 0.5 * (1 - decay_rate ** remaining_nodes)
+
+    distances = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+    if remaining_nodes == total_nodes:
+        next_node = min(unvisited_nodes, key=lambda x: distance_matrix[current_node][x])
+    else:
+        prob_scores = [1 / (distance + 1e-6) for distance in distances]
+        total_prob = sum(prob_scores)
+        normalized_probs = [p / total_prob for p in prob_scores]
+
+        memory_penalty = 0.3 * (1.0 - (remaining_nodes / total_nodes))
+        combined_scores = [immediate_weight * distance + prob_weight * (1 - prob) - memory_penalty for distance, prob in zip(distances, normalized_probs)]
+        min_score = min(combined_scores)
+        selected_index = combined_scores.index(min_score)
+        next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

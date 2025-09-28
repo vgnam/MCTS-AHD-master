@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def avg_distance(node):
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return distance_matrix[current_node][node]
+        return sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+
+    if len(unvisited_nodes) % 2 == 1:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    else:
+        next_node = min(unvisited_nodes, key=avg_distance)
+
+    # Introduce probabilistic element based on node degree
+    if len(unvisited_nodes) > 2 and np.random.rand() < 0.3:
+        degrees = {node: sum(1 for n in unvisited_nodes if distance_matrix[node][n] < np.mean(distance_matrix[node])) for node in unvisited_nodes}
+        next_node = max(unvisited_nodes, key=lambda node: degrees.get(node, 0))
+
+    return next_node

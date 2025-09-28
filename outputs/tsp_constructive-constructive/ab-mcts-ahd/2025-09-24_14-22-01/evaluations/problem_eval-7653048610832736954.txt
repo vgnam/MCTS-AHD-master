@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+    current_to_dest = distance_matrix[current_node][destination_node]
+    avg_unvisited_to_dest = sum(distance_matrix[node][destination_node] for node in unvisited_nodes) / len(unvisited_nodes)
+
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Dynamic bias based on relative distances
+        bias_factor = (current_to_dest - potential_distance) / (avg_unvisited_to_dest + 1e-10)  # Avoid division by zero
+        bias_factor = max(0, min(1, bias_factor))  # Clamp between 0 and 1
+
+        # Weighted cost with dynamic bias
+        total_cost = (1 - bias_factor) * immediate_distance + bias_factor * potential_distance
+        total_cost = (1 - remaining_ratio) * total_cost + remaining_ratio * (immediate_distance + potential_distance)
+
+        if total_cost < min_cost:
+            min_cost = total_cost
+            next_node = node
+
+    return next_node

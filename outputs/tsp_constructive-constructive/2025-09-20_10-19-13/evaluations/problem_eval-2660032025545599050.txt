@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_distance = min(distances)
+    max_distance = max(distances)
+
+    if min_distance == max_distance:
+        return min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    weights = [(max_distance - d + 1) / (max_distance - min_distance + 1) for d in distances]
+    normalized_weights = [w / sum(weights) for w in weights]
+
+    selected_index = np.random.choice(len(unvisited_nodes), p=normalized_weights)
+    return next_node

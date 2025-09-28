@@ -1,0 +1,27 @@
+importance.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    num_unvisited = len(unvisited_nodes)
+    progress_factor = 1.0 - (num_unvisited / len(distance_matrix))
+    centrality_scores = {}
+    for node in unvisited_nodes:
+        centrality_scores[node] = sum(distance_matrix[node][other] for other in unvisited_nodes) / (num_unvisited - 1 if num_unvisited > 1 else 1)
+    min_cost = float('inf')
+    next_node = None
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+        avg_diversity = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (num_unvisited - 1 if num_unvisited > 1 else 1)
+        max_diversity = max(distance_matrix[node][other] for other in unvisited_nodes if other != node) if num_unvisited > 1 else 0
+        diversity_factor = 0.6 * avg_diversity + 0.4 * max_diversity
+        centrality_factor = centrality_scores[node]
+        adaptive_weight = 0.5 - 0.3 * progress_factor
+        weighted_cost = (adaptive_weight * immediate_distance) + (0.3 * potential_distance) + (0.2 * diversity_factor) + (0.1 * centrality_factor)
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+    return next_node

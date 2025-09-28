@@ -1,0 +1,43 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    progress_ratio = 1.0 - (remaining_count / total_nodes)
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Calculate connection strength (hybrid of direct and indirect connectivity)
+        if remaining_count > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            direct_connectivity = sum(1 for n in remaining_nodes if distance_matrix[node][n] < 1.5 * immediate_distance)
+            indirect_connectivity = 0
+            for n in remaining_nodes:
+                for m in remaining_nodes:
+                    if n != m and distance_matrix[node][n] + distance_matrix[n][m] < 1.8 * immediate_distance:
+                        indirect_connectivity += 1
+            connection_strength = (direct_connectivity + 0.5 * indirect_connectivity) / (remaining_count - 1)
+        else:
+            connection_strength = 1.0
+
+        # Dynamic weight adjustment based on progress and density
+        progress_weight = 0.5 + 0.5 * progress_ratio
+        density_weight = 0.3 + 0.4 * (1 - connection_strength)
+
+        # Hybrid selection score
+        nearest_factor = (1 - progress_ratio) * immediate_distance
+        farthest_factor = progress_ratio * (max(distance_matrix[current_node][n] for n in unvisited_nodes) - immediate_distance)
+        connectivity_factor = connection_strength * sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_count - 1) if remaining_count > 1 else 0
+
+        score = (progress_weight * (nearest_factor + farthest_factor) +
+                 density_weight * connectivity_factor)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

@@ -1,0 +1,33 @@
+import defaultdict
+    import heapq
+
+    # Build MST using Prim's algorithm
+    mst_edges = set()
+    connected_nodes = {current_node}
+    heap = []
+    for node in unvisited_nodes:
+        if node in connected_nodes:
+            continue
+        heapq.heappush(heap, (distance_matrix[current_node][node], current_node, node))
+
+    while heap and len(connected_nodes) < len(unvisited_nodes) + 1:
+        dist, u, v = heapq.heappop(heap)
+        if v not in connected_nodes:
+            mst_edges.add((u, v))
+            connected_nodes.add(v)
+            for node in unvisited_nodes:
+                if node not in connected_nodes:
+                    heapq.heappush(heap, (distance_matrix[v][node], v, node))
+
+    # Calculate node centrality in MST
+    centrality = defaultdict(int)
+    for u, v in mst_edges:
+        centrality[u] += 1
+        centrality[v] += 1
+
+    # Select node with minimum combined cost: distance to current + inverse centrality
+    def cost(node):
+        return distance_matrix[current_node][node] + (1 / (centrality[node] + 1))
+
+    next_node = min(unvisited_nodes, key=cost)
+    return next_node

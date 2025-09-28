@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Dynamic weight based on remaining unvisited nodes
+    weight = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+
+    # Penalty factor for revisiting nodes (simplified heuristic)
+    penalty = {node: 1.0 / (1 + distance_matrix[current_node][node]) for node in unvisited_nodes}
+
+    # Combined score: weighted distance plus penalty
+    next_node = min(unvisited_nodes, key=lambda node: weight * distance_matrix[current_node][node] + (1 - weight) * penalty[node])
+
+    return next_node

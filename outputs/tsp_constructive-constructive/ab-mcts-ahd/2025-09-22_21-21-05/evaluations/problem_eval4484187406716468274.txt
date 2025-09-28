@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    scores = []
+
+    # Calculate centrality measure
+    centrality_scores = []
+    for node in unvisited_nodes:
+        centrality = sum(distance_matrix[node][other] for other in unvisited_nodes) / total_unvisited
+        centrality_scores.append(centrality)
+
+    avg_centrality = sum(centrality_scores) / total_unvisited if total_unvisited > 0 else 0
+
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Adaptive weight based on remaining nodes
+        weight = 1.0 - (0.7 * (total_unvisited - 1) / total_unvisited)
+
+        # Centrality reward
+        centrality_reward = (avg_centrality - centrality_scores[i]) / (avg_centrality + 1e-6)
+
+        # Combined score (distance penalty + centrality reward)
+        combined_score = (weight * (distance_to_current + distance_to_destination)) - 0.4 * centrality_reward
+
+        scores.append(combined_score)
+
+    # Normalize scores to probabilities
+    min_score = min(scores)
+    adjusted_scores = [min_score - score + 1e-6 for score in scores]  # Invert and shift to avoid negative probabilities
+    total_prob = sum(adjusted_scores)
+    probabilities = [score / total_prob for score in adjusted_scores]
+
+    # Select node based on probabilities
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+
+    return next_node

@@ -1,0 +1,12 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=1.0, iteration=0):
+    if not unvisited_nodes:
+        return destination_node
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    max_distance = max(distances) if distances else 0
+    weights = [max_distance - d + 1e-9 for d in distances]
+    adjusted_temp = max(0.1, temperature * (0.95 ** iteration))
+    exp_weights = [math.exp(w / adjusted_temp) for w in weights]
+    total = sum(exp_weights)
+    probs = [w / total for w in exp_weights]
+    next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+    return next_node

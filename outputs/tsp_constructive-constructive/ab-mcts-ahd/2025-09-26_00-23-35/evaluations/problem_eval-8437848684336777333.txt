@@ -1,0 +1,28 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+    num_unvisited = len(unvisited_nodes)
+
+    # Dynamic weight adjustment
+    weight_proximity = 1.2 * (0.6 + 0.4 * (num_unvisited / (num_unvisited + 1)))
+    weight_future = 0.8 * (0.4 * (1 - (num_unvisited / (num_unvisited + 1))))
+
+    # Add randomness
+    randomness = 0.15 * random.random()
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, num_unvisited - 1)
+
+        # Proximity bonus
+        proximity_bonus = 0.3 * distance_to_node if num_unvisited <= 2 else 0
+
+        score = (weight_proximity * (-distance_to_node) + weight_future * avg_future_distance) * (1 + randomness) + proximity_bonus
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

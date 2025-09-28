@@ -1,0 +1,52 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    next_node = None
+    best_score = float('inf')
+    total_unvisited = len(unvisited_nodes)
+
+    # Dynamic weights (70% proximity early, 30% future efficiency later)
+    weight_proximity = 0.7 * (0.6 + 0.4 * (total_unvisited / (total_unvisited + 1)))
+    weight_future = 0.3 * (0.4 * (1 - (total_unvisited / (total_unvisited + 1))))
+
+    # Calculate centrality for each node
+    centrality = {}
+    for node in unvisited_nodes:
+        total_distance = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        centrality[node] = total_distance / max(1, total_unvisited - 1)
+
+    # Dynamic temperature based on remaining nodes
+    temperature = max(0.1, 0.5 * (1.0 - (1.0 / total_unvisited)) + 0.5 * (total_unvisited / (total_unvisited + 1)))
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_future_distance = centrality.get(node, 0)
+
+        # Harmonic mean of distances for bias calculation
+        dest_distance = distance_matrix[current_node][destination_node]
+        harmonic_mean = 2 * distance_to_node * dest_distance / (distance_to_node + dest_distance + 1e-6) if dest_distance > 0 else distance_to_node
+
+        # Centrality threshold
+        centrality_threshold = 0.5 + 0.5 * (total_unvisited / (total_unvisited + 1))
+
+        # Score with dynamic weights and centrality penalty
+        score = weight_proximity * distance_to_node + weight_future * avg_future_distance
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    # Adjust bias based on centrality and temperature
+    if next_node != destination_node and total_unvisited > 1:
+        centrality_factor = centrality.get(next_node, 0) / (centrality.get(destination_node, 1) + 1e-6)
+        reroute_prob = (1.0 - temperature) * (centrality_factor / centrality_threshold)
+
+        if (centrality.get(next_node, 0) > centrality_threshold and random.random() < reroute_prob) or \
+           (harmonic_mean > 1.2 * distance_matrix[current_node][next_node] and random.random() < temperature):
+            next_node = destination_node if destination_node in unvisited_nodes else next_node
+
+    return next_node

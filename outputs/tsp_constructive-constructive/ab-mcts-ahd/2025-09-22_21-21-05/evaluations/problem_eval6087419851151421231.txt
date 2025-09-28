@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    exploration_weight = 1 / (1 + remaining_nodes) if remaining_nodes > 0 else 0.5
+    exploitation_weight = 1 - exploration_weight
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        path_efficiency = distance_to_current + distance_to_destination
+        exploration_score = exploration_weight * distance_to_current
+        exploitation_score = exploitation_weight * distance_to_destination
+        path_balance = (exploration_score + exploitation_score) / path_efficiency if path_efficiency > 0 else 0
+
+        combined_score = path_efficiency * (1 + path_balance)
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

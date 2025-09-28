@@ -1,0 +1,32 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=0.5, penalty_weight=0.1):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    for node in unvisited_nodes:
+        next_distance = distance_matrix[current_node][node]
+
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = unvisited_nodes - {node}
+            lookahead_node = min(remaining_nodes, key=lambda n: distance_matrix[node][n])
+            lookahead_distance = distance_matrix[node][lookahead_node]
+            total_distance = next_distance + lookahead_distance
+        else:
+            total_distance = next_distance
+
+        # Apply dynamic penalty based on node revisit likelihood
+        penalty = penalty_weight * (1.0 / (1.0 + math.exp(-(len(unvisited_nodes) - 1))))
+        weighted_distance = total_distance + penalty
+
+        candidates.append((node, weighted_distance))
+
+    # Temperature-based probabilistic selection
+    weights = [math.exp(-c[1] / temperature) for c in candidates]
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    next_node = random.choices([c[0] for c in candidates], weights=probabilities, k=1)[0]
+    return next_node

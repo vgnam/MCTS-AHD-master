@@ -1,0 +1,37 @@
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_remaining_distance = sum(distance_matrix[node][destination_node] for node in unvisited_nodes)
+    avg_remaining_distance = total_remaining_distance / len(unvisited_nodes)
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            lookahead_scores = []
+            for n in remaining_nodes:
+                next_dist = distance_matrix[node][n]
+                return_dist = distance_matrix[n][destination_node]
+                lookahead_scores.append(next_dist + return_dist)
+
+            min_lookahead = min(lookahead_scores)
+            max_lookahead = max(lookahead_scores)
+            normalized_lookahead = [(score - min_lookahead) / (max_lookahead - min_lookahead + 1e-6) for score in lookahead_scores]
+
+            sigmoid_weight = 1 / (1 + np.exp(-5 * (avg_remaining_distance - current_dist)))
+            adjusted_lookahead = sum(score * (1 - weight) for score, weight in zip(lookahead_scores, normalized_lookahead))
+        else:
+            adjusted_lookahead = distance_matrix[node][destination_node]
+
+        return current_dist * (1 - sigmoid_weight) + adjusted_lookahead * sigmoid_weight
+
+    node_scores = [evaluate_node(node) for node in unvisited_nodes]
+    probabilities = np.exp(-np.array(node_scores) / np.sum(node_scores))
+    probabilities /= probabilities.sum()
+
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+    return next_node

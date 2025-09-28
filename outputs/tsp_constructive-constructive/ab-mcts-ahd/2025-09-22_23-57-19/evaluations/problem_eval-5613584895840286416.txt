@@ -1,0 +1,23 @@
+importance' (e.g., centrality or frequency of visits) to balance exploration and exploitation, prioritizing the destination when unvisited but otherwise selecting nodes with high combined scores of distance and importance.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    # Node importance: sum of distances to all other nodes (simplified centrality)
+    node_importance = {node: sum(distance_matrix[node]) for node in unvisited_nodes}
+
+    max_score = -float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        # Weighted score: distance (exploration) + importance (exploitation)
+        score = 0.7 * distance_matrix[current_node][node] + 0.3 * node_importance[node]
+        if score > max_score:
+            max_score = score
+            next_node = node
+
+    return next_node

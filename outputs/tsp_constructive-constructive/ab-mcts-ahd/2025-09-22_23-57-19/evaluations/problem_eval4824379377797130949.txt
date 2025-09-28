@@ -1,0 +1,16 @@
+import random
+    selected = random.choices([node for node, _ in normalized_weights],
+                            weights=[weight for _, weight in normalized_weights],
+                            k=1)[0]
+
+    # Apply threshold-based adjustment
+    if len(unvisited_nodes) > 2:
+        for node in unvisited_nodes:
+            if node == selected:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][selected]
+            if potential_cost < max_cost * threshold:
+                selected = node
+                break
+
+    return next_node

@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(distance_matrix)
+    remaining_nodes = len(unvisited_nodes)
+    proximity_weight = 0.7 if remaining_nodes < total_nodes / 2 else 0.3
+    global_weight = 1.0 - proximity_weight
+
+    global_centrality = lambda node: 1 / (sum(distance_matrix[node][n] for n in range(len(distance_matrix))) + 1e-10)
+    distance_penalty = lambda node: min(1.0, distance_matrix[current_node][node] / (2 * sum(distance_matrix[current_node][n] for n in unvisited_nodes) / len(unvisited_nodes)))
+
+    hybrid_score = lambda node: (proximity_weight * distance_matrix[current_node][node] * distance_penalty(node)) + (global_weight * global_centrality(node))
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

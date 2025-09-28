@@ -1,0 +1,33 @@
+importance scoring by combining immediate costs with both local and global lookahead costs, using a time-varying weight scheme that adapts to the tour's progress, while incorporating a novel penalty mechanism based on node centrality and historical visitation patterns to balance exploration and exploitation more effectively.}
+
+```python
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    progress = 1.0 - remaining_nodes / len(distance_matrix)
+
+    decay_factor = 0.5 ** progress
+    penalty_weight = 0.1 + 0.9 * (1.0 - decay_factor)
+    lookahead_weight = 0.2 * decay_factor
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_cost = distance_matrix[current_node][node]
+
+        local_lookahead = 0.0
+        global_lookahead = 0.0
+
+        if remaining_nodes > 1:
+            remaining = [n for n in unvisited_nodes if n != node]
+            local_lookahead = sum(distance_matrix[node][n] for n in remaining) / len(remaining)
+            global_lookahead = sum(distance_matrix[node][n] for n in range(len(distance_matrix))) / len(distance_matrix)
+
+        penalty = penalty_weight * immediate_cost * (1.0 + 0.1 * (1.0 - global_lookahead / max(distance_matrix[node])))
+        combined_score = immediate_cost + penalty + lookahead_weight * (0.6 * local_lookahead + 0.4 * global_lookahead)
+        scores.append(combined_score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+    return next_node

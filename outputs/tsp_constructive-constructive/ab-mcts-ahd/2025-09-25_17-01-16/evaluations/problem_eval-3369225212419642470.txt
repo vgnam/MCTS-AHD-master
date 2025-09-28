@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_total_score = float('inf')
+
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate dynamic adjustment factor based on remaining nodes' distances to current node
+    remaining_distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    dynamic_factor = 1.0 / (1.0 + max(remaining_distances)) if remaining_distances else 1.0
+
+    # Calculate interquartile range for outlier detection
+    sorted_distances = sorted(remaining_distances)
+    q1 = sorted_distances[len(sorted_distances) // 4]
+    q3 = sorted_distances[3 * len(sorted_distances) // 4]
+    iqr = q3 - q1
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate hub score with dynamic adjustment
+        hub_score = sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        adjusted_hub_score = hub_score * dynamic_factor
+
+        # Apply outlier penalty
+        outlier_penalty = 1.0
+        if distance_to_current < lower_bound or distance_to_current > upper_bound:
+            outlier_penalty = 1.5
+
+        total_score = 0.5 * distance_to_current + 0.3 * distance_to_destination + 0.2 * adjusted_hub_score * outlier_penalty
+
+        if total_score < min_total_score:
+            min_total_score = total_score
+            next_node = node
+
+    return next_node

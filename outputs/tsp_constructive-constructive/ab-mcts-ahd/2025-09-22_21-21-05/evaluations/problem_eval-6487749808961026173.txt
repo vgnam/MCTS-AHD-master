@@ -1,0 +1,33 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_score = 0.0
+    node_scores = {}
+
+    for node in unvisited_nodes:
+        base_distance = distance_matrix[current_node][node]
+        if node == destination_node:
+            weight = remaining_nodes * 2.0  # Stronger bias toward destination
+        else:
+            weight = 1.0 + (0.1 * remaining_nodes)  # Slightly increasing weight as nodes decrease
+
+        # Add randomness to avoid deterministic bias
+        random_factor = 0.5 + 0.5 * (remaining_nodes / len(unvisited_nodes))
+        score = (base_distance * weight) * random_factor
+        node_scores[node] = score
+        total_score += score
+
+    # Select node probabilistically based on scores
+    if total_score == 0:
+        return random.choice(unvisited_nodes)
+
+    threshold = random.uniform(0, total_score)
+    cumulative = 0.0
+    for node, score in node_scores.items():
+        cumulative += score
+        if cumulative >= threshold:
+            return node
+
+    return next_node

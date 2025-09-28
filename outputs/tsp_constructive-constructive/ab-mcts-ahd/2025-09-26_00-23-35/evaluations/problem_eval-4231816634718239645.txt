@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    scores = []
+    total_nodes = len(unvisited_nodes) + 1
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        # Calculate base components
+        distance_to_node = distance_matrix[current_node][node]
+        connectivity_score = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < distance_matrix[node][destination_node]) / max(1, len(unvisited_nodes) - 1)
+        destination_alignment = 1 / (1 + distance_matrix[node][destination_node])
+
+        # Dynamic weights with exploration-exploitation trade-off
+        exploration_weight = 0.5 * (remaining_nodes / total_nodes)
+        exploitation_weight = 0.5 * (1 - remaining_nodes / total_nodes)
+
+        # Novel scoring: combines weighted components with probabilistic elements
+        distance_score = exploration_weight * (1 / (1 + distance_to_node)) + exploitation_weight * (1 / (1 + distance_to_node**2))
+        connectivity_score = exploration_weight * connectivity_score + exploitation_weight * (1 - connectivity_score)
+        alignment_score = exploitation_weight * destination_alignment
+
+        # Normalized combined score
+        score = (0.5 * distance_score + 0.3 * connectivity_score + 0.2 * alignment_score)
+        scores.append((node, score))
+
+    # Memory-based selection: prefer nodes with higher scores relative to others
+    if len(scores) > 1:
+        max_score = max(s[1] for s in scores)
+        candidates = [s for s in scores if s[1] >= max_score * 0.9]  # Consider near-max scores
+        next_node = max(candidates, key=lambda x: x[1])[0]
+    else:
+        next_node = scores[0][0]
+
+    return next_node

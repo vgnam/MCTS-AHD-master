@@ -1,0 +1,72 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:9: RuntimeWarning: divide by zero encountered in scalar divide
+  (1 - alpha) * (distance_matrix[current_node][node] / sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)) +
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:9: RuntimeWarning: invalid value encountered in scalar multiply
+  (1 - alpha) * (distance_matrix[current_node][node] / sum(distance_matrix[node][other] for other in unvisited_nodes if other != node)) +
+[*] Instance 0: 31.164937751665704
+[*] Instance 1: 37.003200218129905
+[*] Instance 2: 33.635601735058884
+[*] Instance 3: 37.62799248310128
+[*] Instance 4: 35.25197004076305
+[*] Instance 5: 35.82492026420171
+[*] Instance 6: 34.75876127406501
+[*] Instance 7: 35.2110552833095
+[*] Instance 8: 32.42260878391372
+[*] Instance 9: 35.637029642262554
+[*] Instance 10: 37.11244357341634
+[*] Instance 11: 33.371857902340174
+[*] Instance 12: 32.244672864491726
+[*] Instance 13: 37.79732241895623
+[*] Instance 14: 34.07550175106338
+[*] Instance 15: 34.557042346959975
+[*] Instance 16: 32.92228609187549
+[*] Instance 17: 34.73710190505698
+[*] Instance 18: 41.0343049499457
+[*] Instance 19: 34.87075973901614
+[*] Instance 20: 30.388548102557152
+[*] Instance 21: 34.43633891537783
+[*] Instance 22: 36.7995520461872
+[*] Instance 23: 36.21414785273787
+[*] Instance 24: 33.707470085632885
+[*] Instance 25: 35.78851223943308
+[*] Instance 26: 32.37214930849542
+[*] Instance 27: 33.80146151209601
+[*] Instance 28: 32.98976519649013
+[*] Instance 29: 37.5957694829079
+[*] Instance 30: 32.05578473632758
+[*] Instance 31: 31.832623432745663
+[*] Instance 32: 30.206522969542867
+[*] Instance 33: 32.64295935730137
+[*] Instance 34: 35.49421785882715
+[*] Instance 35: 37.46564801633239
+[*] Instance 36: 34.8998031177227
+[*] Instance 37: 32.90849262508359
+[*] Instance 38: 30.062518330958692
+[*] Instance 39: 35.60832239692542
+[*] Instance 40: 35.9910866531011
+[*] Instance 41: 32.89195261606859
+[*] Instance 42: 33.98048230728072
+[*] Instance 43: 30.11515437845743
+[*] Instance 44: 33.74325980625891
+[*] Instance 45: 35.41605717001515
+[*] Instance 46: 33.34229206113132
+[*] Instance 47: 34.754230109072054
+[*] Instance 48: 32.480708341631335
+[*] Instance 49: 31.495454269547
+[*] Instance 50: 31.39417535559903
+[*] Instance 51: 38.22057518272714
+[*] Instance 52: 33.97207318692447
+[*] Instance 53: 31.900630066894564
+[*] Instance 54: 33.5811505676568
+[*] Instance 55: 36.21446990259331
+[*] Instance 56: 36.294994924935324
+[*] Instance 57: 33.867798477177104
+[*] Instance 58: 32.30584848881382
+[*] Instance 59: 32.47674972475239
+[*] Instance 60: 32.27263469440114
+[*] Instance 61: 37.59783293968208
+[*] Instance 62: 34.73765797902136
+[*] Instance 63: 34.281426072932376
+[*] Average:
+34.24782302937423

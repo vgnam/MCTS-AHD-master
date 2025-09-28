@@ -1,0 +1,53 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    weight_current = 2.0 - visited_ratio
+    weight_destination = 0.5 * visited_ratio
+    centrality_weight = 0.5
+
+    remaining_nodes = len(unvisited_nodes)
+    time_decay = 0.9 ** (remaining_nodes - 1) if remaining_nodes > 0 else 0.5
+
+    avg_distances = []
+    for node in unvisited_nodes:
+        avg_dist = sum(distance_matrix[node][other] for other in unvisited_nodes) / remaining_nodes
+        avg_distances.append(avg_dist)
+
+    avg_avg_distance = sum(avg_distances) / remaining_nodes if remaining_nodes > 0 else 0
+
+    min_score = float('inf')
+    candidates = []
+
+    for i, node in enumerate(unvisited_nodes):
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        centrality_factor = 1.0 - (avg_distances[i] / (avg_avg_distance + 1e-6))
+
+        penalty = 0.0
+        for neighbor in unvisited_nodes:
+            if neighbor != node and distance_matrix[node][neighbor] < distance_to_current * 1.2:
+                penalty += 0.2
+
+        adjusted_threshold = 1.0 + (1.0 - centrality_factor) * 0.5
+        combined_score = (weight_current * distance_to_current + weight_destination * distance_to_destination +
+                          centrality_weight * centrality_factor + penalty) * time_decay
+
+        if combined_score < min_score * adjusted_threshold:
+            min_score = combined_score
+            candidates = [node]
+        elif combined_score == min_score:
+            candidates.append(node)
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+        if destination_distance < min_score * 1.5:
+            candidates = [destination_node]
+
+    if candidates:
+        next_node = np.random.choice(candidates) if len(candidates) > 1 else candidates[0]
+        return next_node
+    else:
+        return next_node

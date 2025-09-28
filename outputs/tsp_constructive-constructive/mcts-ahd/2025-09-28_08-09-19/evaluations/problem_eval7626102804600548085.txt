@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    weight = 1.0 + (remaining_nodes / (remaining_nodes + 1)) * 0.5
+    dynamic_weight = 1.0 / (1.0 + remaining_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        immediate_weight = 0.4
+        future_weight = 0.3 * (1.0 - weight)
+
+        penalty_weight = 0.3 * (1.0 - future_weight)
+        penalty = penalty_weight * (distance_to_destination / (1.0 + avg_future_distance)) if avg_future_distance > 0 else 0
+
+        avg_distance_to_unvisited = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if len(unvisited_nodes) > 1 else 0
+        connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * avg_distance_to_unvisited)
+        connectivity_weight = 0.2 * (connectivity / (remaining_nodes + 1))
+
+        max_distance = max(distance_to_current, distance_to_destination, 1.0)
+        normalized_current = distance_to_current / max_distance
+        normalized_future = avg_future_distance / max_distance if avg_future_distance > 0 else 0
+
+        decay_factor = 0.7 * (1.0 - dynamic_weight)
+        score = immediate_weight * normalized_current + future_weight * (normalized_future ** decay_factor) + connectivity_weight - penalty
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

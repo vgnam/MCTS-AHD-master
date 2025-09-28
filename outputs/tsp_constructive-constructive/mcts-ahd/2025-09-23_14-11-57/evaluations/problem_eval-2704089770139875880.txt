@@ -1,0 +1,56 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    immediate_regrets = []
+    long_term_regrets = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+
+        # Immediate regret: difference between best and second-best immediate options
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best_immediate = min(distance_matrix[current_node][n] for n in other_nodes)
+            immediate_regret = (distance_matrix[current_node][node] - second_best_immediate) if distance_matrix[current_node][node] > second_best_immediate else 0
+        else:
+            immediate_regret = 0
+        immediate_regrets.append(immediate_regret)
+
+        # Long-term regret: difference between best and worst future paths
+        if other_nodes:
+            best_future = min(distance_matrix[n][destination_node] for n in other_nodes)
+            worst_future = max(distance_matrix[n][destination_node] for n in other_nodes)
+            long_term_regret = (worst_future - best_future) if worst_future > best_future else 0
+        else:
+            long_term_regret = 0
+        long_term_regrets.append(long_term_regret)
+
+    # Dynamic weights: prioritize long-term regret early, immediate regret and distance later
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    long_term_weight = max(0.1, 0.5 * (remaining_nodes / total_nodes))
+    immediate_weight = 0.3 * (remaining_nodes / total_nodes)
+    distance_weight = 1.0 - (long_term_weight + immediate_weight)
+
+    # Combine weighted scores
+    scores = [
+        long_term_weight * long_term_regret +
+        immediate_weight * immediate_regret +
+        distance_weight * distance
+        for long_term_regret, immediate_regret, distance in zip(long_term_regrets, immediate_regrets, distances)
+    ]
+
+    # Probabilistic selection: occasionally choose a suboptimal node to escape local optima
+    min_score = min(scores)
+    max_score = max(scores)
+    if max_score > min_score:
+        normalized_scores = [1 - (score - min_score) / (max_score - min_score) for score in scores]
+        selection_probs = [prob / sum(normalized_scores) for prob in normalized_scores]
+        next_node = list(unvisited_nodes)[np.random.choice(len(unvisited_nodes), p=selection_probs)]
+    else:
+        next_node = list(unvisited_nodes)[scores.index(min_score)]
+
+    return next_node

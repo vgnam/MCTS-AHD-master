@@ -1,0 +1,51 @@
+importance and connectivity.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    proximity_potentials = []
+    node_centralities = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+
+        # Calculate regret: difference between best and second-best options
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+        # Calculate proximity potential: estimate of how well the node bridges current and future paths, weighted by local density
+        nearby_nodes = [n for n in unvisited_nodes if n != node and distance_matrix[node][n] < 1.5 * immediate_distance]
+        local_density = len(nearby_nodes) + 1 if nearby_nodes else 1
+        proximity_potential = (immediate_distance + future_potential) / (1 + sum(distance_matrix[node][n] for n in nearby_nodes))
+        proximity_potentials.append(proximity_potential * local_density)
+
+        # Calculate node centrality: average distance to nearby unvisited nodes
+        centrality = sum(distance_matrix[node][n] for n in nearby_nodes) / local_density if local_density > 0 else 0
+        node_centralities.append(centrality)
+
+    # Dynamic weights: regret adapts to node centrality and remaining nodes
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    distance_weight = 0.5
+    regret_weight = 0.4 * (remaining_nodes / total_nodes) * (1 + max(node_centralities) if node_centralities else 1)
+    proximity_weight = 0.6 * (remaining_nodes / total_nodes)
+
+    # Combine weighted scores: prioritize distance, but adjust regret and proximity dynamically
+    scores = [
+        distance_weight * distance + regret_weight * regret + proximity_weight * potential
+        for distance, regret, potential in zip(distances, regrets, proximity_potentials)
+    ]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

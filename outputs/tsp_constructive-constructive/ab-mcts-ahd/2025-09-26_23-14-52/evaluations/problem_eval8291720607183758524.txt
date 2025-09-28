@@ -1,0 +1,55 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    remaining_ratio = total_unvisited / (total_unvisited + 1)
+    temperature = max(0.1, remaining_ratio)
+
+    # Calculate risk factor (higher when fewer nodes remain)
+    risk_factor = 1.0 - remaining_ratio
+
+    best_score = float('-inf')
+    next_node = None
+    candidates = []
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited
+
+        # Adaptive weight scaling
+        if remaining_ratio > 0.5:
+            distance_weight = 0.7 - 0.3 * risk_factor
+            centrality_weight = 0.3 + 0.4 * risk_factor
+            future_weight = 0.0
+        else:
+            distance_weight = 0.4 - 0.2 * risk_factor
+            centrality_weight = 0.3 + 0.3 * risk_factor
+            future_weight = 0.3 + 0.2 * risk_factor
+
+        # Score calculation with temperature modulation
+        score = (distance_weight * current_distance +
+                 centrality_weight * centrality +
+                 future_weight * future_distance) * temperature
+
+        # Add some randomness for exploration
+        score += random.uniform(-0.1, 0.1) * risk_factor
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+            candidates = [node]
+        elif score == best_score:
+            candidates.append(node)
+
+    # If multiple candidates, select the most central one
+    if len(candidates) > 1:
+        min_centrality = float('inf')
+        for node in candidates:
+            centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / total_unvisited
+            if centrality < min_centrality:
+                min_centrality = centrality
+                next_node = node
+
+    return next_node

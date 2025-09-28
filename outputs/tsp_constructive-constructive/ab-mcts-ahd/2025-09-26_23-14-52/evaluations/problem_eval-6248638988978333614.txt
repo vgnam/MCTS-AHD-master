@@ -1,0 +1,32 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    visit_counts = {node: 0 for node in unvisited_nodes}
+    total_unvisited = len(unvisited_nodes)
+    exploration_factor = 1 / (1 + math.exp(-0.2 * (total_unvisited - 5)))  # Sigmoid decay
+
+    best_score = float('inf')
+    next_node = None
+
+    for candidate in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][candidate]
+        future_dist = distance_matrix[candidate][destination_node]
+        novelty = 1.0 / (1.0 + visit_counts.get(candidate, 0))
+
+        # Local search: average distance to nearby unvisited nodes
+        nearby_avg = sum(distance_matrix[candidate][n] for n in unvisited_nodes if n != candidate) / (total_unvisited - 1) if total_unvisited > 1 else 0
+
+        weighted_score = (0.5 * immediate_dist + 0.3 * future_dist + 0.1 * novelty + 0.1 * nearby_avg) * (1 - exploration_factor) + exploration_factor * random.uniform(0, 1)
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = candidate
+        elif weighted_score == best_score:
+            if future_dist < distance_matrix[next_node][destination_node]:
+                next_node = candidate
+
+    return next_node

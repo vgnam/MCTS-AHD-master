@@ -1,0 +1,9 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, k=3):
+    if not unvisited_nodes:
+        return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])[:k]
+    next_node = random.choice(nearest_neighbors)
+    return next_node

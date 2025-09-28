@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    heuristic_path = [current_node, destination_node]
+    min_cost = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        potential_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weighting factor based on remaining distance
+        remaining_distance = distance_matrix[current_node][destination_node]
+        dynamic_weight = 1.0 - (remaining_distance / (sum(sum(distance_matrix)) / (len(distance_matrix) ** 2)))
+
+        # Heuristic alignment: penalize nodes that deviate from the straight-line path
+        heuristic_direction = (destination_node[0] - current_node[0], destination_node[1] - current_node[1])
+        node_direction = (node[0] - current_node[0], node[1] - current_node[1])
+        dot_product = heuristic_direction[0] * node_direction[0] + heuristic_direction[1] * node_direction[1]
+        alignment_penalty = 1.0 - (dot_product / (sum(x**2 for x in heuristic_direction)**0.5 * sum(x**2 for x in node_direction)**0.5 + 1e-10))
+
+        weighted_cost = (1 - dynamic_weight) * immediate_distance + dynamic_weight * potential_distance + alignment_penalty
+        if weighted_cost < min_cost:
+            min_cost = weighted_cost
+            next_node = node
+
+    return next_node

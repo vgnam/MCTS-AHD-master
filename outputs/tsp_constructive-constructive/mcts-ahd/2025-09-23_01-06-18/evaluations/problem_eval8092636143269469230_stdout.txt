@@ -1,0 +1,11 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+[*] Instance 0: 7.757623722596138
+[*] Instance 1: 9.325006981332457
+[*] Instance 2: 10.250460417567945
+[*] Instance 3: 9.28908769402102
+[*] Instance 4: 9.384282141509697
+[*] Instance 5: 8.709733937011299
+[*] Instance 6: 8.324383660487143
+[*] Instance 7: 9.379263344272916
+[*] Instance 8: 9.617217517269912

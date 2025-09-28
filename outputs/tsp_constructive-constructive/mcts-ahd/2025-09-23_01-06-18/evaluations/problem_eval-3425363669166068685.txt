@@ -1,0 +1,5 @@
+import random
+        candidates = random.sample(candidates, min(5, len(candidates)))
+
+    next_node = min(candidates, key=heuristic)
+    return next_node

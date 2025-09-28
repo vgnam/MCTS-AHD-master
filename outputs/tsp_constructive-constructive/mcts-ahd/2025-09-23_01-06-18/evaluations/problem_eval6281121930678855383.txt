@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - remaining_nodes / total_nodes
+
+    # Adaptive weights based on progress and node centrality
+    base_weight = 0.5 - 0.4 * progress
+    centrality_weight = 0.3 * (1 - progress)
+    diversity_weight = 0.2 + 0.3 * progress
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        regret = immediate_cost - min(distance_matrix[current_node][n] for n in unvisited_nodes)
+        hub_score = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * min(distance_matrix[node][m] for m in unvisited_nodes if m != n)) if remaining_nodes > 1 else 0
+        centrality = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.1 * min(distance_matrix[node][m] for m in unvisited_nodes if m != n)) if remaining_nodes > 1 else 0
+        diversity_bonus = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+
+        # Temperature modulation based on node centrality
+        temperature = 0.7 - 0.4 * (centrality / (remaining_nodes + 1e-6)) * progress
+
+        weighted_score = (base_weight * immediate_cost + (1 - base_weight) * regret + centrality_weight * hub_score + diversity_weight * diversity_bonus) * temperature
+        return weighted_score
+
+    # Probabilistic selection with softmax
+    scores = [heuristic(node) for node in unvisited_nodes]
+    exp_scores = [math.exp(score) for score in scores]
+    probs = [exp_score / sum(exp_scores) for exp_score in exp_scores]
+    next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+
+    return next_node

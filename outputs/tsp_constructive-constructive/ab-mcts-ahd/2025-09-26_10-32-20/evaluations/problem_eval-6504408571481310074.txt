@@ -1,0 +1,13 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    num_unvisited = len(unvisited_nodes)
+    weight_factor = 1 / (1 + math.exp(-0.2 * (num_unvisited - 10)))  # Sigmoid adjustment
+    nearest_weight = 0.2 + 0.6 * (1 - weight_factor)
+    farthest_weight = 0.8 - 0.6 * (1 - weight_factor)
+
+    hybrid_score = lambda node: nearest_weight * distance_matrix[current_node][node] + farthest_weight * distance_matrix[node][destination_node]
+    next_node = min(unvisited_nodes, key=hybrid_score)
+
+    return next_node

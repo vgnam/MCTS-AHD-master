@@ -1,0 +1,48 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def angular_centrality(node, unvisited, current):
+        if len(unvisited) <= 2:
+            return 0.0
+        avg_dist = sum(distance_matrix[current][n] for n in unvisited) / len(unvisited)
+        if avg_dist == 0:
+            return 0.0
+        deviations = [abs(distance_matrix[current][node] - distance_matrix[current][n]) for n in unvisited if n != node]
+        return sum(deviations) / len(deviations) / avg_dist
+
+    def exploration_bonus(node, unvisited, current, memory):
+        if len(unvisited) <= 2:
+            return 0.0
+        avg_dist = sum(distance_matrix[current][n] for n in unvisited) / len(unvisited)
+        if avg_dist == 0:
+            return 0.0
+        base_bonus = (distance_matrix[current][node] - avg_dist) / avg_dist
+        decay_factor = 0.9 ** (10 - len(unvisited))
+        return base_bonus * decay_factor + (0.1 if node in memory else 0.0)
+
+    def dynamic_weight(unvisited_count, exploration_factor):
+        if unvisited_count > 6:
+            return 0.6, 0.2 * exploration_factor, 0.2
+        elif unvisited_count > 3:
+            return 0.4, 0.3 * exploration_factor, 0.3
+        else:
+            return 0.2, 0.4 * exploration_factor, 0.4
+
+    memory = set()
+    exploration_factor = 1.0
+    candidates = []
+    unvisited_count = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        centrality = angular_centrality(node, unvisited_nodes, current_node)
+        bonus = exploration_bonus(node, unvisited_nodes, current_node, memory)
+        weight_dist, weight_cent, weight_bonus = dynamic_weight(unvisited_count, exploration_factor)
+        score = weight_dist * distance + weight_cent * centrality + weight_bonus * bonus
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    memory.add(next_node)
+    exploration_factor *= 0.95
+    return next_node

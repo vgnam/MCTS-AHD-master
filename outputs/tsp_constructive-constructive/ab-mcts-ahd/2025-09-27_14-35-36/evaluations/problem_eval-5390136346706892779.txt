@@ -1,0 +1,13 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_distances = {node: sum(distance_matrix[node][other] for other in unvisited_nodes) for node in unvisited_nodes}
+    next_node = max(unvisited_nodes, key=lambda node: distance_matrix[current_node][node] / total_distances[node])
+
+    if destination_node in unvisited_nodes:
+        dest_score = distance_matrix[current_node][destination_node] / total_distances[destination_node]
+        if dest_score > distance_matrix[current_node][next_node] / total_distances[next_node]:
+            next_node = destination_node
+
+    return next_node

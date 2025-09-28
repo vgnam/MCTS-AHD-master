@@ -1,0 +1,39 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        destination_distance = distance_matrix[current_node][destination_node]
+    else:
+        destination_distance = float('inf')
+
+    min_distance = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    # Normalize distances and compute selection probability
+    if min_distance == 0:
+        min_distance = 1e-6  # Avoid division by zero
+
+    if destination_distance == 0:
+        destination_distance = 1e-6
+
+    normalized_min = min_distance / (min_distance + destination_distance)
+    normalized_dest = destination_distance / (min_distance + destination_distance)
+
+    # Randomly select based on normalized weights
+    if random.random() < normalized_dest and destination_node in unvisited_nodes:
+        next_node = destination_node
+    else:
+        # If not selecting destination, select the nearest node
+        if next_node is None:
+            next_node = random.choice(list(unvisited_nodes))
+
+    return next_node

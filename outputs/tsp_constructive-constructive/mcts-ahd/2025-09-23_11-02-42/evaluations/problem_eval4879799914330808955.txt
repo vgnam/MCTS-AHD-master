@@ -1,0 +1,36 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    candidates = []
+    direct_distance = distance_matrix[current_node][destination_node]
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        if distance_to_destination == 0:
+            score = distance_to_node
+        else:
+            detour_penalty = (distance_to_node + distance_to_destination - direct_distance) ** 2
+            exploration_factor = 0.5 + (0.5 * (remaining_nodes / len(distance_matrix)))
+            centrality_factor = sum(distance_matrix[node]) / len(distance_matrix)
+
+            score = distance_to_node + detour_penalty * (1 - exploration_factor) + centrality_factor * exploration_factor
+
+        candidates.append((node, score))
+
+    candidates.sort(key=lambda x: x[1])
+    top_score = candidates[0][1]
+    similar_candidates = [c for c in candidates if abs(c[1] - top_score) < 0.1 * top_score]
+
+    if len(similar_candidates) > 1:
+        next_node = random.choice(similar_candidates)[0]
+    else:
+        next_node = candidates[0][0]
+
+    return next_node

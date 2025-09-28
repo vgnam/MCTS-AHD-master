@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            return node
+
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+
+        # Temperature-based dynamic weight
+        temperature = 1.0 - (remaining_nodes / (remaining_nodes + 1)) ** 2
+        combined_score = current_to_node + temperature * node_to_dest
+
+        scores.append((node, combined_score))
+
+    # Probabilistic selection based on scores
+    total_score = sum(score for _, score in scores)
+    probabilities = [(score / total_score) for _, score in scores]
+    next_node = random.choices([node for node, _ in scores], weights=probabilities, k=1)[0]
+
+    return next_node

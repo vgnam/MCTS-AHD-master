@@ -1,0 +1,28 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    # Calculate distances to all unvisited nodes and the destination node
+    distances = {node: distance_matrix[current_node][node] for node in unvisited_nodes}
+    destination_distance = distance_matrix[current_node][destination_node]
+    
+    # Find the nearest unvisited node
+    nearest_node = min(distances, key=distances.get)
+    min_distance = distances[nearest_node]
+    
+    # Calculate a score for each unvisited node based on its distance relative to the nearest node's distance and the distance to the destination
+    scores = {node: (distance_matrix[current_node][node] / min_distance) * (destination_distance / (destination_distance + distance_matrix[current_node][node])) for node in unvisited_nodes}
+    
+    # Normalize the scores to obtain probabilities
+    sum_scores = sum(scores.values())
+    probabilities = {node: score / sum_scores for node, score in scores.items()}
+    
+    # Select the next node probabilistically based on the calculated probabilities, but prioritize the destination node if it's unvisited and closer than the nearest node
+    if destination_node in unvisited_nodes and destination_distance < min_distance:
+        next_node = destination_node
+    else:
+        next_node = random.choices(list(probabilities.keys()), weights=probabilities.values(), k=1)[0]
+    
+    return next_node

@@ -1,0 +1,53 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def node_proximity(node, current):
+        return distance_matrix[current][node]
+
+    def node_density(node, unvisited):
+        if len(unvisited) <= 1:
+            return 0.0
+        remaining = unvisited - {node}
+        avg_dist = sum(distance_matrix[node][n] for n in remaining) / len(remaining)
+        return 1.0 / (avg_dist + 1e-6)
+
+    def neighborhood_connectivity(node, unvisited):
+        if len(unvisited) <= 2:
+            return 1.0
+        remaining = unvisited - {node}
+        min_dist = min(distance_matrix[node][n] for n in remaining)
+        max_dist = max(distance_matrix[node][n] for n in remaining)
+        if max_dist == 0:
+            return 0.0
+        return min_dist / max_dist
+
+    def adaptive_gap_penalty(node, current, unvisited):
+        if len(unvisited) <= 2:
+            return 0.0
+        remaining = unvisited - {node}
+        local_avg = sum(distance_matrix[node][n] for n in remaining) / len(remaining)
+        global_avg = sum(sum(row) for row in distance_matrix) / (len(distance_matrix)**2)
+        return (distance_matrix[current][node] - local_avg) / (global_avg + 1e-6)
+
+    progress_factor = 1.0 - (len(unvisited_nodes) / (len(unvisited_nodes) + len(distance_matrix)))
+    exploration_decay = 0.9 ** (10 - len(unvisited_nodes))
+    candidates = []
+
+    for node in unvisited_nodes:
+        proximity = node_proximity(node, current_node)
+        density = node_density(node, unvisited_nodes)
+        connectivity = neighborhood_connectivity(node, unvisited_nodes)
+        gap_penalty = adaptive_gap_penalty(node, current_node, unvisited_nodes)
+        weight_prox = 0.5 * (1 - progress_factor) + 0.2 * exploration_decay
+        weight_dens = 0.3 * progress_factor + 0.1 * exploration_decay
+        weight_conn = 0.2 * (1 - progress_factor) + 0.2 * exploration_decay
+        weight_gap = 0.1 * progress_factor + 0.2 * exploration_decay
+        score = (weight_prox * proximity +
+                weight_dens * density +
+                weight_conn * connectivity +
+                weight_gap * gap_penalty)
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

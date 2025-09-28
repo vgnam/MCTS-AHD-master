@@ -1,0 +1,12 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:19: RuntimeWarning: divide by zero encountered in scalar divide
+  exploitation_factor = (distance_to_destination / direct_distance) * (1.0 - 0.3 * (centrality / distance_to_node))
+D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py:21: RuntimeWarning: invalid value encountered in scalar multiply
+  score = distance_to_node + 0.5 * (1.0 - exploitation_factor) * direct_distance - exploration_bonus
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 52, in eval_heuristic
+    raise KeyError(f"Node {next_node} is already visited.")
+KeyError: 'Node None is already visited.'

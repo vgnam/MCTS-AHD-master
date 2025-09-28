@@ -1,0 +1,18 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def weighted_avg_distance(node):
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return distance_matrix[current_node][node]
+        avg_dist = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+        weight = 1 / (1 + 0.1 * len(remaining_nodes))  # Dynamic weight based on remaining nodes
+        return avg_dist * weight
+
+    if len(unvisited_nodes) % 2 == 1:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    else:
+        next_node = min(unvisited_nodes, key=weighted_avg_distance)
+
+    return next_node

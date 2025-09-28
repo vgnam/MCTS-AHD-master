@@ -1,0 +1,30 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    # Calculate dynamic bias towards destination based on remaining nodes
+    remaining_ratio = len(unvisited_nodes) / len(distance_matrix)
+    destination_bias = 1 - remaining_ratio
+
+    if destination_node in unvisited_nodes and random.random() < destination_bias:
+        return destination_node
+
+    # Calculate average distance to remaining unvisited nodes for each node
+    avg_distances = {}
+    for node in unvisited_nodes:
+        avg_dist = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        avg_distances[node] = avg_dist
+
+    # Sort by distance to current node, then by average distance to remaining nodes
+    candidates = sorted(unvisited_nodes,
+                        key=lambda node: (distance_matrix[current_node][node], avg_distances[node]))
+
+    # Probabilistic selection: bias towards nodes with better overall connectivity
+    weights = [1.0 / (1.0 + avg_distances[node]) for node in candidates]
+    total_weight = sum(weights)
+    probabilities = [w / total_weight for w in weights]
+
+    next_node = random.choices(candidates, weights=probabilities, k=1)[0]
+    return next_node

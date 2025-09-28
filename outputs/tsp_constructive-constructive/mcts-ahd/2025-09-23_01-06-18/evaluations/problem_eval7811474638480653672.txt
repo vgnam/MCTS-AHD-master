@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = 1 / (1 + np.exp(-5 * (1 - remaining_nodes / total_nodes)))
+    exploration_weight = 0.3 + 0.4 * progress_factor
+
+    def heuristic(node):
+        immediate_cost = distance_matrix[current_node][node]
+        future_cost = distance_matrix[node][destination_node]
+
+        local_regret = sum(max(0, distance_matrix[current_node][n] - immediate_cost) for n in unvisited_nodes) / (len(unvisited_nodes) + 1e-6)
+        normalized_regret = local_regret / (max(distance_matrix[current_node][n] for n in unvisited_nodes) - min(distance_matrix[current_node][n] for n in unvisited_nodes) + 1e-6)
+
+        return (exploration_weight * immediate_cost + (1 - exploration_weight) * future_cost) + 0.3 * normalized_regret
+
+    probabilities = np.array([np.exp(-heuristic(node)) for node in unvisited_nodes])
+    probabilities /= probabilities.sum()
+    next_node = np.random.choice(unvisited_nodes, p=probabilities)
+
+    return next_node

@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, memory=None):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    best_score = float('inf')
+    next_node = None
+
+    if memory is None:
+        memory = {}
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic weights with memory influence
+        immediate_weight = 0.8 * (total_unvisited / (total_unvisited + 1)) + 0.2 * (1 - memory.get(node, 0))
+        destination_weight = 1 - immediate_weight
+
+        # Memory factor to avoid revisiting poor choices
+        memory_factor = 1 + 0.1 * memory.get(node, 0)
+
+        score = (immediate_weight * distance_to_current + destination_weight * distance_to_destination) * memory_factor
+
+        if score < best_score:
+            best_score = score
+            next_node = node
+
+    # Update memory for the selected node
+    memory[next_node] = memory.get(next_node, 0) + 1
+
+    return next_node

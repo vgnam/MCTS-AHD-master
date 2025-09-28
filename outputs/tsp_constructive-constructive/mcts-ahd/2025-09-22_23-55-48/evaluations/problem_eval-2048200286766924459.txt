@@ -1,0 +1,25 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    min_total_distance = float('inf')
+    next_node = None
+
+    for candidate in unvisited_nodes:
+        distance_to_candidate = distance_matrix[current_node][candidate]
+        remaining_nodes = unvisited_nodes - {candidate}
+
+        if candidate == destination_node:
+            total_distance = distance_to_candidate + distance_matrix[candidate][destination_node]
+        else:
+            if not remaining_nodes:
+                total_distance = distance_to_candidate + distance_matrix[candidate][destination_node]
+            else:
+                min_next_distance = min(distance_matrix[candidate][node] for node in remaining_nodes)
+                total_distance = distance_to_candidate + min_next_distance
+
+        if total_distance < min_total_distance:
+            min_total_distance = total_distance
+            next_node = candidate
+
+    return next_node

@@ -1,0 +1,35 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    weight_current = 1.0 - visited_ratio
+    weight_destination = visited_ratio
+
+    best_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        avg_distance_current = sum(distance_matrix[current_node]) / len(distance_matrix[current_node])
+        avg_distance_node = sum(distance_matrix[node]) / len(distance_matrix[node])
+
+        normalized_distance = (distance_to_current / avg_distance_current) + (distance_to_destination / avg_distance_node)
+
+        centrality = sum(distance_matrix[node]) / (len(distance_matrix[node]) - 1)
+
+        penalty = 0.0
+        for neighbor in unvisited_nodes:
+            if neighbor != node and distance_matrix[node][neighbor] < distance_matrix[current_node][node] * 0.8:
+                penalty += 0.2
+
+        weighted_score = (weight_current * distance_to_current) + (weight_destination * distance_to_destination) + (0.5 * centrality) + penalty
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+
+    return next_node

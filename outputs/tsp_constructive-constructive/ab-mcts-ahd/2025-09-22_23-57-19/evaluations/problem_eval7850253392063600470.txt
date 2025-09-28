@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+    max_distance = max(distances)
+    min_distance = min(distances)
+
+    normalized_distances = [(d - min_distance) / (max_distance - min_distance + 1e-6) for d in distances]
+    temperature = len(unvisited_nodes) / (len(unvisited_nodes) + 1)
+
+    if len(unvisited_nodes) > 2:
+        candidates = []
+        for i, node in enumerate(unvisited_nodes):
+            if normalized_distances[i] > 0.6:
+                candidates.append((node, normalized_distances[i]))
+
+        if candidates:
+            candidates.sort(key=lambda x: x[1], reverse=True)
+            selected = candidates[0][0]
+            if len(candidates) > 1 and random.random() < temperature:
+                selected = candidates[1][0]
+            return selected
+
+    return next_node

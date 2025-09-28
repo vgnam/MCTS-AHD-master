@@ -1,0 +1,41 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Parameters for simulated annealing
+    initial_temp = 10.0
+    cooling_rate = 0.99
+    current_temp = initial_temp * (cooling_rate ** (len(unvisited_nodes) + 1))
+
+    # Calculate immediate distances
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist = min(distances)
+    max_dist = max(distances)
+
+    # Normalize distances to [0,1]
+    if min_dist == max_dist:
+        normalized_distances = [0.5 for _ in distances]
+    else:
+        normalized_distances = [(d - min_dist) / (max_dist - min_dist) for d in distances]
+
+    # Calculate probabilities using simulated annealing
+    probabilities = []
+    for i, node in enumerate(unvisited_nodes):
+        # Prefer nodes closer to current node
+        base_prob = 1.0 - normalized_distances[i]
+        # Add some randomness based on temperature
+        random_factor = random.uniform(0, 1) * current_temp
+        prob = base_prob + random_factor
+        probabilities.append(prob)
+
+    # Normalize probabilities
+    total_prob = sum(probabilities)
+    probabilities = [p / total_prob for p in probabilities]
+
+    # Select node based on probabilities
+    next_node = random.choices(list(unvisited_nodes), weights=probabilities, k=1)[0]
+
+    return next_node

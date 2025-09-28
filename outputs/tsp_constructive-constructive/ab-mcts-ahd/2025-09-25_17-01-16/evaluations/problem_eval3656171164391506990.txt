@@ -1,0 +1,38 @@
+importance" factor based on the centrality of nodes in the remaining graph, with adaptive weights that prioritize centrality when fewer nodes remain.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+
+        # Calculate node importance as the sum of inverse distances to all other unvisited nodes
+        node_importance = sum(1 / (distance_matrix[node][n] + 1e-6) for n in unvisited_nodes if n != node) if unvisited_nodes else 0
+
+        # Calculate average future distance considering node importance
+        if remaining_nodes > 1:
+            avg_future_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+            weighted_future = 0.5 * avg_future_distance + 0.5 * (1 / (node_importance + 1e-6))
+        else:
+            weighted_future = 0.2 * avg_future_distance + 0.8 * (1 / (node_importance + 1e-6))
+
+        # Dynamic weight adjustment based on remaining nodes and node importance
+        if remaining_nodes > 2:
+            weight_immediate = 0.7 - 0.1 * (1 - 1 / remaining_nodes)
+            weight_future = 0.3 + 0.1 * (1 - 1 / remaining_nodes)
+        else:
+            weight_immediate = 0.4 + 0.2 * (1 / (remaining_nodes + 1e-6))
+            weight_future = 0.6 - 0.2 * (1 / (remaining_nodes + 1e-6))
+
+        # Penalty for nodes that are already in the path (to avoid cycles)
+        penalty = 2.0 if node == destination_node else 0.0
+
+        weighted_score = (weight_immediate * distance_to_current + weight_future * weighted_future) * (1 + penalty)
+
+        if weighted_score < best_score:
+            best_score = weighted_score
+            next_node = node
+
+    return next_node

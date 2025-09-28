@@ -1,0 +1,32 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    candidates = []
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        candidates.append((node, cost))
+
+    if not candidates:
+        return unvisited_nodes.pop()
+
+    candidates.sort(key=lambda x: x[1], reverse=True)
+    avg_cost = sum(cost for _, cost in candidates) / len(candidates)
+    threshold = avg_cost * (0.5 + 0.5 * (len(unvisited_nodes) / len(distance_matrix)))
+    next_node = None
+
+    for node, cost in candidates:
+        if cost <= threshold:
+            next_node = node
+            break
+
+    if next_node is None:
+        next_node = candidates[0][0]
+
+    return next_node

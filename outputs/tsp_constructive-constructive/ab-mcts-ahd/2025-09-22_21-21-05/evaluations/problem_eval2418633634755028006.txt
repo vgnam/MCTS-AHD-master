@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    remaining_nodes_count = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Dynamic exploration factor based on remaining nodes and proximity to destination
+        exploration_factor = 0.7 * (remaining_nodes_count / (remaining_nodes_count + 1)) + 0.3 * (distance_to_current / (distance_to_current + distance_to_destination + 1e-6))
+
+        # Normalized average distance to remaining nodes
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+        normalized_avg_distance = avg_distance_to_remaining / (max(distance_matrix[node]) + 1e-6)
+
+        # Penalty for revisiting nodes and heuristic for minimizing max distance
+        penalty = 1.0 if node in unvisited_nodes else 1.5
+        max_distance_heuristic = max(distance_matrix[node][n] for n in unvisited_nodes if n != node) if unvisited_nodes else 0
+
+        combined_score = (distance_to_current + distance_to_destination) * penalty + exploration_factor * normalized_avg_distance + 0.2 * max_distance_heuristic
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

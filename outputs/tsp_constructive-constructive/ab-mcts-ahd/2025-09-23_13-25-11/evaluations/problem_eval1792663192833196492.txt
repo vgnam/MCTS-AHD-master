@@ -1,0 +1,16 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining_count = len(unvisited_nodes)
+    base_weight_immediate = 0.6 if remaining_count > 5 else 0.4
+    base_weight_future = 0.4 if remaining_count > 5 else 0.6
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            return current_dist
+        avg_future_dist = sum(distance_matrix[node][other] for other in remaining_nodes) / len(remaining_nodes)
+        penalty = 0.1 * (1 / (remaining_count + 1)) if node in unvisited_nodes and remaining_count > 3 else 0
+        return (base_weight_immediate * current_dist + base_weight_future * avg_future_dist) * (1 + penalty)
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

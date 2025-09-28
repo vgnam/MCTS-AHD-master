@@ -1,0 +1,38 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate node degrees (number of connections to unvisited nodes)
+    node_degrees = {}
+    for node in unvisited_nodes:
+        degree = sum(1 for neighbor in unvisited_nodes if distance_matrix[node][neighbor] > 0)
+        node_degrees[node] = degree
+
+    # Compute dynamic probabilities: inverse distance weighted by inverse degree
+    probabilities = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        degree = node_degrees[node]
+        weight = (1.0 / (distance + 1e-6)) * (1.0 / (degree + 1e-6))  # Avoid division by zero
+        probabilities.append(weight)
+        total_weight += weight
+
+    # Normalize probabilities
+    if total_weight > 0:
+        probabilities = [w / total_weight for w in probabilities]
+    else:
+        probabilities = [1.0 / len(unvisited_nodes)] * len(unvisited_nodes)
+
+    # Select node based on probabilities or random exploration
+    if random.random() < 0.85:  # 85% chance to use weighted selection
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    else:  # 15% chance to pick a random node
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

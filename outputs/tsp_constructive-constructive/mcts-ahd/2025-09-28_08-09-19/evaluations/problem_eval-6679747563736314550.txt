@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = float('-inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    exploration_factor = 1.0 - (remaining_count / total_nodes) ** 2
+
+    node_potentials = {}
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            coverage = len(remaining_nodes) / total_nodes
+        else:
+            avg_distance = 0
+            node_centrality = 0
+            coverage = 0
+
+        node_potential = (immediate_distance + node_centrality) * (1 - coverage)
+        node_potentials[node] = node_potential
+
+    min_potential = min(node_potentials.values()) if node_potentials else 0
+    max_potential = max(node_potentials.values()) if node_potentials else 1
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        normalized_potential = (node_potentials[node] - min_potential) / (max_potential - min_potential) if (max_potential - min_potential) > 0 else 0.5
+
+        historical_factor = 1.0 / (1.0 + immediate_distance)
+        selection_probability = (0.7 * (1 - normalized_potential) + 0.3 * historical_factor) * exploration_factor
+
+        score = selection_probability * (1.0 + (remaining_count / total_nodes) * 0.5)
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

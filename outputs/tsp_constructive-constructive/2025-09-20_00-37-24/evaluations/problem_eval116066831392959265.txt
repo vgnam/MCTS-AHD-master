@@ -1,0 +1,20 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Calculate weights based on exponential decay
+    weights = [math.exp(-i * 0.5) for i in range(len(nearest_neighbors))]
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Select node based on weighted probabilities
+    next_node = random.choices(nearest_neighbors, weights=normalized_weights, k=1)[0]
+
+    return next_node

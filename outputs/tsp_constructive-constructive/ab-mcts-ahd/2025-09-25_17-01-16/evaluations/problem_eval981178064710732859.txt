@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+    total_unvisited = len(unvisited_nodes)
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+
+        # Dynamic weight based on remaining unvisited nodes
+        weight = 0.5 + 0.4 * (total_unvisited / (total_unvisited + 1))
+
+        # Normalize distances and apply penalty for revisiting
+        normalized_current = current_distance / max(distance_matrix[current_node][n] for n in unvisited_nodes if n != node)
+        normalized_destination = destination_distance / max(distance_matrix[n][destination_node] for n in unvisited_nodes if n != node)
+
+        # Combine with dynamic weight
+        score = (1 - weight) * normalized_current + weight * normalized_destination
+
+        # Penalty for revisiting nodes (if applicable)
+        if node in [current_node, destination_node]:
+            score *= 0.8
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

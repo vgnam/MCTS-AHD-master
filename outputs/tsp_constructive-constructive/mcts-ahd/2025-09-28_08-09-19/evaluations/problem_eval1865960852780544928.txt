@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    progress = 1 - (len(unvisited_nodes) / len(distance_matrix))
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Dynamic lookahead depth based on progress
+        lookahead_depth = 1 if progress < 0.5 else 2
+        remaining_nodes = unvisited_nodes - {node}
+        lookahead_distance = 0
+
+        for _ in range(lookahead_depth):
+            if not remaining_nodes:
+                break
+            next_candidate = min(remaining_nodes, key=lambda x: distance_matrix[node][x])
+            lookahead_distance += distance_matrix[node][next_candidate]
+            remaining_nodes -= {next_candidate}
+
+        # Global connectivity: weighted by progress
+        connectivity_weight = 0.3 + 0.4 * progress
+        nearby_nodes = sorted(unvisited_nodes, key=lambda n: distance_matrix[node][n])[:min(2, len(unvisited_nodes))]
+        avg_nearby_distance = sum(distance_matrix[node][n] for n in nearby_nodes) / len(nearby_nodes) if nearby_nodes else 0
+
+        # Dynamic weight balance with randomness factor
+        random_factor = 0.1 * (1 - progress)
+        score = (0.7 - 0.2 * random_factor) * immediate_distance + (0.3 + 0.2 * random_factor) * (lookahead_distance + connectivity_weight * avg_nearby_distance)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

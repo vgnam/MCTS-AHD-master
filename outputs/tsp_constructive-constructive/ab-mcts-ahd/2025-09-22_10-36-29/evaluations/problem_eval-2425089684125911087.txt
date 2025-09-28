@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    weights = []
+    total_weight = 0.0
+
+    for node in unvisited_nodes:
+        current_dist = distance_matrix[current_node][node]
+        if node == destination_node:
+            future_cost = 0.0
+        else:
+            future_cost = min(distance_matrix[node][other] for other in unvisited_nodes if other != node)
+        weight = 1.0 / (current_dist + future_cost + 1e-10)
+        weights.append((node, weight))
+        total_weight += weight
+
+    if total_weight == 0:
+        return destination_node
+
+    rand_val = random.random() * total_weight
+    cumulative = 0.0
+
+    for node, weight in weights:
+        cumulative += weight
+        if rand_val <= cumulative:
+            return node
+
+    return next_node

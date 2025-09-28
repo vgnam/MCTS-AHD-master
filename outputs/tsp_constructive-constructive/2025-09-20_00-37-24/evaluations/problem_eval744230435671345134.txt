@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    candidates = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if random.random() < 0.7:  # 70% chance to use balanced scoring
+        min_score = float('inf')
+        next_node = None
+        for node in candidates[:min(5, len(candidates))]:  # Consider top 5 candidates
+            current_distance = distance_matrix[current_node][node]
+            nearest_unvisited = min(unvisited_nodes, key=lambda n: distance_matrix[node][n] if n != node else float('inf'))
+            nearest_distance = distance_matrix[node][nearest_unvisited] if nearest_unvisited != node else 0
+            score = current_distance + nearest_distance
+            if score < min_score:
+                min_score = score
+                next_node = node
+    else:  # 30% chance to pick randomly from top 3
+        next_node = random.choice(candidates[:min(3, len(candidates))])
+
+    return next_node

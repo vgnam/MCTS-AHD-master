@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    total_prob = 0.0
+
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        if not remaining_nodes:
+            prob = 1.0
+        else:
+            remaining_dist = sum(distance_matrix[node][n] for n in remaining_nodes)
+            prob = 1.0 / (immediate_dist + remaining_dist + 1e-6)
+        total_prob += prob
+        candidates.append((node, prob))
+
+    if total_prob == 0:
+        return min(unvisited_nodes, key=lambda x: distance_matrix[current_node][x])
+
+    rand = random.random() * total_prob
+    cumulative = 0.0
+
+    for node, prob in candidates:
+        cumulative += prob
+        if rand <= cumulative:
+            return node
+
+    return next_node

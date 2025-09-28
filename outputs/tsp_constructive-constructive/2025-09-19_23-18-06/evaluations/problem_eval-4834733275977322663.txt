@@ -1,0 +1,37 @@
+importance.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    candidates = []
+    total_nodes = len(distance_matrix)
+    remaining_count = len(unvisited_nodes)
+    progress_ratio = (total_nodes - remaining_count) / total_nodes
+
+    for node in unvisited_nodes:
+        immediate_dist = distance_matrix[current_node][node]
+        if remaining_count == 1:
+            score = immediate_dist
+        else:
+            remaining_nodes = unvisited_nodes - {node}
+            node_degree = sum(1 for d in distance_matrix[node] if d > 0)
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            max_remaining_dist = max(distance_matrix[node][n] for n in remaining_nodes)
+            centrality = 1.0 / (1.0 + avg_remaining_dist)
+            connectivity = node_degree / (total_nodes - 1)
+
+            dynamic_weight = 0.3 + 0.7 * (1.0 - progress_ratio)
+            dist_weight = 1.0 - 0.5 * progress_ratio
+            centrality_weight = 0.5 * progress_ratio
+            connectivity_weight = 0.5 * progress_ratio
+
+            score = (dist_weight * immediate_dist +
+                     centrality_weight * centrality +
+                     connectivity_weight * connectivity)
+            if remaining_count < total_nodes / 2:
+                score += 0.2 * (max_remaining_dist - avg_remaining_dist)
+        candidates.append((node, score))
+
+    next_node, _ = min(candidates, key=lambda x: x[1])
+    return next_node

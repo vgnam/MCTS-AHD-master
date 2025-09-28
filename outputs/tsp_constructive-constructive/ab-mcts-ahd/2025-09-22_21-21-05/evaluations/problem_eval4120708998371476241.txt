@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_score = float('inf')
+    next_node = None
+    num_unvisited = len(unvisited_nodes)
+    dynamic_weight = 1.0 + (1.5 * (1.0 / (num_unvisited + 0.5)))  # Enhanced dynamic weight
+
+    # Calculate centroid of unvisited nodes
+    centroid = sum(unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        distance_to_centroid = abs(node - centroid)  # Simplified centroid distance
+
+        # Dynamic penalty based on centroid distance
+        penalty = 0.2 * distance_to_centroid if distance_to_current > 1.2 * distance_to_destination else 0.0
+
+        # Nonlinear weighting for balance between local and global
+        combined_score = (0.3 * distance_to_current) + (dynamic_weight * distance_to_destination) + penalty
+
+        if combined_score < best_score:
+            best_score = combined_score
+            next_node = node
+
+    return next_node

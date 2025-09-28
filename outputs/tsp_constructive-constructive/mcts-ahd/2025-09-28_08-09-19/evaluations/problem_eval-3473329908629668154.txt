@@ -1,0 +1,61 @@
+importance.}
+
+```python
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    best_score = -float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    # Calculate global statistics for normalization
+    if remaining_count > 1:
+        all_distances = [distance_matrix[node][n] for node in unvisited_nodes for n in unvisited_nodes if node != n]
+        global_avg = sum(all_distances) / len(all_distances) if all_distances else 0
+        global_std = (sum((d - global_avg)**2 for d in all_distances) / len(all_distances))**0.5 if all_distances else 1
+    else:
+        global_avg = 0
+        global_std = 1
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        # Phase 1: Distance-based scoring
+        distance_score = -immediate_distance / (global_avg + 1e-6)
+
+        # Phase 2: Connectivity scoring
+        if remaining_nodes:
+            avg_connectivity = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            connectivity_score = -abs(avg_connectivity - global_avg) / (global_std + 1e-6)
+        else:
+            connectivity_score = 0
+
+        # Phase 3: Detour risk assessment
+        if remaining_nodes:
+            detour_risk = sum(1 for n in remaining_nodes if distance_matrix[node][n] > 1.5 * global_avg) / len(remaining_nodes)
+        else:
+            detour_risk = 0
+
+        # Dynamic weight adjustment
+        distance_weight = 0.7 - 0.4 * visited_ratio
+        connectivity_weight = 0.3 * (0.5 + 0.5 * visited_ratio)
+        risk_weight = 0.2 * (0.3 + 0.7 * visited_ratio)
+
+        # Composite score
+        score = (distance_weight * distance_score +
+                 connectivity_weight * connectivity_score -
+                 risk_weight * detour_risk)
+
+        # Probabilistic selection modifier
+        if node == destination_node and visited_ratio > 0.7:
+            score *= 1.5  # Strong preference for destination in later stages
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

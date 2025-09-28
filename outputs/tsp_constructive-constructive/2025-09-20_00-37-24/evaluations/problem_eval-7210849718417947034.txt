@@ -1,0 +1,37 @@
+import random
+import numpy as np
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate centrality (simplified as average distance to other nodes)
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = np.mean([distance_matrix[node][other] for other in unvisited_nodes if other != node])
+
+    # Calculate selection probabilities: inverse distance weighted by centrality
+    probabilities = []
+    total_weight = 0.0
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        weight = (1 / (distance + 1e-6)) * (centrality[node] + 1)  # Avoid division by zero
+        probabilities.append(weight)
+        total_weight += weight
+
+    if total_weight == 0:
+        return random.choice(unvisited_nodes)
+
+    probabilities = [p / total_weight for p in probabilities]
+
+    # 90% chance to pick from top 3 nearest, 10% chance to pick based on centrality
+    if random.random() < 0.9:
+        nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+        candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+        next_node = random.choice(candidates)
+    else:
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+
+    return next_node

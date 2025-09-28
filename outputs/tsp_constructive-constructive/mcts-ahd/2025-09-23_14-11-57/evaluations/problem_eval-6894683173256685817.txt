@@ -1,0 +1,36 @@
+importance, uses a different heuristic based on average remaining distances, and applies a step penalty to avoid revisiting nodes in close proximity, creating a balance between immediate gains and long-term tour optimization.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    best_node = None
+    best_score = float('inf')
+
+    # Dynamic weighting with different progression
+    remaining_nodes = len(unvisited_nodes)
+    weight_proximity = 0.4 if remaining_nodes > 3 else 0.6
+    weight_efficiency = 1.0 - weight_proximity
+
+    for node in unvisited_nodes:
+        current_to_node = distance_matrix[current_node][node]
+        node_to_dest = distance_matrix[node][destination_node]
+        total_increase = current_to_node + node_to_dest
+
+        # Different penalty function
+        penalty = 0.3 * (1.0 / (current_to_node + 1e-6)) if current_to_node < 0.2 else 0
+
+        # Alternative heuristic using average distances
+        avg_dist = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (len(unvisited_nodes) - 1) if len(unvisited_nodes) > 1 else 0
+        heuristic = avg_dist * 0.5
+
+        # Different score composition
+        score = (weight_proximity * total_increase +
+                 weight_efficiency * current_to_node +
+                 0.3 * heuristic) + penalty
+
+        if score < best_score:
+            best_score = score
+            best_node = node
+
+    return next_node

@@ -1,0 +1,22 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    min_distance = float('inf')
+    dest_distance = distance_matrix[current_node][destination_node]
+    temperature = 0.5  # Controls exploration/exploitation trade-off
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            next_node = node
+
+    if next_node != destination_node and len(unvisited_nodes) > 1:
+        bias_factor = dest_distance / (min_distance + 1e-6)
+        prob_dest = (bias_factor - 1.0) / (bias_factor + 1.0)  # Normalized probability
+        prob_dest = max(0.0, min(1.0, prob_dest))  # Clamp between 0 and 1
+        prob_dest = prob_dest ** (1.0 / temperature)  # Adjust with temperature
+
+        if destination_node in unvisited_nodes and random.random() < prob_dest:
+            next_node = destination_node
+
+    return next_node

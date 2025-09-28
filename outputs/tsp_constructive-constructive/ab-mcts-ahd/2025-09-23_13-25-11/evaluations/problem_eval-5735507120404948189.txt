@@ -1,0 +1,6 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    remaining = len(unvisited_nodes)
+    next_node = min(unvisited_nodes, key=lambda node: (0.7 * distance_matrix[current_node][node] + 0.3 * (sum(distance_matrix[node][other] for other in unvisited_nodes if other != node) / (remaining - 1 if remaining > 1 else 1))))
+    return next_node

@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+        else:
+            regret = 0
+        regrets.append(regret)
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+
+    regret_threshold = 0.3 * (1.0 - (remaining_nodes / total_nodes))
+    filtered_nodes = [node for i, node in enumerate(unvisited_nodes) if regrets[i] >= regret_threshold]
+
+    if not filtered_nodes:
+        filtered_nodes = unvisited_nodes
+
+    temperature = 1.0 - 0.8 * (1.0 - (remaining_nodes / total_nodes))
+    selection_probs = []
+    for node in filtered_nodes:
+        idx = list(unvisited_nodes).index(node)
+        distance = distances[idx]
+        regret = regrets[idx]
+        score = regret + temperature * distance
+        selection_probs.append(score)
+
+    if selection_probs:
+        min_score = min(selection_probs)
+        selected_index = selection_probs.index(min_score)
+        next_node = filtered_nodes[selected_index]
+    else:
+        next_node = list(unvisited_nodes)[0]
+
+    return next_node

@@ -1,0 +1,31 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_nodes = len(unvisited_nodes)
+    progress_factor = 1.0 - (remaining_nodes / (remaining_nodes + 1))  # Adjusted normalization
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Calculate centrality: average distance to all other nodes
+        avg_distance = sum(distance_matrix[node]) / len(distance_matrix[node])
+        centrality_factor = avg_distance / (sum(sum(distance_matrix)) / (len(distance_matrix) * len(distance_matrix)))
+
+        # Dynamic weights: prioritize proximity early, balance with centrality later
+        proximity_weight = 0.7 * (1 - progress_factor)
+        centrality_weight = 0.3 * progress_factor
+
+        # Score combines proximity, detour penalty, and centrality
+        score = (proximity_weight * distance_to_current +
+                 (1 - proximity_weight) * (distance_to_current + distance_to_destination) +
+                 centrality_weight * centrality_factor)
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

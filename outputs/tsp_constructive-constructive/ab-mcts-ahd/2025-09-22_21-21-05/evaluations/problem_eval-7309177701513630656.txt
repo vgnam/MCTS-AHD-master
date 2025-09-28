@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    temperature = 0.9  # Initial temperature for probabilistic selection
+    exploration_weight = 0.3  # Weight for exploration component
+    decay_factor = 0.95  # Decay factor for temperature over iterations
+
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        avg_distance_to_remaining = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / len(unvisited_nodes) if unvisited_nodes else 0
+
+        # Dynamic weight based on remaining nodes
+        dynamic_weight = 1.0 / (1.0 + len(unvisited_nodes) * 0.1)
+
+        # Combined score with exploration component
+        local_score = distance_to_current + distance_to_destination
+        global_score = dynamic_weight * avg_distance_to_remaining
+        exploration_component = exploration_weight * (1.0 / (1.0 + distance_to_current))  # Reward less traversed nodes
+
+        combined_score = local_score + global_score - exploration_component
+        scores.append((node, combined_score))
+
+    # Apply softmax with temperature to get probabilities
+    exp_scores = [math.exp(-score / temperature) for _, score in scores]
+    probs = [exp_score / sum(exp_scores) for exp_score in exp_scores]
+
+    # Select node based on probabilities
+    next_node = random.choices([node for node, _ in scores], weights=probs, k=1)[0]
+
+    # Update temperature for next iteration
+    temperature *= decay_factor
+
+    return next_node

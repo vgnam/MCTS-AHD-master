@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = float('-inf')
+    remaining_nodes = len(unvisited_nodes)
+    weight_factor = 1.0 / (1.0 + 0.2 * remaining_nodes)
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        future_potential = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / (remaining_nodes - 1)
+        variance_penalty = (sum((distance_matrix[node][n] - future_potential) ** 2 for n in unvisited_nodes if n != node) / (remaining_nodes - 1)) ** 0.5
+        score = -current_distance + (future_potential ** weight_factor) - 0.1 * variance_penalty
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

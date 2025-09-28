@@ -1,0 +1,33 @@
+import math
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_count = len(unvisited_nodes)
+    temperature = 1.0 / (1.0 + math.exp(-remaining_count))  # Temperature decreases as nodes are visited
+
+    scores = []
+    nodes = list(unvisited_nodes)
+
+    for node in nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+        total_remaining_distance = sum(distance_matrix[node][n] for n in remaining_nodes) if remaining_nodes else 0
+        avg_remaining_distance = total_remaining_distance / len(remaining_nodes) if remaining_nodes else 0
+
+        # Novel scoring: combines immediate cost with potential long-term savings
+        immediate_penalty = distance_to_node ** 1.5  # Non-linear penalty
+        long_term_gain = avg_remaining_distance * (1.0 - (remaining_count / (remaining_count + len(unvisited_nodes))))
+        score = (long_term_gain - immediate_penalty) * (1.0 + temperature * random.uniform(-0.1, 0.1))  # Temperature-based noise
+
+        scores.append(score)
+
+    # Softmax selection with temperature
+    exp_scores = [math.exp(s / temperature) for s in scores]
+    sum_exp_scores = sum(exp_scores)
+    probabilities = [e / sum_exp_scores for e in exp_scores]
+    next_node = random.choices(nodes, weights=probabilities, k=1)[0]
+
+    return next_node

@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    temperature = max(0.1, 1.0 / remaining_nodes)  # Decreases as nodes are visited
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes_set = unvisited_nodes - {node}
+
+        if not remaining_nodes_set:
+            return current_dist
+
+        # Connectivity score: potential to connect to multiple distant nodes
+        connectivity_score = sum(
+            distance_matrix[node][other] for other in remaining_nodes_set
+        ) / len(remaining_nodes_set)
+
+        # Dynamic weight combining immediate and connectivity
+        weight = 0.5 + 0.5 * (1 - 1 / (1 + math.exp(-temperature * (remaining_nodes - 1))))
+
+        # Novel scoring: weighted combination with temperature effect
+        score = (1 - weight) * current_dist + weight * connectivity_score
+
+        # Apply temperature-controlled softmax effect
+        return math.exp(score / temperature)
+
+    # Probabilistic selection with temperature-controlled probabilities
+    scores = {node: evaluate_node(node) for node in unvisited_nodes}
+    total_score = sum(scores.values())
+    probabilities = {node: score / total_score for node, score in scores.items()}
+
+    next_node = random.choices(
+        list(probabilities.keys()),
+        weights=probabilities.values(),
+        k=1
+    )[0]
+
+    return next_node

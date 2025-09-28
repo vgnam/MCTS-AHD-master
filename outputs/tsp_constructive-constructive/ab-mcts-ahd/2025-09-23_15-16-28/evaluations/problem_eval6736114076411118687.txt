@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    node_scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        sum_distance = distance_to_current + distance_to_destination
+        node_scores.append((node, sum_distance))
+
+    if not node_scores:
+        return destination_node
+
+    min_score = min(score for _, score in node_scores)
+    max_score = max(score for _, score in node_scores)
+    temperature = max_score - min_score if max_score != min_score else 1.0
+
+    probabilities = []
+    for node, score in node_scores:
+        normalized_score = (score - min_score) / temperature if temperature != 0 else 0
+        probability = 1.0 - normalized_score
+        probabilities.append((node, probability))
+
+    if not probabilities:
+        return destination_node
+
+    total_prob = sum(prob for _, prob in probabilities)
+    if total_prob == 0:
+        return destination_node
+
+    rand_val = random.random() * total_prob
+    cumulative_prob = 0.0
+    for node, prob in probabilities:
+        cumulative_prob += prob
+        if rand_val <= cumulative_prob:
+            return node
+
+    return next_node

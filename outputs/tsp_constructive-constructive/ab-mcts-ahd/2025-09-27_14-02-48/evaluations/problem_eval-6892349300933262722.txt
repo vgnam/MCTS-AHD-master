@@ -1,0 +1,51 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    
+    # Initialize variables
+    min_total = float('inf')
+    next_node = None
+    temperature = max(100, len(unvisited_nodes))  # Adjust temperature based on the number of unvisited nodes
+    cooling_rate = 0.95
+    
+    # Evaluate each unvisited node as a potential next node
+    for node in unvisited_nodes:
+        remaining_nodes = unvisited_nodes - {node}
+        if destination_node in remaining_nodes:
+            remaining_nodes.remove(destination_node)
+        
+        if not remaining_nodes:
+            total = distance_matrix[current_node][node] + distance_matrix[node][destination_node]
+        else:
+            total = distance_matrix[current_node][node]
+            for next_node_candidate in remaining_nodes:
+                total += distance_matrix[node][next_node_candidate]
+            total += distance_matrix[next_node_candidate][destination_node]
+        
+        # Simulated annealing-inspired choice
+        if total < min_total or (random.random() < math.exp((min_total - total) / temperature)):
+            min_total = total
+            next_node = node
+    
+    # Explicitly check if going to the destination node is a good choice
+    if destination_node in unvisited_nodes:
+        destination_total = distance_matrix[current_node][destination_node]
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = unvisited_nodes - {destination_node}
+            for node in remaining_nodes:
+                destination_total += distance_matrix[destination_node][node]
+            # Assuming the path ends back at the current_node for simplicity, 
+            # though in a real TSP, the path should end at the destination_node and this line wouldn't be needed.
+            # destination_total += distance_matrix[node][destination_node] 
+            destination_total += distance_matrix[node][current_node]  # This is an approximation
+        
+        if destination_total < min_total or (random.random() < math.exp((min_total - destination_total) / temperature)):
+            next_node = destination_node
+    
+    # Cool down the temperature for the next iteration
+    temperature *= cooling_rate
+    
+    return next_node

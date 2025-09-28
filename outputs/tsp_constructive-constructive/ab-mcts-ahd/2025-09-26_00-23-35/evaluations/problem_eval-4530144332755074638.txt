@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    next_node = None
+    best_score = -float('inf')
+    total_unvisited = len(unvisited_nodes)
+
+    # Memory-based recency penalty
+    recency_penalty = {}
+    for node in unvisited_nodes:
+        recency_penalty[node] = 1.0  # Default penalty if not recently visited
+
+    # Dynamic penalty for recently visited nodes (simplified for example)
+    # In practice, you'd track visited nodes history and adjust penalties
+    for node in unvisited_nodes:
+        if node in recency_penalty:
+            recency_penalty[node] *= 0.8  # Reduce penalty for less recent nodes
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        avg_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node) / max(1, total_unvisited - 1)
+        adjustment_factor = 1.0 - (total_unvisited / (total_unvisited + 1)) ** 0.5
+
+        # Original score with recency penalty
+        score = (-1.5 * distance_to_node + 0.5 * avg_distance * adjustment_factor) * recency_penalty[node]
+
+        if score > best_score:
+            best_score = score
+            next_node = node
+
+    return next_node

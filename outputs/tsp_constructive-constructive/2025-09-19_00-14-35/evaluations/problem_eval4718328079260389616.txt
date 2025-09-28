@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    def exploration_function(step):
+        return 1.0 - (step / (total_nodes * 2)) ** 2
+
+    def evaluate_node(node, step):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            remaining_nodes_list = [n for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in remaining_nodes_list) / len(remaining_nodes_list)
+            connectivity_score = sum(1.0 / (1.0 + distance_matrix[node][n]) for n in remaining_nodes_list) / (remaining_nodes - 1)
+            potential_gain = (distance_matrix[current_node][destination_node] - immediate_dist - dest_dist) / (1 + immediate_dist)
+        else:
+            connectivity_score = 0
+            potential_gain = 0
+
+        weight_local = 0.4 * exploration_function(step)
+        weight_connectivity = 0.3 * exploration_function(step)
+        weight_dest = -0.25 * (1 - exploration_factor)
+        weight_gain = 0.15 * (1 - exploration_factor)
+
+        score = (weight_local * immediate_dist) + (weight_connectivity * connectivity_score) + \
+                (weight_dest * dest_dist) + (weight_gain * potential_gain)
+        return score
+
+    step = total_nodes - remaining_nodes
+    scores = {node: evaluate_node(node, step) for node in unvisited_nodes}
+    min_score = min(scores.values())
+    max_score = max(scores.values())
+
+    if max_score != min_score:
+        normalized_scores = {node: (score - min_score) / (max_score - min_score) for node, score in scores.items()}
+        temperature = exploration_function(step) * 10
+        probabilities = [math.exp(-normalized_scores[node] / temperature) for node in unvisited_nodes]
+        total_prob = sum(probabilities)
+        probabilities = [p / total_prob for p in probabilities]
+        next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

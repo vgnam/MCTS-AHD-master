@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    max_distance_to_farthest_unvisited = float('-inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        farthest_distance = max(distance_matrix[node][far_node] for far_node in unvisited_nodes if far_node != node)
+        total_distance = current_distance + farthest_distance
+
+        if total_distance > max_distance_to_farthest_unvisited:
+            max_distance_to_farthest_unvisited = total_distance
+            next_node = node
+
+    # Prioritize destination if it's unvisited and the path to it is not too long
+    if destination_node in unvisited_nodes:
+        direct_distance = distance_matrix[current_node][destination_node]
+        if direct_distance <= max_distance_to_farthest_unvisited * 0.9:  # More lenient threshold
+            next_node = destination_node
+
+    return next_node

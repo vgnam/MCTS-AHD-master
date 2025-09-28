@@ -1,0 +1,16 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    if random.random() < 0.7:  # 70% chance to pick from nearest neighbors
+        next_node = random.choice(nearest_neighbors)
+    else:  # 30% chance to pick any unvisited node
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

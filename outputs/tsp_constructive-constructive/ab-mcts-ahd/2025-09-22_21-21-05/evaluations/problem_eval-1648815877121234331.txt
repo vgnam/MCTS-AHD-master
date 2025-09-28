@@ -1,0 +1,44 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_steps = len(unvisited_nodes)
+    best_score = -float('inf')
+    next_node = None
+
+    # Calculate straight-line direction vector for path smoothness
+    straight_vector = (destination_node[0] - current_node[0], destination_node[1] - current_node[1])
+    straight_length = (straight_vector[0]**2 + straight_vector[1]**2)**0.5
+
+    for node in unvisited_nodes:
+        # Immediate distance component
+        distance_to_current = distance_matrix[current_node][node]
+
+        # Long-term potential component (inverse distance)
+        potential = 1.0 / (distance_matrix[node][destination_node] + 1e-6)
+
+        # Path smoothness component (angular deviation from straight path)
+        node_vector = (node[0] - current_node[0], node[1] - current_node[1])
+        node_length = (node_vector[0]**2 + node_vector[1]**2)**0.5
+        dot_product = node_vector[0]*straight_vector[0] + node_vector[1]*straight_vector[1]
+        angle = abs(math.acos(dot_product / (node_length * straight_length + 1e-6)))
+        smoothness = 1.0 - angle / math.pi  # Normalized to [0,1]
+
+        # Adaptive weights based on tour progress
+        progress = 1.0 - remaining_steps / (remaining_steps + len(unvisited_nodes))
+        weight_immediate = 1.0 - progress**2
+        weight_potential = progress**2
+        weight_smoothness = 0.5 * progress
+
+        # Combined score with probabilistic element
+        score = (weight_immediate * distance_to_current +
+                 weight_potential * potential +
+                 weight_smoothness * smoothness)
+
+        # Add stochastic element (higher probability for better scores)
+        if random.random() < score / (score + 1.0):
+            if score > best_score:
+                best_score = score
+                next_node = node
+
+    return next_node

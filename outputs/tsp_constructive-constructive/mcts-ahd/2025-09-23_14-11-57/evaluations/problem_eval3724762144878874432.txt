@@ -1,0 +1,47 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1.0 - (remaining_nodes / total_nodes)
+
+    # Dynamic lookahead horizon (1 to 3 nodes ahead)
+    lookahead = 1 + int(2 * progress)
+
+    # Calculate scores for each candidate node
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+
+        # Lookahead future potential
+        future_potential = 0
+        if remaining_nodes > 1:
+            next_nodes = [n for n in unvisited_nodes if n != node]
+            if lookahead > 1:
+                # Multi-step lookahead
+                for step in range(1, min(lookahead, len(next_nodes)) + 1):
+                    if step == 1:
+                        future_potential += distance_matrix[node][destination_node]
+                    else:
+                        # Approximate multi-step paths
+                        future_potential += sum(distance_matrix[n][destination_node] for n in next_nodes) / len(next_nodes)
+            else:
+                # Single-step lookahead
+                future_potential = distance_matrix[node][destination_node]
+
+        # Adaptive weighting (more immediate focus early, more lookahead later)
+        weight = 0.7 * (1 - progress) + 0.3 * progress
+        combined_score = weight * immediate_distance + (1 - weight) * future_potential
+        scores.append(combined_score)
+
+    # Probabilistic selection with temperature cooling
+    temperature = 1.0 - progress
+    if temperature > 0:
+        exp_scores = [np.exp(-score / temperature) for score in scores]
+        probabilities = [e / sum(exp_scores) for e in exp_scores]
+        next_node = np.random.choice(list(unvisited_nodes), p=probabilities)
+    else:
+        next_node = list(unvisited_nodes)[scores.index(min(scores))]
+
+    return next_node

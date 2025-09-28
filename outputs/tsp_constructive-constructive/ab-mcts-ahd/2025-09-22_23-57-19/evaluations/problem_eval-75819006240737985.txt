@@ -1,0 +1,40 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    avg_distance = sum(distances) / len(distances)
+
+    min_cost = float('inf')
+    next_node = None
+    node_scores = {}
+
+    total_nodes = len(distance_matrix)
+    phase_factor = (total_nodes - len(unvisited_nodes)) / total_nodes
+    cost_weight = 1.5 - 0.5 * phase_factor
+    conn_weight = 0.5 + 0.5 * phase_factor
+
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node][node]
+        connectivity = sum(1 / (distance_matrix[node][other] + 1e-6) for other in unvisited_nodes if other != node)
+        weighted_score = cost_weight * cost + conn_weight * (1 / (connectivity + 1e-6))
+
+        node_scores[node] = weighted_score
+
+        if cost < min_cost:
+            min_cost = cost
+            next_node = node
+
+    if len(unvisited_nodes) > 2:
+        candidate_nodes = [node for node in unvisited_nodes if distance_matrix[current_node][node] <= 1.1 * min_cost]
+        if candidate_nodes:
+            candidate_scores = {node: node_scores[node] for node in candidate_nodes}
+            next_node = min(candidate_scores, key=candidate_scores.get)
+
+    return next_node

@@ -1,0 +1,36 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    exploration_factor = remaining_nodes / total_nodes
+
+    def evaluate_node(node):
+        immediate_dist = distance_matrix[current_node][node]
+        dest_dist = distance_matrix[node][destination_node]
+
+        if remaining_nodes > 1:
+            remaining_nodes_excl = [n for n in unvisited_nodes if n != node]
+            avg_remaining_dist = sum(distance_matrix[node][n] for n in remaining_nodes_excl) / len(remaining_nodes_excl)
+            remaining_dists = [distance_matrix[node][n] for n in remaining_nodes_excl]
+            std_dev = (sum((d - avg_remaining_dist) ** 2 for d in remaining_dists) / len(remaining_dists)) ** 0.5
+            connectivity_score = sum(1.0 / (1.0 + d) for d in remaining_dists) / len(remaining_dists)
+            flow_disruption = max(remaining_dists) - immediate_dist
+        else:
+            avg_remaining_dist = immediate_dist
+            std_dev = 0
+            connectivity_score = 0
+            flow_disruption = 0
+
+        weight_local = 0.3 + 0.3 * exploration_factor
+        weight_connectivity = 0.2 + 0.2 * exploration_factor
+        weight_dest = -0.1 + 0.2 * (1 - exploration_factor)
+        weight_flow = -0.2 * flow_disruption if flow_disruption > 0 else 0
+        weight_std_dev = 0.1 * std_dev
+
+        score = (weight_local * immediate_dist * avg_remaining_dist) + (weight_connectivity * connectivity_score) + (weight_flow * flow_disruption) + (weight_dest * dest_dist) + (weight_std_dev * std_dev)
+        return score
+
+    next_node = min(unvisited_nodes, key=lambda node: evaluate_node(node))
+    return next_node

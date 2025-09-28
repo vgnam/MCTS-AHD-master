@@ -1,0 +1,39 @@
+importance decreases
+
+    # Adaptive penalty based on node density
+    avg_distance = sum(distance_matrix[current_node]) / total_nodes
+    penalty_threshold = avg_distance * (0.5 + 0.5 * progress_ratio)
+    density_factor = 1 + (0.5 * (total_nodes - num_unvisited) / total_nodes)
+
+    for node in unvisited_nodes:
+        # Core distance components
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Path potential estimation
+        remaining_distances = [distance_matrix[node][n] for n in unvisited_nodes if n != node]
+        min_remaining = min(remaining_distances) if remaining_distances else 0
+        avg_remaining = sum(remaining_distances) / len(remaining_distances) if remaining_distances else 0
+
+        # Node centrality measure
+        node_centrality = sum(distance_matrix[node]) / total_nodes
+
+        # Multi-criteria scoring
+        immediate_score = -distance_to_current * weight_immediate
+        destination_score = -distance_to_destination * weight_destination
+        potential_score = -(min_remaining + 0.5 * avg_remaining) * (1 - weight_immediate - weight_destination)
+        centrality_score = -node_centrality * weight_centrality
+
+        # Adaptive penalty application
+        penalty = 1.0
+        if distance_to_current < penalty_threshold:
+            penalty = 1.5 + 0.5 * density_factor
+
+        total_score = immediate_score + destination_score + potential_score + centrality_score
+        total_score *= penalty
+
+        if total_score > best_score:
+            best_score = total_score
+            next_node = node
+
+    return next_node

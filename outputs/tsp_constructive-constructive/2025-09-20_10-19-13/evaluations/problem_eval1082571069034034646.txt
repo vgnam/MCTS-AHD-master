@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate weighted scores: distance + randomness (0.1-0.3 of max distance)
+    max_distance = max(distance_matrix[current_node][node] for node in unvisited_nodes)
+    scores = {
+        node: distance_matrix[current_node][node] + (0.1 + 0.2 * random.random()) * max_distance
+        for node in unvisited_nodes
+    }
+
+    # Select node with lowest weighted score
+    next_node = min(unvisited_nodes, key=lambda node: scores[node])
+    return next_node

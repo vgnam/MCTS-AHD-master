@@ -1,0 +1,29 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    candidates = []
+    for node in unvisited_nodes:
+        candidates.append((node, distance_matrix[current_node][node]))
+
+    candidates.sort(key=lambda x: x[1])
+    next_node, min_cost = candidates[0]
+
+    if len(unvisited_nodes) > 2:
+        remaining_costs = [cost for _, cost in candidates[1:]]
+        avg_remaining_cost = sum(remaining_costs) / len(remaining_costs) if remaining_costs else min_cost
+        exploration_factor = (len(unvisited_nodes) / len(distance_matrix)) ** 2
+        threshold = min_cost + exploration_factor * avg_remaining_cost
+
+        eligible_nodes = [(node, cost) for node, cost in candidates[1:] if cost <= threshold]
+        if eligible_nodes:
+            selected_node, _ = eligible_nodes[0] if len(eligible_nodes) == 1 else random.choice(eligible_nodes)
+            next_node = selected_node
+
+    return next_node

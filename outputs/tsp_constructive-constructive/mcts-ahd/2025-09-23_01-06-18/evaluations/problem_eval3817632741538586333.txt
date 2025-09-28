@@ -1,0 +1,38 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress = 1 - remaining_nodes / total_nodes
+    weight = 1 + 0.6 * progress
+    risk_tolerance = 0.3 + 0.7 * (1 - progress)
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node]
+        global_potential = (distance_matrix[node][destination_node] +
+                           sum(distance_matrix[node][n] for n in unvisited_nodes if n != destination_node)) / (remaining_nodes + 1)
+
+        # Dynamic regret scaling based on node centrality
+        node_centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        regret_factor = 0.5 if node_centrality < 0.75 * sum(distance_matrix[current_node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6) else 1.5
+        regret_term = max(distance_matrix[current_node][n] - distance_matrix[current_node][node] for n in unvisited_nodes) * regret_factor
+
+        # Path memory factor to avoid revisiting suboptimal segments
+        memory_penalty = 0.3 if node in unvisited_nodes and distance_matrix[current_node][node] > 1.2 * sum(distance_matrix[current_node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6) else 0
+
+        # Anticipation term for future bottlenecks
+        anticipation_term = sum(distance_matrix[n][destination_node] for n in unvisited_nodes if n != node) / (remaining_nodes + 1)
+
+        diversity_bonus = sum(distance_matrix[node][n] for n in unvisited_nodes) / (remaining_nodes + 1e-6)
+        detour_cost = distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node]
+
+        weighted_score = (local_cost * weight + global_potential * (1 - weight) +
+                          0.5 * regret_term + 0.2 * detour_cost + 0.3 * anticipation_term +
+                          memory_penalty) * risk_tolerance - 0.15 * diversity_bonus
+        return weighted_score
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

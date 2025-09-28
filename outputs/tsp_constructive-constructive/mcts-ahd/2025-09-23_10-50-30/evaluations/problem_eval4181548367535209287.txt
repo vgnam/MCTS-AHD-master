@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    weight_factor = 1.0 / (len(unvisited_nodes) + 1)  # Dynamic weight based on remaining nodes
+
+    for node in unvisited_nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+
+        # Harmonic mean of distances with dynamic weight
+        score = (1 + weight_factor) / ((1 / distance_to_node) + (weight_factor / distance_to_destination))
+
+        # Lookahead: evaluate the impact of choosing this node
+        if len(unvisited_nodes) > 1:
+            remaining_nodes = [n for n in unvisited_nodes if n != node]
+            lookahead_score = sum(distance_matrix[node][n] for n in remaining_nodes)
+            score += lookahead_score * weight_factor
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

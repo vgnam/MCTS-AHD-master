@@ -1,0 +1,57 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes[0]
+
+    nearest_node = None
+    min_distance = float('inf')
+    dest_distance = distance_matrix[current_node][destination_node]
+
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            nearest_node = node
+
+    if nearest_node == destination_node:
+        return nearest_node
+
+    # Calculate centrality score for each node
+    centrality = {}
+    for node in unvisited_nodes:
+        centrality[node] = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+
+    # Sigmoid-based bias toward destination
+    distance_ratio = min_distance / (dest_distance + 1e-6)
+    bias_prob = 1 / (1 + math.exp(-5 * (distance_ratio - 0.7)))
+
+    # Probabilistic selection based on centrality and bias
+    candidates = []
+    for node in unvisited_nodes:
+        if node == destination_node:
+            candidates.append((node, bias_prob))
+        else:
+            # Combine distance and centrality (normalized)
+            dist_score = 1 - (distance_matrix[current_node][node] / (max(distance_matrix[current_node]) + 1e-6))
+            cent_score = 1 - (centrality[node] / (max(centrality.values()) + 1e-6))
+            combined_score = 0.6 * dist_score + 0.4 * cent_score
+            candidates.append((node, combined_score))
+
+    # Normalize probabilities
+    total_score = sum(score for _, score in candidates)
+    normalized_candidates = [(node, score / total_score) for node, score in candidates]
+
+    # Select node based on probability
+    rand_val = random.random()
+    cumulative = 0
+    for node, prob in normalized_candidates:
+        cumulative += prob
+        if rand_val <= cumulative:
+            return node
+
+    return next_node

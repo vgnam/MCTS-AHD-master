@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    distances = []
+    regrets = []
+    centralities = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_potential = distance_matrix[node][destination_node]
+        distances.append(immediate_distance)
+
+        other_nodes = [n for n in unvisited_nodes if n != node]
+        if other_nodes:
+            second_best = min(distance_matrix[current_node][n] for n in other_nodes)
+            regret = (distance_matrix[current_node][node] - second_best) if distance_matrix[current_node][node] > second_best else 0
+            regrets.append(regret)
+
+            # Calculate node centrality (average distance to other unvisited nodes)
+            centrality = sum(distance_matrix[node][n] for n in other_nodes) / len(other_nodes)
+            centralities.append(centrality)
+        else:
+            regrets.append(0)
+            centralities.append(0)
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    base_regret_weight = max(0.1, 0.8 * (remaining_nodes / total_nodes))
+
+    # Dynamic regret scaling: higher centrality nodes get higher regret weight
+    regret_weights = [base_regret_weight * (1 + 0.5 * (centrality / (sum(centralities) / len(centralities) if centralities else 1))) for centrality in centralities]
+    distance_weights = [1.0 - w for w in regret_weights]
+
+    scores = [regret_weights[i] * regret + distance_weights[i] * distance for i, (regret, distance) in enumerate(zip(regrets, distances))]
+    min_score = min(scores)
+    selected_index = scores.index(min_score)
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

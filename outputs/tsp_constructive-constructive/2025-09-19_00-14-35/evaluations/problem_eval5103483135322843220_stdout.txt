@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 11, in <module>
+    from gpt import select_next_node_v2 as select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance (10-30%) and flow disruption factors based on tour progress. It balances exploration and exploitation through a connectivity_factor that increases local importance and reduces connectivity weight as the tour progresses. The score combines weighted average distance, local distance (positive weight), and penalizes flow disruption (negative weight).}
+                                                                                                                                                                                                                                                                                                                                                                           ^
+SyntaxError: unmatched '}'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 13, in <module>
+    from gpt import select_next_node
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 1
+    importance (10-30%) and flow disruption factors based on tour progress. It balances exploration and exploitation through a connectivity_factor that increases local importance and reduces connectivity weight as the tour progresses. The score combines weighted average distance, local distance (positive weight), and penalizes flow disruption (negative weight).}
+                                                                                                                                                                                                                                                                                                                                                                           ^
+SyntaxError: unmatched '}'

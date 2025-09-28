@@ -1,0 +1,41 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    candidates = []
+    for node in unvisited_nodes:
+        immediate_cost = distance_matrix[current_node][node]
+        candidates.append((node, immediate_cost))
+
+    if not candidates:
+        return unvisited_nodes.pop()
+
+    candidates.sort(key=lambda x: x[1])
+    nearest_node, nearest_cost = candidates[0]
+    farthest_node, farthest_cost = candidates[-1]
+
+    if len(unvisited_nodes) > 2:
+        hybrid_costs = []
+        for node in unvisited_nodes:
+            if node == nearest_node or node == farthest_node:
+                continue
+            potential_cost = distance_matrix[current_node][node] + distance_matrix[node][nearest_node]
+            hybrid_cost = (potential_cost + distance_matrix[current_node][node]) / 2
+            hybrid_costs.append((node, hybrid_cost))
+
+        if hybrid_costs:
+            hybrid_costs.sort(key=lambda x: x[1])
+            if hybrid_costs[0][1] < nearest_cost * 1.3:
+                return hybrid_costs[0][0]
+
+    if len(unvisited_nodes) > 3:
+        if farthest_cost > nearest_cost * 1.5:
+            return farthest_node
+
+    return next_node

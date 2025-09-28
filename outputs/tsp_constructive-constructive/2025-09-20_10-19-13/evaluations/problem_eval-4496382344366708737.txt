@@ -1,0 +1,11 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    exploration_factor = 0.3  # Adjustable parameter for exploration vs. exploitation
+    if np.random.rand() < exploration_factor:
+        next_node = np.random.choice(list(unvisited_nodes))
+    else:
+        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    return next_node

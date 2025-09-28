@@ -1,0 +1,49 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    remaining_nodes_count = len(unvisited_nodes)
+    weight = remaining_nodes_count / (remaining_nodes_count + 2)
+
+    remaining_nodes = unvisited_nodes - {current_node}
+    if remaining_nodes:
+        total_avg_distance = sum(distance_matrix[n1][n2] for n1 in remaining_nodes for n2 in remaining_nodes if n1 != n2)
+        avg_distance = total_avg_distance / (len(remaining_nodes) * (len(remaining_nodes) - 1)) if len(remaining_nodes) > 1 else 0
+    else:
+        avg_distance = 0
+
+    scores = []
+    nodes = list(unvisited_nodes)
+
+    for node in nodes:
+        distance_to_node = distance_matrix[current_node][node]
+        remaining_nodes_after_visit = unvisited_nodes - {node}
+
+        if not remaining_nodes_after_visit:
+            max_remaining_distance = 0
+            avg_remaining_distance = 0
+        else:
+            max_remaining_distance = max(distance_matrix[node][n] for n in remaining_nodes_after_visit)
+            total_remaining_distance = sum(distance_matrix[node][n] for n in remaining_nodes_after_visit)
+            avg_remaining_distance = total_remaining_distance / len(remaining_nodes_after_visit)
+
+        reduction = max_remaining_distance - distance_to_node
+        savings = avg_remaining_distance - distance_to_node
+        score = (1 - weight) * (-reduction + savings) + weight * distance_to_node
+        scores.append(score)
+
+    if not scores:
+        return destination_node
+
+    min_score = min(scores)
+    max_score = max(scores)
+
+    if min_score == max_score:
+        probabilities = [1.0 / len(scores)] * len(scores)
+    else:
+        normalized_scores = [(max_score - s) / (max_score - min_score) for s in scores]
+        total = sum(normalized_scores)
+        probabilities = [s / total for s in normalized_scores]
+
+    next_node = np.random.choice(nodes, p=probabilities)
+    return next_node

@@ -1,0 +1,32 @@
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+
+        # Calculate node centrality (average distance to all other nodes)
+        centrality = sum(distance_matrix[node]) / (len(distance_matrix) - 1)
+        normalized_centrality = centrality / max(sum(distance_matrix[node]) for node in unvisited_nodes + [current_node])
+
+        # Dynamic weighting based on progress
+        total_nodes = len(distance_matrix)
+        remaining_nodes = len(unvisited_nodes)
+        progress = (total_nodes - remaining_nodes) / total_nodes
+        weight_local = math.exp(-progress * 3)
+        weight_global = 1 - weight_local
+
+        # Combined score with centrality influence
+        score = (weight_local * immediate_distance +
+                 weight_global * (future_distance + normalized_centrality * 0.5))
+
+        scores.append(score)
+
+    selected_index = scores.index(min(scores))
+    next_node = list(unvisited_nodes)[selected_index]
+
+    return next_node

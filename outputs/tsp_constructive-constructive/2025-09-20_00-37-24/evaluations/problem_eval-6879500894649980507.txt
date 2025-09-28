@@ -1,0 +1,30 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return None
+
+    total_nodes = len(distance_matrix)
+    remaining_ratio = len(unvisited_nodes) / total_nodes if total_nodes > 0 else 0
+    temperature = 1.0 - (1.0 - remaining_ratio) ** 2  # Decreases as more nodes are visited
+
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    nearest_neighbors = sorted(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+
+    # Dynamic probability threshold based on remaining nodes
+    prob_threshold = 0.7 + 0.2 * remaining_ratio  # Higher probability of exploitation early, lower later
+
+    if random.random() < prob_threshold:
+        # Temperature-based stochasticity: higher temperature allows more randomness
+        if random.random() < temperature:
+            candidates = nearest_neighbors[:min(3, len(nearest_neighbors))]
+            next_node = random.choice(candidates)
+        else:
+            next_node = random.choice(nearest_neighbors)
+    else:
+        next_node = random.choice(nearest_neighbors)
+
+    return next_node

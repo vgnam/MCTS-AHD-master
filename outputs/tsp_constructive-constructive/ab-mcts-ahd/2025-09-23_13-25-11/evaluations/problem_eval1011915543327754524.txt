@@ -1,0 +1,28 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    total_unvisited = len(unvisited_nodes)
+    # Dynamic weight using sigmoid to smooth transition
+    sigmoid = 1 / (1 + math.exp(-(total_unvisited - 5)))
+    weight_current = sigmoid
+    weight_future = 1 - sigmoid
+
+    def evaluate_node(node):
+        current_dist = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        if not remaining_nodes:
+            return current_dist
+
+        # Calculate future savings with probabilistic exploration
+        future_dists = [distance_matrix[node][other] for other in remaining_nodes]
+        min_future_dist = min(future_dists)
+        avg_future_dist = sum(future_dists) / len(future_dists)
+        exploration_factor = random.uniform(0.5, 1.5)  # Random exploration
+        future_score = (min_future_dist + exploration_factor * avg_future_dist) / 2
+
+        return weight_current * current_dist + weight_future * future_score
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

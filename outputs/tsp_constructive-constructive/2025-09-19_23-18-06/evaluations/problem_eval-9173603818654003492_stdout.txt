@@ -1,0 +1,44 @@
+[*] Running ...
+[*] Dataset loaded: D:\MCTS-AHD-master\problems\tsp_constructive\dataset\train50_dataset.npy with 64 instances.
+[*] Instance 0: 5.634006917330332
+[*] Instance 1: 6.121809832657325
+[*] Instance 2: 7.191278081552926
+[*] Instance 3: 6.996389337633015
+[*] Instance 4: 7.1747174686246105
+[*] Instance 5: 6.8163814026469485
+[*] Instance 6: 7.224190969588081
+[*] Instance 7: 6.753871907905875
+[*] Instance 8: 6.745228348235196
+[*] Instance 9: 7.1828413697679805
+[*] Instance 10: 6.793204729583795
+[*] Instance 11: 6.458798233623625
+[*] Instance 12: 6.932415929187915
+[*] Instance 13: 6.802609822540605
+[*] Instance 14: 6.865642380903409
+[*] Instance 15: 6.931484099475865
+[*] Instance 16: 6.145417837314403
+[*] Instance 17: 6.506131820240373
+[*] Instance 18: 6.404859035852852
+[*] Instance 19: 6.540902402714425
+[*] Instance 20: 6.964368204836227
+[*] Instance 21: 6.8119612151618325
+[*] Instance 22: 5.591771119391165
+[*] Instance 23: 6.323199286831548
+[*] Instance 24: 6.4055278840564895
+[*] Instance 25: 6.928684991595645
+[*] Instance 26: 6.466093536287422
+[*] Instance 27: 6.490355164805024
+[*] Instance 28: 6.753557595300718
+[*] Instance 29: 6.967717411512952
+Traceback (most recent call last):
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 82, in <module>
+    obj = eval_heuristic(node_positions[i])
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\eval.py", line 42, in eval_heuristic
+    next_node = select_next_node(
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 59, in select_next_node
+    next_node = local_search_optimization(current_node, candidates, unvisited_nodes)
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 36, in local_search_optimization
+    lookahead_mst = min_spanning_tree_cost(node, temp_remaining)
+  File "D:\MCTS-AHD-master\problems\tsp_constructive\gpt.py", line 13, in min_spanning_tree_cost
+    edges.append((u, v, distance_matrix[u][v]))
+KeyboardInterrupt

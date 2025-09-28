@@ -1,0 +1,25 @@
+import random
+import math
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix, temperature=0.5):
+    if not unvisited_nodes:
+        return destination_node
+
+    # Calculate penalties for revisiting nodes (higher penalty for closer nodes)
+    penalties = {node: math.exp(-distance_matrix[current_node][node]) for node in unvisited_nodes}
+
+    # Combine distance and penalty into a weighted score
+    scores = {
+        node: distance_matrix[current_node][node] * (1 + penalties[node])
+        for node in unvisited_nodes
+    }
+
+    # Apply softmax-like selection with temperature
+    exp_scores = [math.exp(-score / temperature) for score in scores.values()]
+    sum_exp = sum(exp_scores)
+    probs = [exp / sum_exp for exp in exp_scores]
+
+    # Select node based on probabilities
+    next_node = random.choices(list(scores.keys()), weights=probs, k=1)[0]
+
+    return next_node

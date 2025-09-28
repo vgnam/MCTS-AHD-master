@@ -1,0 +1,50 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    next_node = None
+    min_score = float('inf')
+    remaining_count = len(unvisited_nodes)
+    total_nodes = remaining_count + 1
+    visited_ratio = 1 - (remaining_count / total_nodes)
+
+    # Dynamic exploration factor based on visited ratio and node frequency
+    exploration_factor = 1.0 - (visited_ratio ** 1.5) * 0.7
+    frequency_bias = 1.0 + (1 - exploration_factor) * 0.5
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        remaining_nodes = unvisited_nodes - {node}
+
+        # Adaptive centrality calculation with historical bias
+        if remaining_nodes:
+            avg_distance = sum(distance_matrix[node][n] for n in remaining_nodes) / len(remaining_nodes)
+            node_centrality = avg_distance * (1 + (1 - visited_ratio) * 0.3)
+        else:
+            avg_distance = 0
+            node_centrality = 0
+
+        # Novel connectivity penalty considering both immediate and long-term neighbors
+        short_range_connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < 1.2 * avg_distance)
+        long_range_connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] > 1.5 * avg_distance)
+        connectivity_penalty = 1.0 + (short_range_connectivity / (total_nodes - 1)) * 0.2 - (long_range_connectivity / (total_nodes - 1)) * 0.1
+
+        # Path diversity term to encourage less-traveled regions
+        path_diversity = 1.0 + (1 - visited_ratio) * 0.4
+
+        # Adaptive weight scaling
+        immediate_weight = 0.6 * (1 - visited_ratio) + 0.3 * (1 - exploration_factor)
+        centrality_weight = 0.5 * (1 - immediate_weight) * (1 + visited_ratio * 0.2)
+        diversity_weight = 0.3 * (1 - visited_ratio) * exploration_factor
+
+        # Composite score calculation
+        score = (immediate_weight * immediate_distance +
+                centrality_weight * node_centrality -
+                diversity_weight * path_diversity)
+        score *= connectivity_penalty * frequency_bias
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    return next_node

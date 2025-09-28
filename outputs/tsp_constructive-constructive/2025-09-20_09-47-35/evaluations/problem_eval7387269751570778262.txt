@@ -1,0 +1,19 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    """Selects the next node based on a weighted combination of distance to the nearest neighbor and angle to the destination."""
+    if not unvisited_nodes:
+        return destination_node
+    
+    nearest_neighbor = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    
+    def calculate_angle(node):
+        dx1 = distance_matrix[current_node][destination_node]
+        dy1 = 0  # Assuming destination is on the x-axis relative to current_node
+
+        dx2 = distance_matrix[current_node][node]
+        dy2 = 0 # Assuming the node is also on x-axis relative to current_node
+
+        #Simplified angle calculation as distances are already represented in the distance matrix
+        return abs(dx1 - dx2) 
+    
+    next_node = min(unvisited_nodes, key=lambda node: 0.7 * distance_matrix[current_node][node] + 0.3 * calculate_angle(node))
+    return next_node

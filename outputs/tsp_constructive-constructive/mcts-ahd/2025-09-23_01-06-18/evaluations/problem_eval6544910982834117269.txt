@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = 1 - (remaining_nodes / total_nodes)
+    selection_pressure = 0.5 + 0.5 * progress_factor
+    exploration_weight = 0.6 * (remaining_nodes / total_nodes) + 0.4
+
+    def calculate_centrality(node):
+        if not unvisited_nodes:
+            return 0
+        total_distance = sum(distance_matrix[node][n] for n in unvisited_nodes if n != node)
+        return total_distance / len(unvisited_nodes) if len(unvisited_nodes) > 1 else 0
+
+    def calculate_potential(node):
+        immediate_cost = distance_matrix[current_node][node]
+        global_potential = (distance_matrix[node][destination_node] +
+                           sum(distance_matrix[node][n] for n in unvisited_nodes if n != destination_node)) / (remaining_nodes + 1)
+        regret_term = max(distance_matrix[current_node][n] - distance_matrix[current_node][node] for n in unvisited_nodes) if unvisited_nodes else 0
+        centrality = calculate_centrality(node)
+        weighted_score = (selection_pressure * immediate_cost + (1 - selection_pressure) * global_potential +
+                         0.1 * regret_term - 0.3 * centrality)
+        return weighted_score
+
+    next_node = min(unvisited_nodes, key=calculate_potential)
+    return next_node

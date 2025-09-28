@@ -1,0 +1,30 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    total_nodes = len(unvisited_nodes) + 1
+    visited_ratio = (total_nodes - len(unvisited_nodes)) / total_nodes
+    temperature = max(0.1, 1.0 - 0.8 * visited_ratio)
+
+    def calculate_score(node):
+        if not unvisited_nodes:
+            return distance_matrix[current_node][node]
+
+        distances_to_unvisited = [distance_matrix[node][n] for n in unvisited_nodes]
+        avg_distance = sum(distances_to_unvisited) / len(unvisited_nodes)
+        variance = sum((d - avg_distance) ** 2 for d in distances_to_unvisited) / len(unvisited_nodes)
+
+        local_score = distance_matrix[current_node][node]
+        global_score = avg_distance
+        diversity_score = variance
+
+        selection_penalty = 0.3 * (1.0 - (1.0 / (1.0 + math.exp(-(node - len(unvisited_nodes) / 2)))))
+
+        combined_score = (temperature * local_score +
+                         (1.0 - temperature) * global_score +
+                         0.4 * diversity_score +
+                         selection_penalty)
+
+        return combined_score
+
+    next_node = min(unvisited_nodes, key=calculate_score)
+    return next_node

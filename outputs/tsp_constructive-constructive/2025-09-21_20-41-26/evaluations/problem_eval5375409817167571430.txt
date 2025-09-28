@@ -1,0 +1,23 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if len(unvisited_nodes) == 1 and destination_node in unvisited_nodes:
+        return destination_node
+
+    min_score = float('inf')
+    next_node = None
+
+    for node in unvisited_nodes:
+        if node == destination_node:
+            continue  # Ensure destination is visited last
+
+        immediate_distance = distance_matrix[current_node][node]
+        future_distance = distance_matrix[node][destination_node]
+        score = 0.7 * immediate_distance + 0.3 * future_distance  # Weighted sum
+
+        if score < min_score:
+            min_score = score
+            next_node = node
+
+    if next_node is None:  # Fallback if no candidate found (shouldn't happen if destination is handled)
+        next_node = destination_node
+
+    return next_node

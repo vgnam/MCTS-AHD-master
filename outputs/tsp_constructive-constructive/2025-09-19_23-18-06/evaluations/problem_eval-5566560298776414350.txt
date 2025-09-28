@@ -1,0 +1,17 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def hybrid_score(node):
+        distance = distance_matrix[current_node][node]
+        degree = sum(1 for d in distance_matrix[node] if d > 0)
+        if not unvisited_nodes:
+            locality = 1.0
+        else:
+            remaining_nodes = unvisited_nodes - {node}
+            max_distance = max(distance_matrix[node][n] for n in remaining_nodes) if remaining_nodes else 0
+            locality = 1.0 / (sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes) + 1e-6)
+        return distance + 0.4 * max_distance + 0.3 * (1.0 / (degree + 1e-6)) * locality
+
+    next_node = min(unvisited_nodes, key=hybrid_score)
+    return next_node

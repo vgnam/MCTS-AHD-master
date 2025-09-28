@@ -1,0 +1,21 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    scores = []
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+        score = immediate_distance + 0.3 * lookahead_distance
+        scores.append((node, score))
+
+    scores.sort(key=lambda x: x[1])
+    top_nodes = scores[:3] if len(scores) > 3 else scores
+
+    if not top_nodes:
+        return destination_node
+
+    weights = [1 / (i + 1) for i in range(len(top_nodes))]
+    selected = random.choices([node for node, _ in top_nodes], weights=weights, k=1)[0]
+
+    return next_node

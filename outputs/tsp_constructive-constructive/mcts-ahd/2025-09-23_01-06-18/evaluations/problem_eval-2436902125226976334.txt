@@ -1,0 +1,39 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        return destination_node
+
+    def adaptive_cluster(nodes, base_threshold=1.5, max_clusters=5):
+        clusters = []
+        nodes = list(nodes)
+        threshold = base_threshold * (1 + 0.1 * len(nodes) / len(distance_matrix))
+
+        while nodes:
+            cluster = [nodes.pop(0)]
+            for node in list(nodes):
+                avg_dist = sum(distance_matrix[cluster[0]][c] for c in cluster) / len(cluster)
+                if distance_matrix[cluster[0]][node] <= threshold * avg_dist:
+                    cluster.append(node)
+                    nodes.remove(node)
+            clusters.append(cluster)
+            if len(clusters) >= max_clusters and nodes:
+                threshold *= 0.9
+        return clusters
+
+    clusters = adaptive_cluster(unvisited_nodes)
+    cluster_scores = []
+
+    for cluster in clusters:
+        cluster_cohesion = sum(distance_matrix[node1][node2] for node1 in cluster for node2 in cluster) / (len(cluster) ** 2)
+        cluster_score = 0
+        for node in cluster:
+            immediate_cost = distance_matrix[current_node][node]
+            future_cost = distance_matrix[node][destination_node]
+            cluster_score += immediate_cost + 0.6 * future_cost + 0.2 * cluster_cohesion
+        cluster_score /= len(cluster)
+        cluster_scores.append(cluster_score)
+
+    selected_cluster = clusters[cluster_scores.index(min(cluster_scores))]
+    next_node = min(selected_cluster, key=lambda node: distance_matrix[current_node][node] + 0.4 * distance_matrix[node][destination_node] + 0.3 * sum(distance_matrix[node][n] for n in selected_cluster) / len(selected_cluster))
+    return next_node

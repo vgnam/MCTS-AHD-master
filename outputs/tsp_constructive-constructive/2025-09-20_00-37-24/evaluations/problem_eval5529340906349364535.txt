@@ -1,0 +1,27 @@
+import random
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if destination_node in unvisited_nodes:
+        return destination_node
+    if not unvisited_nodes:
+        return None
+
+    # Calculate proximity probabilities inversely proportional to distance
+    distances = [distance_matrix[current_node][node] for node in unvisited_nodes]
+    min_dist, max_dist = min(distances), max(distances)
+    if min_dist == max_dist:
+        probs = [1.0 / len(unvisited_nodes)] * len(unvisited_nodes)
+    else:
+        # Exponential decay: closer nodes have higher probability
+        normalized = [(max_dist - d) / (max_dist - min_dist) for d in distances]
+        probs = [n ** 2 for n in normalized]  # Squared to emphasize proximity
+        total_prob = sum(probs)
+        probs = [p / total_prob for p in probs]
+
+    # 90% chance to pick based on proximity, 10% random
+    if random.random() < 0.9:
+        next_node = random.choices(unvisited_nodes, weights=probs, k=1)[0]
+    else:
+        next_node = random.choice(unvisited_nodes)
+
+    return next_node

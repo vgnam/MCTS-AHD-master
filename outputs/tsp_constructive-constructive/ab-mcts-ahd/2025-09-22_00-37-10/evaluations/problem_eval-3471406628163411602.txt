@@ -1,0 +1,22 @@
+import math
+    import random
+
+    scores = []
+    remaining_nodes = len(unvisited_nodes)
+    dynamic_weight = 1.0 / (remaining_nodes + 1)  # Avoid division by zero
+
+    for node in unvisited_nodes:
+        immediate_distance = distance_matrix[current_node][node]
+        lookahead_distance = distance_matrix[node][destination_node]
+        score = immediate_distance + dynamic_weight * lookahead_distance
+        scores.append(score)
+
+    # Convert scores to probabilities using softmax
+    max_score = max(scores)
+    exp_scores = [math.exp(score - max_score) for score in scores]
+    sum_exp_scores = sum(exp_scores)
+    probabilities = [exp_score / sum_exp_scores for exp_score in exp_scores]
+
+    # Select node based on probabilities
+    next_node = random.choices(unvisited_nodes, weights=probabilities, k=1)[0]
+    return next_node

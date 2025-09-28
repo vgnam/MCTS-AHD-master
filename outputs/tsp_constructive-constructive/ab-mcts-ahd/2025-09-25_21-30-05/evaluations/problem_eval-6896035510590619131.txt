@@ -1,0 +1,18 @@
+import random
+    remaining_nodes = len(unvisited_nodes)
+    node_scores = []
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        dynamic_weight = 0.7 * (remaining_nodes / (remaining_nodes + 2))
+        exploration_factor = 0.3 * (1 / (remaining_nodes + 1))
+        penalty = 0.2 * (1 / (remaining_nodes + 1)) if node in unvisited_nodes else 0
+        total_score = distance_to_current + (dynamic_weight * distance_to_destination ** 2) + penalty - exploration_factor
+        node_scores.append((node, total_score))
+    node_scores.sort(key=lambda x: x[1])
+    selected_node = random.choices(
+        [node for node, score in node_scores],
+        weights=[1 / (score + 1e-6) for node, score in node_scores],
+        k=1
+    )[0]
+    return next_node

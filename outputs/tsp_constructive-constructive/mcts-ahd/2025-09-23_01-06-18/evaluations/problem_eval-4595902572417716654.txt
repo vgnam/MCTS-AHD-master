@@ -1,0 +1,26 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if destination_node in unvisited_nodes:
+        remaining_distance = distance_matrix[current_node][destination_node]
+        avg_distance = sum(distance_matrix[current_node][node] for node in unvisited_nodes) / len(unvisited_nodes)
+        compactness = avg_distance / max(distance_matrix[current_node][node] for node in unvisited_nodes) if unvisited_nodes else 1
+        if compactness >= 0.6 or remaining_distance <= 1.2 * avg_distance:
+            return destination_node
+
+    remaining_nodes = len(unvisited_nodes)
+    total_nodes = len(distance_matrix)
+    progress_factor = 1 - (remaining_nodes / total_nodes)
+    weight = 1.2 - 0.4 * progress_factor
+
+    def heuristic(node):
+        local_cost = distance_matrix[current_node][node]
+        path_potential = (distance_matrix[node][destination_node] +
+                         sum(distance_matrix[node][n] for n in unvisited_nodes if n != destination_node)) / (remaining_nodes + 1)
+        regret_term = max(distance_matrix[current_node][n] - distance_matrix[current_node][node] for n in unvisited_nodes) if unvisited_nodes else 0
+        compactness_term = local_cost / (path_potential + 1e-6)
+        return (local_cost * weight + path_potential * (1 - weight) +
+                0.4 * regret_term - 0.3 * compactness_term)
+
+    next_node = min(unvisited_nodes, key=heuristic)
+    return next_node

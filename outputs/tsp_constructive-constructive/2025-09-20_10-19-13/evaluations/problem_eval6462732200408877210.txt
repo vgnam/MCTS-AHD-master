@@ -1,0 +1,14 @@
+importance factor, allowing for adaptive path selection that balances immediate and long-term optimality.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    time_decay_factor = 0.9
+    current_time = len(unvisited_nodes)
+    weights = {
+        node: (distance_matrix[current_node][node] * (time_decay_factor ** current_time))
+        for node in unvisited_nodes
+    }
+    next_node = min(unvisited_nodes, key=lambda node: weights[node])
+    return next_node

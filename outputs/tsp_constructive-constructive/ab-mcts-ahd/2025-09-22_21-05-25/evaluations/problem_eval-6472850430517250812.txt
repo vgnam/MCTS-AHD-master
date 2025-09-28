@@ -1,0 +1,14 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    exploration_factor = 1 + 1 / (len(unvisited_nodes) + 1)
+    weights = {}
+    for node in unvisited_nodes:
+        if len(unvisited_nodes) > 1:
+            remaining_unvisited = [n for n in unvisited_nodes if n != node]
+            nearest_remaining = min(remaining_unvisited, key=lambda n: distance_matrix[node][n])
+            weights[node] = distance_matrix[current_node][node] * 0.7 + distance_matrix[node][nearest_remaining] * 0.3 * exploration_factor
+        else:
+            weights[node] = distance_matrix[current_node][node]
+    next_node = min(unvisited_nodes, key=lambda node: weights[node])
+    return next_node
