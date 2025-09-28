@@ -70,7 +70,7 @@ class MCTSNode:
         self.is_root = is_root
         self.algorithm = algorithm
         self.code = code
-        self.parent = parent.mu_prior if is_root == False else 0
+        self.parent = parent
         self.depth = depth
         self.children = []
         self.visits = visit
@@ -87,7 +87,7 @@ class MCTSNode:
         self.kappa_prior = 1.0
         self.nu_prior = 3.0
         self.tau2_prior = 1.0
-        self.mu_post = self.mu_prior
+        self.mu_post = parent.mu_prior if is_root == False else 0
         self.kappa_post = self.kappa_prior
         self.nu_post = self.nu_prior
         self.tau2_post = self.tau2_prior
