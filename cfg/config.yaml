@@ -15,7 +15,7 @@ model: mistral/codestral-latest # LLM model
 temperature: 1  # temperature for chat completion
 
 # The chosen algorithm
-algorithm: mcts-ahd
+algorithm: ab-mcts-ahd
 
 # Main GA loop parameters
 max_fe: 1000 # maximum number of function evaluations

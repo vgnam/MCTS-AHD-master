@@ -29,7 +29,7 @@ class Paras():
         self.llm_api_endpoint = "chat.openai.com"
         self.llm_api_key = "Not used"  # Not used
         self.llm_model = "mistral/codestral-latest"
-        self.llm_model_names = ["mistral/codestral-latest", "nvidia_nim/qwen/qwen2.5-coder-32b-instruct"]
+        self.llm_model_names = ["mistral/codestral-latest", "nvidia_nim/qwen/qwen2.5-coder-32b-instruct","nvidia_nim/meta/llama-4-maverick-17b-128e-instruct"]
 
         #####################
         ###  Exp settings  ###
