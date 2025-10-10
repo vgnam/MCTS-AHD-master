@@ -1,0 +1,9 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    penalty_factor = 1.0 / len(unvisited_nodes) if unvisited_nodes else 0
+    distance_to_dest_avg = sum(distance_matrix[node][destination_node] for node in unvisited_nodes) / len(unvisited_nodes) if unvisited_nodes else 0
+    next_node = min(unvisited_nodes, key=lambda node: (
+        0.5 * distance_matrix[current_node][node] +
+        0.9 * distance_matrix[node][destination_node] +
+        penalty_factor * (distance_matrix[node][destination_node] - distance_to_dest_avg)
+    ))
+    return next_node

@@ -1,0 +1,32 @@
+importance" factor based on centrality and connectivity, with weights that adapt exponentially to the remaining nodes, favoring exploration early and exploitation later.}
+
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+    if len(unvisited_nodes) == 1:
+        return unvisited_nodes.pop()
+
+    remaining_nodes = len(unvisited_nodes)
+    exploration_weight = 0.7 * (0.9 ** remaining_nodes)
+    exploitation_weight = 0.3 * (1.1 ** (1 - remaining_nodes / (remaining_nodes + 1)))
+
+    def evaluate_node(node):
+        immediate_cost = distance_matrix[current_node][node]
+        remaining_nodes_after = unvisited_nodes - {node}
+        if not remaining_nodes_after:
+            return immediate_cost
+
+        avg_detour_cost = sum(distance_matrix[node][n] for n in remaining_nodes_after) / len(remaining_nodes_after)
+        regret = immediate_cost - avg_detour_cost
+        future_savings = sum(distance_matrix[node][other] for other in remaining_nodes_after) / len(remaining_nodes_after)
+
+        centrality = sum(distance_matrix[node][n] for n in unvisited_nodes) / len(unvisited_nodes)
+        connectivity = sum(1 for n in unvisited_nodes if distance_matrix[node][n] < (sum(distance_matrix[node][m] for m in unvisited_nodes) / len(unvisited_nodes)))
+
+        importance = (centrality + connectivity) / 2
+        priority_score = (exploration_weight * immediate_cost) + (0.4 * regret) + (exploitation_weight * future_savings) + (0.2 * importance)
+
+        return priority_score
+
+    next_node = min(unvisited_nodes, key=evaluate_node)
+    return next_node

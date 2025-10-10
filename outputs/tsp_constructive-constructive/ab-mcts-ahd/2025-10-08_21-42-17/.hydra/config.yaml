@@ -1,0 +1,21 @@
+model: mistral/codestral-latest
+temperature: 1
+algorithm: ab-mcts-ahd
+max_fe: 1000
+pop_size: 10
+init_pop_size: 4
+timeout: 60
+problem:
+  problem_name: tsp_constructive
+  problem_type: constructive
+  obj_type: min
+  problem_size: 50
+  func_name: select_next_node
+  description: Solving Traveling Salesman Problem (TSP) with constructive heuristics.
+    TSP requires finding the shortest path that visits all given nodes and returns
+    to the starting node.
+llm_client:
+  target: utils.llm_client.gemini.GeminiClient
+  model: gemini-2.5-flash
+  temperature: 1.0
+  api_key: AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc

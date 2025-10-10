@@ -1,0 +1,37 @@
+def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):
+    if not unvisited_nodes:
+        return destination_node
+
+    def angular_deviation(node):
+        vec1 = (distance_matrix[current_node][node], distance_matrix[node][destination_node])
+        vec2 = (distance_matrix[current_node][destination_node], 0)
+        dot_product = vec1[0] * vec2[0] + vec1[1] * vec2[1]
+        mag1 = (vec1[0]**2 + vec1[1]**2)**0.5
+        mag2 = (vec2[0]**2 + vec2[1]**2)**0.5
+        if mag1 * mag2 == 0:
+            return 0
+        cos_theta = dot_product / (mag1 * mag2)
+        angle = (1 - cos_theta) * 0.5
+        return angle
+
+    def combined_score(node):
+        distance_score = distance_matrix[current_node][node] * distance_matrix[node][destination_node]
+        angle_score = angular_deviation(node)
+        return distance_score * (1 + angle_score)
+
+    candidate_node = min(unvisited_nodes, key=combined_score)
+    current_tour = [current_node, candidate_node] + list(unvisited_nodes - {candidate_node}) + [destination_node]
+    improved = True
+    while improved:
+        improved = False
+        for i in range(1, len(current_tour) - 2):
+            for j in range(i + 1, len(current_tour) - 1):
+                if j - i == 1: continue
+                before = distance_matrix[current_tour[i-1]][current_tour[i]] + distance_matrix[current_tour[j]][current_tour[j+1]]
+                after = distance_matrix[current_tour[i-1]][current_tour[j]] + distance_matrix[current_tour[i]][current_tour[j+1]]
+                if after < before:
+                    current_tour[i:j+1] = reversed(current_tour[i:j+1])
+                    improved = True
+
+    next_node = current_tour[1]
+    return next_node
