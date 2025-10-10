@@ -18,13 +18,16 @@ class GENNode:
         self.nu_post = self.nu_prior
         self.tau2_post = self.tau2_prior
         self.rewards = []
+        self._lambda = 0.3
+        self.depth = self.parent.depth
 
-    def sample_from_posterior(self):
+
+    def sample_from_posterior(self, fe):
 
         sigma2 = invgamma.rvs(max(self.nu_post / 2, 0.1), scale=max(self.nu_post * self.tau2_post / 2, 0.1))
         kappa_post = max(self.kappa_post, 1e-6)
         mu = np.random.normal(self.mu_post, math.sqrt(max(sigma2 / kappa_post, 1e-12)))
-        return mu
+        return mu * math.exp(fe * self._lambda / 1000)
 
 
     def update_posterior(self, new_reward):
@@ -105,8 +108,8 @@ class MCTSNode:
         child_node._generation_action = generation_action
         self.children.append(child_node)
 
-    def sample_from_gen_node(self, gen_node: GENNode):
-        return gen_node.sample_from_posterior()
+    def sample_from_gen_node(self, gen_node: GENNode, fe):
+        return gen_node.sample_from_posterior(fe=fe)
 
     def sample_from_node_posterior(self):
         """Sample from this node's posterior (used for CONT actions)."""
@@ -137,7 +140,7 @@ class MCTSNode:
         term2 = (N * kappa_prior) / (kappa_prior + N) * (self.mu_post - r_bar) ** 2 if (kappa_prior + N) > 0 else 0.0
         self.tau2_post = (nu_prior * tau2_prior + sum_sq + term2) / self.nu_post if self.nu_post > 0 else tau2_prior
 
-    def select_best_action_via_thompson(self, num_samples=1, epsilon=0.3):
+    def select_best_action_via_thompson(self, fe, num_samples=1, epsilon=0.3):
 
         candidates = []
 
@@ -163,7 +166,7 @@ class MCTSNode:
 
             # Sample from GEN nodes
             for gen_node in self.gen_nodes:
-                samples = [self.sample_from_gen_node(gen_node) for _ in range(num_samples)]
+                samples = [self.sample_from_gen_node(gen_node, fe=fe) for _ in range(num_samples)]
                 avg_sample = np.mean(samples)
                 candidates.append(('GEN', gen_node.llm_model_name, avg_sample))
 
@@ -199,7 +202,7 @@ class AB_MCTS_A:
         self.root = MCTSNode(algorithm=root_answer, code="Root", obj=0, depth=0, is_root=True,
                              llm_model_names=llm_model_names)
 
-    def select_expansion_target(self):
+    def select_expansion_target(self, fe):
 
         current_node = self.root
 
@@ -219,13 +222,13 @@ class AB_MCTS_A:
             if not current_node.children:
                 candidates = []
                 for gen_node in current_node.gen_nodes:
-                    sample = current_node.sample_from_gen_node(gen_node)  # chỉ sample 1 lần
+                    sample = current_node.sample_from_gen_node(gen_node, fe=fe)  # chỉ sample 1 lần
                     candidates.append(('GEN', gen_node.llm_model_name, sample))
 
                 best_candidate = min(candidates, key=lambda x: x[2])
                 return current_node, 'GEN', best_candidate[1]
 
-            selection_result = current_node.select_best_action_via_thompson()
+            selection_result = current_node.select_best_action_via_thompson(fe=fe)
 
             action_type, action_info, _ = selection_result
 
@@ -286,7 +289,6 @@ class AB_MCTS_A:
 
         # CONT actions don't trigger backpropagation in AB-MCTS-A
         # They just traverse to existing nodes
-
 
 
 

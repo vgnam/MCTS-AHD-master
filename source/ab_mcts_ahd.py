@@ -163,11 +163,6 @@ class AB_MCTS_A_AHD:
                 if hasattr(mcts, 'backpropagate'):
                     mcts.backpropagate(new_node)
 
-                # Print tree rewards after successful expansion
-                print(f"\n--- Tree after operator '{option}' with model '{model_name}' ---")
-                self.print_tree_rewards(mcts)
-                print("--- End Tree ---\n")
-
         return nodes_set
 
     def run(self):
@@ -254,21 +249,31 @@ class AB_MCTS_A_AHD:
             print(f"Current rewards of MCTS nodes: {[round(float(x), 2) for x in mcts.rank_list[:]]}")
 
             # AB-MCTS-A Multiple LLM selection and expansion
-            target_node, expansion_type, selected_model_name = mcts.select_expansion_target()
+            target_node, expansion_type, selected_model_name = mcts.select_expansion_target(fe=self.eval_times)
             print(
                 f"Iter: {self.eval_times}/{self.fe_max} Type: {expansion_type}, Selected Model: {selected_model_name}")
 
             # Apply operators according to weights
             n_op = len(self.operators)
-            for i in range(n_op):
-                op = self.operators[i]
-                op_w = self.operator_weights[i] if i < len(self.operator_weights) else 1
+            # for i in range(n_op):
+            #     op = self.operators[i]
+            #     op_w = self.operator_weights[i] if i < len(self.operator_weights) else 1
+            #
+            #     print(f"OP: {op} (weight: {op_w})", end="|")
+            #
+            #     # Apply this operator op_w times with selected LLM
+            #     for j in range(op_w):
+            #         nodes_set = self.expand(mcts, target_node, nodes_set, op, selected_model_name)
 
-                print(f"OP: {op} (weight: {op_w})", end="|")
+            n_op = len(self.operators)
+            i = random.randint(0, n_op - 1)
+            op_w = self.operator_weights[i]
+            op = self.operators[i]
+            print(f"OP: {op} (weight: {op_w})", end="|")
 
-                # Apply this operator op_w times with selected LLM
-                for j in range(op_w):
-                    nodes_set = self.expand(mcts, target_node, nodes_set, op, selected_model_name)
+            # Apply this operator op_w times with selected LLM
+            for j in range(op_w):
+                nodes_set = self.expand(mcts, target_node, nodes_set, op, selected_model_name)
 
             # Population management
             size_act = min(len(nodes_set), self.pop_size)
@@ -283,6 +288,8 @@ class AB_MCTS_A_AHD:
             filename = self.output_path + "best_population_generation_" + str(self.eval_times) + ".json"
             with open(filename, 'w') as f:
                 json.dump(nodes_set[0]["code"], f, indent=5)
+
+            self.print_tree_rewards(mcts)
 
         return nodes_set[0]["code"], filename
 
