@@ -19,7 +19,7 @@ class Paras():
         self.ec_fe_max = 1000  # Number of evaluations, default = 1000
         self.ec_operators = ['e1', 'e2', 'm1', 'm2', 's1']
         self.ec_m = 2
-        self.ec_operator_weights = [0, 1, 2, 2, 1]  # weights for operators default = [0,1,k,k,1], default = [0,1,2,2,1]
+        self.ec_operator_weights = [0, 1, 1, 1, 1]  # weights for operators default = [0,1,k,k,1], default = [0,1,2,2,1]
 
         #####################
         ### LLM settings  ###
@@ -29,7 +29,8 @@ class Paras():
         self.llm_api_endpoint = "chat.openai.com"
         self.llm_api_key = "Not used"  # Not used
         self.llm_model = "mistral/codestral-latest"
-        self.llm_model_names = ["mistral/codestral-latest", "nvidia_nim/qwen/qwen2.5-coder-32b-instruct","nvidia_nim/meta/llama-4-maverick-17b-128e-instruct"]
+        # self.llm_model_names = ["mistral/codestral-latest", "nvidia_nim/qwen/qwen2.5-coder-32b-instruct"]
+        self.llm_model_names = ["mistral/codestral-latest"]
 
         #####################
         ###  Exp settings  ###
