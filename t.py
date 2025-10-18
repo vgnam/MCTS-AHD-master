@@ -1,57 +1,54 @@
-import logging
 import os
-from pathlib import Path
-import subprocess
-import hydra
+import glob
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
 
-# from ahd_adapter import AHD as LHH
-
-os.environ["GEMINI_API_KEY"] = "AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc"
-os.environ["MISTRAL_API_KEY"] = "59cjVL5qVzQqKN5CfRlhIhJvaDQT8jwt"
-
-ROOT_DIR = os.getcwd()
-logging.basicConfig(level=logging.INFO)
-
-
-@hydra.main(version_base=None, config_path="cfg", config_name="config")
-def main(cfg):
-    workspace_dir = Path.cwd()
-    print(workspace_dir)
-    # Set logging level
-    logging.info(f"Workspace: {workspace_dir}")
-    logging.info(f"Project Root: {ROOT_DIR}")
-    logging.info(f"Using LLM: {cfg.get('model', cfg.llm_client.model)}")
-    logging.info(f"Using Algorithm: {cfg.algorithm}")
-
-    if cfg.algorithm == "mcts-ahd":
-        from ahd_adapter import AHD as LHH
-    elif cfg.algorithm == "ab-mcts-ahd":
-        from ab_mcts_adapter import AB_AHD as LHH
-    else:
-        raise NotImplementedError
-    # client = init_client(cfg)
-
-    # Main algorithm
-    lhh = LHH(cfg, ROOT_DIR, workspace_dir)
-    best_code_overall, best_code_path_overall = lhh.evolve()
-    logging.info(f"Best Code Overall: {best_code_overall}")
-    logging.info(f"Best Code Path Overall: {best_code_path_overall}")
-
-    # Run validation and redirect stdout to a file "best_code_overall_stdout.txt"
-    with open(f"{ROOT_DIR}/problems/{cfg.problem.problem_name}/gpt.py", 'w') as file:
-        file.writelines(best_code_overall + '\n')
-    test_script = f"{ROOT_DIR}/problems/{cfg.problem.problem_name}/eval.py"
-    test_script_stdout = "best_code_overall_val_stdout.txt"
-    logging.info(f"Running validation script...: {test_script}")
-    with open(test_script_stdout, 'w') as stdout:
-        subprocess.run(["python", test_script, "-1", ROOT_DIR, "val"], stdout=stdout)
-    logging.info(f"Validation script finished. Results are saved in {test_script_stdout}.")
-
-    # Print the results
-    with open(test_script_stdout, 'r') as file:
-        for line in file.readlines():
-            logging.info(line.strip())
+# --- Đường dẫn tới thư mục ---
+folders = [
+    r"D:\MCTS-AHD-master\outputs\tsp_constructive-constructive\mcts-ahd\2025-09-23_01-06-18",
+    r"D:\MCTS-AHD-master\outputs\tsp_constructive-constructive\ab-mcts-ahd\2025-10-17_00-06-40"
+]
+labels = ["MCTS-AHD", "AB-MCTS-AHD"]
 
 
-if __name__ == "__main__":
-    main()
+# --- Hàm đọc file JSON ---
+def read_objective_from_json(file_path):
+    with open(file_path, "r") as f:
+        data = json.load(f)
+    # Giả sử trong JSON có key "objective"
+    return data.get("objective", None)
+
+
+# --- Thu thập dữ liệu ---
+gen_start, gen_end = 50, 1000
+results = {}
+
+for folder, label in zip(folders, labels):
+    gen_nums = []
+    obj_vals = []
+    pattern = os.path.join(folder, "best_population_generation_*.json")
+    files = sorted(glob.glob(pattern), key=lambda x: int(os.path.basename(x).split("_")[-1].split(".")[0]))
+
+    for file in files:
+        gen_num = int(os.path.basename(file).split("_")[-1].split(".")[0])
+        if gen_start <= gen_num <= gen_end:
+            obj = read_objective_from_json(file)
+            if obj is not None:
+                gen_nums.append(gen_num)
+                obj_vals.append(obj)
+
+    results[label] = pd.DataFrame({"generation": gen_nums, "objective": obj_vals})
+
+# --- Vẽ đồ thị ---
+plt.figure(figsize=(12, 6))
+for label, df in results.items():
+    plt.plot(df["generation"], df["objective"], label=label)
+
+plt.xlabel("Generation")
+plt.ylabel("Objective")
+plt.title("So sánh Objective giữa MCTS-AHD và AB-MCTS-AHD")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()

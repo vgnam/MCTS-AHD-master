@@ -3,7 +3,7 @@ import os
 import subprocess
 import re
 from typing import List, Any
-
+from gls_tsp_adapt.gls_tsp_eval import Sandbox
 from utils.utils import block_until_running, file_to_string, filter_traceback
 
 
@@ -19,6 +19,8 @@ class Prompts:
         problem_prompt_path = f'{self.prompt_dir}/{self.problem}{prompt_path_suffix}'
         self.func_signature = file_to_string(f'{problem_prompt_path}/func_signature.txt').format(version=2).strip()
         self.func_desc = file_to_string(f'{problem_prompt_path}/func_desc.txt')
+
+        self.seed_func = file_to_string(f'{problem_prompt_path}/seed_func.txt')
 
         match = re.match(r'^def +(.+?)\((.*)\) *-> *(.*?) *:', self.func_signature)
         assert match is not None
@@ -55,6 +57,9 @@ class Prompts:
     def get_other_inf(self):
         return ""
 
+    def get_seed_func(self):
+        return self.seed_func
+
 
 class Problem:
     def __init__(self, cfg, root_dir):
@@ -68,14 +73,8 @@ class Problem:
         self.problem_type = self.config.problem.problem_type
         self.output_file = f"{self.root_dir}/problems/{self.problem}/gpt.py"
 
-        if self.problem_type == "tsp_constructive":
-            from .original.prompts.tsp_greedy import GetPrompts
-            self.prompts = GetPrompts()
-        elif self.problem_type == "bpp_online":
-            from .original.prompts.bpp_online import GetPrompts
-            self.prompts = GetPrompts()
-        else:
-            self.prompts = Prompts(self.config.problem, root_dir)
+
+        self.prompts = Prompts(self.config.problem, root_dir)
 
     def response_to_individual(self, code, response_id, file_name=None) -> dict:
         """
@@ -182,3 +181,4 @@ class Problem:
 
             logging.info(f"Iteration {self.iteration}, response_id {response_id}: Objective value: {individual['obj']}")
         return [indiv["obj"] for indiv in population]
+

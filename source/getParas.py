@@ -17,10 +17,13 @@ class Paras():
         self.pop_size = 10  # Size of Elite set E, default = 10
         self.init_size = 4  # Number of initial nodes N_I, default = 4
         self.ec_fe_max = 1000  # Number of evaluations, default = 1000
-        self.ec_operators = ['e1', 'e2', 'm1', 'm2', 's1']
         self.ec_m = 2
-        self.ec_operator_weights = [0, 1, 1, 1, 1]  # weights for operators default = [0,1,k,k,1], default = [0,1,2,2,1]
 
+        # self.ec_operators = ['e1', 'e2', 'm1', 'm2', 's1']
+        # self.ec_operator_weights = [0, 1, 1, 1, 1]  # weights for operators default = [0,1,k,k,1], default = [0,1,2,2,1]
+
+        self.ec_operators = ['counter', 'e2', 'm1', 'm2', 's1']
+        self.ec_operator_weights = [2, 2, 2, 2, 2]
         #####################
         ### LLM settings  ###
         #####################

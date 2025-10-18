@@ -1,20 +1,24 @@
 import numpy as np
 
-
 def heuristics(distance_matrix):
-    num_nodes = distance_matrix.shape[0]
-    heuristics_matrix = np.zeros((num_nodes, num_nodes))
+    n = len(distance_matrix)
+    heuristics_matrix = np.zeros_like(distance_matrix)
 
-    # Calculate the sum of distances and the maximum distance from each node to all others
-    for i in range(num_nodes):
-        total_distance = np.sum(distance_matrix[i, :])
-        max_distance = np.max(distance_matrix[i, :])
+    # Compute inverse distance
+    inv_distance = 1.0 / (distance_matrix + np.eye(n) * np.max(distance_matrix))
 
-        for j in range(num_nodes):
-            # Avoid self-distance and compute heuristic for edge (i, j)
-            if i != j:
-                # Modified penalty factor based on maximum distance
-                heuristics_matrix[i, j] = (distance_matrix[i, j] / total_distance) * (
-                            1 + distance_matrix[i, j] / max_distance)
+    # Compute local density (average distance to neighbors)
+    local_density = np.mean(inv_distance, axis=1)
+
+    # Combine inverse distance and local density
+    for i in range(n):
+        for j in range(i + 1, n):
+            heuristics_matrix[i, j] = inv_distance[i, j] * local_density[i] * local_density[j]
+            heuristics_matrix[j, i] = heuristics_matrix[i, j]
+
+    # Normalize to [0, 1] range
+    max_heuristic = np.max(heuristics_matrix)
+    if max_heuristic > 0:
+        heuristics_matrix = heuristics_matrix / max_heuristic
 
     return heuristics_matrix

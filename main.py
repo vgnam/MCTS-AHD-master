@@ -8,7 +8,7 @@ from utils.utils import init_client
 
 # API keys
 os.environ["GEMINI_API_KEY"] = "AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc"
-os.environ["MISTRAL_API_KEY"] = "59cjVL5qVzQqKN5CfRlhIhJvaDQT8jwt"
+os.environ["MISTRAL_API_KEY"] = "n2DcW1wVL8CVRMxjb8qPQrerUXHwcT4l"
 os.environ['NVIDIA_NIM_API_KEY'] = "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"
 
 ROOT_DIR = os.getcwd()

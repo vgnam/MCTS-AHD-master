@@ -62,7 +62,6 @@ class Evolution():
         return prompt_content
 
     def get_prompt_i1(self):
-
         prompt_content = self.prompt_task + "\n" + "First, describe the design idea and main steps of your algorithm in one sentence. " + "The description must be inside a brace outside the code implementation. Next, implement it in Python as a function named \
 '" + self.prompt_func_name + "'.\nThis function should accept " + str(
             len(self.prompt_func_inputs)) + " input(s): " \
@@ -173,6 +172,45 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
                          + self.joined_outputs + ". " + self.prompt_inout_inf + " " \
                          + self.prompt_other_inf + "\n" + "Do not give additional explanations."
         return prompt_content
+
+    def get_prompt_counter(self, indiv1):
+        prompt_content = self.prompt_task + "\n" \
+                                            "I have one algorithm with its code as follows.\n\n" \
+                                            "Algorithm's description: " + indiv1['algorithm'] + "\n" \
+                                                                                                "Code:\n" + indiv1[
+                             'code'] + "\n" \
+                                       "Please analyze the provided algorithm carefully to identify any weaknesses, inefficiencies, or limitations in its design or implementation.\n" \
+                                       "Then, create a new algorithm that specifically exploits these weaknesses to outperform or counter the original one.\n" \
+                                       "Focus on areas where the opponent’s approach is suboptimal or vulnerable, and redesign or optimize those parts.\n" \
+                                       "First, describe the design idea based on the provided algorithm and the main steps of the new algorithm in one sentence. " \
+                                       "The description must be inside a brace outside the code implementation. " \
+                                       "Next, implement it in Python as a function named '" + self.prompt_func_name + "'.\n" \
+                                                                                                                      "This function should accept " + str(
+            len(self.prompt_func_inputs)) + " input(s): " + self.joined_inputs + ". " \
+                                                                                 "The function should return " + str(
+            len(self.prompt_func_outputs)) + " output(s): " + self.joined_outputs + ". " \
+                         + self.prompt_inout_inf + " " + self.prompt_other_inf + "\n" \
+                                                                                 "Do not give additional explanations."
+        return prompt_content
+
+    def counter(self, parents):
+
+        prompt_content = self.get_prompt_counter(parents)
+
+        if self.debug_mode:
+            print("\n >>> check prompt for creating algorithm using [ counter ] : \n", prompt_content)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        [code_all, algorithm] = self._get_alg(prompt_content)
+
+        if self.debug_mode:
+            print("\n >>> check designed algorithm: \n", algorithm)
+            print("\n >>> check designed code: \n", code_all)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        return [code_all, algorithm]
 
     def _get_thought(self, prompt_content):
 
