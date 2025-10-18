@@ -1,4 +1,0 @@
-import random
-        if random.random() < 0.1:
-            return random.choice(candidates[1:])
-    return next_node

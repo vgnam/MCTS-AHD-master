@@ -1,4 +1,0 @@
-import random
-        next_node = random.choice(top_nodes)
-
-    return next_node

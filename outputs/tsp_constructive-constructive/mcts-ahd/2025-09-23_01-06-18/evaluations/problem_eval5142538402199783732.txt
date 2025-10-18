@@ -1,3 +1,0 @@
-import math
-    next_node = min(unvisited_nodes, key=heuristic)
-    return next_node

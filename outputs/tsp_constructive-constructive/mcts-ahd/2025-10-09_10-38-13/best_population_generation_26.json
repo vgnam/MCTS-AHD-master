@@ -1,7 +1,0 @@
-{
-     "algorithm": "The algorithm selects the next node to visit by prioritizing the unvisited node closest to the current node (using the distance matrix). If no unvisited nodes remain, it returns the destination node. The selection is purely greedy, favoring immediate proximity over potential global optimality.",
-     "thought": "The algorithm selects the next node to visit by choosing the unvisited node closest to the current node, using the distance matrix to evaluate distances, and prioritizes returning to the destination node if all other nodes are visited.",
-     "code": "def select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix):\n    if not unvisited_nodes:\n        return destination_node\n    min_distance = float('inf')\n    next_node = None\n    for node in unvisited_nodes:\n        distance = distance_matrix[current_node][node]\n        if distance < min_distance:\n            min_distance = distance\n            next_node = node\n    return next_node",
-     "objective": 7.00437,
-     "other_inf": null
-}

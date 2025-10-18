@@ -1,3 +1,0 @@
-import math
-    next_node = min(unvisited_nodes, key=evaluate_node)
-    return next_node

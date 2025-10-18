@@ -1,4 +1,0 @@
-import random
-            best_node = random.choice(candidates)
-
-        return next_node

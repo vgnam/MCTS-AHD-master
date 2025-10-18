@@ -1,6 +1,0 @@
-import random
-        next_node = random.choice(eligible_nodes)
-    else:
-        next_node = candidates[0][0]
-
-    return next_node
