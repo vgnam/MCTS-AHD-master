@@ -21,7 +21,7 @@ def read_objective_from_json(file_path):
 
 
 # --- Thu thập dữ liệu ---
-gen_start, gen_end = 50, 1000
+gen_start, gen_end = 0, 1000
 results = {}
 
 for folder, label in zip(folders, labels):
