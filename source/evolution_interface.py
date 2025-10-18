@@ -123,6 +123,9 @@ class InterfaceEC():
         elif operator == "s1":
             parents = pop
             [offspring['code'], offspring['thought']] = self.evol.s1(pop)
+        elif operator == "counter":
+            parents = pop
+            [offspring['code'], offspring['thought']] = self.evol.counter(parents[0])
         else:
             print(f"Evolution operator [{operator}] has not been implemented ! \n")
 
