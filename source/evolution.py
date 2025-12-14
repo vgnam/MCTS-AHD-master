@@ -222,8 +222,11 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
     def _get_alg(self, prompt_content):
 
         response = self.interface_llm.get_response(prompt_content)
-
-        algorithm = re.search(r"\{(.*?)\}", response, re.DOTALL).group(1)
+        match = re.search(r"\{(.*?)\}", response, re.DOTALL)
+        if match:
+            algorithm = match.group(1)
+        else:
+            algorithm = "" # Trả về rỗng thay vì crash
         if len(algorithm) == 0:
             if 'python' in response:
                 algorithm = re.findall(r'^.*?(?=python)', response, re.DOTALL)
@@ -385,4 +388,50 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
             print(">>> Press 'Enter' to continue")
             input()
 
+        return [code_all, algorithm]
+    
+    # [THÊM MỚI] Prompt cho Critic đánh giá Code
+    def get_prompt_critic(self, code, algorithm, objective=None):
+        prompt_content = self.prompt_task + "\n"
+        prompt_content += "I have a heuristic algorithm with the following code:\n"
+        prompt_content += code + "\n\n"
+        if objective is not None:
+            prompt_content += f"Its current objective value is: {objective}\n"
+        
+        prompt_content += "Act as a critical evaluator (Critic). Analyze the code and identify 3 key weaknesses or potential risks (e.g., local optima, high complexity, lack of diversity).\n"
+        prompt_content += "Provide your feedback in a concise list. Do not generate new code yet."
+        return prompt_content
+
+    # Tìm hàm này và thay thế nội dung
+    def get_prompt_refine_with_critic(self, code, critic_feedback):
+        prompt_content = self.prompt_task + "\n"
+        prompt_content += "I have a heuristic algorithm:\n" + code + "\n\n"
+        prompt_content += "A Critic has provided the following feedback:\n" + critic_feedback + "\n\n"
+        prompt_content += "Based on this feedback, please act as an Exploiter/Developer to refine the code.\n"
+        
+        # --- PHẦN THÊM VÀO ---
+        prompt_content += "First, describe the design idea and main steps of your refined algorithm in one sentence. The description must be inside a brace outside the code implementation.\n"
+        # ---------------------
+
+        prompt_content += "1. Address the weaknesses mentioned.\n"
+        prompt_content += "2. Keep the logic that works well.\n"
+        prompt_content += "3. Implement the improved version in Python as a function named '" + self.prompt_func_name + "'.\n"
+        prompt_content += "The function should accept " + str(len(self.prompt_func_inputs)) + " input(s): " + self.joined_inputs + ".\n"
+        prompt_content += "Do not give additional explanations."
+        return prompt_content
+
+    # [THÊM MỚI] Hàm gọi LLM cho Critic
+    def critic(self, code, algorithm, objective=None):
+        prompt = self.get_prompt_critic(code, algorithm, objective)
+        if self.debug_mode:
+            print("\n >>> Critic is analyzing...")
+        response = self._get_thought(prompt) # Critic chỉ trả về text, không cần parse code
+        return response
+
+    # [THÊM MỚI] Hàm gọi LLM cho Refine
+    def refine_with_critic(self, code, critic_feedback):
+        prompt = self.get_prompt_refine_with_critic(code, critic_feedback)
+        if self.debug_mode:
+            print("\n >>> Exploiter is refining based on critic...")
+        [code_all, algorithm] = self._get_alg(prompt)
         return [code_all, algorithm]

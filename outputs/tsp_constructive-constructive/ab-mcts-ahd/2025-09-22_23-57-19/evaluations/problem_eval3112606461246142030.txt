@@ -1,5 +1,0 @@
-import random
-    if len(eligible_nodes) > 1 and random.random() < 0.3:
-        return random.choice(eligible_nodes)
-
-    return next_node

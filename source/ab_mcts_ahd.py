@@ -92,6 +92,7 @@ class AB_MCTS_A_AHD:
     def expand(self, mcts, cur_node, nodes_set, option, model_name=None):
         """Expand using specific operator and LLM model"""
         # Get the interface for this specific model
+        use_roco = True
         interface_ec = self.interface_ecs.get(model_name,
                                               list(self.interface_ecs.values())[0]) if self.interface_ecs else None
 
@@ -106,17 +107,17 @@ class AB_MCTS_A_AHD:
                 return nodes_set
             self.eval_times, offsprings = interface_ec.evolve_algorithm(self.eval_times, path_set,
                                                                              cur_node.raw_info,
-                                                                             cur_node.children_info, option)
+                                                                             cur_node.children_info, option, use_roco=use_roco)
         elif option == 'e1':
             e1_set = [copy.deepcopy(children.subtree[random.choices(range(len(children.subtree)), k=1)[0]].raw_info) for
                       children in mcts.root.children]
             self.eval_times, offsprings = interface_ec.evolve_algorithm(self.eval_times, e1_set,
                                                                              cur_node.raw_info,
-                                                                             cur_node.children_info, option)
+                                                                             cur_node.children_info, option, use_roco=use_roco)
         else:
             self.eval_times, offsprings = interface_ec.evolve_algorithm(self.eval_times, nodes_set,
                                                                              cur_node.raw_info,
-                                                                             cur_node.children_info, option)
+                                                                             cur_node.children_info, option, use_roco=use_roco)
         if offsprings == None:
             print(f"Timeout emerge, no expanding with action {option}.")
             return nodes_set

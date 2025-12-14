@@ -151,10 +151,13 @@ class InterfaceEC():
                 print(e)
         return p, offspring
 
-    def get_algorithm(self, eval_times, pop, operator):
+    def get_algorithm(self, eval_times, pop, operator, use_roco=True):
         while True:
             eval_times += 1
-            parents, offspring = self.get_offspring(pop, operator)
+            if use_roco:
+                parents, offspring = self.get_collaborative_offspring(pop, operator)
+            else:
+                parents, offspring = self.get_offspring(pop, operator)
             objs = self.interface_eval.batch_evaluate([offspring['code']], 0)
             if objs == 'timeout' or objs[0] == float('inf') or self.check_duplicate_obj(pop, np.round(objs[0], 5)):
                 continue
@@ -163,10 +166,20 @@ class InterfaceEC():
             return eval_times, pop, offspring
         return eval_times, None, None
 
-    def evolve_algorithm(self, eval_times, pop, node, brother_node, operator):
+    # Tìm hàm evolve_algorithm cũ và thay thế bằng đoạn này
+    def evolve_algorithm(self, eval_times, pop, node, brother_node, operator, use_roco=True): # <--- Thêm use_roco vào đây
         for i in range(3):
             eval_times += 1
-            _, offspring = self.get_offspring(pop, operator, father=node)
+            
+            # --- ĐOẠN SỬA ĐỔI BẮT ĐẦU ---
+            if use_roco:
+                # Sử dụng quy trình hợp tác (RoCo)
+                _, offspring = self.get_collaborative_offspring(pop, operator, father=node)
+            else:
+                # Sử dụng quy trình thường
+                _, offspring = self.get_offspring(pop, operator, father=node)
+            # --- ĐOẠN SỬA ĐỔI KẾT THÚC ---
+
             objs = self.interface_eval.batch_evaluate([offspring['code']], 0)
             if objs == 'timeout':
                 return eval_times, None
@@ -176,3 +189,29 @@ class InterfaceEC():
 
             return eval_times, offspring
         return eval_times, None
+    
+    # [THÊM MỚI] Quy trình sinh con hợp tác (RoCo style)
+    def get_collaborative_offspring(self, pop, operator, father=None):
+        # 1. Bước 1: Explorer/Generator sinh ra lời giải nháp (Draft)
+        parents, draft_offspring = self._get_alg(pop, operator, father)
+        
+        # Nếu sinh lỗi hoặc trùng lặp ngay từ đầu, trả về luôn để retry bên ngoài
+        if draft_offspring['code'] is None:
+            return parents, draft_offspring
+
+        # 2. Bước 2: Critic đánh giá lời giải nháp
+        # Lưu ý: Chúng ta chưa có objective thực tế vì chưa chạy eval, 
+        # Critic sẽ đánh giá dựa trên logic code (Static Analysis).
+        critique = self.evol.critic(draft_offspring['code'], draft_offspring['algorithm'])
+        
+        # 3. Bước 3: Exploiter tinh chỉnh dựa trên lời phê bình
+        refined_code, refined_alg = self.evol.refine_with_critic(draft_offspring['code'], critique)
+        
+        # Cập nhật lại offspring
+        final_offspring = copy.deepcopy(draft_offspring)
+        final_offspring['code'] = refined_code
+        final_offspring['algorithm'] = refined_alg
+        # Lưu lại thought process (Reflection) để dùng cho Prompting sau này nếu cần
+        final_offspring['other_inf'] = f"Critic: {critique}" 
+
+        return parents, final_offspring

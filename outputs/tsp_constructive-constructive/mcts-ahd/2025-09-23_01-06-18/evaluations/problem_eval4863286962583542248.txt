@@ -1,3 +1,0 @@
-import numpy as np
-    next_node = min(unvisited_nodes, key=heuristic)
-    return next_node

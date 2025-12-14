@@ -1,5 +1,0 @@
-import random
-                selected = random.choice(candidates[:2])
-                next_node = selected[0]
-
-    return next_node

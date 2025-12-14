@@ -1,4 +1,0 @@
-import random
-    next_node = random.choices([node for node, _, _ in distances], weights=probs, k=1)[0]
-
-    return next_node
