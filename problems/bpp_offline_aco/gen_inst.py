@@ -16,6 +16,7 @@ dataset_conf = {
     'train': (500,),
     'val':   (120, 500, 1000),
     'test':  (500, 1000),
+    'debug': (1500, 2000),
 }
 
 def generate_dataset(filepath, n, batch_size=64):
@@ -28,11 +29,17 @@ def generate_datasets(basepath = None):
     basepath = basepath or os.path.join(os.path.dirname(__file__), "dataset")
     os.makedirs(basepath, exist_ok=True)
 
+    # for mood, problem_sizes in dataset_conf.items():
+    #     np.random.seed(len(mood))
+    #     for n in problem_sizes:
+    #         filepath = os.path.join(basepath, f"{mood}{n}_dataset.npz")
+    #         generate_dataset(filepath, n, batch_size=5 if mood =='train' else 64)
+
     for mood, problem_sizes in dataset_conf.items():
         np.random.seed(len(mood))
         for n in problem_sizes:
             filepath = os.path.join(basepath, f"{mood}{n}_dataset.npz")
-            generate_dataset(filepath, n, batch_size=5 if mood =='train' else 64)
+            generate_dataset(filepath, n, batch_size=5 if mood =='train' else 32)
 
 def load_dataset(fp) -> list[BPPInstance]:
     data = np.load(fp)

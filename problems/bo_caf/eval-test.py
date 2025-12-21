@@ -11,7 +11,7 @@ from botorch.models import SingleTaskGP
 from gpytorch.mlls import ExactMarginalLogLikelihood
 from botorch.fit import fit_gpytorch_mll
 from botorch.optim import optimize_acqf
-from abc import ABC, abstractmethod
+from abcd import ABC, abstractmethod
 from botorch.models.transforms import Log
 from botorch.exceptions import BadInitialCandidatesWarning
 from botorch.exceptions import OptimizationWarning

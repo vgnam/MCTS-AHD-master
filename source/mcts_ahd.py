@@ -8,8 +8,8 @@ import time
 from .mcts import MCTS, MCTSNode
 from .evolution_interface import InterfaceEC
 
-
 # main class for eoh
+
 class MCTS_AHD:
     def __init__(self, paras, problem, select, manage, **kwargs):
 
@@ -136,30 +136,83 @@ class MCTS_AHD:
                                         timeout=self.timeout, use_numba=self.use_numba
                                         )
 
+        # brothers = []
+        # mcts = MCTS('Root')
+        # # main loop
+        # n_op = len(self.operators)
+        # self.eval_times, brothers, offsprings = self.interface_ec.get_algorithm(self.eval_times, brothers, "i1")
+        # brothers.append(offsprings)
+        # nownode = MCTSNode(offsprings['algorithm'], offsprings['code'], offsprings['objective'], parent=mcts.root,
+        #                    depth=1, visit=1, Q=-1 * offsprings['objective'], raw_info=offsprings)
+        # mcts.root.add_child(nownode)
+        # mcts.root.children_info.append(offsprings)
+        # mcts.backpropagate(nownode)
+        # nownode.subtree.append(nownode)
+        # for i in range(1, self.init_size):
+        #     self.eval_times, brothers, offsprings = self.interface_ec.get_algorithm(self.eval_times, brothers, "e1")
+        #     brothers.append(offsprings)
+        #     nownode = MCTSNode(offsprings['algorithm'], offsprings['code'], offsprings['objective'], parent=mcts.root,
+        #                        depth=1, visit=1, Q=-1 * offsprings['objective'], raw_info=offsprings)
+        #     mcts.root.add_child(nownode)
+        #     mcts.root.children_info.append(offsprings)
+        #     mcts.backpropagate(nownode)
+        #     nownode.subtree.append(nownode)
+        #
+        #
+        # nodes_set = brothers
+        # size_act = min(len(nodes_set), self.pop_size)
+        # nodes_set = self.manage.population_management(nodes_set, size_act)
+
+        print("- Initialization Start -")
+
+        # --- Initialize MCTS and brothers ---
         brothers = []
         mcts = MCTS('Root')
-        # main loop
         n_op = len(self.operators)
-        self.eval_times, brothers, offsprings = self.interface_ec.get_algorithm(self.eval_times, brothers, "i1")
-        brothers.append(offsprings)
-        nownode = MCTSNode(offsprings['algorithm'], offsprings['code'], offsprings['objective'], parent=mcts.root,
-                           depth=1, visit=1, Q=-1 * offsprings['objective'], raw_info=offsprings)
-        mcts.root.add_child(nownode)
-        mcts.root.children_info.append(offsprings)
-        mcts.backpropagate(nownode)
-        nownode.subtree.append(nownode)
-        for i in range(1, self.init_size):
-            self.eval_times, brothers, offsprings = self.interface_ec.get_algorithm(self.eval_times, brothers, "e1")
-            brothers.append(offsprings)
-            nownode = MCTSNode(offsprings['algorithm'], offsprings['code'], offsprings['objective'], parent=mcts.root,
-                               depth=1, visit=1, Q=-1 * offsprings['objective'], raw_info=offsprings)
+
+        # --- Load all pre-prepared nodes from JSON ---
+        import os
+        import json
+
+        # Lấy folder chứa script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Kết hợp với file JSON
+        json_path = os.path.join(script_dir, "seed.json")
+        with open(json_path, 'r', encoding='utf-8') as f:
+            pre_nodes = json.load(f)
+
+        model_name = "mistral/codestral-latest"
+
+        # --- Add all nodes ---
+        for idx, node_info in enumerate(pre_nodes):
+            brothers.append(node_info)  # track all nodes, same as original
+
+            nownode = MCTSNode(
+                node_info['algorithm'],
+                node_info['code'],
+                node_info['objective'],
+                parent=mcts.root,
+                depth=1,
+                visit=1,
+                Q=-1 * node_info['objective'],
+                raw_info=node_info
+            )
+
             mcts.root.add_child(nownode)
-            mcts.root.children_info.append(offsprings)
+            mcts.root.children_info.append(node_info)
+
+            # Mimic original backprop logic: first node was "i1", others "e1"
+            # op_name = "i1" if idx == 0 else "e1"
             mcts.backpropagate(nownode)
+
             nownode.subtree.append(nownode)
+
+        # --- Population management (same as original) ---
         nodes_set = brothers
         size_act = min(len(nodes_set), self.pop_size)
         nodes_set = self.manage.population_management(nodes_set, size_act)
+
         print("- Initialization Finished - Evolution Start -")
         while self.eval_times < self.fe_max:
             print(f"Current performances of MCTS nodes: {mcts.rank_list}")

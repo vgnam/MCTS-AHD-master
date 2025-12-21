@@ -20,10 +20,18 @@ class AB_AHD:
                              exp_debug_mode = False,
                              eva_timeout=cfg.timeout)
 
+
     def evolve(self):
         print("- Evolution Start -")
 
-        method = AB_MCTS_A_AHD(self.paras, self.problem, prob_rank, pop_greedy)
+        method = AB_MCTS_A_AHD(
+            self.paras,
+            self.problem,
+            prob_rank,
+            pop_greedy,
+            cfg=self.cfg
+        )
+
 
         results = method.run()
 

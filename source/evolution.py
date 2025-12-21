@@ -39,30 +39,80 @@ class Evolution():
         self.model_LLM = model_LLM
         self.debug_mode = debug_mode  # close prompt checking
 
-
         self.interface_llm = InterfaceLLM(self.api_endpoint, self.api_key, self.model_LLM, self.debug_mode)
 
-    def get_prompt_post(self, code, algorithm):
+    def _format_advice(self, advice):
+        if advice is None:
+            return ""
 
+        # Nếu là dict → chuyển thành text có cấu trúc
+        if isinstance(advice, dict):
+            selected = advice.get('selected_direction', {})
+            direction_type = selected.get('type', '').strip()
+            rationale = selected.get('rationale', '').strip()
+            what_to_do = selected.get('what_to_do', [])
+            expected_impact = selected.get('expected_impact', '').strip()
+
+            # Định dạng "what to do" thành danh sách
+            what_to_do_str = "\n".join(f"- {item.strip()}" for item in what_to_do if item)
+
+            parts = []
+            if direction_type:
+                parts.append(f"Improvement Direction: {direction_type}")
+            if rationale:
+                parts.append(f"Rationale: {rationale}")
+            if what_to_do_str:
+                parts.append(f"Implementation Guidance:\n{what_to_do_str}")
+            if expected_impact:
+                parts.append(f"Expected Impact: {expected_impact}")
+
+            # (Tùy chọn) thêm "what to avoid"
+            what_to_avoid = advice.get('what_to_avoid', [])
+            if what_to_avoid:
+                avoid_items = []
+                for item in what_to_avoid:
+                    if isinstance(item, dict):
+                        critique = item.get('critique', '')
+                        if critique:
+                            avoid_items.append(critique)
+                    elif isinstance(item, str) and item.strip():
+                        avoid_items.append(item.strip())
+                if avoid_items:
+                    avoid_str = "\n".join(f"- {item}" for item in avoid_items)
+                    parts.append(f"Cautions / What to Avoid:\n{avoid_str}")
+
+            return "\n\n".join(parts) if parts else ""
+
+        # Nếu là chuỗi → xử lý như cũ (tương thích)
+        if isinstance(advice, str):
+            return advice.strip()
+
+        # Trường hợp fallback
+        return str(advice).strip()
+
+    def get_prompt_post(self, code, algorithm, advice=None):
         prompt_content = self.prompt_task + "\n" + "Following is the a Code implementing a heuristic algorithm with function name " + self.prompt_func_name + " to solve the above mentioned problem.\n"
         prompt_content += self.prompt_inout_inf + " " + self.prompt_other_inf
         prompt_content += "\n\nCode:\n" + code
+        prompt_content += self._format_advice(advice)
         prompt_content += "\n\nNow you should describe the Design Idea of the algorithm using less than 5 sentences.\n"
         prompt_content += "Hint: You should highlight every meaningful designs in the provided code and describe their ideas. You can analyse the code to see which variables are given higher values and which variables are given lower values, the choice of parameters or the total structure of the code."
         return prompt_content
 
-    def get_prompt_refine(self, code, algorithm):
-
+    def get_prompt_refine(self, code, algorithm, advice=None):
         prompt_content = self.prompt_task + "\n" + "Following is the Design Idea of a heuristic algorithm for the problem and the code with function name '" + self.prompt_func_name + "' for implementing the heuristic algorithm.\n"
         prompt_content += self.prompt_inout_inf + " " + self.prompt_other_inf
         prompt_content += "\nDesign Idea:\n" + algorithm
         prompt_content += "\n\nCode:\n" + code
+        prompt_content += self._format_advice(advice)
         prompt_content += "\n\nThe content of the Design Idea idea cannot fully represent what the algorithm has done informative. So, now you should re-describe the algorithm using less than 3 sentences.\n"
         prompt_content += "Hint: You should reference the given Design Idea and highlight the most critical design ideas of the code. You can analyse the code to describe which variables are given higher priorities and which variables are given lower priorities, the parameters and the structure of the code."
         return prompt_content
 
-    def get_prompt_i1(self):
-        prompt_content = self.prompt_task + "\n" + "First, describe the design idea and main steps of your algorithm in one sentence. " + "The description must be inside a brace outside the code implementation. Next, implement it in Python as a function named \
+    def get_prompt_i1(self, advice=None):
+        prompt_content = self.prompt_task + "\n"
+        prompt_content += self._format_advice(advice)
+        prompt_content += "First, describe the design idea and main steps of your algorithm in one sentence. " + "The description must be inside a brace outside the code implementation. Next, implement it in Python as a function named \
 '" + self.prompt_func_name + "'.\nThis function should accept " + str(
             len(self.prompt_func_inputs)) + " input(s): " \
                          + self.joined_inputs + ". The function should return " + str(
@@ -71,10 +121,9 @@ class Evolution():
                          + self.prompt_other_inf + "\n" + "Do not give additional explanations."
         return prompt_content
 
-    def get_prompt_e1(self, indivs):
+    def get_prompt_e1(self, indivs, advice=None):
         prompt_indiv = ""
         for i in range(len(indivs)):
-            # print(indivs[i]['algorithm'] + f"Objective value: {indivs[i]['objective']}")
             prompt_indiv = prompt_indiv + "No." + str(
                 i + 1) + " algorithm's description, its corresponding code and its objective value are: \n" + \
                            indivs[i]['algorithm'] + "\n" + indivs[i][
@@ -83,8 +132,9 @@ class Evolution():
         prompt_content = self.prompt_task + "\n" \
                                             "I have " + str(
             len(indivs)) + " existing algorithms with their codes as follows: \n\n" \
-                         + prompt_indiv + \
-                         "Please create a new algorithm that has a totally different form from the given algorithms. Try generating codes with different structures, flows or algorithms. The new algorithm should have a relatively low objective value. \n" \
+                         + prompt_indiv
+        prompt_content += self._format_advice(advice)
+        prompt_content += "Please create a new algorithm that has a totally different form from the given algorithms. Try generating codes with different structures, flows or algorithms. The new algorithm should have a relatively low objective value. \n" \
                          "First, describe the design idea and main steps of your algorithm in one sentence. The description must be inside a brace outside the code implementation. Next, implement it in Python as a function named \
 '" + self.prompt_func_name + "'.\nThis function should accept " + str(
             len(self.prompt_func_inputs)) + " input(s): " \
@@ -94,10 +144,9 @@ class Evolution():
                          + self.prompt_other_inf + "\n" + "Do not give additional explanations."
         return prompt_content
 
-    def get_prompt_e2(self, indivs):
+    def get_prompt_e2(self, indivs, advice=None):
         prompt_indiv = ""
         for i in range(len(indivs)):
-            # print(indivs[i]['algorithm'] + f"Objective value: {indivs[i]['objective']}")
             prompt_indiv = prompt_indiv + "No." + str(
                 i + 1) + " algorithm's description, its corresponding code and its objective value are: \n" + \
                            indivs[i]['algorithm'] + "\n" + indivs[i][
@@ -106,8 +155,9 @@ class Evolution():
         prompt_content = self.prompt_task + "\n" \
                                             "I have " + str(
             len(indivs)) + " existing algorithms with their codes and objective values as follows: \n\n" \
-                         + prompt_indiv + \
-                         f"Please create a new algorithm that has a similar form to the No.{len(indivs)} algorithm and is inspired by the No.{1} algorithm. The new algorithm should have a objective value lower than both algorithms.\n" \
+                         + prompt_indiv
+        prompt_content += self._format_advice(advice)
+        prompt_content += f"Please create a new algorithm that has a similar form to the No.{len(indivs)} algorithm and is inspired by the No.{1} algorithm. The new algorithm should have a objective value lower than both algorithms.\n" \
                          f"Firstly, list the common ideas in the No.{1} algorithm that may give good performances. Secondly, based on the common idea, describe the design idea based on the No.{len(indivs)} algorithm and main steps of your algorithm in one sentence. \
 The description must be inside a brace. Thirdly, implement it in Python as a function named \
 '" + self.prompt_func_name + "'.\nThis function should accept " + str(
@@ -118,13 +168,14 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
                          + self.prompt_other_inf + "\n" + "Do not give additional explanations."
         return prompt_content
 
-    def get_prompt_m1(self, indiv1):
+    def get_prompt_m1(self, indiv1, advice=None):
         prompt_content = self.prompt_task + "\n" \
                                             "I have one algorithm with its code as follows. \n\n\
 Algorithm's description: " + indiv1['algorithm'] + "\n\
 Code:\n\
-" + indiv1['code'] + "\n\
-Please create a new algorithm that has a different form but can be a modified version of the provided algorithm. Attempt to introduce more novel mechanisms and new equations or programme segments.\n" \
+" + indiv1['code'] + "\n"
+        prompt_content += self._format_advice(advice)
+        prompt_content += "Please create a new algorithm that has a different form but can be a modified version of the provided algorithm. Attempt to introduce more novel mechanisms and new equations or programme segments.\n" \
                      "First, describe the design idea based on the provided algorithm and main steps of the new algorithm in one sentence. \
 The description must be inside a brace outside the code implementation. Next, implement it in Python as a function named \
 '" + self.prompt_func_name + "'.\nThis function should accept " + str(
@@ -135,13 +186,14 @@ The description must be inside a brace outside the code implementation. Next, im
                          + self.prompt_other_inf + "\n" + "Do not give additional explanations."
         return prompt_content
 
-    def get_prompt_m2(self, indiv1):
+    def get_prompt_m2(self, indiv1, advice=None):
         prompt_content = self.prompt_task + "\n" \
                                             "I have one algorithm with its code as follows. \n\n\
 Algorithm's description: " + indiv1['algorithm'] + "\n\
 Code:\n\
-" + indiv1['code'] + "\n\
-Please identify the main algorithm parameters and help me in creating a new algorithm that has different parameter settings to equations compared to the provided algorithm. \n" \
+" + indiv1['code'] + "\n"
+        prompt_content += self._format_advice(advice)
+        prompt_content += "Please identify the main algorithm parameters and help me in creating a new algorithm that has different parameter settings to equations compared to the provided algorithm. \n" \
                      "First, describe the design idea based on the provided algorithm and main steps of the new algorithm in one sentence. \
 The description must be inside a brace outside the code implementation. Next, implement it in Python as a function named \
 '" + self.prompt_func_name + "'.\nThis function should accept " + str(
@@ -150,7 +202,7 @@ The description must be inside a brace outside the code implementation. Next, im
                          + self.prompt_other_inf + "\n" + "Do not give additional explanations."
         return prompt_content
 
-    def get_prompt_s1(self, indivs):
+    def get_prompt_s1(self, indivs, advice=None):
         prompt_indiv = ""
         for i in range(len(indivs)):
             prompt_indiv = prompt_indiv + "No." + str(
@@ -161,8 +213,9 @@ The description must be inside a brace outside the code implementation. Next, im
         prompt_content = self.prompt_task + "\n" \
                                             "I have " + str(
             len(indivs)) + " existing algorithms with their codes and objective values as follows: \n\n" \
-                         + prompt_indiv + \
-                         f"Please help me create a new algorithm that is inspired by all the above algorithms with its objective value lower than any of them.\n" \
+                         + prompt_indiv
+        prompt_content += self._format_advice(advice)
+        prompt_content += f"Please help me create a new algorithm that is inspired by all the above algorithms with its objective value lower than any of them.\n" \
                          "Firstly, list some ideas in the provided algorithms that are clearly helpful to a better algorithm. Secondly, based on the listed ideas, describe the design idea and main steps of your new algorithm in one sentence. \
 The description must be inside a brace. Thirdly, implement it in Python as a function named \
 '" + self.prompt_func_name + "'.\nThis function should accept " + str(
@@ -173,15 +226,16 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
                          + self.prompt_other_inf + "\n" + "Do not give additional explanations."
         return prompt_content
 
-    def get_prompt_counter(self, indiv1):
+    def get_prompt_counter(self, indiv1, advice=None):
         prompt_content = self.prompt_task + "\n" \
                                             "I have one algorithm with its code as follows.\n\n" \
                                             "Algorithm's description: " + indiv1['algorithm'] + "\n" \
                                                                                                 "Code:\n" + indiv1[
-                             'code'] + "\n" \
-                                       "Please analyze the provided algorithm carefully to identify any weaknesses, inefficiencies, or limitations in its design or implementation.\n" \
+                             'code'] + "\n"
+        prompt_content += self._format_advice(advice)
+        prompt_content += "Please analyze the provided algorithm carefully to identify any weaknesses, inefficiencies, or limitations in its design or implementation.\n" \
                                        "Then, create a new algorithm that specifically exploits these weaknesses to outperform or counter the original one.\n" \
-                                       "Focus on areas where the opponent’s approach is suboptimal or vulnerable, and redesign or optimize those parts.\n" \
+                                       "Focus on areas where the opponent's approach is suboptimal or vulnerable, and redesign or optimize those parts.\n" \
                                        "First, describe the design idea based on the provided algorithm and the main steps of the new algorithm in one sentence. " \
                                        "The description must be inside a brace outside the code implementation. " \
                                        "Next, implement it in Python as a function named '" + self.prompt_func_name + "'.\n" \
@@ -193,9 +247,8 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
                                                                                  "Do not give additional explanations."
         return prompt_content
 
-    def counter(self, parents):
-
-        prompt_content = self.get_prompt_counter(parents)
+    def counter(self, parents, advice=None):
+        prompt_content = self.get_prompt_counter(parents, advice)
 
         if self.debug_mode:
             print("\n >>> check prompt for creating algorithm using [ counter ] : \n", prompt_content)
@@ -213,14 +266,10 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
         return [code_all, algorithm]
 
     def _get_thought(self, prompt_content):
-
         response = self.interface_llm.get_response(prompt_content)
-
-        # algorithm = response.split(':')[-1]
         return response
 
     def _get_alg(self, prompt_content):
-
         response = self.interface_llm.get_response(prompt_content)
 
         algorithm = re.search(r"\{(.*?)\}", response, re.DOTALL).group(1)
@@ -265,17 +314,13 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
 
         return [code_all, algorithm]
 
-    def post_thought(self, code, algorithm):
-
-        prompt_content = self.get_prompt_refine(code, algorithm)
-
+    def post_thought(self, code, algorithm, advice=None):
+        prompt_content = self.get_prompt_refine(code, algorithm, advice)
         post_thought = self._get_thought(prompt_content)
-
         return post_thought
 
-    def i1(self):
-
-        prompt_content = self.get_prompt_i1()
+    def i1(self, advice=None):
+        prompt_content = self.get_prompt_i1(advice)
 
         if self.debug_mode:
             print("\n >>> check prompt for creating algorithm using [ i1 ] : \n", prompt_content)
@@ -292,9 +337,8 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
 
         return [code_all, algorithm]
 
-    def e1(self, parents):
-
-        prompt_content = self.get_prompt_e1(parents)
+    def e1(self, parents, advice=None):
+        prompt_content = self.get_prompt_e1(parents, advice)
 
         if self.debug_mode:
             print("\n >>> check prompt for creating algorithm using [ e1 ] : \n", prompt_content)
@@ -311,9 +355,8 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
 
         return [code_all, algorithm]
 
-    def e2(self, parents):
-
-        prompt_content = self.get_prompt_e2(parents)
+    def e2(self, parents, advice=None):
+        prompt_content = self.get_prompt_e2(parents, advice)
 
         if self.debug_mode:
             print("\n >>> check prompt for creating algorithm using [ e2 ] : \n", prompt_content)
@@ -330,9 +373,8 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
 
         return [code_all, algorithm]
 
-    def m1(self, parents):
-
-        prompt_content = self.get_prompt_m1(parents)
+    def m1(self, parents, advice=None):
+        prompt_content = self.get_prompt_m1(parents, advice)
 
         if self.debug_mode:
             print("\n >>> check prompt for creating algorithm using [ m1 ] : \n", prompt_content)
@@ -349,9 +391,8 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
 
         return [code_all, algorithm]
 
-    def m2(self, parents):
-
-        prompt_content = self.get_prompt_m2(parents)
+    def m2(self, parents, advice=None):
+        prompt_content = self.get_prompt_m2(parents, advice)
 
         if self.debug_mode:
             print("\n >>> check prompt for creating algorithm using [ m2 ] : \n", prompt_content)
@@ -368,9 +409,8 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
 
         return [code_all, algorithm]
 
-    def s1(self, parents):
-
-        prompt_content = self.get_prompt_s1(parents)
+    def s1(self, parents, advice=None):
+        prompt_content = self.get_prompt_s1(parents, advice)
 
         if self.debug_mode:
             print("\n >>> check prompt for creating algorithm using [ s1 ] : \n", prompt_content)

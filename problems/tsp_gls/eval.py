@@ -60,7 +60,7 @@ if __name__ == "__main__":
             logging.info(f"[*] Evaluating {dataset_path}")
 
             objs = []
-            for i, instance in enumerate(tqdm(dataset)):
+            for i, instance in enumerate(dataset):
                 obj = solve(instance)
                 objs.append(obj)
             

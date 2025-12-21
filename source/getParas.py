@@ -20,11 +20,11 @@ class Paras():
         self.ec_m = 2
 
         # self.ec_operators = ['e1', 'e2', 'm1', 'm2', 's1']
-        # self.ec_operator_weights = [0, 1, 1, 1, 1]  # weights for operators default = [0,1,k,k,1], default = [0,1,2,2,1]
+        # self.ec_operator_weights = [0, 1, 2, 2, 1]  # weights for operators default = [0,1,k,k,1], default = [0,1,2,2,1]
 
         self.ec_operators = ['counter', 'e2', 'm1', 'm2', 's1']
-        self.ec_operator_weights = [2, 2, 2, 2, 2]
-        #####################
+        self.ec_operator_weights = [4, 4, 4, 4, 4]
+        ####################
         ### LLM settings  ###
         #####################
         self.llm_use_local = False  # if use local model
@@ -32,8 +32,10 @@ class Paras():
         self.llm_api_endpoint = "chat.openai.com"
         self.llm_api_key = "Not used"  # Not used
         self.llm_model = "mistral/codestral-latest"
-        # self.llm_model_names = ["mistral/codestral-latest", "nvidia_nim/qwen/qwen2.5-coder-32b-instruct"]
+
+        # self.llm_model_names = ["mistral/codestral-latest", "nvidia_nim/qwen/qwen3-coder-480b-a35b-instruct"]
         self.llm_model_names = ["mistral/codestral-latest"]
+        # self.llm_model_names = ["nvidia_nim/qwen/qwen3-coder-480b-a35b-instruct"]
 
         #####################
         ###  Exp settings  ###

@@ -4,12 +4,17 @@ import os
 import traceback
 from pathlib import Path
 import subprocess
-from utils.utils import init_client
+# from utils.utils import init_client
+
+
 
 # API keys
-os.environ["GEMINI_API_KEY"] = "AIzaSyB7_zB7UcJ18cmFKMzrGtreSmzDBUeI-Rc"
-os.environ["MISTRAL_API_KEY"] = "n2DcW1wVL8CVRMxjb8qPQrerUXHwcT4l"
-os.environ['NVIDIA_NIM_API_KEY'] = "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"
+
+# os.environ["GEMINI_API_KEY"] = ("AIzaSyB7_zB7UcJ18cmFKMzrGtreSm"
+#                                 "1000zDBUeI-Rc")
+os.environ["MISTRAL_API_KEY"] = "EMuUqn7Hx10GB6wqvIgm70kbdTscgSpA"
+#
+os.environ['NVIDIA_NIM_API_KEY'] = "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"
 
 ROOT_DIR = os.getcwd()
 logging.basicConfig(level=logging.INFO)
@@ -41,6 +46,7 @@ def main(cfg):
         logging.info(f"Best Code Overall: {best_code_overall}")
         logging.info(f"Best Code Path Overall: {best_code_path_overall}")
 
+
         # Write best code to file
         problem_dir = Path(ROOT_DIR) / "problems" / cfg.problem.problem_name
         gpt_file = problem_dir / "gpt.py"
@@ -50,6 +56,7 @@ def main(cfg):
         # Run validation and redirect stdout
         test_script = problem_dir / "eval.py"
         test_script_stdout = "best_code_overall_val_stdout.txt"
+
         logging.info(f"Running validation script: {test_script}")
         with open(test_script_stdout, 'w') as stdout:
             subprocess.run(
@@ -58,7 +65,9 @@ def main(cfg):
                 stderr=subprocess.STDOUT,  # capture errors too
                 check=False
             )
-        logging.info(f"Validation script finished. Results saved in {test_script_stdout}.")
+
+        logging.info(f"Validation scri"
+                     f"pt finished. Results saved in {test_script_stdout}.")
 
         # Print results
         with open(test_script_stdout, 'r') as file:

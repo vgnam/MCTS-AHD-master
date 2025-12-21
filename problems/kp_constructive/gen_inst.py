@@ -7,20 +7,21 @@ def generate_datasets():
 
     np.random.seed(3333)
 
-    for problem_size in [100]:
-        n_instances = 64
-        test_dataset = np.random.rand(n_instances, problem_size, 2)
-        np.save(os.path.join(basepath, f'train{problem_size}_dataset.npy'), test_dataset)
-
-    for problem_size in [50, 100, 200]:
-        n_instances = 64
-        test_dataset = np.random.rand(n_instances, problem_size, 2)
-        np.save(os.path.join(basepath, f'val{problem_size}_dataset.npy'), test_dataset)
+    # for problem_size in [100]:
+    #     n_instances = 64
+    #     test_dataset = np.random.rand(n_instances, problem_size, 2)
+    #     np.save(os.path.join(basepath, f'train{problem_size}_dataset.npy'), test_dataset)
+    #
+    # for problem_size in [50, 100, 200]:
+    #     n_instances = 64
+    #     test_dataset = np.random.rand(n_instances, problem_size, 2)
+    #     np.save(os.path.join(basepath, f'val{problem_size}_dataset.npy'), test_dataset)
         
-    for problem_size in [50, 100, 200, 500]:
-        n_instances = 1000
+    for problem_size in [500, 1000, 2000]:
+        n_instances = 64
         test_dataset = np.random.rand(n_instances, problem_size, 2)
         np.save(os.path.join(basepath, f'test{problem_size}_dataset.npy'), test_dataset)
 
 if __name__ == "__main__":
     generate_datasets()
+

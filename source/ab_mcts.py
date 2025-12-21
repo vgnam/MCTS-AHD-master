@@ -6,7 +6,7 @@ from scipy.stats import invgamma, norm
 import warnings
 
 class GlobalHyperPrior:
-    def __init__(self, mu_0=0.0, kappa_0=1.0, nu_0=2.0, tau2_0=1.0):
+    def __init__(self, mu_0=0, kappa_0=1.0, nu_0=2.0, tau2_0=1.0):
         self.mu_0 = mu_0
         self.kappa_0 = kappa_0
         self.nu_0 = nu_0
@@ -23,9 +23,6 @@ class GlobalHyperPrior:
         Update the global hyper-posterior based on data from all GEN nodes.
         Uses the means and variances of local posteriors.
         """
-        if not gen_nodes:
-            return
-
         # Get local mu_post and tau2_post from GEN nodes
         mu_locals = [g.mu_post for g in gen_nodes]
         tau2_locals = [g.tau2_post for g in gen_nodes]
@@ -49,13 +46,13 @@ class GlobalHyperPrior:
         self.nu_post = nu_n
         self.tau2_post = tau2_n
 
+
     def sample_hyperparameter(self):
         # Sample variance (global)
         sigma2 = invgamma.rvs(a=self.nu_post / 2, scale=self.nu_post * self.tau2_post / 2)
         # Sample mean (global)
         mu = norm.rvs(loc=self.mu_post, scale=math.sqrt(sigma2 / self.kappa_post))
         return mu, sigma2
-
 
 
 
@@ -124,7 +121,9 @@ class MCTSNode:
         self.visits = visit
         self.raw_info = raw_info
         self.subtree = []
-        self.reward = float(obj)
+        # self.reward = float(-100/obj) if is_root == False else 0  # Lower obj is better
+        self.reward = obj
+
         self.children_info = []
 
         # Global hyper prior
@@ -132,15 +131,15 @@ class MCTSNode:
 
         # Create GEN nodes for this node: one for each (LLM, Operator) pair
         self.gen_nodes = []
-        if llm_model_names and ['counter', 'e2', 'm1', 'm2', 's1']:
-            for llm in llm_model_names:
-                for op in ['counter', 'e2', 'm1', 'm2', 's1']:
-                    self.gen_nodes.append(GENNode(self, llm, op, global_hyper))
+
+        for llm in llm_model_names:
+            for op in ['counter', 'e2', 'm1', 'm2', 's1']:
+                self.gen_nodes.append(GENNode(self, llm, op, global_hyper))
 
         # Node posterior (for CONT actions)
-        self.mu_prior = 0.0
+        self.mu_prior = 0
         self.kappa_prior = 10
-        self.nu_prior = 3.0
+        self.nu_prior = 2.0
         self.tau2_prior = 1.0
         self.mu_post = self.mu_prior
         self.kappa_post = self.kappa_prior
@@ -209,7 +208,7 @@ class MCTSNode:
             # Precision = 1/variance = kappa / sigma2
             local_precision = gen_node.kappa_post / gen_node.tau2_post
             global_precision = self.global_hyper.kappa_post / sigma2_global
-            combined_precision = local_precision + global_precision
+            combined_precision = local_precision + 0.5 * global_precision
             combined_mu = (gen_node.mu_post * local_precision + mu_global * global_precision) / combined_precision
             combined_sigma2 = 1.0 / combined_precision
 
@@ -219,6 +218,9 @@ class MCTSNode:
             # Feature scaling
             sampled_reward = mu_local * math.exp(gen_node._lambda * fe / 1000)
 
+            print(
+                f"GEN {gen_node.operator_name}: mu_post={gen_node.mu_post:.3f}, tau2={gen_node.tau2_post:.3f}, combined_mu={combined_mu:.3f}, sampled={mu_local:.3f}, sampled_reward={sampled_reward:.3f}")
+
             action_identifier = (gen_node.llm_model_name, gen_node.operator_name)
             candidates.append(('GEN', action_identifier, sampled_reward))
 
@@ -226,34 +228,17 @@ class MCTSNode:
         for i, child in enumerate(self.children):
             samples = [child.sample_from_node_posterior() for _ in range(num_samples)]
             avg_sample = np.mean(samples)
+            print(f"CHILD {i}: mu_post={child.mu_post:.3f}, tau2={child.tau2_post:.3f}, sample={avg_sample:.3f}")
             candidates.append(('CONT', i, avg_sample))
 
         # Choose the best action (lowest reward)
         best_candidate = min(candidates, key=lambda x: x[2])
+
         return best_candidate
 
-    def compute_wasserstein_barycenter(self):
-        """
-        Compute the Wasserstein barycenter of GEN node posteriors.
-        Returns a representative (mu, sigma2).
-        """
-        if not self.gen_nodes:
-            return None
-
-        mus = [g.mu_post for g in self.gen_nodes]
-        sigma2s = [g.tau2_post for g in self.gen_nodes]
-
-        # Weight by visits (more visited nodes have higher weight)
-        weights = [g.visits + 1 for g in self.gen_nodes]
-        weights = np.array(weights) / sum(weights)
-
-        # Calculate barycenter for mean and variance (Wasserstein-2)
-        mu_b = np.average(mus, weights=weights)
-        sigma2_b = np.average(sigma2s, weights=weights)
-
-        return mu_b, sigma2_b
 
     def select_best_action_via_thompson(self, fe, num_samples=1, epsilon=0):
+
         if random.random() < epsilon:
             candidates = []
             for i, child in enumerate(self.children):
@@ -269,7 +254,7 @@ class MCTSNode:
             return best_candidate
 
         # If too many children, only consider CONT actions
-        if len(self.children) >= 8:
+        if len(self.children) >= 7:
             candidates = []
             for i, child in enumerate(self.children):
                 samples = [child.sample_from_node_posterior() for _ in range(num_samples)]
@@ -342,6 +327,7 @@ class AB_MCTS_A:
 
     def backpropagate(self, node: MCTSNode, op_name):
 
+        print("backpropagate")
         score = float(node.reward)
         if score not in self.rank_list:
             self.rank_list.append(score)
@@ -354,9 +340,10 @@ class AB_MCTS_A:
         # Update the GEN node that generated this child
         gen_node_found = False
         for gen_node in parent.gen_nodes:
-            if gen_node.llm_model_name == llm_name and gen_node.operator_name == op_name:
+            if gen_node.operator_name == op_name:
                 gen_node.update_posterior(score, self.global_hyper)
                 gen_node_found = True
+                print(111111111111111111111111111111111)
                 break
 
         # Update rewards store

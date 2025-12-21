@@ -4,6 +4,7 @@ import random
 import numpy as np
 import time
 
+from .debate import Debate
 from .evolution import Evolution
 import warnings
 from joblib import Parallel, delayed
@@ -14,14 +15,27 @@ import concurrent.futures
 class InterfaceEC():
     def __init__(self, m, api_endpoint, api_key, llm_model, debug_mode, interface_prob, select, n_p, timeout, use_numba,
                  **kwargs):
+
         assert 'use_local_llm' in kwargs
         assert 'url' in kwargs
-        # -----------------------------------------------------------
 
-        # LLM settings
         self.interface_eval = interface_prob
         prompts = interface_prob.prompts
-        self.evol = Evolution(api_endpoint, api_key, llm_model, debug_mode, prompts, **kwargs)
+
+        # ---- Evolution (luôn dùng) ----
+        self.evol = Evolution(
+            api_endpoint, api_key, llm_model,
+            debug_mode, prompts, **kwargs
+        )
+
+        # ---- Debate (chỉ tạo khi có advisor_configs) ----
+        if kwargs.get("advisor_configs"):
+            self.debate = Debate(
+                api_endpoint, api_key, llm_model,
+                debug_mode, prompts, **kwargs
+            )
+        else:
+            self.debate = None
         self.m = m
         self.debug = debug_mode
 
@@ -88,7 +102,7 @@ class InterfaceEC():
 
         return population
 
-    def _get_alg(self, pop, operator, father=None):
+    def _get_alg(self, pop, operator, advice=None, father=None):
         offspring = {
             'algorithm': None,
             'thought': None,
@@ -98,12 +112,12 @@ class InterfaceEC():
         }
         if operator == "i1":
             parents = None
-            [offspring['code'], offspring['thought']] = self.evol.i1()
+            [offspring['code'], offspring['thought']] = self.evol.i1(advice=advice)
         elif operator == "e1":
             real_m = random.randint(2, self.m)
             real_m = min(real_m, len(pop))
             parents = self.select.parent_selection_e1(pop, real_m)
-            [offspring['code'], offspring['thought']] = self.evol.e1(parents)
+            [offspring['code'], offspring['thought']] = self.evol.e1(parents, advice=advice)
         elif operator == "e2":
             other = copy.deepcopy(pop)
             if father in pop:
@@ -113,36 +127,36 @@ class InterfaceEC():
             # real_m = min(real_m, len(other))
             parents = self.select.parent_selection(other, real_m)
             parents.append(father)
-            [offspring['code'], offspring['thought']] = self.evol.e2(parents)
+            [offspring['code'], offspring['thought']] = self.evol.e2(parents, advice=advice)
         elif operator == "m1":
             parents = [father]
-            [offspring['code'], offspring['thought']] = self.evol.m1(parents[0])
+            [offspring['code'], offspring['thought']] = self.evol.m1(parents[0], advice=advice)
         elif operator == "m2":
             parents = [father]
-            [offspring['code'], offspring['thought']] = self.evol.m2(parents[0])
+            [offspring['code'], offspring['thought']] = self.evol.m2(parents[0], advice=advice)
         elif operator == "s1":
             parents = pop
-            [offspring['code'], offspring['thought']] = self.evol.s1(pop)
+            [offspring['code'], offspring['thought']] = self.evol.s1(pop, advice=advice)
         elif operator == "counter":
             parents = pop
-            [offspring['code'], offspring['thought']] = self.evol.counter(parents[0])
+            [offspring['code'], offspring['thought']] = self.evol.counter(parents[0], advice=advice)
         else:
             print(f"Evolution operator [{operator}] has not been implemented ! \n")
 
-        offspring['algorithm'] = self.evol.post_thought(offspring['code'], offspring['thought'])
+        offspring['algorithm'] = self.evol.post_thought(offspring['code'], offspring['thought'], advice=advice)
         return parents, offspring
 
-    def get_offspring(self, pop, operator, father=None):
+    def get_offspring(self, pop, operator, advice=None, father=None):
         while True:
             try:
-                p, offspring = self._get_alg(pop, operator, father=father)
+                p, offspring = self._get_alg(pop, operator, advice=advice, father=father)
                 code = offspring['code']
                 n_retry = 1
                 while self.check_duplicate(pop, offspring['code']):
                     n_retry += 1
                     if self.debug:
                         print("duplicated code, wait 1 second and retrying ... ")
-                    p, offspring = self._get_alg(pop, operator, father=father)
+                    p, offspring = self._get_alg(pop, operator, advice=advice, father=father)
                     code = offspring['code']
                     if n_retry > 1:
                         break
@@ -151,10 +165,10 @@ class InterfaceEC():
                 print(e)
         return p, offspring
 
-    def get_algorithm(self, eval_times, pop, operator):
+    def get_algorithm(self, eval_times, pop, operator, advice=None):
         while True:
             eval_times += 1
-            parents, offspring = self.get_offspring(pop, operator)
+            parents, offspring = self.get_offspring(pop, operator, advice=advice)
             objs = self.interface_eval.batch_evaluate([offspring['code']], 0)
             if objs == 'timeout' or objs[0] == float('inf') or self.check_duplicate_obj(pop, np.round(objs[0], 5)):
                 continue
@@ -163,10 +177,10 @@ class InterfaceEC():
             return eval_times, pop, offspring
         return eval_times, None, None
 
-    def evolve_algorithm(self, eval_times, pop, node, brother_node, operator):
+    def evolve_algorithm(self, eval_times, pop, node, brother_node, operator, advice=None):
         for i in range(3):
             eval_times += 1
-            _, offspring = self.get_offspring(pop, operator, father=node)
+            _, offspring = self.get_offspring(pop, operator, advice=advice, father=node)
             objs = self.interface_eval.batch_evaluate([offspring['code']], 0)
             if objs == 'timeout':
                 return eval_times, None
