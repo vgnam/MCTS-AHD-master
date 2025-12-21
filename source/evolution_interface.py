@@ -140,6 +140,10 @@ class InterfaceEC():
         elif operator == "counter":
             parents = pop
             [offspring['code'], offspring['thought']] = self.evol.counter(parents[0], advice=advice)
+        elif operator == "refine":
+            parents = [father]
+            [offspring['code'], offspring['thought']] = self.evol.refine(father)
+
         else:
             print(f"Evolution operator [{operator}] has not been implemented ! \n")
 
@@ -150,6 +154,10 @@ class InterfaceEC():
         while True:
             try:
                 p, offspring = self._get_alg(pop, operator, advice=advice, father=father)
+
+                if pop == []:
+                    break
+
                 code = offspring['code']
                 n_retry = 1
                 while self.check_duplicate(pop, offspring['code']):
@@ -163,6 +171,7 @@ class InterfaceEC():
                 break
             except Exception as e:
                 print(e)
+
         return p, offspring
 
     def get_algorithm(self, eval_times, pop, operator, advice=None):
@@ -190,3 +199,4 @@ class InterfaceEC():
 
             return eval_times, offspring
         return eval_times, None
+

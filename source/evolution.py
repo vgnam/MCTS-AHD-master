@@ -426,3 +426,322 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
             input()
 
         return [code_all, algorithm]
+
+    def get_prompt_error_signal(self, indiv):
+        prompt = (
+                self.prompt_task + "\n\n"
+                                   "You are given an algorithm and its implementation.\n\n"
+                                   "Algorithm description:\n"
+                + indiv['algorithm'] + "\n\n"
+                                       "Code:\n"
+                + indiv['code'] + "\n\n"
+                                  "Your task is NOT to judge correctness.\n"
+                                  "Your task is to surface *subtle discomforts* or *uneasy feelings* about this algorithm.\n\n"
+                                  "Think like a human expert who says:\n"
+                                  "\"I can't prove it's wrong yet, but something here feels fragile or over-assumed.\"\n\n"
+                                  "Focus on:\n"
+                                  "- Implicit assumptions that may not always hold\n"
+                                  "- Design choices that feel brittle or overly confident\n"
+                                  "- Parts that might fail silently rather than obviously\n\n"
+                                  "Strict rules:\n"
+                                  "- Do NOT propose solutions\n"
+                                  "- Do NOT suggest fixes\n"
+                                  "- Do NOT rewrite code\n"
+                                  "- Do NOT explain in detail\n\n"
+                                  "List 3–5 brief uncertainty signals (one line each):\n"
+                                  "- "
+        )
+        return prompt
+
+    def get_prompt_counterfactual(self, indiv, error_signal):
+        prompt = (
+                self.prompt_task + "\n\n"
+                                   "You are given an algorithm and its implementation.\n\n"
+                                   "Algorithm description:\n"
+                + indiv['algorithm'] + "\n\n"
+                                       "Code:\n"
+                + indiv['code'] + "\n\n"
+                                  "Previously identified uncertainty signals:\n"
+                + error_signal + "\n\n"
+                                 "Now assume the algorithm's behavior is WRONG.\n\n"
+                                 "Your goal is to imagine the *simplest possible situation* where this algorithm fails.\n"
+                                 "The failure should come from assumptions breaking, not from extreme or unrealistic cases.\n\n"
+                                 "Strict rules:\n"
+                                 "- Do NOT defend the algorithm\n"
+                                 "- Do NOT propose fixes\n"
+                                 "- Do NOT modify the algorithm\n\n"
+                                 "Describe ONE minimal failure case:\n"
+                                 "- Scenario: (brief, concrete)\n"
+                                 "- Why this breaks the algorithm: (conceptual reason)\n"
+        )
+        return prompt
+
+    def get_prompt_role_conflict(self, indiv, counterfactual):
+        prompt = (
+                self.prompt_task + "\n\n"
+                                   "You are given an algorithm and its implementation.\n\n"
+                                   "Algorithm description:\n"
+                + indiv['algorithm'] + "\n\n"
+                                       "Code:\n"
+                + indiv['code'] + "\n\n"
+                                  "Identified failure scenario:\n"
+                + counterfactual + "\n\n"
+                                   "You will analyze this algorithm from three strictly separated roles.\n\n"
+                                   "ROLE 1 — Defender:\n"
+                                   "Argue why the original design choices are reasonable under the intended assumptions.\n"
+                                   "Do NOT address the counterfactual directly.\n\n"
+                                   "ROLE 2 — Attacker:\n"
+                                   "Argue why the counterfactual exposes a fundamental weakness.\n"
+                                   "Do NOT suggest solutions.\n\n"
+                                   "ROLE 3 — Observer:\n"
+                                   "Summarize the *core unresolved tension* between Defender and Attacker.\n"
+                                   "Do NOT choose a winner.\n"
+                                   "Do NOT propose fixes.\n\n"
+                                   "Output:\n"
+                                   "Defender:\n"
+                                   "- ...\n\n"
+                                   "Attacker:\n"
+                                   "- ...\n\n"
+                                   "Observer (conflicts only):\n"
+                                   "- ...\n"
+        )
+        return prompt
+
+    def get_prompt_abstraction(self, role_conflict):
+        prompt = (
+                self.prompt_task + "\n\n"
+                                   "Below is a multi-perspective analysis of an algorithm.\n\n"
+                                   "Analysis:\n"
+                + role_conflict + "\n\n"
+                                  "Your task is to step back and reason at a higher level of abstraction.\n\n"
+                                  "Ignore all implementation details.\n"
+                                  "Think in terms of *strategy*, *assumptions*, and *trade-offs*.\n\n"
+                                  "Output format:\n"
+                                  "Core strategy (1–2 bullets):\n"
+                                  "- ...\n\n"
+                                  "Hidden or risky assumptions:\n"
+                                  "- ...\n"
+                                  "- ...\n"
+        )
+        return prompt
+
+    def get_prompt_assumption_repair(self, abstraction):
+        prompt = (
+                self.prompt_task + "\n\n"
+                                   "Below are abstract principles and risky assumptions of an algorithm.\n\n"
+                + abstraction + "\n\n"
+                                "Your task is to revise ONLY the assumptions or applicability conditions.\n\n"
+                                "You are NOT allowed to:\n"
+                                "- Design a new algorithm\n"
+                                "- Suggest new mechanisms\n"
+                                "- Change the overall strategy\n\n"
+                                "Only clarify, restrict, or condition the assumptions to make failures less likely.\n\n"
+                                "Revised assumptions:\n"
+                                "- ...\n"
+                                "- ...\n"
+        )
+        return prompt
+
+    def get_prompt_final_advice(self, repaired_assumptions):
+        prompt = (
+            self.prompt_task + "\n\n"
+            "You are given revised assumptions that improve the robustness of an algorithm.\n\n"
+            "Revised assumptions:\n"
+            + repaired_assumptions + "\n\n"
+            "Based ONLY on these assumptions, provide actionable guidance for improving the algorithm.\n\n"
+            "Output in the following structured format:\n\n"
+            "Improvement Direction: [short, concrete label]\n"
+            "Rationale: [why adjusting the algorithm under these assumptions helps]\n"
+            "Implementation Guidance:\n"
+            "- ...\n"
+            "- ...\n"
+            "Expected Impact: [robustness / stability / generalization gain]\n\n"
+            "Cautions / What to Avoid:\n"
+            "- ...\n"
+            "- ...\n"
+        )
+        return prompt
+
+    def error_signal(self, indiv):
+        prompt_content = self.get_prompt_error_signal(indiv)
+
+        if self.debug_mode:
+            print("\n >>> check prompt for [ error_signal ] : \n", prompt_content)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        error_signal = self._get_thought(prompt_content)
+
+        if self.debug_mode:
+            print("\n >>> error signals: \n", error_signal)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        return error_signal
+
+    def counterfactual(self, indiv, error_signal):
+        prompt_content = self.get_prompt_counterfactual(indiv, error_signal)
+
+        if self.debug_mode:
+            print("\n >>> check prompt for [ counterfactual ] : \n", prompt_content)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        counterfactual = self._get_thought(prompt_content)
+
+        if self.debug_mode:
+            print("\n >>> counterfactual: \n", counterfactual)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        return counterfactual
+
+    def role_conflict(self, indiv, counterfactual):
+        prompt_content = self.get_prompt_role_conflict(indiv, counterfactual)
+
+        if self.debug_mode:
+            print("\n >>> check prompt for [ role_conflict ] : \n", prompt_content)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        conflict = self._get_thought(prompt_content)
+
+        if self.debug_mode:
+            print("\n >>> role conflict analysis: \n", conflict)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        return conflict
+
+    def abstraction(self, role_conflict):
+        prompt_content = self.get_prompt_abstraction(role_conflict)
+
+        if self.debug_mode:
+            print("\n >>> check prompt for [ abstraction ] : \n", prompt_content)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        abstraction = self._get_thought(prompt_content)
+
+        if self.debug_mode:
+            print("\n >>> abstract principles: \n", abstraction)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        return abstraction
+
+    def assumption_repair(self, abstraction):
+        prompt_content = self.get_prompt_assumption_repair(abstraction)
+
+        if self.debug_mode:
+            print("\n >>> check prompt for [ assumption_repair ] : \n", prompt_content)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        repaired = self._get_thought(prompt_content)
+
+        if self.debug_mode:
+            print("\n >>> repaired assumptions: \n", repaired)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        return repaired
+
+    def final_advice(self, repaired_assumptions):
+        prompt_content = self.get_prompt_final_advice(repaired_assumptions)
+
+        if self.debug_mode:
+            print("\n >>> check prompt for [ final_advice ] : \n", prompt_content)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        advice = self._get_thought(prompt_content)
+
+        if self.debug_mode:
+            print("\n >>> final advice: \n", advice)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        return advice
+
+    def ecdrr(self, indiv):
+        """
+        Run Error-Driven Counterfactual Role Reflection (EDCRR) as a 5-step pipeline.
+        Returns: advice (str or dict) compatible with other Evolution methods.
+        """
+        # --- Step 0: Error Signal ---
+        error_signal_output = self.error_signal(indiv)
+        # print("Error Signal Output:", error_signal_output)
+        # --- Step 1: Counterfactual Attack ---
+        counterfactual_output = self.counterfactual(indiv, error_signal_output)
+        # print("Counterfactual Output:", counterfactual_output)
+        # --- Step 2: Role Conflict ---
+        role_conflict_output = self.role_conflict(indiv, counterfactual_output)
+        # print("Role Conflict Output:", role_conflict_output)
+        # --- Step 3: Abstraction Shift ---
+        abstraction_output = self.abstraction(role_conflict_output)
+        # print("Abstraction Output:", abstraction_output)
+        # --- Step 4: Assumption Repair ---
+        repaired_assumptions = self.assumption_repair(abstraction_output)
+        # print("Repaired Assumptions:", repaired_assumptions)
+        # --- Step 5: Final Advice ---
+        advice = self.final_advice(repaired_assumptions)
+        # print("Final Advice:", advice)
+        return advice
+
+    def get_prompt_refine_with_critic(self, indiv, advice):
+
+        prompt_content = self.prompt_task + "\n"
+
+        prompt_content += (
+                "You are an expert algorithm engineer and software developer with extensive experience in refining "
+                "heuristic and optimization algorithms for reliability and performance. "
+                "You are given a heuristic algorithm and its current Python implementation.\n\n"
+
+                "Current code:\n"
+                + indiv['code'] + "\n\n"
+                         "A Critic has analyzed this implementation and produced the following feedback:\n"
+                + advice + "\n\n"
+                                    "Your task is to performe a refinement step by carefully revising "
+                                    "the existing implementation to address the weaknesses identified by the Critic, while preserving "
+                                    "the parts of the logic that already work well. "
+                                    "You must improve robustness, correctness, clarity, and efficiency without changing the core "
+                                    "algorithmic idea, the intended behavior, or the input–output interface.\n\n"
+
+                                    "First, briefly describe the refined algorithm’s design idea and main steps in one sentence; "
+                                    "this description must be enclosed in braces and placed outside the code implementation. "
+                                    "Then, implement the refined version in Python as a function named '"
+                + self.prompt_func_name + "'. "
+                                          "The function should accept "
+                + str(len(self.prompt_func_inputs)) + " input(s): "
+                + self.joined_inputs + ". "
+                + self.prompt_inout_inf + " "
+                + self.prompt_other_inf + " "
+                                          "Do not provide any additional explanations outside the required description and code. "
+                                          "Ensure all necessary imports are included and that the code has no syntax errors."
+        )
+
+        return prompt_content
+
+    def refine(self, indiv):
+
+        advice = self.ecdrr(indiv)
+        prompt_content = self.get_prompt_refine_with_critic(indiv, advice)
+
+        if self.debug_mode:
+            print("\n >>> check prompt for refining algorithm using [ refine_with_critic ] : \n", prompt_content)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        [code_all, algorithm] = self._get_alg(prompt_content)
+
+        if self.debug_mode:
+            print("\n >>> check refined algorithm: \n", algorithm)
+            print("\n >>> check refined code: \n", code_all)
+            print(">>> Press 'Enter' to continue")
+            input()
+
+        return [code_all, algorithm]
+
+
+

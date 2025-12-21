@@ -110,122 +110,177 @@ class AB_MCTS_A_AHD:
         population.append(offspring)
         return True
 
-    def expand(self, mcts, cur_node, nodes_set, option, model_name=None, use_advice=False, advice=None):
-        """Expand using specific operator and LLM model"""
-        # Get the interface for this specific model
+    # def expand(self, mcts, cur_node, nodes_set, option, model_name=None, use_BoN=False):
+    #     """Expand using specific operator and LLM model"""
+    #     interface_ec = self.interface_ecs.get(model_name,
+    #                                           list(self.interface_ecs.values())[0]) if self.interface_ecs else None
+    #
+    #     # === Chuẩn bị path_set cho các option ===
+    #     def get_path_set():
+    #         if option == 's1':
+    #             path = []
+    #             node = copy.deepcopy(cur_node)
+    #             while node.code != "Root":
+    #                 path.append(node.raw_info)
+    #                 node = copy.deepcopy(node.parent)
+    #             path = self.manage.population_management_s1(path, len(path))
+    #             if len(path) == 1:
+    #                 return None
+    #             return path
+    #         elif option == 'e1':
+    #             return [copy.deepcopy(child.subtree[random.choices(range(len(child.subtree)), k=1)[0]].raw_info)
+    #                     for child in mcts.root.children]
+    #         return nodes_set
+    #
+    #     path_set = get_path_set()
+    #     if path_set is None:
+    #         return nodes_set
+    #
+    #     # === Generate offsprings ===
+    #     all_offsprings = []
+    #     num_generations = 32 if use_BoN else 1
+    #
+    #     for i in range(num_generations):
+    #         self.eval_times, offspring = interface_ec.evolve_algorithm(
+    #             self.eval_times, path_set, cur_node.raw_info,
+    #             cur_node.children_info, option, advice=None
+    #         )
+    #
+    #         if offspring is None:
+    #             if not use_BoN:
+    #                 print(f"Timeout emerge, no expanding with action {option}.")
+    #                 return nodes_set
+    #             continue
+    #
+    #         all_offsprings.append(offspring)
+    #
+    #         # Print progress
+    #         if not use_BoN:
+    #             prefix = f"Action: {option}, Father is Root" if option == 'e1' else \
+    #                 f"Action: {option}, Father Obj: {cur_node.raw_info['objective']}"
+    #             print(f"{prefix}, Now Obj: {offspring['objective']}, Depth: {cur_node.depth + 1}")
+    #
+    #     if not all_offsprings:
+    #         return nodes_set
+    #
+    #     # === Select best offsprings ===
+    #     if use_BoN:
+    #         all_offsprings = sorted(all_offsprings, key=lambda x: float(x['objective']))[:5]
+    #         print(f"Best-of-N: Selected top {len(all_offsprings)} from {num_generations} candidates")
+    #
+    #     # === Add nodes to tree ===
+    #     for offspring in all_offsprings:
+    #         if offspring['objective'] == float('inf'):
+    #             continue
+    #
+    #         if self.add2pop(nodes_set, offspring):
+    #             nodes_set = self.manage.population_management(nodes_set, min(len(nodes_set), self.pop_size))
+    #
+    #             new_node = MCTSNode(
+    #                 algorithm=offspring['algorithm'], code=offspring['code'],
+    #                 obj=float(offspring['objective']), parent=cur_node,
+    #                 depth=cur_node.depth + 1, visit=1, raw_info=offspring,
+    #                 llm_model_names=self.llm_model_names, global_hyper=mcts.global_hyper
+    #             )
+    #             new_node._generation_method = 'GEN_BON' if use_BoN else 'GEN'
+    #             new_node._generation_action = model_name
+    #
+    #             cur_node.add_child(new_node)
+    #             cur_node.children_info.append(offspring)
+    #             mcts.backpropagate(new_node, op_name=option)
+    #
+    #     return nodes_set
+
+    def expand(self, mcts, cur_node, nodes_set, option, model_name=None, op_w=1):
+        """
+        Expand using specific operator and LLM model.
+        op_w: number of children to generate.
+        Then refine the best one, and add all to tree.
+        """
         interface_ec = self.interface_ecs.get(model_name,
                                               list(self.interface_ecs.values())[0]) if self.interface_ecs else None
 
-        # # === Tính diversity và quyết định có dùng advice không ===
-        # advice = None
-        # use_advice = False
-        #
-        # # Ngưỡng quyết định sử dụng advice
-        # LOW_DIVERSITY_SDI_THRESHOLD = 0.65  # SDI ratio < 65% của max
-        # LOW_DIVERSITY_CDI_THRESHOLD = 1.5  # CDI < 1.5
-        # MIN_NODES_FOR_DIVERSITY = 3  # Cần ít nhất 3 nodes để tính diversity
-        #
-        # # Chỉ tính diversity nếu có đủ nodes
-        # if len(nodes_set) >= 40:
-        #     diversity_info = self.calculate_diversity_from_nodes(nodes_set, threshold=0.95)
-        #
-        #     if diversity_info['error'] is None:
-        #         sdi = diversity_info['sdi']
-        #         cdi = diversity_info['cdi']
-        #         num_nodes = diversity_info['num_nodes']
-        #
-        #         # Tính max SDI và ratio
-        #         max_sdi = log(num_nodes) if num_nodes > 0 else 0
-        #         sdi_ratio = sdi / max_sdi if max_sdi > 0 else 0
-        #
-        #
-        #         # Quyết định có dùng advice không
-        #         if sdi_ratio < LOW_DIVERSITY_SDI_THRESHOLD or cdi < LOW_DIVERSITY_CDI_THRESHOLD:
-        #             use_advice = True
-        #
-        #
-        #
-        # # === Lấy advice từ debate nếu diversity thấp ===
-        # if use_advice:
-        #
-        #     advice = interface_ec.debate.get_advice(
-        #         cur_node.raw_info['code'],
-        #         cur_node.raw_info['algorithm'],
-        #         cur_node.raw_info['objective']
-        #     )
-
-
-
-        # === Expand với các option khác nhau ===
-        if option == 's1':
-            path_set = []
-            now = copy.deepcopy(cur_node)
-            while now.code != "Root":
-                path_set.append(now.raw_info)
-                now = copy.deepcopy(now.parent)
-            path_set = self.manage.population_management_s1(path_set, len(path_set))
-            if len(path_set) == 1:
-                return nodes_set
-            self.eval_times, offsprings = interface_ec.evolve_algorithm(
-                self.eval_times, path_set,
-                cur_node.raw_info,
-                cur_node.children_info, option,
-                advice=advice
-            )
-
-        elif option == 'e1':
-            e1_set = [copy.deepcopy(children.subtree[random.choices(range(len(children.subtree)), k=1)[0]].raw_info)
-                      for children in mcts.root.children]
-            self.eval_times, offsprings = interface_ec.evolve_algorithm(
-                self.eval_times, e1_set,
-                cur_node.raw_info,
-                cur_node.children_info, option,
-                advice=advice
-            )
-        else:
-            self.eval_times, offsprings = interface_ec.evolve_algorithm(
-                self.eval_times, nodes_set,
-                cur_node.raw_info,
-                cur_node.children_info, option,
-                advice=advice
-            )
-
-        if offsprings == None:
-            print(f"Timeout emerge, no expanding with action {option}.")
+        # === Chuẩn bị path_set cho các option ===
+        def get_path_set():
+            if option == 's1':
+                path = []
+                node = copy.deepcopy(cur_node)
+                while node.code != "Root":
+                    path.append(node.raw_info)
+                    node = copy.deepcopy(node.parent)
+                path = self.manage.population_management_s1(path, len(path))
+                if len(path) == 1:
+                    return None
+                return path
+            elif option == 'e1':
+                return [copy.deepcopy(child.subtree[random.choices(range(len(child.subtree)), k=1)[0]].raw_info)
+                        for child in mcts.root.children]
             return nodes_set
 
-        # In kết quả với flag [ADVISED] nếu có advice
-        advice_flag = ""
-        if option != 'e1':
-            print(f"Action: {option}, Father Obj: {cur_node.raw_info['objective']}, "
-                  f"Now Obj: {offsprings['objective']}, Depth: {cur_node.depth + 1}{advice_flag}")
-        else:
-            print(f"Action: {option}, Father is Root, Now Obj: {offsprings['objective']}{advice_flag}")
+        path_set = get_path_set()
+        if path_set is None:
+            return nodes_set
 
-        if offsprings['objective'] != float('inf'):
-            success = self.add2pop(nodes_set, offsprings)
-            if success:
-                size_act = min(len(nodes_set), self.pop_size)
-                nodes_set = self.manage.population_management(nodes_set, size_act)
+        # === Generate op_w offsprings using evolve_algorithm (no refinement yet) ===
+        all_offsprings = []
 
-                new_reward = float(offsprings['objective'])
+        for i in range(op_w):
+            self.eval_times, offspring = interface_ec.evolve_algorithm(
+                self.eval_times, path_set, cur_node.raw_info,
+                cur_node.children_info, option, advice=None
+            )
+
+            if offspring is None:
+                continue  # Bỏ qua cá thể lỗi
+
+            all_offsprings.append(offspring)
+
+            # Print progress
+            prefix = f"Action: {option}, Father is Root" if option == 'e1' else \
+                f"Action: {option}, Father Obj: {cur_node.raw_info['objective']}"
+            print(f"{prefix}, Candidate Obj: {offspring['objective']}, Depth: {cur_node.depth + 1}")
+
+        if not all_offsprings:
+            return nodes_set
+
+        # === Chọn cá thể tốt nhất theo objective ===
+        best_offspring = min(all_offsprings, key=lambda x: float(x['objective']))
+
+        # offsprings_to_add = list(all_offsprings)
+        # # === Tinh chỉnh cá thể tốt nhất bằng EDCRR ===
+        # for offspring in all_offsprings:
+        try:
+            _, refined_offspring = interface_ec.get_offspring(path_set, "refine", father=best_offspring)
+            refined_offspring['objective'] = interface_ec.batch_evaluate([refined_offspring['code']], 0)
+        except Exception:
+            refined_offspring = best_offspring
+
+        # === Add tất cả offsprings vào tree (gồm cả refined_offspring nếu khác best_offspring) ===
+        offsprings_to_add = list(all_offsprings)
+        offsprings_to_add.append(refined_offspring)
+
+        # Nếu cá thể đã tinh chỉnh khác với best_offspring, thêm vào danh sách
+        if refined_offspring and refined_offspring != best_offspring:
+            offsprings_to_add.append(refined_offspring)
+
+        for offspring in offsprings_to_add:
+            if offspring['objective'] == float('inf'):
+                continue
+
+            if self.add2pop(nodes_set, offspring):
+                nodes_set = self.manage.population_management(nodes_set, min(len(nodes_set), self.pop_size))
+
                 new_node = MCTSNode(
-                    algorithm=offsprings['algorithm'],
-                    code=offsprings['code'],
-                    obj=new_reward,
-                    parent=cur_node,
-                    depth=cur_node.depth + 1,
-                    visit=1,
-                    raw_info=offsprings,
-                    llm_model_names=self.llm_model_names,
-                    global_hyper=mcts.global_hyper
+                    algorithm=offspring['algorithm'], code=offspring['code'],
+                    obj=float(offspring['objective']), parent=cur_node,
+                    depth=cur_node.depth + 1, visit=1, raw_info=offspring,
+                    llm_model_names=self.llm_model_names, global_hyper=mcts.global_hyper
                 )
-
-                new_node._generation_method = 'GEN'
+                new_node._generation_method = 'GEN'  # Đánh dấu là cá thể gốc
                 new_node._generation_action = model_name
 
                 cur_node.add_child(new_node)
-                cur_node.children_info.append(offsprings)
+                cur_node.children_info.append(offspring)
                 mcts.backpropagate(new_node, op_name=option)
 
         return nodes_set
@@ -467,67 +522,43 @@ class AB_MCTS_A_AHD:
             print(f"OP: {op} (weight: {op_w})", end="|")
 
             interface_ec = next(iter(self.interface_ecs.values()))
-
-            # === Tính diversity và quyết định có dùng advice không ===
-            advice = None
-            use_advice = False
-
-            # ===== Thresholds =====
-            LOW_DIVERSITY_SDI_THRESHOLD = 0.65  # SDI ratio < 65% max
-            MIN_NODES_FOR_DIVERSITY = 40  # cần đủ node để SDI có ý nghĩa
-
-            use_advice = False
-
-            # ----- Chỉ tính diversity nếu đủ node -----
-            if len(nodes_set) >= MIN_NODES_FOR_DIVERSITY:
-                diversity_info = self.calculate_diversity_from_nodes(
-                    nodes_set,
-                    threshold=0.95
-                )
-
-                if diversity_info['error'] is None:
-                    sdi = diversity_info['sdi']
-                    num_nodes = diversity_info['num_nodes']
-
-                    # ---- Max SDI ----
-                    max_sdi = log(num_nodes) if num_nodes > 1 else 0.0
-                    sdi_ratio = sdi / max_sdi if max_sdi > 0 else 0.0
-
-                    # ---- Decision (SDI ONLY) ----
-                    if sdi_ratio < LOW_DIVERSITY_SDI_THRESHOLD:
-                        use_advice = True
-
-            # === Lấy advice từ debate nếu diversity thấp ===
-            if use_advice:
-                advice = interface_ec.debate.get_advice(
-                    target_node.raw_info['code'],
-                    target_node.raw_info['algorithm'],
-                    target_node.raw_info['objective']
-                )
-
-                print("[ADVISED]: ", advice)
-
-                # Lấy selected_direction
-                selected_direction = advice.get("selected_direction", {})
-
-                # Lấy what_to_do
-                what_to_do = selected_direction.get("what_to_do", [])
-
-                # Lấy what_to_avoid
-                what_to_avoid = advice.get("what_to_avoid", [])
-
-                print("=== WHAT TO DO ===")
-                for i, item in enumerate(what_to_do, 1):
-                    print(f"{i}. {item}")
-
-                print("\n=== WHAT TO AVOID ===")
-                for item in what_to_avoid:
-                    print(f"- From {item.get('from')}:")
-                    print(f"  {item.get('critique')}\n")
-
-            # Apply this operator op_w times with selected LLM
-            for j in range(op_w):
-                nodes_set = self.expand(mcts, target_node, nodes_set, op, selected_model_name, use_advice, advice)
+            #
+            # # === Tính diversity và quyết định có dùng advice không ===
+            # advice = None
+            # use_advice = False
+            #
+            # # ===== Thresholds =====
+            # LOW_DIVERSITY_SDI_THRESHOLD = 0.65  # SDI ratio < 65% max
+            # MIN_NODES_FOR_DIVERSITY = 40  # cần đủ node để SDI có ý nghĩa
+            #
+            # use_advice = False
+            #
+            # # ----- Chỉ tính diversity nếu đủ node -----
+            # if len(nodes_set) >= MIN_NODES_FOR_DIVERSITY:
+            #     diversity_info = self.calculate_diversity_from_nodes(
+            #         nodes_set,
+            #         threshold=0.95
+            #     )
+            #
+            #     if diversity_info['error'] is None:
+            #         sdi = diversity_info['sdi']
+            #         num_nodes = diversity_info['num_nodes']
+            #
+            #         # ---- Max SDI ----
+            #         max_sdi = log(num_nodes) if num_nodes > 1 else 0.0
+            #         sdi_ratio = sdi / max_sdi if max_sdi > 0 else 0.0
+            #
+            #         # ---- Decision (SDI ONLY) ----
+            #         if sdi_ratio < LOW_DIVERSITY_SDI_THRESHOLD:
+            #             use_advice = True
+            #
+            # # === Lấy advice từ debate nếu diversity thấp ===
+            # if use_advice:
+            #     nodes_set = self.expand(mcts, target_node, nodes_set, op, selected_model_name, use_BoN=True)
+            # else:
+            #     # Apply this operator op_w times with selected LLM
+            for j in range(1):
+                nodes_set = self.expand(mcts, target_node, nodes_set, op, selected_model_name, op_w=op_w)
 
 
             # Population management

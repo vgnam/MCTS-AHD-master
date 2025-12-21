@@ -12,7 +12,8 @@ import subprocess
 
 # os.environ["GEMINI_API_KEY"] = ("AIzaSyB7_zB7UcJ18cmFKMzrGtreSm"
 #                                 "1000zDBUeI-Rc")
-os.environ["MISTRAL_API_KEY"] = "EMuUqn7Hx10GB6wqvIgm70kbdTscgSpA"
+os.environ["MISTRAL_API_KEY"] = (""
+                                 "EMuUqn7Hx10GB6wqvIgm70kbdTscgSpA")
 #
 os.environ['NVIDIA_NIM_API_KEY'] = "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"
 
