@@ -170,7 +170,7 @@ class InterfaceEC():
     def evolve_algorithm(self, eval_times, pop, node, brother_node, operator, use_roco=True): # <--- Thêm use_roco vào đây
         for i in range(3):
             eval_times += 1
-            
+            # use_roco = random.choice([True, False])
             # --- ĐOẠN SỬA ĐỔI BẮT ĐẦU ---
             if use_roco:
                 # Sử dụng quy trình hợp tác (RoCo)
@@ -195,9 +195,26 @@ class InterfaceEC():
         # 1. Bước 1: Explorer/Generator sinh ra lời giải nháp (Draft)
         parents, draft_offspring = self._get_alg(pop, operator, father)
         
-        # Nếu sinh lỗi hoặc trùng lặp ngay từ đầu, trả về luôn để retry bên ngoài
-        if draft_offspring['code'] is None:
-            return parents, draft_offspring
+        # # Nếu sinh lỗi hoặc trùng lặp ngay từ đầu, trả về luôn để retry bên ngoài
+        # if draft_offspring['code'] is None:
+        #     return parents, draft_offspring
+        
+        while True:
+            try:
+                parents, draft_offspring = self._get_alg(pop, operator, father=father)
+                code = draft_offspring['code']
+                n_retry = 1
+                while self.check_duplicate(pop, draft_offspring['code']):
+                    n_retry += 1
+                    if self.debug:
+                        print("duplicated code, wait 1 second and retrying ... ")
+                    parents, draft_offspring = self._get_alg(pop, operator, father=father)
+                    code = draft_offspring['code']
+                    if n_retry > 1:
+                        break
+                break
+            except Exception as e:
+                print(e)
 
         # 2. Bước 2: Critic đánh giá lời giải nháp
         # Lưu ý: Chúng ta chưa có objective thực tế vì chưa chạy eval, 

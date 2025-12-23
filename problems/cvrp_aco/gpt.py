@@ -1,37 +1,28 @@
-import numpy as np
+importance, and a probabilistic sampling approach to avoid premature convergence.}
 
+import numpy as np
 
 def heuristics_v2(distance_matrix, coordinates, demands, capacity):
     n = len(distance_matrix)
     heuristics_matrix = np.zeros((n, n))
-    visited = [False] * n
-    current_capacity = capacity
-    cumulative_demand = 0
 
     for i in range(n):
-        if i == 0:  # Start from the depot
-            for j in range(1, n):
-                heuristics_matrix[i][j] = 1 / distance_matrix[i][j]
-        else:
-            visited[i] = True
-            current_demand = demands[i]
-            cumulative_demand += current_demand
-            current_capacity -= current_demand
+        for j in range(n):
+            if i == j:
+                heuristics_matrix[i, j] = 0.0
+            else:
+                # Distance-based heuristic (inverse distance)
+                distance_heuristic = 1.0 / (distance_matrix[i, j] + 1e-10)
 
-            penalty = (max(0, cumulative_demand - capacity) ** 3) / (capacity ** 3)
+                # Demand-based heuristic (capacity-aware soft constraint)
+                remaining_capacity = capacity - demands[i] if i != 0 else capacity
+                demand_heuristic = np.exp(-(demands[j] / remaining_capacity) ** 2)
 
-            for j in range(1, n):
-                if not visited[j]:
-                    distance_weight = (distance_matrix[i][j] ** 2 + 1e-3)
-                    demand_weighted_ratio = demands[j] / (distance_weight + 1e-3)
-                    proximity_factor = 1 / (np.linalg.norm(coordinates[i] - coordinates[j]) + 1e-3)
-                    heuristics_matrix[i][j] = (
-                                                          1 / distance_weight) * demand_weighted_ratio * proximity_factor - penalty * 0.5
+                # Combine heuristics
+                heuristics_matrix[i, j] = distance_heuristic * demand_heuristic
 
-                    heuristics_matrix[j][i] = heuristics_matrix[i][j]
-
-            if current_capacity < 0:
-                cumulative_demand = current_demand
-                current_capacity = capacity
+    # Dynamic normalization based on node degrees
+    row_sums = np.sum(heuristics_matrix, axis=1, keepdims=True)
+    heuristics_matrix = heuristics_matrix / (row_sums + 1e-10)
 
     return heuristics_matrix

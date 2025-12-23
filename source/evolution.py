@@ -222,11 +222,8 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
     def _get_alg(self, prompt_content):
 
         response = self.interface_llm.get_response(prompt_content)
-        match = re.search(r"\{(.*?)\}", response, re.DOTALL)
-        if match:
-            algorithm = match.group(1)
-        else:
-            algorithm = "" # Trả về rỗng thay vì crash
+
+        algorithm = re.search(r"\{(.*?)\}", response, re.DOTALL).group(1)
         if len(algorithm) == 0:
             if 'python' in response:
                 algorithm = re.findall(r'^.*?(?=python)', response, re.DOTALL)
@@ -415,9 +412,12 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
 
         prompt_content += "1. Address the weaknesses mentioned.\n"
         prompt_content += "2. Keep the logic that works well.\n"
-        prompt_content += "3. Implement the improved version in Python as a function named '" + self.prompt_func_name + "'.\n"
-        prompt_content += "The function should accept " + str(len(self.prompt_func_inputs)) + " input(s): " + self.joined_inputs + ".\n"
-        prompt_content += "Do not give additional explanations."
+        # prompt_content += "3. Implement the improved version in Python as a function named '" + self.prompt_func_name + "'.\n"
+        prompt_content +=  "Next, implement it in Python as a function named \
+'" + self.prompt_func_name + "'.\nThis function should accept " + str(
+            len(self.prompt_func_inputs)) + " input(s): " \
+                         + self.joined_inputs + ". " + self.prompt_inout_inf + " " \
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
         return prompt_content
 
     # [THÊM MỚI] Hàm gọi LLM cho Critic

@@ -2,33 +2,23 @@ def select_next_node(current_node, destination_node, unvisited_nodes, distance_m
     if not unvisited_nodes:
         return destination_node
 
-    candidates = unvisited_nodes.copy()
-    if destination_node in candidates:
-        candidates.remove(destination_node)
+    min_distance = float('inf')
+    next_node = None
+    lookahead_factor = 0.3  # Weight for future steps
 
-    if not candidates:
-        return destination_node
-
-    distances = [distance_matrix[current_node][node] for node in candidates]
-    min_dist = min(distances)
-    max_dist = max(distances)
-
-    if min_dist == max_dist:
-        weights = [1.0 / len(candidates)] * len(candidates)
-    else:
-        normalized = [(max_dist - d) / (max_dist - min_dist) for d in distances]
-        weights = [w / sum(normalized) for w in normalized]
-
-    if destination_node in unvisited_nodes:
-        dest_dist = distance_matrix[current_node][destination_node]
-        if min_dist == max_dist:
-            dest_weight = 1.0 / (len(candidates) + 1)
+    for node in unvisited_nodes:
+        direct_distance = distance_matrix[current_node][node]
+        if destination_node in unvisited_nodes:
+            # Estimate future path cost: direct + return to destination
+            future_cost = direct_distance + distance_matrix[node][destination_node]
         else:
-            dest_weight = (max_dist - dest_dist) / (max_dist - min_dist) / sum(normalized)
-        candidates.append(destination_node)
-        weights.append(dest_weight)
-        weights = [w / sum(weights) for w in weights]
+            future_cost = direct_distance
 
-    next_node = random.choices(candidates, weights=weights, k=1)[0]
+        # Combine immediate and future cost
+        total_cost = direct_distance + lookahead_factor * future_cost
+
+        if total_cost < min_distance:
+            min_distance = total_cost
+            next_node = node
 
     return next_node
