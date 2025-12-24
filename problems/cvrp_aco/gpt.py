@@ -1,28 +1,41 @@
-importance, and a probabilistic sampling approach to avoid premature convergence.}
-
 import numpy as np
+from collections import defaultdict
 
 def heuristics_v2(distance_matrix, coordinates, demands, capacity):
-    n = len(distance_matrix)
-    heuristics_matrix = np.zeros((n, n))
+    n = len(demands)
+    num_samples = 100
+    edge_counts = defaultdict(int)
+    total_distance = defaultdict(float)
 
-    for i in range(n):
-        for j in range(n):
-            if i == j:
-                heuristics_matrix[i, j] = 0.0
+    for _ in range(num_samples):
+        # Initialize a random permutation of customers (excluding depot)
+        customers = np.random.permutation(range(1, n))
+        current_load = 0
+        route = [0]  # Start at depot
+
+        for customer in customers:
+            if current_load + demands[customer] <= capacity:
+                route.append(customer)
+                current_load += demands[customer]
             else:
-                # Distance-based heuristic (inverse distance)
-                distance_heuristic = 1.0 / (distance_matrix[i, j] + 1e-10)
+                route.append(0)  # Return to depot
+                route.append(customer)
+                current_load = demands[customer]
 
-                # Demand-based heuristic (capacity-aware soft constraint)
-                remaining_capacity = capacity - demands[i] if i != 0 else capacity
-                demand_heuristic = np.exp(-(demands[j] / remaining_capacity) ** 2)
+        # Close the route by returning to depot
+        route.append(0)
 
-                # Combine heuristics
-                heuristics_matrix[i, j] = distance_heuristic * demand_heuristic
+        # Count edges and accumulate distances
+        for i in range(len(route) - 1):
+            u, v = route[i], route[i+1]
+            edge_counts[(u, v)] += 1
+            total_distance[(u, v)] += distance_matrix[u, v]
 
-    # Dynamic normalization based on node degrees
-    row_sums = np.sum(heuristics_matrix, axis=1, keepdims=True)
-    heuristics_matrix = heuristics_matrix / (row_sums + 1e-10)
+    # Create the heuristic matrix with adaptive weights
+    heuristics_matrix = np.zeros_like(distance_matrix)
+    for (u, v), count in edge_counts.items():
+        if count > 0:
+            avg_distance = total_distance[(u, v)] / count
+            heuristics_matrix[u, v] = count / (avg_distance + 1e-6)  # Avoid division by zero
 
     return heuristics_matrix

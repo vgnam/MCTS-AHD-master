@@ -169,7 +169,7 @@ class InterfaceEC():
     # Tìm hàm evolve_algorithm cũ và thay thế bằng đoạn này
     def evolve_algorithm(self, eval_times, pop, node, brother_node, operator, use_roco=True): # <--- Thêm use_roco vào đây
         for i in range(3):
-            eval_times += 1
+            # eval_times += 1
             # use_roco = random.choice([True, False])
             # --- ĐOẠN SỬA ĐỔI BẮT ĐẦU ---
             if use_roco:
@@ -185,6 +185,8 @@ class InterfaceEC():
                 return eval_times, None
             if objs[0] == float('inf') or self.check_duplicate(pop, offspring['code']):
                 continue
+            
+            eval_times += 1
             offspring['objective'] = np.round(objs[0], 5)
 
             return eval_times, offspring

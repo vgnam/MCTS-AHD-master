@@ -172,12 +172,15 @@ class Problem:
                     individual["obj"] = float(stdout_str.split('\n')[-2])
                     assert individual["obj"] > 0, "Objective value <= 0 is not supported."
                     individual["obj"] = -individual["obj"] if self.obj_type == "max" else individual["obj"]
-                    # individual["fitness"] = 1 / individual["obj"] if self.obj_type == "min" else individual["obj"]
                     individual["exec_success"] = True
-                except:
+                except Exception as e:
+                    # [FIX] In ra nội dung stdout để debug khi không parse được số
+                    logging.error(f"Error parsing output for response_id {response_id}. Stdout content:\n{stdout_str}")
                     population[response_id] = self.mark_invalid_individual(population[response_id],
                                                                            "Invalid std out / objective value!")
             else:  # Otherwise, also provide execution traceback error feedback
+                # [FIX] Log thêm traceback message để biết lỗi gì
+                logging.error(f"Execution error for response_id {response_id}:\n{traceback_msg}")
                 population[response_id] = self.mark_invalid_individual(population[response_id], traceback_msg)
 
             logging.info(f"Iteration {self.iteration}, response_id {response_id}: Objective value: {individual['obj']}")

@@ -68,7 +68,7 @@ class Evolution():
                          + self.joined_inputs + ". The function should return " + str(
             len(self.prompt_func_outputs)) + " output(s): " \
                          + self.joined_outputs + ". " + self.prompt_inout_inf + " " \
-                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations. Remember to import necessary modules and check the syntax error"
         return prompt_content
 
     def get_prompt_e1(self, indivs):
@@ -91,7 +91,7 @@ class Evolution():
                          + self.joined_inputs + ". The function should return " + str(
             len(self.prompt_func_outputs)) + " output(s): " \
                          + self.joined_outputs + ". " + self.prompt_inout_inf + " " \
-                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations. Remember to import necessary modules and check the syntax error"
         return prompt_content
 
     def get_prompt_e2(self, indivs):
@@ -115,7 +115,7 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
                          + self.joined_inputs + ". The function should return " + str(
             len(self.prompt_func_outputs)) + " output(s): " \
                          + self.joined_outputs + ". " + self.prompt_inout_inf + " " \
-                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations.  Remember to import necessary modules and check the syntax error"
         return prompt_content
 
     def get_prompt_m1(self, indiv1):
@@ -132,7 +132,7 @@ The description must be inside a brace outside the code implementation. Next, im
                          + self.joined_inputs + ". The function should return " + str(
             len(self.prompt_func_outputs)) + " output(s): " \
                          + self.joined_outputs + ". " + self.prompt_inout_inf + " " \
-                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations.  Remember to import necessary modules and check the syntax error"
         return prompt_content
 
     def get_prompt_m2(self, indiv1):
@@ -147,7 +147,7 @@ The description must be inside a brace outside the code implementation. Next, im
 '" + self.prompt_func_name + "'.\nThis function should accept " + str(
             len(self.prompt_func_inputs)) + " input(s): " \
                          + self.joined_inputs + ". " + self.prompt_inout_inf + " " \
-                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations. Remember to import necessary modules and check the syntax error"
         return prompt_content
 
     def get_prompt_s1(self, indivs):
@@ -190,7 +190,7 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
                                                                                  "The function should return " + str(
             len(self.prompt_func_outputs)) + " output(s): " + self.joined_outputs + ". " \
                          + self.prompt_inout_inf + " " + self.prompt_other_inf + "\n" \
-                                                                                 "Do not give additional explanations."
+                                                                                 "Do not give additional explanations.  Remember to import necessary modules and check the syntax error"
         return prompt_content
 
     def counter(self, parents):
@@ -220,37 +220,58 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
         return response
 
     def _get_alg(self, prompt_content):
-
         response = self.interface_llm.get_response(prompt_content)
 
-        algorithm = re.search(r"\{(.*?)\}", response, re.DOTALL).group(1)
+        # SỬA: Kiểm tra match trước khi gọi group()
+        match = re.search(r"\{(.*?)\}", response, re.DOTALL)
+        if match:
+            algorithm = match.group(1)
+        else:
+            algorithm = ""
+
+        # Logic dự phòng (Fallback)
         if len(algorithm) == 0:
             if 'python' in response:
-                algorithm = re.findall(r'^.*?(?=python)', response, re.DOTALL)
+                # Tìm text trước từ khóa python
+                algo_match = re.findall(r'^.*?(?=python)', response, re.DOTALL)
+                algorithm = algo_match[0] if algo_match else ""
             elif 'import' in response:
-                algorithm = re.findall(r'^.*?(?=import)', response, re.DOTALL)
+                algo_match = re.findall(r'^.*?(?=import)', response, re.DOTALL)
+                algorithm = algo_match[0] if algo_match else ""
             else:
-                algorithm = re.findall(r'^.*?(?=def)', response, re.DOTALL)
+                algo_match = re.findall(r'^.*?(?=def)', response, re.DOTALL)
+                algorithm = algo_match[0] if algo_match else ""
 
         code = re.findall(r"import.*return", response, re.DOTALL)
         if len(code) == 0:
             code = re.findall(r"def.*return", response, re.DOTALL)
 
         n_retry = 1
+        # SỬA: Áp dụng logic an toàn tương tự cho vòng lặp retry
         while (len(algorithm) == 0 or len(code) == 0):
             if self.debug_mode:
                 print("Error: algorithm or code not identified, wait 1 seconds and retrying ... ")
+            
+            # Cần gọi lại LLM ở đây nếu muốn retry thật sự, nhưng code cũ chỉ parse lại response cũ? 
+            # Giả sử logic cũ là muốn gọi lại response mới (nhưng code gốc bạn gửi lại dùng biến response cũ ở dòng 328, tôi giữ nguyên logic gọi API lại nếu cần)
+            response = self.interface_llm.get_response(prompt_content) 
 
-            response = self.interface_llm.get_response(prompt_content)
+            match = re.search(r"\{(.*?)\}", response, re.DOTALL)
+            if match:
+                algorithm = match.group(1)
+            else:
+                algorithm = ""
 
-            algorithm = re.search(r"\{(.*?)\}", response, re.DOTALL).group(1)
             if len(algorithm) == 0:
                 if 'python' in response:
-                    algorithm = re.findall(r'^.*?(?=python)', response, re.DOTALL)
+                    algo_match = re.findall(r'^.*?(?=python)', response, re.DOTALL)
+                    algorithm = algo_match[0] if algo_match else ""
                 elif 'import' in response:
-                    algorithm = re.findall(r'^.*?(?=import)', response, re.DOTALL)
+                    algo_match = re.findall(r'^.*?(?=import)', response, re.DOTALL)
+                    algorithm = algo_match[0] if algo_match else ""
                 else:
-                    algorithm = re.findall(r'^.*?(?=def)', response, re.DOTALL)
+                    algo_match = re.findall(r'^.*?(?=def)', response, re.DOTALL)
+                    algorithm = algo_match[0] if algo_match else ""
 
             code = re.findall(r"import.*return", response, re.DOTALL)
             if len(code) == 0:
@@ -259,6 +280,11 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
             if n_retry > 3:
                 break
             n_retry += 1
+
+        # SỬA: Kiểm tra nếu code vẫn rỗng để tránh lỗi index out of range
+        if len(code) == 0:
+             # Trả về dummy code để tránh crash, hoặc raise error
+             return ["def function(): return None", "Error parsing"]
 
         code = code[0]
         code_all = code + " " + ", ".join(s for s in self.prompt_func_outputs)
@@ -417,7 +443,7 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
 '" + self.prompt_func_name + "'.\nThis function should accept " + str(
             len(self.prompt_func_inputs)) + " input(s): " \
                          + self.joined_inputs + ". " + self.prompt_inout_inf + " " \
-                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations. Remember to import necessary modules and no syntax error"
         return prompt_content
 
     # [THÊM MỚI] Hàm gọi LLM cho Critic

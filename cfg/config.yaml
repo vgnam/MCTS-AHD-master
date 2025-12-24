@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - problem: tsp_constructive
+  - problem: cvrp_aco
   - llm_client: gemini
   - override hydra/output: local
 

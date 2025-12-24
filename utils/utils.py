@@ -47,17 +47,19 @@ def filter_traceback(s):
             return '\n'.join(filtered_lines)
     return ''  # Return an empty string if no Traceback is found
 
+# Trong file: utils/utils.py
+
 def block_until_running(stdout_filepath, log_status=False, iter_num=-1, response_id=-1):
     # Ensure that the evaluation has started before moving on
     while True:
         log = file_to_string(stdout_filepath)
-        if  len(log) > 0:
+        if len(log) > 0:
             if log_status and "Traceback" in log:
-                logging.info(f"Iteration {iter_num}: Code Run {response_id} execution error!")
+                logging.info(f"Iteration {iter_num}: Code Run {response_id} execution error detected in logs!")
             else:
-                logging.info(f"Iteration {iter_num}: Code Run {response_id} successful!")
+                # SỬA DÒNG NÀY: Thay đổi thông báo để tránh hiểu lầm
+                logging.info(f"Iteration {iter_num}: Code Run {response_id} output detected (running)...")
             break
-
 
 def extract_description(response: str) -> tuple[str, str]:
     # Regex patterns to extract code description enclosed in GPT response, it starts with ‘<start>’ and ends with ‘<end>’
