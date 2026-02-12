@@ -1,0 +1,7 @@
+problem_name: jssp_constructive
+problem_type: constructive
+obj_type: min
+problem_size: 50 # problem size for training
+func_name: determine_next_operation
+description: Given jobs and machines, schedule jobs on machines to minimize the total makespan. Design an algorithm to select the next operation in each step.
+

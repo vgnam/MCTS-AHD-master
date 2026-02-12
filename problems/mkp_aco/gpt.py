@@ -1,13 +1,23 @@
 import numpy as np
 
 def heuristics_v2(prize, weight):
-    n, m = weight.shape
-    prize_normalized = prize / np.max(prize)
-    weight_sum = np.sum(weight, axis=1)
-    constraint_tightness = np.mean(weight, axis=0)
-    global_tightness = np.sum(constraint_tightness)
-    weight_balance = np.std(weight, axis=1) / (np.mean(weight, axis=1) + 1e-6)
-    prize_to_weight = prize_normalized / (weight_sum + 1e-10)
-    dim_penalty = np.exp(np.sum(weight * constraint_tightness, axis=1)) ** (1 + 2 * global_tightness)
-    heuristics_matrix = 0.6 * prize_to_weight * (1 / (1 + weight_balance)) - 0.4 * dim_penalty
+    remaining_capacity = np.ones(weight.shape[1])
+    heuristics_matrix = np.zeros(weight.shape[0])
+    base_ratio_power = 2.0
+    adaptive_power = 1.2
+    base_penalty_factor = 10.0
+
+    for i in range(weight.shape[0]):
+        normalized_weight = weight[i] / (remaining_capacity + 1e-10)
+        weight_balance = 1 - np.std(normalized_weight) / (np.mean(normalized_weight) + 1e-10)
+
+        if np.all(weight[i] <= remaining_capacity):
+            heuristics_matrix[i] = (prize[i] ** base_ratio_power) * (1 + weight_balance) / (np.sum(normalized_weight ** 2) + 1e-10)
+        else:
+            excess = np.maximum(weight[i] - remaining_capacity, 0)
+            penalty_factor = base_penalty_factor * (1 + np.sum(excess ** adaptive_power) / (np.sum(remaining_capacity) + 1e-10))
+            infeasibility_penalty = 1 / (1 + np.exp(-penalty_factor * np.sum(excess)))
+            heuristics_matrix[i] = (prize[i] ** base_ratio_power) * infeasibility_penalty * weight_balance / (np.sum(normalized_weight ** 2) + 1e-10)
+
+    heuristics_matrix = (heuristics_matrix - np.min(heuristics_matrix)) / (np.max(heuristics_matrix) - np.min(heuristics_matrix) + 1e-10)
     return heuristics_matrix

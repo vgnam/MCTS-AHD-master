@@ -10,7 +10,7 @@ class TSPInstance:
     
 dataset_conf = {
     'train': (200,),
-    'val':   (20, 50, 100, 200),
+    'val':   (20, 50, 100, 200, 500),
     'test':  (100, 200, 500, 1000),
 }
 

@@ -4,7 +4,8 @@ import itertools
 import math
 import sys
 from os import path
-
+sys.path.insert(0, "../../../")
+sys.path.insert(0, "/kaggle/working/MCTS-AHD")
 import numpy as np
 
 try:

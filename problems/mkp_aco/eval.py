@@ -4,6 +4,7 @@ import torch
 import logging
 import sys
 sys.path.insert(0, "../../../")
+sys.path.insert(0, "/kaggle/working/MCTS-AHD")
 
 import gpt
 from utils.utils import get_heuristic_name

@@ -1,0 +1,2 @@
+def equation_v1(b: np.ndarray, s: np.ndarray, temp: np.ndarray, pH: np.ndarray, params: np.ndarray) -> np.ndarray:
+    return params[0] * b + params[1] * s + params[2] * temp + params[3] * pH + params[4]

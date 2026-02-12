@@ -1,0 +1,24 @@
+def determine_next_operation_v1(current_status, feasible_operations):
+    """
+    Select the next operation to schedule.
+
+    Parameters
+    ----------
+    current_status : dict
+        {
+            "job_status": List[float],      # earliest available time of each job
+            "machine_status": List[float]   # earliest available time of each machine
+        }
+
+    feasible_operations : np.ndarray
+        Array of shape (n_ops, 3), where each row is:
+        (job_id: int, machine_id: int, processing_time: float)
+
+    Returns
+    -------
+    tuple[int, int, float]
+        Selected operation (job_id, machine_id, processing_time)
+    """
+    # Simple greedy heuristic: choose the operation with the shortest processing time
+    next_operation = min(feasible_operations, key=lambda x: x[2])
+    return next_operation

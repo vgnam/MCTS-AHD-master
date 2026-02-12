@@ -1,0 +1,6 @@
+problem_name: bacteria_grow
+problem_type: science_discovery
+obj_type: min
+problem_size: 10
+func_name: equation
+description: Find the mathematical function skeleton that represents E. Coli bacterial growth rate, given data on population density, substrate concentration, temperature, and pH level.

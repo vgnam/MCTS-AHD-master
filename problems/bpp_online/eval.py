@@ -1,13 +1,17 @@
 """
 Adapted from https://github.com/google-deepmind/funsearch
 """
-
+import sys
+sys.path.insert(0, "../../../")
+sys.path.insert(0, "/kaggle/working/MCTS-AHD")
 import numpy as np
 import pickle
 import sys
 
-from gpt import priority_v2 as priority
-
+try:
+    from gpt import priority_v2 as priority
+except:
+    from gpt import priority
 
 def get_valid_bin_indices(item: float, bins: np.ndarray) -> np.ndarray:
     """Returns indices of bins in which item can fit."""
@@ -96,27 +100,41 @@ if __name__ == "__main__":
     problem_size = int(sys.argv[1])
     root_dir = sys.argv[2]  # reserved for compatibility
     mood = sys.argv[3]
-    total = 0
-    number = 0
+
     assert mood in ['train', 'val']
+
+    total_excess = 0.0
+    number = 0
+
+    basepath = os.path.dirname(__file__)
+
     for scale in ['1k', '5k']:
-        for i in [1, 2]:
-            number = number + 1
+        max_i = 3 if scale == '5k' else 2
+        for i in range(1, max_i + 1):
             file_name = f"weibull_{scale}_{mood}{i}.pickle"
-            basepath = os.path.dirname(__file__)
             dataset_path = os.path.join(basepath, "dataset", file_name)
 
             if not os.path.isfile(dataset_path):
                 from gen_inst import generate_datasets
-
                 generate_datasets()
 
             dataset = pickle.load(open(dataset_path, 'rb'))
 
-            # Evaluate heuristic function on dataset
             avg_num_bins = -evaluate(dataset)
             l1_bound = dataset['l1_bound']
-            excess = (avg_num_bins - l1_bound) / l1_bound
-            total = total + excess * 100
-        print("[*] Average:")
-        print(total / number)
+            excess = (avg_num_bins - l1_bound) / l1_bound * 100.0
+
+            # ✅ In chi tiết từng dataset
+            print(
+                f"[Dataset] {file_name} | "
+                f"avg_bins={avg_num_bins:.2f}, "
+                f"l1_bound={l1_bound:.2f}, "
+                f"excess={excess:.2f}%"
+            )
+
+            total_excess += excess
+            number += 1
+
+    # ✅ BẮT BUỘC giữ đúng format này
+    print("[*] Average:")
+    print(total_excess / number)

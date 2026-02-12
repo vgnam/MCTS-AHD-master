@@ -1,0 +1,1 @@
+The determine_next_operation function takes as input the current system status and a set of feasible operations, and returns the operation selected to be scheduled next.

@@ -161,7 +161,7 @@ class Problem:
 
             individual = population[response_id]
             stdout_filepath = individual["stdout_filepath"]
-            with open(stdout_filepath, 'r') as f:  # read the stdout file
+            with open(stdout_filepath, "r", encoding="utf-8", errors="ignore") as f:
                 stdout_str = f.read()
             traceback_msg = filter_traceback(stdout_str)
 

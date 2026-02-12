@@ -135,11 +135,11 @@ if __name__ == '__main__':
                 gap = (- obj + optimal_values[problem_size][i]) / optimal_values[problem_size][i] * 100
                 gaps.append(gap)
 
-        print(f"\n[*] Summary for size {problem_size}:")
-        print(f"Average value: {np.mean(objs):.6f}")
+        # print(f"[*] Summary for size {problem_size}:")
+        # print(f"Average value: {np.mean(objs):.6f}")
         if gaps:
-            print(f"Average gap (%): {np.mean(gaps):.6f}")
-        print(f"Average runtime (s): {np.mean(runtimes):.6f}")
+            print(f"[*] Summary for size {problem_size}: average gap (%): {np.mean(gaps):.6f}")
+        # print(f"Average runtime (s): {np.mean(runtimes):.6f}")
 
         # # Optional: print table per instance
         # print("\nInstance | Value      | Runtime (s) | Gap (%)")
@@ -147,125 +147,125 @@ if __name__ == '__main__':
         # for i in range(n_instances):
         #     gap_str = f"{gaps[i]:.4f}" if gaps else "-"
         #     print(f"{i:8d} | {objs[i]:10.4f} | {runtimes[i]:10.4f} | {gap_str}")
-        print("\n" + "="*50 + "\n")
+        # print("\n" + "="*50 + "\n")
 
 
-# AB MCTS:
 
 
-#
-# [*] Summary for size 50:
-# Average value: 24.880386
-# Average gap (%): 0.013598
-# Average runtime (s): 0.012471
-#
-# ==================================================
-#
-#
-# [*] Summary for size 100:
-# Average value: 40.660065
-# Average gap (%): 0.084577
-# Average runtime (s): 0.021950
-#
-# ==================================================
-#
-#
-# [*] Summary for size 200:
-# Average value: 57.835016
-# Average gap (%): 0.091528
-# Average runtime (s): 0.050521
-#
-# ==================================================
-#
-#
-# [*] Summary for size 500:
-# Average value: 90.854252
-# Average gap (%): 0.165398
-# Average runtime (s): 0.192450
-#
-# ==================================================
-#
-#
-# [*] Summary for size 1000:
-# Average value: 127.933921
-# Average gap (%): 0.241800
-# Average runtime (s): 0.720535
+# [*] Summary for size 50: average gap (%): 0.013188
+# [*] Summary for size 100: average gap (%): 0.072771
+# [*] Summary for size 200: average gap (%): 0.098319
+# [*] Summary for size 500: average gap (%): 0.066703
+# [*] Summary for size 1000: average gap (%): 0.052853
 
 
-#
-# [*] Summary for size 50:
-# Average value: 24.880480
-# Average gap (%): 0.013188
-# Average runtime (s): 0.010578
-#
-# ==================================================
-#
-#
-# [*] Summary for size 100:
-# Average value: 40.660181
-# Average gap (%): 0.083671
-# Average runtime (s): 0.030503
-#
-# ==================================================
-#
-#
-# [*] Summary for size 200:
-# Average value: 57.835992
-# Average gap (%): 0.090416
-# Average runtime (s): 0.099905
-#
-# ==================================================
-#
-#
-# [*] Summary for size 500:
-# Average value: 90.941714
-# Average gap (%): 0.068868
-# Average runtime (s): 0.450999
-#
-# ==================================================
-#
-#
-# [*] Summary for size 1000:
-# Average value: 128.176161
-# Average gap (%): 0.052511
-# Average runtime (s): 1.770808
+# [*] Summary for size 50: average gap (%): 0.007310
+# [*] Summary for size 100: average gap (%): 0.064808
+# [*] Summary for size 200: average gap (%): 0.064477
+# [*] Summary for size 500: average gap (%): 0.033945
+# [*] Summary for size 1000: average gap (%): 0.025385
+
+# [*] Summary for size 50: average gap (%): 0.013188
+# [*] Summary for size 100: average gap (%): 0.081871
+# [*] Summary for size 200: average gap (%): 0.088417
+# [*] Summary for size 500: average gap (%): 0.051124
+# [*] Summary for size 1000: average gap (%): 0.031421
 
 
-#
-# [*] Summary for size 50:
-# Average value: 24.880480
-# Average gap (%): 0.013188
-# Average runtime (s): 0.001393
-#
-# ==================================================
-#
-#
-# [*] Summary for size 100:
-# Average value: 40.663427
-# Average gap (%): 0.074915
-# Average runtime (s): 0.002127
-#
-# ==================================================
-#
-#
-# [*] Summary for size 200:
-# Average value: 57.840450
-# Average gap (%): 0.082873
-# Average runtime (s): 0.004580
-#
-# ==================================================
-#
-#
-# [*] Summary for size 500:
-# Average value: 90.952700
-# Average gap (%): 0.057039
-# Average runtime (s): 0.012218
-#
-# ==================================================
-#
-#
-# [*] Summary for size 1000:
-# Average value: 128.190735
-# Average gap (%): 0.041198
-# Average runtime (s): 0.027132
+
+
+
+
+# [*] Summary for size 50: average gap (%): 0.008435
+# [*] Summary for size 100: average gap (%): 0.096277
+# [*] Summary for size 200: average gap (%): 0.102842
+# [*] Summary for size 500: average gap (%): 0.107587
+# [*] Summary for size 1000: average gap (%): 0.118274
+
+# [*] Summary for size 50: average gap (%): 0.011093
+# [*] Summary for size 100: average gap (%): 0.094437
+# [*] Summary for size 200: average gap (%): 0.103702
+# [*] Summary for size 500: average gap (%): 0.051030
+# [*] Summary for size 1000: average gap (%): 0.034854
+
+# [*] Summary for size 50: average gap (%): 0.009656
+# [*] Summary for size 100: average gap (%): 0.085598
+# [*] Summary for size 200: average gap (%): 0.106463
+# [*] Summary for size 500: average gap (%): 0.109262
+# [*] Summary for size 1000: average gap (%): 0.111614
+
+
+
+
+
+
+
+# [*] Summary for size 50: average gap (%): 0.008616
+# [*] Summary for size 100: average gap (%): 0.095377
+# [*] Summary for size 200: average gap (%): 0.105295
+# [*] Summary for size 500: average gap (%): 0.052028
+# [*] Summary for size 1000: average gap (%): 0.034854
+
+
+# [*] Summary for size 50: average gap (%): 0.011093
+# [*] Summary for size 100: average gap (%): 0.088285
+# [*] Summary for size 200: average gap (%): 0.106512
+# [*] Summary for size 500: average gap (%): 0.048883
+# [*] Summary for size 1000: average gap (%): 0.034263
+
+# [*] Summary for size 50: average gap (%): 0.013188
+# [*] Summary for size 100: average gap (%): 0.088506
+# [*] Summary for size 200: average gap (%): 0.102544
+# [*] Summary for size 500: average gap (%): 0.074421
+# [*] Summary for size 1000: average gap (%): 0.061841
+
+
+
+
+
+# [*] Summary for size 50: average gap (%): 0.011093
+# [*] Summary for size 100: average gap (%): 0.061548
+# [*] Summary for size 200: average gap (%): 0.097329
+# [*] Summary for size 500: average gap (%): 0.079029
+# [*] Summary for size 1000: average gap (%): 0.064179
+
+
+# [*] Summary for size 50: average gap (%): 0.013188
+# [*] Summary for size 100: average gap (%): 0.080993
+# [*] Summary for size 200: average gap (%): 0.082673
+# [*] Summary for size 500: average gap (%): 0.050241
+# [*] Summary for size 1000: average gap (%): 0.030503
+
+
+# [*] Summary for size 50: average gap (%): 0.008017
+# [*] Summary for size 100: average gap (%): 0.078885
+# [*] Summary for size 200: average gap (%): 0.087755
+# [*] Summary for size 500: average gap (%): 0.057627
+# [*] Summary for size 1000: average gap (%): 0.037908
+
+
+
+
+
+
+# [*] Summary for size 50: average gap (%): 0.009515
+# [*] Summary for size 100: average gap (%): 0.092908
+# [*] Summary for size 200: average gap (%): 0.098069
+# [*] Summary for size 500: average gap (%): 0.053138
+# [*] Summary for size 1000: average gap (%): 0.035322
+
+# [*] Summary for size 50: average gap (%): 0.011093
+# [*] Summary for size 100: average gap (%): 0.056300
+# [*] Summary for size 200: average gap (%): 0.081402
+# [*] Summary for size 500: average gap (%): 0.041744
+# [*] Summary for size 1000: average gap (%): 0.026884
+
+
+# [*] Summary for size 50: average gap (%): 0.008480
+# [*] Summary for size 100: average gap (%): 0.090218
+# [*] Summary for size 200: average gap (%): 0.065449
+# [*] Summary for size 500: average gap (%): 0.075672
+# [*] Summary for size 1000: average gap (%): 0.096811
+
+
 

@@ -23,6 +23,7 @@ class Evolution():
         self.prompt_func_outputs = prompts.get_func_outputs()
         self.prompt_inout_inf = prompts.get_inout_inf()
         self.prompt_other_inf = prompts.get_other_inf()
+        self.prompt_seed_code = prompts.get_seed_func()
         if len(self.prompt_func_inputs) > 1:
             self.joined_inputs = ", ".join("'" + s + "'" for s in self.prompt_func_inputs)
         else:
@@ -141,7 +142,7 @@ class Evolution():
                          + self.joined_inputs + ". The function should return " + str(
             len(self.prompt_func_outputs)) + " output(s): " \
                          + self.joined_outputs + ". " + self.prompt_inout_inf + " " \
-                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations. Use only standard English letters and numbers. Do not output any special characters."
         return prompt_content
 
     def get_prompt_e2(self, indivs, advice=None):
@@ -165,7 +166,7 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
                          + self.joined_inputs + ". The function should return " + str(
             len(self.prompt_func_outputs)) + " output(s): " \
                          + self.joined_outputs + ". " + self.prompt_inout_inf + " " \
-                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations. Use only standard English letters and numbers. Do not output any special characters."
         return prompt_content
 
     def get_prompt_m1(self, indiv1, advice=None):
@@ -183,7 +184,7 @@ The description must be inside a brace outside the code implementation. Next, im
                          + self.joined_inputs + ". The function should return " + str(
             len(self.prompt_func_outputs)) + " output(s): " \
                          + self.joined_outputs + ". " + self.prompt_inout_inf + " " \
-                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations. Use only standard English letters and numbers. Do not output any special characters."
         return prompt_content
 
     def get_prompt_m2(self, indiv1, advice=None):
@@ -199,7 +200,7 @@ The description must be inside a brace outside the code implementation. Next, im
 '" + self.prompt_func_name + "'.\nThis function should accept " + str(
             len(self.prompt_func_inputs)) + " input(s): " \
                          + self.joined_inputs + ". " + self.prompt_inout_inf + " " \
-                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations. Use only standard English letters and numbers. Do not output any special characters."
         return prompt_content
 
     def get_prompt_s1(self, indivs, advice=None):
@@ -223,7 +224,7 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
                          + self.joined_inputs + ". The function should return " + str(
             len(self.prompt_func_outputs)) + " output(s): " \
                          + self.joined_outputs + ". " + self.prompt_inout_inf + " " \
-                         + self.prompt_other_inf + "\n" + "Do not give additional explanations."
+                         + self.prompt_other_inf + "\n" + "Do not give additional explanations. Use only standard English letters and numbers. Do not output any special characters."
         return prompt_content
 
     def get_prompt_counter(self, indiv1, advice=None):
@@ -244,7 +245,7 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
                                                                                  "The function should return " + str(
             len(self.prompt_func_outputs)) + " output(s): " + self.joined_outputs + ". " \
                          + self.prompt_inout_inf + " " + self.prompt_other_inf + "\n" \
-                                                                                 "Do not give additional explanations."
+                                                                                 "Do not give additional explanations. Use only standard English letters and numbers. Do not output any special characters."
         return prompt_content
 
     def counter(self, parents, advice=None):

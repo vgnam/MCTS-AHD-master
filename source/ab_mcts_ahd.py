@@ -21,19 +21,7 @@ from math import log
 from scipy.spatial.distance import euclidean
 from scipy.sparse.csgraph import minimum_spanning_tree
 
-# Import từ population_encoding.py
-from population_encode import (
-    get_embedding,
-    format_python_code,
-    remove_comments_and_docstrings,
-    compute_cosine_similarity,
-    cluster_nodes,
-    calculate_shannon_diversity,
-    total_diversity,
-    model,
-    tokenizer,
-    device
-)
+
 class AB_MCTS_A_AHD:
     def __init__(self, paras, problem, select, manage, **kwargs):
         self.prob = problem
@@ -285,52 +273,52 @@ class AB_MCTS_A_AHD:
 
         return nodes_set
 
-    def calculate_diversity_from_nodes(self, nodes_set, threshold=0.95):
-        """
-        Tính diversity từ nodes_set sử dụng hàm từ population_encoding.
-
-        Args:
-            nodes_set: List of node dictionaries
-            threshold: Similarity threshold for clustering
-
-        Returns:
-            Dictionary chứa SDI, CDI và các thông tin liên quan
-        """
-        # Extract codes từ nodes_set
-        codes = [node['code'] for node in nodes_set if 'code' in node]
-
-        # Tạo embeddings
-        embeddings = []
-        for code in codes:
-            processed_code = remove_comments_and_docstrings(format_python_code(code))
-            embedding = get_embedding(processed_code, model=model, tokenizer=tokenizer, device=device)
-            embeddings.append(embedding)
-
-        # Stack embeddings
-        embeddings_2d = np.vstack(embeddings)
-
-        # Compute similarity matrix
-        similarity_matrix = compute_cosine_similarity(embeddings_2d)
-        np.fill_diagonal(similarity_matrix, 1)
-
-        # Cluster nodes
-        clusters = cluster_nodes(similarity_matrix, threshold)
-
-        # Calculate Shannon Diversity Index
-        sdi = calculate_shannon_diversity(clusters, len(embeddings))
-
-        # Calculate Code Diversity Index
-        cdi = total_diversity(embeddings)
-
-        return {
-            'sdi': sdi,
-            'cdi': cdi,
-            'num_nodes': len(embeddings),
-            'clusters': clusters,
-            'num_clusters': len(clusters),
-            'similarity_matrix': similarity_matrix,
-            'error': None
-        }
+    # def calculate_diversity_from_nodes(self, nodes_set, threshold=0.95):
+    #     """
+    #     Tính diversity từ nodes_set sử dụng hàm từ population_encoding.
+    #
+    #     Args:
+    #         nodes_set: List of node dictionaries
+    #         threshold: Similarity threshold for clustering
+    #
+    #     Returns:
+    #         Dictionary chứa SDI, CDI và các thông tin liên quan
+    #     """
+    #     # Extract codes từ nodes_set
+    #     codes = [node['code'] for node in nodes_set if 'code' in node]
+    #
+    #     # Tạo embeddings
+    #     embeddings = []
+    #     for code in codes:
+    #         processed_code = remove_comments_and_docstrings(format_python_code(code))
+    #         embedding = get_embedding(processed_code, model=model, tokenizer=tokenizer, device=device)
+    #         embeddings.append(embedding)
+    #
+    #     # Stack embeddings
+    #     embeddings_2d = np.vstack(embeddings)
+    #
+    #     # Compute similarity matrix
+    #     similarity_matrix = compute_cosine_similarity(embeddings_2d)
+    #     np.fill_diagonal(similarity_matrix, 1)
+    #
+    #     # Cluster nodes
+    #     clusters = cluster_nodes(similarity_matrix, threshold)
+    #
+    #     # Calculate Shannon Diversity Index
+    #     sdi = calculate_shannon_diversity(clusters, len(embeddings))
+    #
+    #     # Calculate Code Diversity Index
+    #     cdi = total_diversity(embeddings)
+    #
+    #     return {
+    #         'sdi': sdi,
+    #         'cdi': cdi,
+    #         'num_nodes': len(embeddings),
+    #         'clusters': clusters,
+    #         'num_clusters': len(clusters),
+    #         'similarity_matrix': similarity_matrix,
+    #         'error': None
+    #     }
 
     def run(self):
         print("- Initialization Start -")
@@ -417,7 +405,7 @@ class AB_MCTS_A_AHD:
                                               reverse=False)  # Assuming higher is better
 
         # Select top 5 best additional offsprings
-        top_5_additional_offsprings = sorted_additional_offsprings[:5]
+        top_5_additional_offsprings = all_additional_offsprings
 
         # Add top 5 additional offsprings to MCTS
         for offsprings, model_name in top_5_additional_offsprings:
@@ -439,7 +427,7 @@ class AB_MCTS_A_AHD:
 
 
 
-        # --- Create MCTS instance ---
+        # # --- Create MCTS instance ---
         # mcts = AB_MCTS_A('Root', self.llm_model_names)
         #
         # # --- Load pre-prepared nodes from JSON file ---
@@ -480,10 +468,10 @@ class AB_MCTS_A_AHD:
         #     mcts.root.add_child(new_node)
         #     mcts.root.children_info.append(node_info)
         #     mcts.backpropagate(new_node, op_name="i1")
-        #
-        #     brothers.append(node_info)
-        #
-        # # --- Optional: manage population size ---
+
+            # brothers.append(node_info)
+
+        # --- Optional: manage population size ---
         size_act = min(len(brothers), self.pop_size)
         brothers = self.manage.population_management(brothers, size_act)
         nodes_set = brothers if 'brothers' in locals() else []
