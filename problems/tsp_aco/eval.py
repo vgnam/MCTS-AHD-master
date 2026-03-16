@@ -1,12 +1,15 @@
 from os import path
 from aco import ACO
 import sys
+from pathlib import Path
 import numpy as np
 from scipy.spatial import distance_matrix
 import logging
-import sys
-sys.path.insert(0, "../../../")
-sys.path.insert(0, "/kaggle/working/MCTS-AHD")
+
+# Resolve project root robustly regardless of current working directory.
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
+# sys.path.insert(0, "/kaggle/working/MCTS-AHD")
 import gpt
 from utils.utils import get_heuristic_name
 

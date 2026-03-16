@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - problem: bacteria_grow
+  - problem: tsp_aco
   - llm_client: gemini
   - override hydra/output: local
 
@@ -13,11 +13,35 @@ hydra:
 model: mistral/codestral-latest # LLM model
 temperature: 1  # temperature for chat completion
 
+# === LLM Advisor Configuration (list of advisor LLMs) ===
+llm_advisor:
+  enabled: true  # Toggle debate mechanism on/off
+  debate_rounds: 3  # Number of debate rounds
+  list:  # List of advisor LLMs
+    - api_endpoint: "https://integrate.api.nvidia.com/v1/chat/completions"
+      api_key: "Not used"
+      model: "nvidia_nim/deepseek-ai/deepseek-v3.1"
+      name: "DeepSeek"
+      role: "Advanced Reasoning Specialist"
+      expertise: "complex problem solving, logical reasoning, and strategic heuristic design"
+    - api_endpoint: "https://integrate.api.nvidia.com/v1/chat/completions"
+      api_key: "Not used"
+      model: "nvidia_nim/qwen/qwen3-coder-480b-a35b-instruct"
+      name: "Qwen3-Coder"
+      role: "Code Optimization Expert"
+      expertise: "code generation, refactoring, and optimization for heuristic algorithms"
+    - api_endpoint: "https://integrate.api.nvidia.com/v1/chat/completions"
+      api_key: "Not used"
+      model: "mistral/codestral-latest"
+      name: "Codestral"
+      role: "Code Generation Specialist"
+      expertise: "generating efficient and robust code implementations for heuristics"
+
 # The chosen algorithm
-algorithm: mcts-ahd
+algorithm: ab-mcts-ahd
 
 # Main GA loop parameters
-max_fe: 1000 # maximum number of function evaluations
+max_fe: 500 # maximum number of function evaluations
 pop_size: 30 # population size for GA
 init_pop_size: 5 # initial population size for GA
 timeout: 60 # timeout for evaluation of a single heuristic

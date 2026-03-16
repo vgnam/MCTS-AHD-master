@@ -3,51 +3,47 @@ import numpy as np
 def heuristics_v2(distance_matrix):
     n = len(distance_matrix)
     heuristics_matrix = np.zeros_like(distance_matrix)
-    num_samples = 500
-    edge_weights = np.ones((n, n))
-    temperature = 1.0
-    decay_rate = 0.95
-    exploration_factor = 0.1
+    num_iterations = 200 * n
+    base_partial_solution_length = max(2, n // 2)
+    base_memory_factor = 0.7
+    base_exploration_noise = 0.6
+    exploration_decay = 0.95
+    neighborhood_size = max(2, n // 3)
+    entropy_factor = 0.2
 
-    for _ in range(num_samples):
-        path = [0]
-        remaining = set(range(1, n))
-        while remaining:
-            last = path[-1]
-            candidates = list(remaining)
-            probs = np.exp((edge_weights[last, candidates] - np.max(edge_weights[last, candidates])) / temperature)
-            probs = (1 - exploration_factor) * probs + exploration_factor * (1 / len(candidates))
-            probs /= np.sum(probs)
-            next_node = np.random.choice(candidates, p=probs)
+    for iteration in range(num_iterations):
+        memory_factor = base_memory_factor * (1 + 0.3 * (iteration / num_iterations))
+        exploration_weight = base_exploration_noise * (exploration_decay ** (iteration / n))
+        start_node = np.random.randint(n)
+        current_node = start_node
+        visited = {current_node}
+        path = [current_node]
+        partial_solution_length = base_partial_solution_length + int(np.random.rand() * (n // 2))
+
+        for _ in range(partial_solution_length - 1):
+            candidates = [node for node in range(n) if node not in visited]
+            if not candidates:
+                break
+            local_distances = distance_matrix[current_node]
+            nearest_neighbors = np.argsort(local_distances)[:neighborhood_size]
+            nearest_neighbors = [node for node in nearest_neighbors if node not in visited]
+            if not nearest_neighbors:
+                nearest_neighbors = candidates
+            base_probabilities = np.array([1.0 / (local_distances[node] + 1e-10) for node in nearest_neighbors])
+            memory_probabilities = heuristics_matrix[current_node, nearest_neighbors]
+            probabilities = (1 - memory_factor) * base_probabilities + memory_factor * memory_probabilities
+            probabilities += exploration_weight * np.random.rand(len(nearest_neighbors)) * (1 + entropy_factor * np.log(iteration + 1))
+            probabilities /= probabilities.sum()
+            next_node = np.random.choice(nearest_neighbors, p=probabilities)
             path.append(next_node)
-            remaining.remove(next_node)
-        path.append(0)
+            visited.add(next_node)
+            current_node = next_node
 
-        improved = True
-        while improved:
-            improved = False
-            for i in range(n):
-                for j in range(i + 2, min(i + 10, n)):
-                    a, b, c, d = path[i], path[i+1], path[j], path[j+1]
-                    current_dist = distance_matrix[a, b] + distance_matrix[c, d]
-                    new_dist = distance_matrix[a, c] + distance_matrix[b, d]
-                    if new_dist < current_dist:
-                        path[i+1:j+1] = path[j:i:-1]
-                        improved = True
+        path_length = sum(distance_matrix[path[i], path[i+1]] for i in range(len(path)-1))
+        for i in range(len(path) - 1):
+            heuristics_matrix[path[i], path[i+1]] += 1.0 / (path_length * distance_matrix[path[i], path[i+1]])
 
-        total_dist = sum(distance_matrix[path[i], path[i+1]] for i in range(n))
-        for i in range(n):
-            u, v = path[i], path[i+1]
-            heuristics_matrix[u, v] += 1 / (total_dist * (1 + np.exp(-(edge_weights[u, v] - 0.5))))
+    if np.max(heuristics_matrix) > 0:
+        heuristics_matrix /= np.max(heuristics_matrix)
 
-        for i in range(n):
-            u, v = path[i], path[i+1]
-            edge_weights[u, v] *= 0.8
-            edge_weights[u, v] += 1 / (total_dist * (1 + np.exp(-(edge_weights[u, v] - 0.5))))
-
-        temperature *= decay_rate
-        exploration_factor = max(0.05, exploration_factor * 0.99)
-
-    exp_heuristics = np.exp(heuristics_matrix - np.max(heuristics_matrix))
-    heuristics_matrix = exp_heuristics / np.sum(exp_heuristics)
     return heuristics_matrix

@@ -6,8 +6,10 @@ from scipy.spatial import distance_matrix
 import logging
 import inspect
 import sys
-sys.path.insert(0, "../../../")
-sys.path.insert(0, "/kaggle/working/MCTS-AHD")
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
 import gpt
 from utils.utils import get_heuristic_name
 

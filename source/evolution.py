@@ -671,24 +671,30 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
         Returns: advice (str or dict) compatible with other Evolution methods.
         """
         # --- Step 0: Error Signal ---
-        error_signal_output = self.error_signal(indiv)
-        # print("Error Signal Output:", error_signal_output)
+        x = self.error_signal(indiv)
+        # print("Error Signal Output:", x)
+
         # --- Step 1: Counterfactual Attack ---
-        counterfactual_output = self.counterfactual(indiv, error_signal_output)
-        # print("Counterfactual Output:", counterfactual_output)
+        x = self.counterfactual(indiv, x)
+        # print("Counterfactual Output:", x)
+
         # --- Step 2: Role Conflict ---
-        role_conflict_output = self.role_conflict(indiv, counterfactual_output)
-        # print("Role Conflict Output:", role_conflict_output)
+        # x = self.role_conflict(indiv, x)
+        # print("Role Conflict Output:", x)
+
         # --- Step 3: Abstraction Shift ---
-        abstraction_output = self.abstraction(role_conflict_output)
-        # print("Abstraction Output:", abstraction_output)
+        x = self.abstraction(x)
+        # print("Abstraction Output:", x)
+
         # --- Step 4: Assumption Repair ---
-        repaired_assumptions = self.assumption_repair(abstraction_output)
-        # print("Repaired Assumptions:", repaired_assumptions)
+        x = self.assumption_repair(x)
+        # print("Repaired Assumptions:", x)
+
         # --- Step 5: Final Advice ---
-        advice = self.final_advice(repaired_assumptions)
-        # print("Final Advice:", advice)
-        return advice
+        x = self.final_advice(x)
+        # print("Final Advice:", x)
+
+        return x
 
     def get_prompt_refine_with_critic(self, indiv, advice):
 

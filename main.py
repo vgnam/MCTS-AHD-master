@@ -29,7 +29,7 @@ import subprocess
 #                                 "1000zDBUeI-Rc")
 # os.environ["MISTRAL_API_KEY"] = "gz7HXe7UZEJBmbez2brM07sUPGDN4WKm"
 
-os.environ["MISTRAL_API_KEY"] = "pLlrbWVf1pzO4aN0cNXcBbArUx0JLJMp"
+os.environ["MISTRAL_API_KEY"] = "v0ReHEBIecibPUAQFCw8m5oWkg7eJP3r"
 
 #
 os.environ['NVIDIA_NIM_API_KEY'] = "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"
