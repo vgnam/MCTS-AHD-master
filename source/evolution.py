@@ -13,6 +13,8 @@ class Evolution():
         assert 'url' in kwargs
         self._use_local_llm = kwargs.get('use_local_llm')
         self._url = kwargs.get('url')
+        # AGRE stage switches for ablation (missing key = stage enabled)
+        self.agre_stages = kwargs.get('agre_stages') or {}
         # -----------------------------------------------------------
 
         # set prompt interface
@@ -667,27 +669,35 @@ The description must be inside a brace. Thirdly, implement it in Python as a fun
 
     def ecdrr(self, indiv):
         """
-        Run Error-Driven Counterfactual Role Reflection (EDCRR) as a 5-step pipeline.
+        Run Error-Driven Counterfactual Role Reflection (EDCRR) as a 6-step pipeline.
+        Steps 1-4 can be disabled via self.agre_stages for the ablation study;
+        a disabled step passes its input through to the next one.
         Returns: advice (str or dict) compatible with other Evolution methods.
         """
+        stages = self.agre_stages
+
         # --- Step 0: Error Signal ---
         x = self.error_signal(indiv)
         # print("Error Signal Output:", x)
 
         # --- Step 1: Counterfactual Attack ---
-        x = self.counterfactual(indiv, x)
+        if stages.get('counterfactual', True):
+            x = self.counterfactual(indiv, x)
         # print("Counterfactual Output:", x)
 
         # --- Step 2: Role Conflict ---
-        # x = self.role_conflict(indiv, x)
+        if stages.get('role_conflict', True):
+            x = self.role_conflict(indiv, x)
         # print("Role Conflict Output:", x)
 
         # --- Step 3: Abstraction Shift ---
-        x = self.abstraction(x)
+        if stages.get('abstraction', True):
+            x = self.abstraction(x)
         # print("Abstraction Output:", x)
 
         # --- Step 4: Assumption Repair ---
-        x = self.assumption_repair(x)
+        if stages.get('assumption_repair', True):
+            x = self.assumption_repair(x)
         # print("Repaired Assumptions:", x)
 
         # --- Step 5: Final Advice ---

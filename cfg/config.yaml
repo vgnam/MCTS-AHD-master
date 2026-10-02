@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - problem: tsp_aco
+  - problem: cvrp_aco
   - llm_client: gemini
   - override hydra/output: local
 
@@ -10,7 +10,7 @@ hydra:
   run:
     dir: outputs/${problem.problem_name}-${problem.problem_type}/${algorithm}/${now:%Y-%m-%d_%H-%M-%S}
 
-model: mistral/codestral-latest # LLM model
+model: openrouter/mistralai/codestral-2508 # LLM model
 temperature: 1  # temperature for chat completion
 
 # === LLM Advisor Configuration (list of advisor LLMs) ===
@@ -39,6 +39,20 @@ llm_advisor:
 
 # The chosen algorithm
 algorithm: ab-mcts-ahd
+
+# === Ablation switches for ab-mcts-ahd (all true = full GENESIS) ===
+# e.g. python main.py ablation.global_sharing=false
+ablation:
+  posterior_sampling: true     # false: deterministic UCB on posterior means instead of Thompson sampling
+  adaptive_op_selection: true  # false: operator drawn uniformly at random once expansion is chosen
+  global_sharing: true         # false: GEN nodes use a fixed prior, no global hyper-posterior
+  ucb_c: 1.0                   # exploration constant, only used when posterior_sampling=false
+  agre: true                   # false: skip the AGRE refinement step entirely
+  agre_stages:                 # individual AGRE stages (only used when agre=true)
+    counterfactual: true
+    role_conflict: true
+    abstraction: true
+    assumption_repair: true
 
 # Main GA loop parameters
 max_fe: 500 # maximum number of function evaluations

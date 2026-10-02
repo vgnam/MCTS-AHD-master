@@ -4,19 +4,26 @@ def heuristics_v2(distance_matrix, coordinates, demands, capacity):
     n = len(distance_matrix)
     heuristics_matrix = np.zeros((n, n))
 
-    for i in range(n):
-        remaining_capacity = capacity - demands[i] if i != 0 else capacity
-        for j in range(n):
-            if i == j or j == 0:
-                continue
-            if demands[i] + demands[j] <= capacity:
-                spatial_weight = 1.0 / (1.0 + distance_matrix[i, j])
-                demand_weight = (demands[j] / remaining_capacity) if remaining_capacity > 0 else 0.0
-                heuristics_matrix[i, j] = 0.6 * spatial_weight + 0.4 * demand_weight
-            else:
-                heuristics_matrix[i, j] = 0.0
+    depot_x, depot_y = coordinates[0]
+    distances_from_depot = np.linalg.norm(coordinates - [depot_x, depot_y], axis=1)
 
-    row_sums = heuristics_matrix.sum(axis=1, keepdims=True)
-    heuristics_matrix = np.divide(heuristics_matrix, row_sums, where=row_sums!=0)
+    demand_balance = (demands[None, :] + demands[:, None]) / capacity
+    balance_penalty = 1.0 / (1.0 + np.abs(demand_balance - 0.7) * 1.5)
+
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                continue
+
+            distance_factor = 0.5 / (1.0 + distance_matrix[i, j] / np.median(distance_matrix[i, :]))
+
+            spatial_factor = 0.3 * (1.0 - (distances_from_depot[i] + distances_from_depot[j]) / (2 * np.median(distances_from_depot)))
+
+            demand_factor = 0.8 * balance_penalty[i, j]
+
+            heuristics_matrix[i, j] = distance_factor * spatial_factor * demand_factor
+
+    heuristics_matrix = (heuristics_matrix - np.min(heuristics_matrix)) / (np.max(heuristics_matrix) - np.min(heuristics_matrix) + 1e-10)
+    heuristics_matrix = np.power(heuristics_matrix, 1.5)
 
     return heuristics_matrix

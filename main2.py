@@ -25,14 +25,13 @@ import subprocess
 # [2026-01-02 11:08:59,784][root][INFO] - [*] Average for 50: 9.191845707996968
 # [2026-01-02 11:08:59,784][root][INFO] - [*] Average for 100: 16.090914473409164
 
-# os.environ["GEMINI_API_KEY"] = ("AIzaSyB7_zB7UcJ18cmFKMzrGtreSm"
-#                                 "1000zDBUeI-Rc")
-# os.environ["MISTRAL_API_KEY"] = "gz7HXe7UZEJBmbez2brM07sUPGDN4WKm"
 
-os.environ["MISTRAL_API_KEY"] = "oKIXvnvgtLoeznZprveKbW0LMjfY0XNM"
 
 #
-os.environ['NVIDIA_NIM_API_KEY'] = "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"
+try:
+    import api_keys  # noqa: F401  (local, gitignored; sets API key env vars)
+except ImportError:
+    pass
 
 ROOT_DIR = os.getcwd()
 logging.basicConfig(level=logging.INFO)

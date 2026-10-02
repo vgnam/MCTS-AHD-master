@@ -20,10 +20,10 @@ class Paras():
         self.ec_m = 2
 
         # self.ec_operators = ['e1', 'e2', 'm1', 'm2', 's1']
-        # self.ec_operator_weights = [0, 1, 2, 2, 1]  # weights for operators default = [0,1,k,k,1], default = [0,1,2,2,1]
+        # self.ec_operator_weights = [0, 1, 1, 1, 1]  # weights for operators default = [0,1,k,k,1], default = [0,1,2,2,1]
 
         self.ec_operators = ['counter', 'e2', 'm1', 'm2', 's1']
-        self.ec_operator_weights = [4, 4, 4, 4, 4]
+        self.ec_operator_weights = [3, 3, 3, 3, 3]
         ####################
         ### LLM settings  ###
         #####################

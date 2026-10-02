@@ -1,9 +1,24 @@
 import random
 import math
 from collections import defaultdict
+from dataclasses import dataclass
 import numpy as np
 from scipy.stats import invgamma, norm
 import warnings
+
+
+@dataclass
+class AblationConfig:
+    """Switches for the ablation study; all True = full GENESIS."""
+    posterior_sampling: bool = True     # False: deterministic UCB on posterior means
+    adaptive_op_selection: bool = True  # False: operator drawn uniformly at random
+    global_sharing: bool = True         # False: GEN nodes ignore the global hyper-prior
+    ucb_c: float = 1.0                  # exploration constant when posterior_sampling=False
+
+
+def lcb_score(mean, visits, parent_visits, scale, c):
+    """Deterministic UCB score for minimization (lower is better)."""
+    return mean - c * scale * math.sqrt(math.log(parent_visits + 1) / (visits + 1))
 
 class GlobalHyperPrior:
     def __init__(self, mu_0=0, kappa_0=1.0, nu_0=2.0, tau2_0=1.0):
@@ -190,54 +205,83 @@ class MCTSNode:
         self.nu_post = nu_n
         self.tau2_post = tau2_n
 
-    def hierarchical_thompson_sampling(self, fe, num_samples=1):
+    def cont_candidates(self, num_samples=1, ablation=None):
+        """Score every real child (CONT action); lower is better."""
+        ablation = ablation or AblationConfig()
+        candidates = []
+        for i, child in enumerate(self.children):
+            if ablation.posterior_sampling:
+                score = np.mean([child.sample_from_node_posterior() for _ in range(num_samples)])
+            else:
+                score = lcb_score(child.mu_post, child.visits, self.visits, np.sqrt(self.tau2_post), ablation.ucb_c)
+            print(f"CHILD {i}: mu_post={child.mu_post:.3f}, tau2={child.tau2_post:.3f}, score={score:.3f}")
+            candidates.append(('CONT', i, score))
+        return candidates
+
+    def gen_score(self, gen_node, fe, global_params, ablation):
+        """Score one GEN node; lower is better."""
+        local_precision = gen_node.kappa_post / gen_node.tau2_post
+        if ablation.global_sharing:
+            # Pull local posterior towards global
+            # Precision = 1/variance = kappa / sigma2
+            mu_global, sigma2_global = global_params
+            global_precision = self.global_hyper.kappa_post / sigma2_global
+            combined_precision = local_precision + 0.5 * global_precision
+            combined_mu = (gen_node.mu_post * local_precision + mu_global * global_precision) / combined_precision
+        else:
+            combined_precision = local_precision
+            combined_mu = gen_node.mu_post
+
+        if ablation.posterior_sampling:
+            # Sample theta_i ~ Normal(combined_mu, combined_sigma2)
+            value = norm.rvs(loc=combined_mu, scale=np.sqrt(1.0 / combined_precision))
+        else:
+            value = lcb_score(combined_mu, gen_node.visits, self.visits, np.sqrt(self.tau2_post), ablation.ucb_c)
+
+        # Feature scaling
+        score = value * math.exp(gen_node._lambda * fe / 1000)
+
+        print(
+            f"GEN {gen_node.operator_name}: mu_post={gen_node.mu_post:.3f}, tau2={gen_node.tau2_post:.3f}, combined_mu={combined_mu:.3f}, value={value:.3f}, score={score:.3f}")
+        return score
+
+    def hierarchical_thompson_sampling(self, fe, num_samples=1, ablation=None):
         """
         Perform proper Hierarchical Thompson Sampling:
         1. Sample global hyperparameter φ ~ p(φ | D)
         2. For each GEN node G_i, sample θ_i ~ p(θ_i | φ, D_i)
         3. Choose the GEN with the best sampled reward
+        The ablation switches replace individual steps (see AblationConfig).
         """
-        # 1. Sample global hyperparameter
-        mu_global, sigma2_global = self.global_hyper.sample_hyperparameter()
+        ablation = ablation or AblationConfig()
 
-        candidates = []
+        # 1. Sample global hyperparameter (posterior mean when sampling is disabled)
+        if ablation.posterior_sampling:
+            global_params = self.global_hyper.sample_hyperparameter()
+        else:
+            global_params = (self.global_hyper.mu_post, self.global_hyper.tau2_post)
+
+        # 2. Score GEN actions
+        gen_candidates = []
         for gen_node in self.gen_nodes:
-            # 2. Sample local posterior using hierarchical approach
-            # Pull local posterior towards global
-            # Weighted combination of local mu_post and global mu_global
-            # Precision = 1/variance = kappa / sigma2
-            local_precision = gen_node.kappa_post / gen_node.tau2_post
-            global_precision = self.global_hyper.kappa_post / sigma2_global
-            combined_precision = local_precision + 0.5 * global_precision
-            combined_mu = (gen_node.mu_post * local_precision + mu_global * global_precision) / combined_precision
-            combined_sigma2 = 1.0 / combined_precision
-
-            # Sample theta_i ~ Normal(combined_mu, combined_sigma2)
-            mu_local = norm.rvs(loc=combined_mu, scale=np.sqrt(combined_sigma2))
-
-            # Feature scaling
-            sampled_reward = mu_local * math.exp(gen_node._lambda * fe / 1000)
-
-            print(
-                f"GEN {gen_node.operator_name}: mu_post={gen_node.mu_post:.3f}, tau2={gen_node.tau2_post:.3f}, combined_mu={combined_mu:.3f}, sampled={mu_local:.3f}, sampled_reward={sampled_reward:.3f}")
-
+            score = self.gen_score(gen_node, fe, global_params, ablation)
             action_identifier = (gen_node.llm_model_name, gen_node.operator_name)
-            candidates.append(('GEN', action_identifier, sampled_reward))
+            gen_candidates.append(('GEN', action_identifier, score))
 
-        # Sample from CONT actions as before
-        for i, child in enumerate(self.children):
-            samples = [child.sample_from_node_posterior() for _ in range(num_samples)]
-            avg_sample = np.mean(samples)
-            print(f"CHILD {i}: mu_post={child.mu_post:.3f}, tau2={child.tau2_post:.3f}, sample={avg_sample:.3f}")
-            candidates.append(('CONT', i, avg_sample))
+        if gen_candidates and not ablation.adaptive_op_selection:
+            # Expand-vs-continue still uses the best GEN score; only the operator is random
+            best_gen_score = min(c[2] for c in gen_candidates)
+            chosen = random.choice(self.gen_nodes)
+            gen_candidates = [('GEN', (chosen.llm_model_name, chosen.operator_name), best_gen_score)]
 
-        # Choose the best action (lowest reward)
+        # 3. Choose the best action (lowest reward)
+        candidates = gen_candidates + self.cont_candidates(num_samples, ablation)
         best_candidate = min(candidates, key=lambda x: x[2])
 
         return best_candidate
 
 
-    def select_best_action_via_thompson(self, fe, num_samples=1, epsilon=0):
+    def select_best_action_via_thompson(self, fe, num_samples=1, epsilon=0, ablation=None):
 
         if random.random() < epsilon:
             candidates = []
@@ -255,23 +299,20 @@ class MCTSNode:
 
         # If too many children, only consider CONT actions
         if len(self.children) >= 7:
-            candidates = []
-            for i, child in enumerate(self.children):
-                samples = [child.sample_from_node_posterior() for _ in range(num_samples)]
-                avg_sample = np.mean(samples)
-                candidates.append(('CONT', i, avg_sample))
+            candidates = self.cont_candidates(num_samples, ablation)
             best_candidate = min(candidates, key=lambda x: x[2])
             return best_candidate
 
         # Use HTS
-        return self.hierarchical_thompson_sampling(fe, num_samples)
+        return self.hierarchical_thompson_sampling(fe, num_samples, ablation)
 
 
 
 
 class AB_MCTS_A:
-    def __init__(self, root_answer, llm_model_names, max_depth=10):
+    def __init__(self, root_answer, llm_model_names, max_depth=10, ablation=None):
         self.max_depth = max_depth
+        self.ablation = ablation or AblationConfig()
         self.rank_list = []
         self.eval_times = 0
         self.llm_model_names = llm_model_names
@@ -295,20 +336,17 @@ class AB_MCTS_A:
         current_node = self.root
 
         if current_node == self.root and current_node.children:
-            candidates = []
-            for i, child in enumerate(current_node.children):
-                sample = child.sample_from_node_posterior()
-                candidates.append(('CONT', i, sample))
+            candidates = current_node.cont_candidates(ablation=self.ablation)
             best_candidate = min(candidates, key=lambda x: x[2])
             current_node = current_node.children[best_candidate[1]]
 
         while current_node.depth < self.max_depth:
             if not current_node.children:
-                selection_result = current_node.select_best_action_via_thompson(fe=fe)
+                selection_result = current_node.select_best_action_via_thompson(fe=fe, ablation=self.ablation)
                 action_type, action_info, _ = selection_result
                 return current_node, action_type, action_info
 
-            selection_result = current_node.select_best_action_via_thompson(fe=fe)
+            selection_result = current_node.select_best_action_via_thompson(fe=fe, ablation=self.ablation)
             action_type, action_info, _ = selection_result
 
             if action_type == 'GEN':
@@ -350,7 +388,9 @@ class AB_MCTS_A:
         self.all_rewards_store[(llm_name, op_name)].append(score)
 
         # Update global hyper-posterior based on updated GEN nodes
-        self.global_hyper.update_global_posterior(parent.gen_nodes)
+        # (without global sharing it stays at the initial prior, so GEN nodes are independent)
+        if self.ablation.global_sharing:
+            self.global_hyper.update_global_posterior(parent.gen_nodes)
 
         # Backpropagate through ancestors (CONT nodes)
         current = parent

@@ -81,3 +81,8 @@ if __name__ == "__main__":
                 objs.append(obj.item())
             
             print(f"[*] Average for {problem_size}: {np.mean(objs)}")
+
+
+# [*] Average for 20: 4.760639626155106
+# [*] Average for 50: 9.151473106175654
+# [*] Average for 100: 15.957398545791147

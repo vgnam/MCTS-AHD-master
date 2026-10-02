@@ -62,3 +62,6 @@ checkpoints/
 *.pkl
 *.pt
 *.pth
+
+# Local API keys
+api_keys.py

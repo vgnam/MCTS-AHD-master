@@ -12,7 +12,7 @@ import json
 import random
 import time
 from .evolution_interface import InterfaceEC
-from .ab_mcts import GENNode, MCTSNode, AB_MCTS_A
+from .ab_mcts import GENNode, MCTSNode, AB_MCTS_A, AblationConfig
 
 import copy
 import random
@@ -84,8 +84,20 @@ class AB_MCTS_A_AHD:
         self.timeout = paras.eva_timeout
         self.use_numba = paras.eva_numba_decorator
 
+        # Ablation settings (missing keys = full GENESIS)
+        abl = (self.config.get("ablation") if self.config is not None else None) or {}
+        self.ablation = AblationConfig(
+            posterior_sampling=bool(abl.get("posterior_sampling", True)),
+            adaptive_op_selection=bool(abl.get("adaptive_op_selection", True)),
+            global_sharing=bool(abl.get("global_sharing", True)),
+            ucb_c=float(abl.get("ucb_c", 1.0)),
+        )
+        self.use_agre = bool(abl.get("agre", True))
+        self.agre_stages = dict(abl.get("agre_stages") or {})
+
         print("- AB-MCTS-A Multiple LLM parameters loaded -")
         print(f"LLM Models: {self.llm_model_names}")
+        print(f"Ablation: {self.ablation}, AGRE: {self.use_agre}, AGRE stages: {self.agre_stages}")
         random.seed(2024)
 
     def add2pop(self, population, offspring):
@@ -234,22 +246,22 @@ class AB_MCTS_A_AHD:
         # === Chọn cá thể tốt nhất theo objective ===
         best_offspring = min(all_offsprings, key=lambda x: float(x['objective']))
 
-        # offsprings_to_add = list(all_offsprings)
-        # # === Tinh chỉnh cá thể tốt nhất bằng EDCRR ===
-        # for offspring in all_offsprings:
-        try:
-            _, refined_offspring = interface_ec.get_offspring(path_set, "refine", father=best_offspring)
-            refined_offspring['objective'] = interface_ec.batch_evaluate([refined_offspring['code']], 0)
-        except Exception:
-            refined_offspring = best_offspring
-
         # === Add tất cả offsprings vào tree (gồm cả refined_offspring nếu khác best_offspring) ===
         offsprings_to_add = list(all_offsprings)
-        offsprings_to_add.append(refined_offspring)
 
-        # Nếu cá thể đã tinh chỉnh khác với best_offspring, thêm vào danh sách
-        if refined_offspring and refined_offspring != best_offspring:
+        # === Tinh chỉnh cá thể tốt nhất bằng AGRE (bỏ qua khi ablation.agre=false) ===
+        if self.use_agre:
+            try:
+                _, refined_offspring = interface_ec.get_offspring(path_set, "refine", father=best_offspring)
+                refined_offspring['objective'] = interface_ec.batch_evaluate([refined_offspring['code']], 0)
+            except Exception:
+                refined_offspring = best_offspring
+
             offsprings_to_add.append(refined_offspring)
+
+            # Nếu cá thể đã tinh chỉnh khác với best_offspring, thêm vào danh sách
+            if refined_offspring and refined_offspring != best_offspring:
+                offsprings_to_add.append(refined_offspring)
 
         for offspring in offsprings_to_add:
             if offspring['objective'] == float('inf'):
@@ -349,7 +361,8 @@ class AB_MCTS_A_AHD:
                 timeout=self.timeout,
                 use_numba=self.use_numba,
                 advisor_configs=advisor_configs,
-                debate_rounds=debate_rounds
+                debate_rounds=debate_rounds,
+                agre_stages=self.agre_stages
             )
 
             print(advisor_configs)
@@ -357,7 +370,7 @@ class AB_MCTS_A_AHD:
             self.interface_ecs[model_name] = interface_ec
             print(f"Created interface for model: {model_name}")
 
-        mcts = AB_MCTS_A('Root', self.llm_model_names)  # Pass LLM model names to MCTS
+        mcts = AB_MCTS_A('Root', self.llm_model_names, ablation=self.ablation)  # Pass LLM model names to MCTS
 
         for model_name, interface_ec in self.interface_ecs.items():
             self.eval_times, brothers, offsprings = interface_ec.get_algorithm(self.eval_times, [], "i1")

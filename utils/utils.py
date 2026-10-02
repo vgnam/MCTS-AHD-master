@@ -157,14 +157,14 @@ def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature
     return contents
 
 
-def chat_completion(n: int, messages: list[dict], temperature: float, model: str = "mistral/codestral-latest") -> list[dict]:
+def chat_completion(n: int, messages: list[dict], temperature: float, model: str = "nvidia_nim/openai/gpt-oss-120b") -> list[dict]:
     """
     Generate n responses using OpenAI Chat Completions API
     """
 
     for attempt in range(100):
         try:
-            response_cur = completion(model=model,
+            response_cur = completion(model="openrouter/mistralai/codestral-2508",
                                       messages=messages,
                                       temperature=temperature,
                                       n=n)
