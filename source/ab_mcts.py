@@ -92,7 +92,6 @@ class GENNode:
         self.tau2_post = self.tau2_prior
 
         self.rewards = []
-        self._lambda = 1.2
         self.depth = getattr(parent, "depth", 0) + 1
 
     def update_posterior(self, new_reward, global_hyper):
@@ -175,7 +174,8 @@ class MCTSNode:
     def sample_from_node_posterior(self):
         sigma2 = invgamma.rvs(a=self.nu_post / 2.0, scale=self.nu_post * self.tau2_post / 2.0)
         mu_sample = norm.rvs(loc=self.mu_post, scale=np.sqrt(sigma2 / self.kappa_post))
-        return mu_sample
+        # theta ~ N(mu, sigma2)
+        return norm.rvs(loc=mu_sample, scale=np.sqrt(sigma2))
 
     def update_node_posterior(self, new_reward):
         new_reward = float(new_reward)
@@ -219,18 +219,33 @@ class MCTSNode:
         return candidates
 
     def gen_score(self, gen_node, fe, global_params, ablation):
-        """Score one GEN node; lower is better."""
-        local_precision = gen_node.kappa_post / gen_node.tau2_post
+        """
+        Score one GEN node; lower is better.
+        (mu_g, sigma2_g) ~ NIG_g is combined with the global sample (mu_0, sigma2_0) by precision weighting:
+            lambda = (kappa_g / sigma2_g) / (kappa_g / sigma2_g + kappa_0 / sigma2_0)
+            mu     = lambda * mu_g + (1 - lambda) * mu_0
+            sigma2 = 1 / (kappa_g / sigma2_g + kappa_0 / sigma2_0)
+            theta  ~ N(mu, sigma2)
+        Without posterior sampling, posterior point estimates replace the samples.
+        """
+        if ablation.posterior_sampling:
+            sigma2_local = invgamma.rvs(a=gen_node.nu_post / 2.0, scale=gen_node.nu_post * gen_node.tau2_post / 2.0)
+            mu_local = norm.rvs(loc=gen_node.mu_post, scale=math.sqrt(sigma2_local / gen_node.kappa_post))
+        else:
+            mu_local, sigma2_local = gen_node.mu_post, gen_node.tau2_post
+        local_precision = gen_node.kappa_post / sigma2_local
+
         if ablation.global_sharing:
-            # Pull local posterior towards global
-            # Precision = 1/variance = kappa / sigma2
+            # Precision = kappa / sigma2
             mu_global, sigma2_global = global_params
             global_precision = self.global_hyper.kappa_post / sigma2_global
-            combined_precision = local_precision + 0.5 * global_precision
-            combined_mu = (gen_node.mu_post * local_precision + mu_global * global_precision) / combined_precision
         else:
-            combined_precision = local_precision
-            combined_mu = gen_node.mu_post
+            # lambda = 1: the GEN node relies on its local posterior only
+            mu_global, global_precision = 0.0, 0.0
+
+        combined_precision = local_precision + global_precision
+        lam = local_precision / combined_precision
+        combined_mu = lam * mu_local + (1 - lam) * mu_global
 
         if ablation.posterior_sampling:
             # Sample theta_i ~ Normal(combined_mu, combined_sigma2)
@@ -238,8 +253,7 @@ class MCTSNode:
         else:
             value = lcb_score(combined_mu, gen_node.visits, self.visits, np.sqrt(self.tau2_post), ablation.ucb_c)
 
-        # Feature scaling
-        score = value * math.exp(gen_node._lambda * fe / 1000)
+        score = value
 
         print(
             f"GEN {gen_node.operator_name}: mu_post={gen_node.mu_post:.3f}, tau2={gen_node.tau2_post:.3f}, combined_mu={combined_mu:.3f}, value={value:.3f}, score={score:.3f}")
