@@ -1,4 +1,5 @@
 problem_name: asp_constructive
+max_fe: 1000
 problem_type: constructive
 obj_type: max
 problem_size: 10 # problem size fpriorityor training

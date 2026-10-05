@@ -17,6 +17,9 @@ class AB_AHD:
                              pop_size = self.cfg.pop_size,
                              ec_fe_max = self.cfg.max_fe,
                              exp_output_path = f"{workdir}/",
+                             llm_model=self.cfg.model,
+                             llm_model_names=[self.cfg.model],
+                             ec_operator_weights=[self.cfg.get('candidates_per_expansion', 4)] * len(self.paras.ec_operators),
                              exp_debug_mode = False,
                              eva_timeout=cfg.timeout)
 

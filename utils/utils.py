@@ -147,7 +147,7 @@ def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature
         num_workers = 2
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
-        args = [(n, messages, model, temperature) for messages in messages_list]
+        args = [(n, messages, temperature, model) for messages in messages_list]
         choices = executor.map(lambda p: chat_completion(*p), args)
 
     contents: list[str] = []
@@ -157,28 +157,35 @@ def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature
     return contents
 
 
-def chat_completion(n: int, messages: list[dict], temperature: float, model: str = "nvidia_nim/openai/gpt-oss-120b") -> list[dict]:
-    """
-    Generate n responses using OpenAI Chat Completions API
-    """
+def chat_completion(n: int, messages: list[dict], temperature: float,
+                    model: str = "nvidia_nim/openai/gpt-oss-120b", deadline=None) -> list[dict]:
+    """Call the configured model with bounded retries and a shared deadline."""
+    from source.search_budget import BudgetExhausted
 
-    for attempt in range(100):
+    for attempt in range(3):
+        timeout = 60.0
+        if deadline is not None:
+            timeout = min(timeout, deadline - time.monotonic())
+            if timeout <= 0:
+                raise BudgetExhausted("Search wall-clock budget exhausted during generation.")
         try:
-            response_cur = completion(model="openrouter/mistralai/codestral-2508",
-                                      messages=messages,
-                                      temperature=temperature,
-                                      n=n)
-                                      # api_base="http://localhost:1234/v1",
-                                      # api_key="sk-no-key-required")
-            break
-        except Exception as e:
-            logging.info(f"Attempt {attempt + 1} failed with error: {e}")
-            time.sleep(3)
-    if response_cur is None:
-        logging.info("Code terminated due to too many failed attempts!")
-        exit()
+            response = completion(model=model, messages=messages,
+                                  temperature=temperature, n=n,
+                                  timeout=timeout, num_retries=0)
+            if deadline is not None and time.monotonic() >= deadline:
+                raise BudgetExhausted("Search wall-clock budget exhausted during generation.")
+            return response.choices
+        except BudgetExhausted:
+            raise
+        except Exception:
+            if deadline is not None and time.monotonic() >= deadline:
+                raise BudgetExhausted("Search wall-clock budget exhausted during generation.")
+            if attempt == 2:
+                raise
+            delay = 3 if deadline is None else min(3, max(0, deadline - time.monotonic()))
+            logging.warning("LLM request failed (attempt %s); retrying.", attempt + 1)
+            time.sleep(delay)
 
-    return response_cur.choices
 
 def format_messages(cfg, pre_messages):
     messages = [{"role": "system", "content": pre_messages["system"]},

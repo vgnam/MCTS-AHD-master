@@ -1,10 +1,11 @@
 import logging
 import os
 import subprocess
+import sys
+import time
 import re
 from typing import List, Any
-from gls_tsp_adapt.gls_tsp_eval import Sandbox
-from utils.utils import block_until_running, file_to_string, filter_traceback
+from utils.utils import file_to_string, filter_traceback
 
 
 class Prompts:
@@ -110,15 +111,20 @@ class Problem:
         individual["traceback_msg"] = traceback_msg
         return individual
 
-    def batch_evaluate(self, codes: list[str], iteration: int) -> str | list[Any]:
+    def batch_evaluate(self, codes: list[str], iteration: int, timeout=None) -> str | list[Any]:
         """
         Evaluate population by running code in parallel and computing objective values and fitness.
         """
         self.iteration = iteration
+        deadline = None if timeout is None else time.monotonic() + timeout
         population = [self.response_to_individual(resp, index) for index, resp in enumerate(codes)]
         inner_runs = []
         # Run code to evaluate
         for response_id in range(len(population)):
+            inner_run = None
+            if deadline is not None and time.monotonic() >= deadline:
+                return 'timeout'
+            evaluation_started = time.monotonic()
             runid = hash(population[response_id]["code"])
             # Skip if response is invalid
             if population[response_id]["code"] is None:
@@ -139,9 +145,8 @@ class Problem:
                 with open(individual["stdout_filepath"], 'w') as f:
                     file_path = f'{self.root_dir}/problems/{self.problem}/eval.py' if self.problem_type != "black_box" else f'{self.root_dir}/problems/{self.problem}/eval_black_box.py'
                     inner_run = process = subprocess.Popen(
-                        ['python', '-u', file_path, f'{self.problem_size}', self.root_dir, "train"], stdout=f, stderr=f)
+                        [sys.executable, '-u', file_path, f'{self.problem_size}', self.root_dir, "train"], stdout=f, stderr=f)
 
-                block_until_running(individual["stdout_filepath"], log_status=True)
                 inner_runs.append(process)
             except Exception as e:  # If code execution fails
                 print(e)
@@ -152,11 +157,15 @@ class Problem:
             if inner_run is None:  # If code execution fails, skip
                 continue
             try:
-                inner_run.communicate(timeout=self.config.timeout)  # Wait for code execution to finish
+                remaining = self.config.timeout - (time.monotonic() - evaluation_started)
+                if deadline is not None:
+                    remaining = min(remaining, deadline - time.monotonic())
+                inner_run.communicate(timeout=max(0, remaining))
             except subprocess.TimeoutExpired as e:
                 logging.info(f"Error for response_id {response_id}: {e}")
                 population[response_id] = self.mark_invalid_individual(population[response_id], str(e))
                 inner_run.kill()
+                inner_run.communicate()  # Reap the evaluator before returning.
                 return 'timeout'
 
             individual = population[response_id]

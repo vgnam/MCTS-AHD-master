@@ -43,6 +43,7 @@ class Evolution():
         self.debug_mode = debug_mode  # close prompt checking
 
         self.interface_llm = InterfaceLLM(self.api_endpoint, self.api_key, self.model_LLM, self.debug_mode)
+        self.interface_llm.budget = kwargs.get('budget')
 
     def _format_advice(self, advice):
         if advice is None:

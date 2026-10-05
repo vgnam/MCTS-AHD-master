@@ -4,6 +4,7 @@ import os
 import traceback
 from pathlib import Path
 import subprocess
+import sys
 # from utils.utils import init_client
 
 
@@ -80,7 +81,7 @@ def main(cfg):
         logging.info(f"Running validation script: {test_script}")
         with open(test_script_stdout, 'w') as stdout:
             subprocess.run(
-                ["python", str(test_script), "-1", ROOT_DIR, "val"],
+                [sys.executable, str(test_script), "-1", ROOT_DIR, "val"],
                 stdout=stdout,
                 stderr=subprocess.STDOUT,  # capture errors too
                 check=False

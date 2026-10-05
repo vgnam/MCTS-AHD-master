@@ -33,28 +33,16 @@ class GlobalHyperPrior:
         self.nu_post = self.nu_0
         self.tau2_post = self.tau2_0
 
-    def update_global_posterior(self, gen_nodes):
-        """
-        Update the global hyper-posterior based on data from all GEN nodes.
-        Uses the means and variances of local posteriors.
-        """
-        # Get local mu_post and tau2_post from GEN nodes
-        mu_locals = [g.mu_post for g in gen_nodes]
-        tau2_locals = [g.tau2_post for g in gen_nodes]
-
-        # Calculate averages for new prior
-        mu_avg = np.mean(mu_locals) if mu_locals else self.mu_0
-        tau2_avg = np.mean(tau2_locals) if tau2_locals else self.tau2_0
-
-        # Update hyper-posterior parameters (simplified aggregation)
-        N = len(gen_nodes)
-        r_bar = mu_avg
-        ssq = np.var(mu_locals) * N if len(mu_locals) > 1 else 0
-
-        kappa_n = self.kappa_0 + N
-        mu_n = (self.kappa_0 * self.mu_0 + N * r_bar) / kappa_n
-        nu_n = self.nu_0 + N
-        tau2_n = (self.nu_0 * self.tau2_0 + ssq + (self.kappa_0 * N) / kappa_n * (r_bar - self.mu_0) ** 2) / nu_n
+    def update_global_posterior(self, reward):
+        """Incorporate one new evaluation, once, irrespective of path length."""
+        reward = float(reward)
+        if not math.isfinite(reward):
+            raise ValueError("NIG observations must be finite.")
+        kappa_n = self.kappa_post + 1
+        mu_n = (self.kappa_post * self.mu_post + reward) / kappa_n
+        nu_n = self.nu_post + 1
+        tau2_n = (self.nu_post * self.tau2_post
+                  + self.kappa_post / kappa_n * (reward - self.mu_post) ** 2) / nu_n
 
         self.mu_post = mu_n
         self.kappa_post = kappa_n
@@ -79,11 +67,11 @@ class GENNode:
         self.visits = visits
         self.global_hyper = global_hyper  # Reference to GlobalHyperPrior
 
-        # Prior is taken from global hyper
-        self.mu_prior = global_hyper.mu_post
-        self.kappa_prior = global_hyper.kappa_post
-        self.nu_prior = global_hyper.nu_post
-        self.tau2_prior = global_hyper.tau2_post
+        # Fixed local prior; global evidence is fused at selection, not replayed here.
+        self.mu_prior = global_hyper.mu_0
+        self.kappa_prior = global_hyper.kappa_0
+        self.nu_prior = global_hyper.nu_0
+        self.tau2_prior = global_hyper.tau2_0
 
         # Posterior (starts as prior)
         self.mu_post = self.mu_prior
@@ -94,15 +82,15 @@ class GENNode:
         self.rewards = []
         self.depth = getattr(parent, "depth", 0) + 1
 
-    def update_posterior(self, new_reward, global_hyper):
+    def update_posterior(self, new_reward):
         new_reward = float(new_reward)
         self.rewards.append(new_reward)
         N = len(self.rewards)
 
         r_bar = np.mean(self.rewards)
 
-        # Get prior from global hyper (updated)
-        mu0, kappa0, nu0, tau20 = global_hyper.mu_post, global_hyper.kappa_post, global_hyper.nu_post, global_hyper.tau2_post
+        mu0, kappa0 = self.mu_prior, self.kappa_prior
+        nu0, tau20 = self.nu_prior, self.tau2_prior
 
         kappa_n = kappa0 + N
         mu_n = (kappa0 * mu0 + N * r_bar) / kappa_n
@@ -146,8 +134,10 @@ class MCTSNode:
         # Create GEN nodes for this node: one for each (LLM, Operator) pair
         self.gen_nodes = []
 
+        # The virtual root has no heuristic to modify; E1 grows its initial pool.
+        operators = ['e1'] if is_root else ['counter', 'e2', 'm1', 'm2', 's1']
         for llm in llm_model_names:
-            for op in ['counter', 'e2', 'm1', 'm2', 's1']:
+            for op in operators:
                 self.gen_nodes.append(GENNode(self, llm, op, global_hyper))
 
         # Node posterior (for CONT actions)
@@ -163,12 +153,16 @@ class MCTSNode:
 
         self._generation_method = None
         self._generation_action = None  # Can store (llm_name, op_name) tuple later if needed
+        self._generation_operator = None
+        self._backpropagated = False
 
     def add_child(self, child_node, generation_method=None, generation_action=None):
         child_node.parent = self
         child_node.depth = self.depth + 1
-        child_node._generation_method = generation_method
-        child_node._generation_action = generation_action
+        if generation_method is not None:
+            child_node._generation_method = generation_method
+        if generation_action is not None:
+            child_node._generation_action = generation_action
         self.children.append(child_node)
 
     def sample_from_node_posterior(self):
@@ -259,7 +253,8 @@ class MCTSNode:
             f"GEN {gen_node.operator_name}: mu_post={gen_node.mu_post:.3f}, tau2={gen_node.tau2_post:.3f}, combined_mu={combined_mu:.3f}, value={value:.3f}, score={score:.3f}")
         return score
 
-    def hierarchical_thompson_sampling(self, fe, num_samples=1, ablation=None):
+    def hierarchical_thompson_sampling(self, fe, num_samples=1, ablation=None,
+                                      allow_recombination=True):
         """
         Perform proper Hierarchical Thompson Sampling:
         1. Sample global hyperparameter φ ~ p(φ | D)
@@ -270,7 +265,7 @@ class MCTSNode:
         ablation = ablation or AblationConfig()
 
         # 1. Sample global hyperparameter (posterior mean when sampling is disabled)
-        if ablation.posterior_sampling:
+        if ablation.posterior_sampling and ablation.global_sharing:
             global_params = self.global_hyper.sample_hyperparameter()
         else:
             global_params = (self.global_hyper.mu_post, self.global_hyper.tau2_post)
@@ -278,6 +273,11 @@ class MCTSNode:
         # 2. Score GEN actions
         gen_candidates = []
         for gen_node in self.gen_nodes:
+            # S1 needs at least two real heuristics on the selected path.
+            if gen_node.operator_name == 's1' and self.depth < 2:
+                continue
+            if gen_node.operator_name == 'e2' and not allow_recombination:
+                continue
             score = self.gen_score(gen_node, fe, global_params, ablation)
             action_identifier = (gen_node.llm_model_name, gen_node.operator_name)
             gen_candidates.append(('GEN', action_identifier, score))
@@ -285,8 +285,8 @@ class MCTSNode:
         if gen_candidates and not ablation.adaptive_op_selection:
             # Expand-vs-continue still uses the best GEN score; only the operator is random
             best_gen_score = min(c[2] for c in gen_candidates)
-            chosen = random.choice(self.gen_nodes)
-            gen_candidates = [('GEN', (chosen.llm_model_name, chosen.operator_name), best_gen_score)]
+            chosen = random.choice(gen_candidates)
+            gen_candidates = [('GEN', chosen[1], best_gen_score)]
 
         # 3. Choose the best action (lowest reward)
         candidates = gen_candidates + self.cont_candidates(num_samples, ablation)
@@ -295,37 +295,15 @@ class MCTSNode:
         return best_candidate
 
 
-    def select_best_action_via_thompson(self, fe, num_samples=1, epsilon=0, ablation=None):
-
-        if random.random() < epsilon:
-            candidates = []
-            for i, child in enumerate(self.children):
-                reward = child.reward
-                candidates.append(('CONT', i, reward))
-            if not candidates:
-                if self.gen_nodes:
-                    # Return first GEN node's (LLM, Operator) pair
-                    first_gen = self.gen_nodes[0]
-                    return 'GEN', (first_gen.llm_model_name, first_gen.operator_name), float('inf')
-                return 'GEN', None, float('inf')
-            best_candidate = min(candidates, key=lambda x: x[2])
-            return best_candidate
-
-        # If too many children, only consider CONT actions
-        if len(self.children) >= 7:
-            candidates = self.cont_candidates(num_samples, ablation)
-            best_candidate = min(candidates, key=lambda x: x[2])
-            return best_candidate
-
-        # Use HTS
-        return self.hierarchical_thompson_sampling(fe, num_samples, ablation)
-
+    def select_best_action_via_thompson(self, fe, num_samples=1, ablation=None,
+                                      allow_recombination=True):
+        return self.hierarchical_thompson_sampling(
+            fe, num_samples, ablation, allow_recombination=allow_recombination)
 
 
 
 class AB_MCTS_A:
-    def __init__(self, root_answer, llm_model_names, max_depth=10, ablation=None):
-        self.max_depth = max_depth
+    def __init__(self, root_answer, llm_model_names, ablation=None):
         self.ablation = ablation or AblationConfig()
         self.rank_list = []
         self.eval_times = 0
@@ -346,69 +324,41 @@ class AB_MCTS_A:
             global_hyper=self.global_hyper
         )
 
-    def select_expansion_target(self, fe):
-        current_node = self.root
-
-        if current_node == self.root and current_node.children:
-            candidates = current_node.cont_candidates(ablation=self.ablation)
-            best_candidate = min(candidates, key=lambda x: x[2])
-            current_node = current_node.children[best_candidate[1]]
-
-        while current_node.depth < self.max_depth:
-            if not current_node.children:
-                selection_result = current_node.select_best_action_via_thompson(fe=fe, ablation=self.ablation)
-                action_type, action_info, _ = selection_result
-                return current_node, action_type, action_info
-
-            selection_result = current_node.select_best_action_via_thompson(fe=fe, ablation=self.ablation)
-            action_type, action_info, _ = selection_result
-
-            if action_type == 'GEN':
-                return current_node, 'GEN', action_info  # action_info is (llm_name, op_name)
-            elif action_type == 'CONT':
-                child_idx = action_info
-                current_node = current_node.children[child_idx]
-
-
-        # Reached max depth, must expand here
-        if current_node.gen_nodes:
-            chosen_gen = random.choice(current_node.gen_nodes)
-            return current_node, 'GEN', (chosen_gen.llm_model_name, chosen_gen.operator_name)
-        return current_node, 'GEN', (
-        self.llm_model_names[0], self.operators[0])
+    def select_expansion_target(self, fe, population=None):
+        current = self.root
+        while True:
+            action, info, _ = current.select_best_action_via_thompson(
+                fe=fe, ablation=self.ablation,
+                allow_recombination=population is None or any(
+                    item['code'] != current.code for item in population))
+            if action == 'GEN':
+                return current, action, info
+            current = current.children[info]
 
     def backpropagate(self, node: MCTSNode, op_name):
-
-        print("backpropagate")
+        """Update every real/GEN node on the path, and global evidence once."""
+        if node._backpropagated:
+            raise ValueError("This evaluation has already been backpropagated.")
         score = float(node.reward)
+        if not math.isfinite(score):
+            raise ValueError("NIG observations must be finite.")
+        node._generation_operator = op_name
+        node._backpropagated = True
         if score not in self.rank_list:
             self.rank_list.append(score)
             self.rank_list.sort()
+        self.all_rewards_store[(node._generation_action, op_name)].append(score)
 
-        llm_name = node._generation_action
-
-        parent = node.parent
-
-        # Update the GEN node that generated this child
-        gen_node_found = False
-        for gen_node in parent.gen_nodes:
-            if gen_node.operator_name == op_name:
-                gen_node.update_posterior(score, self.global_hyper)
-                gen_node_found = True
-                print(111111111111111111111111111111111)
-                break
-
-        # Update rewards store
-        self.all_rewards_store[(llm_name, op_name)].append(score)
-
-        # Update global hyper-posterior based on updated GEN nodes
-        # (without global sharing it stays at the initial prior, so GEN nodes are independent)
-        if self.ablation.global_sharing:
-            self.global_hyper.update_global_posterior(parent.gen_nodes)
-
-        # Backpropagate through ancestors (CONT nodes)
-        current = parent
+        current = node
         while current is not None:
             current.update_node_posterior(score)
-            current.visits += 1
-            current = current.parent
+            parent = current.parent
+            if parent is not None:
+                for gen in parent.gen_nodes:
+                    if (gen.operator_name == current._generation_operator
+                            and gen.llm_model_name == current._generation_action):
+                        gen.update_posterior(score)
+                        break
+            current = parent
+        if self.ablation.global_sharing:
+            self.global_hyper.update_global_posterior(score)

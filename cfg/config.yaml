@@ -10,7 +10,7 @@ hydra:
   run:
     dir: outputs/${problem.problem_name}-${problem.problem_type}/${algorithm}/${now:%Y-%m-%d_%H-%M-%S}
 
-model: openrouter/mistralai/codestral-2508 # LLM model
+model: mistral/codestral-2508 # Paper model via the Mistral API
 temperature: 1  # temperature for chat completion
 
 # === LLM Advisor Configuration (list of advisor LLMs) ===
@@ -55,7 +55,10 @@ ablation:
     assumption_repair: true
 
 # Main GA loop parameters
-max_fe: 500 # maximum number of function evaluations
+max_fe: ${oc.select:problem.max_fe,500} # Constructive tasks override to 1000
+candidates_per_expansion: 4 # N candidates, followed by at most one AGRE evaluation
+search_timeout: 60 # Whole search, including LLM calls and evaluations; null disables
+seed: 2024 # Override for each independent run
 pop_size: 30 # population size for GA
 init_pop_size: 5 # initial population size for GA
 timeout: 60 # timeout for evaluation of a single heuristic

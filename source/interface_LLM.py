@@ -17,6 +17,7 @@ class InterfaceAPI:
         self.n_trial = 5
         self.prompt_tokens = 0
         self.completion_tokens = 0
+        self.budget = None
 
     def cal_usage_LLM(self, lst_prompt, lst_completion, encoding_name="cl100k_base"):
         """Returns the number of tokens in a text string."""
@@ -32,11 +33,14 @@ class InterfaceAPI:
         return self.completion_tokens
 
     def get_response(self, prompt_content):
+        if self.budget is not None:
+            self.budget.check()
         pre_messages = {"system": "", "user": prompt_content}
         cfg = ConfigEoH(model=self.model_LLM)
         messages = format_messages(cfg, pre_messages)
         #logging.info(f"Prompt: {prompt_content}")
-        response = chat_completion(1, [messages[1]], temperature=1., model=self.model_LLM)
+        response = chat_completion(1, [messages[1]], temperature=1., model=self.model_LLM,
+                                   deadline=self.budget.deadline if self.budget else None)
         response = response[0].message.content
         self.cal_usage_LLM([messages], [response])
         logging.info(f"LLM usage: prompt_tokens = {self.prompt_tokens}, completion_tokens = {self.completion_tokens}")

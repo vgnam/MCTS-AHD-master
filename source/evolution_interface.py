@@ -1,4 +1,6 @@
 import copy
+import logging
+from .search_budget import BudgetExhausted
 import random
 
 import numpy as np
@@ -19,6 +21,7 @@ class InterfaceEC():
         assert 'use_local_llm' in kwargs
         assert 'url' in kwargs
 
+        self.budget = kwargs.get("budget")
         self.interface_eval = interface_prob
         prompts = interface_prob.prompts
 
@@ -120,8 +123,7 @@ class InterfaceEC():
             [offspring['code'], offspring['thought']] = self.evol.e1(parents, advice=advice)
         elif operator == "e2":
             other = copy.deepcopy(pop)
-            if father in pop:
-                other.remove(father)
+            other = [individual for individual in other if individual['code'] != father['code']]
             real_m = 1
             # real_m = random.randint(2, self.m) - 1
             # real_m = min(real_m, len(other))
@@ -138,7 +140,7 @@ class InterfaceEC():
             parents = pop
             [offspring['code'], offspring['thought']] = self.evol.s1(pop, advice=advice)
         elif operator == "counter":
-            parents = pop
+            parents = [father]
             [offspring['code'], offspring['thought']] = self.evol.counter(parents[0], advice=advice)
         elif operator == "refine":
             parents = [father]
@@ -151,52 +153,55 @@ class InterfaceEC():
         return parents, offspring
 
     def get_offspring(self, pop, operator, advice=None, father=None):
-        while True:
+        # Bound malformed-response retries as well as API retries.
+        for attempt in range(3):
+            if self.budget is not None:
+                self.budget.check()
             try:
-                p, offspring = self._get_alg(pop, operator, advice=advice, father=father)
+                parents, offspring = self._get_alg(pop, operator, advice=advice, father=father)
+                if not self.check_duplicate(pop, offspring['code']) or attempt == 2:
+                    return parents, offspring
+            except BudgetExhausted:
+                raise
+            except Exception:
+                if attempt == 2:
+                    raise
+                logging.exception("Candidate generation failed; retrying.")
+        raise RuntimeError("Candidate generation exhausted its retries.")
 
-                if pop == []:
-                    break
-
-                code = offspring['code']
-                n_retry = 1
-                while self.check_duplicate(pop, offspring['code']):
-                    n_retry += 1
-                    if self.debug:
-                        print("duplicated code, wait 1 second and retrying ... ")
-                    p, offspring = self._get_alg(pop, operator, advice=advice, father=father)
-                    code = offspring['code']
-                    if n_retry > 1:
-                        break
-                break
-            except Exception as e:
-                print(e)
-
-        return p, offspring
+    def evaluate_offspring(self, eval_times, offspring):
+        """Count every evaluator invocation, including invalid outputs and AGRE."""
+        if self.budget is not None:
+            timeout = self.budget.remaining_seconds()
+            eval_times = self.budget.reserve_evaluation()
+            objs = self.interface_eval.batch_evaluate([offspring['code']], 0, timeout=timeout)
+        else:
+            eval_times += 1
+            objs = self.interface_eval.batch_evaluate([offspring['code']], 0)
+        if isinstance(objs, str) or not objs or not np.isfinite(objs[0]):
+            return eval_times, None
+        offspring['objective'] = float(np.round(objs[0], 5))
+        return eval_times, offspring
 
     def get_algorithm(self, eval_times, pop, operator, advice=None):
         while True:
-            eval_times += 1
-            parents, offspring = self.get_offspring(pop, operator, advice=advice)
-            objs = self.interface_eval.batch_evaluate([offspring['code']], 0)
-            if objs == 'timeout' or objs[0] == float('inf') or self.check_duplicate_obj(pop, np.round(objs[0], 5)):
-                continue
-            offspring['objective'] = np.round(objs[0], 5)
-
-            return eval_times, pop, offspring
-        return eval_times, None, None
+            if self.budget is not None:
+                self.budget.check()
+            _, offspring = self.get_offspring(pop, operator, advice=advice)
+            eval_times, offspring = self.evaluate_offspring(eval_times, offspring)
+            if offspring is not None:
+                if self.budget is None and self.check_duplicate_obj(pop, offspring['objective']):
+                    continue
+                return eval_times, pop, offspring
 
     def evolve_algorithm(self, eval_times, pop, node, brother_node, operator, advice=None):
-        for i in range(3):
-            eval_times += 1
+        for _ in range(3):
+            if self.budget is not None:
+                self.budget.check()
             _, offspring = self.get_offspring(pop, operator, advice=advice, father=node)
-            objs = self.interface_eval.batch_evaluate([offspring['code']], 0)
-            if objs == 'timeout':
-                return eval_times, None
-            if objs[0] == float('inf') or self.check_duplicate(pop, offspring['code']):
-                continue
-            offspring['objective'] = np.round(objs[0], 5)
-
-            return eval_times, offspring
+            eval_times, offspring = self.evaluate_offspring(eval_times, offspring)
+            if offspring is not None:
+                if self.budget is None and self.check_duplicate(pop, offspring['code']):
+                    continue
+                return eval_times, offspring
         return eval_times, None
-
