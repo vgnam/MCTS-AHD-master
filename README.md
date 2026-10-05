@@ -1,7 +1,7 @@
 # GENESIS
 
 Run from the repository root after installing `requirements.txt`. The default
-model is `mistral/codestral-2508`, using the Mistral API (`MISTRAL_API_KEY`).
+model is `openrouter/mistralai/codestral-2508`, using OpenRouter (`OPENROUTER_API_KEY`).
 The configured `model` is passed through to the API without a hard-coded override.
 
 ```bash

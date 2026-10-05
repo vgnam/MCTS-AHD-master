@@ -10,7 +10,7 @@ hydra:
   run:
     dir: outputs/${problem.problem_name}-${problem.problem_type}/${algorithm}/${now:%Y-%m-%d_%H-%M-%S}
 
-model: mistral/codestral-2508 # Paper model via the Mistral API
+model: openrouter/mistralai/codestral-2508 # Codestral via OpenRouter
 temperature: 1  # temperature for chat completion
 
 # === LLM Advisor Configuration (list of advisor LLMs) ===

@@ -367,7 +367,7 @@ def test_paper_config_and_adapter_forward_model(tmp_path, problem, expected):
     assert cfg.candidates_per_expansion == 4
     assert cfg.search_timeout == 60
     adapter = AB_AHD(cfg, str(root), tmp_path)
-    assert adapter.paras.llm_model_names == ['mistral/codestral-2508']
+    assert adapter.paras.llm_model_names == ['openrouter/mistralai/codestral-2508']
     assert adapter.paras.ec_operator_weights == [4] * 5
 
 
