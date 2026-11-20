@@ -74,6 +74,12 @@ def make_paras(tmp_path, max_fe):
     return paras
 
 
+@pytest.fixture(autouse=True)
+def fresh_token_usage():
+    from utils.utils import TOKEN_USAGE
+    TOKEN_USAGE.reset()  # process-wide tracker; main.py resets it once per run
+
+
 @pytest.fixture
 def cfg():
     return compose_cfg('problem=tsp_constructive', 'search_timeout=null')
@@ -138,6 +144,22 @@ def test_moh_spends_exact_budget_and_improves_meta_population(tmp_path, cfg, mon
     assert search.improver_pop.get_subtask_size('meta-optimizer') >= 2
     state = json.loads((tmp_path / 'moh_state.json').read_text())
     assert state['log'] and state['heuristics']
+    usage = json.loads((tmp_path / 'token_usage.json').read_text())
+    assert usage['calls'] == len(llm.prompts) and usage['total_tokens'] > 0
+    assert set(usage['by_tag']) == {'moh_heuristic', 'moh_meta'}
+    assert usage['history'][-1]['evaluations'] == 30
+
+
+def test_token_usage_prefers_provider_usage_and_tags():
+    from utils.utils import TokenUsage
+    tracker = TokenUsage()
+    response = SimpleNamespace(usage=SimpleNamespace(prompt_tokens=11, completion_tokens=7), choices=[])
+    with tracker.tag('outer'):
+        with tracker.tag('inner'):
+            tracker.record(response, [])
+        tracker.record(response, [])
+    assert tracker.prompt_tokens == 22 and tracker.estimated_calls == 0
+    assert tracker.by_tag['inner']['calls'] == tracker.by_tag['outer']['calls'] == 1
 
 
 def test_moh_budget_stop_escapes_generated_try_except(tmp_path, cfg, monkeypatch):

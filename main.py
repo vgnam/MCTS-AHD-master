@@ -41,6 +41,20 @@ logging.basicConfig(level=logging.INFO)
 
 @hydra.main(version_base=None, config_path="cfg", config_name="config")
 def main(cfg):
+    from utils.utils import TOKEN_USAGE
+    TOKEN_USAGE.reset()
+    try:
+        _run(cfg)
+    finally:
+        TOKEN_USAGE.dump(str(Path.cwd() / "token_usage.json"))
+        logging.info("LLM token usage: %s calls, %s prompt + %s completion = %s tokens (%s estimated calls)",
+                     TOKEN_USAGE.calls, TOKEN_USAGE.prompt_tokens, TOKEN_USAGE.completion_tokens,
+                     TOKEN_USAGE.prompt_tokens + TOKEN_USAGE.completion_tokens, TOKEN_USAGE.estimated_calls)
+        for tag, usage in TOKEN_USAGE.by_tag.items():
+            logging.info("  [%s] %s", tag, usage)
+
+
+def _run(cfg):
     try:
         workspace_dir = Path.cwd()
         print(workspace_dir)

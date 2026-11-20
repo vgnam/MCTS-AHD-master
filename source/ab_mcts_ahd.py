@@ -10,6 +10,7 @@ import numpy as np
 from .evolution_interface import InterfaceEC
 from .ab_mcts import MCTSNode, AB_MCTS_A, AblationConfig
 from .search_budget import BudgetExhausted, SearchBudget
+from utils.utils import TOKEN_USAGE
 
 
 class AB_MCTS_A_AHD:
@@ -161,6 +162,7 @@ class AB_MCTS_A_AHD:
             json.dumps(population, indent=2), encoding="utf-8")
         filename = directory / f"best_population_{suffix}"
         filename.write_text(json.dumps(population[0], indent=2), encoding="utf-8")
+        TOKEN_USAGE.checkpoint(self.eval_times, directory)
         return str(filename)
 
     def run(self):

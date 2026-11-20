@@ -16,7 +16,7 @@ from pathlib import Path
 
 import numpy as np
 
-from utils.utils import chat_completion
+from utils.utils import TOKEN_USAGE, chat_completion
 from .search_budget import SearchBudget
 
 
@@ -73,14 +73,17 @@ class EliteArchive:
         best = self.output_path / f"best_population_{suffix}"
         best.write_text(json.dumps(self.items[0] if self.items else {}, indent=2, default=str),
                         encoding="utf-8")
+        TOKEN_USAGE.checkpoint(eval_times, self.output_path)
         return str(best)
 
 
 class ChatLLM:
     """Small chat wrapper with a system role, temperature and the search deadline."""
 
-    def __init__(self, model: str, budget: SearchBudget | None = None, batch_size: int = 5):
+    def __init__(self, model: str, budget: SearchBudget | None = None, batch_size: int = 5,
+                 tag: str = "default"):
         self.model = model
+        self.tag = tag
         self.budget = budget
         self.batch_size = batch_size
         self.n_calls = 0
@@ -91,8 +94,9 @@ class ChatLLM:
         messages = [{"role": "system", "content": str(expertise or "")},
                     {"role": "user", "content": str(message)}]
         started = time.monotonic()
-        choices = chat_completion(1, messages, temperature=float(temperature), model=self.model,
-                                  deadline=self.budget.deadline if self.budget else None)
+        with TOKEN_USAGE.tag(self.tag):
+            choices = chat_completion(1, messages, temperature=float(temperature), model=self.model,
+                                      deadline=self.budget.deadline if self.budget else None)
         self.n_calls += 1
         logging.debug("LLM call %s took %.1fs", self.n_calls, time.monotonic() - started)
         return choices[0].message.content

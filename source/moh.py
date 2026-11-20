@@ -502,9 +502,9 @@ class MoH_AHD:
     def run(self):
         self.budget.start()
         self.evaluator = BudgetedEvaluator(self.prob, self.budget)
-        self.heu_llm = _BudgetedLLM(self.model, self.budget, self.batch_size)
-        self.meta_llm = self.heu_llm if self.meta_model == self.model else \
-            _BudgetedLLM(self.meta_model, self.budget, self.batch_size)
+        # Separate clients so token usage is reported per level (moh_heuristic / moh_meta).
+        self.heu_llm = _BudgetedLLM(self.model, self.budget, self.batch_size, tag="moh_heuristic")
+        self.meta_llm = _BudgetedLLM(self.meta_model, self.budget, self.batch_size, tag="moh_meta")
         self.subtask_pop = Pop([self.subtask], self.pop_size)
         self.improver_pop = Pop([META_TASK], self.pop_size)
         self.improver_str = clean_code(SEED_OPTIMIZER)

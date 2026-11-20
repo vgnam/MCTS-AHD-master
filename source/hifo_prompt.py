@@ -35,6 +35,7 @@ import numpy as np
 from .baseline_common import BudgetedEvaluator, EliteArchive, make_budget
 from .evolution import Evolution
 from .search_budget import BudgetExhausted
+from utils.utils import TOKEN_USAGE
 
 FAILED_OFFSPRING_EFFECTIVENESS = -0.8
 
@@ -421,7 +422,8 @@ class HiFo_AHD:
                    "\n- Prioritize choices that maintain flexibility for future decision-making steps."
                    "\n- Implement adaptive mechanisms that respond to problem instance characteristics.")
         try:
-            response = self.evol.interface_llm.get_response(prompt)
+            with TOKEN_USAGE.tag("hifo_insight_extraction"):
+                response = self.evol.interface_llm.get_response(prompt)
         except BudgetExhausted:
             raise
         except Exception:
@@ -456,8 +458,9 @@ class HiFo_AHD:
         regime, directive, insights = self._guidance()
         parents = self._select_parents(pop, operator)
         prompt = self.evol.hifo_prompt(operator, parents, insights, directive, regime)
-        code, algorithm = self.evol.hifo_get_alg(prompt)
-        meta = {'operator': operator, 'insights': insights, 'design_directive': directive,
+        with TOKEN_USAGE.tag("hifo_generation"):
+            code, algorithm = self.evol.hifo_get_alg(prompt)
+        meta ={'operator': operator, 'insights': insights, 'design_directive': directive,
                 'regime': regime, 'timestamp': time.time()}
         return code, algorithm, meta
 

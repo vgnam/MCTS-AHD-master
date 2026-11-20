@@ -157,6 +157,96 @@ def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature
     return contents
 
 
+class TokenUsage:
+    """Process-wide LLM token counter, filled by every ``chat_completion`` call.
+
+    Uses the provider's reported ``usage``; when it is missing, both sides are
+    estimated with tiktoken (cl100k) and counted in ``estimated_calls``. Calls can
+    be attributed to a tag (``with TOKEN_USAGE.tag("moh_meta"): ...``; the
+    innermost tag wins), and ``checkpoint`` records the totals against the FE
+    count and rewrites ``<output>/token_usage.json``.
+    """
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.calls = self.prompt_tokens = self.completion_tokens = self.estimated_calls = 0
+        self.by_tag = {}
+        self.history = []
+        self._tags = []
+        self._encoding = None
+
+    def tag(self, name):
+        tracker = self
+
+        class _Tag:
+            def __enter__(self):
+                tracker._tags.append(name)
+
+            def __exit__(self, *exc):
+                tracker._tags.pop()
+                return False
+        return _Tag()
+
+    def _count(self, text):
+        if self._encoding is None:
+            import tiktoken
+            self._encoding = tiktoken.get_encoding("cl100k_base")
+        return len(self._encoding.encode(text or ""))
+
+    def record(self, response, messages):
+        try:
+            usage = getattr(response, "usage", None)
+            if isinstance(usage, dict):
+                prompt, completion_ = usage.get("prompt_tokens"), usage.get("completion_tokens")
+            else:
+                prompt = getattr(usage, "prompt_tokens", None)
+                completion_ = getattr(usage, "completion_tokens", None)
+            if prompt is None or completion_ is None:
+                prompt = sum(self._count(str(m.get("content", ""))) for m in messages)
+                completion_ = sum(self._count(c.message.content) for c in response.choices)
+                self.estimated_calls += 1
+            prompt, completion_ = int(prompt), int(completion_)
+        except Exception:
+            logging.debug("Could not record token usage.", exc_info=True)
+            return
+        self.calls += 1
+        self.prompt_tokens += prompt
+        self.completion_tokens += completion_
+        tag = self._tags[-1] if self._tags else "default"
+        bucket = self.by_tag.setdefault(tag, {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0})
+        bucket["calls"] += 1
+        bucket["prompt_tokens"] += prompt
+        bucket["completion_tokens"] += completion_
+
+    def summary(self):
+        return {"calls": self.calls, "prompt_tokens": self.prompt_tokens,
+                "completion_tokens": self.completion_tokens,
+                "total_tokens": self.prompt_tokens + self.completion_tokens,
+                "estimated_calls": self.estimated_calls,
+                "by_tag": self.by_tag, "history": self.history}
+
+    def checkpoint(self, evaluations, output_path=None):
+        point = {"evaluations": int(evaluations), "calls": self.calls,
+                 "prompt_tokens": self.prompt_tokens, "completion_tokens": self.completion_tokens}
+        if not self.history or self.history[-1] != point:
+            self.history.append(point)
+        if output_path is not None:
+            self.dump(os.path.join(str(output_path), "token_usage.json"))
+
+    def dump(self, path):
+        import json
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(self.summary(), f, indent=2)
+        except OSError:
+            logging.warning("Could not write token usage to %s", path)
+
+
+TOKEN_USAGE = TokenUsage()
+
+
 def chat_completion(n: int, messages: list[dict], temperature: float,
                     model: str = "nvidia_nim/openai/gpt-oss-120b", deadline=None) -> list[dict]:
     """Call the configured model with bounded retries and a shared deadline."""
@@ -172,6 +262,7 @@ def chat_completion(n: int, messages: list[dict], temperature: float,
             response = completion(model=model, messages=messages,
                                   temperature=temperature, n=n,
                                   timeout=timeout, num_retries=0)
+            TOKEN_USAGE.record(response, messages)  # tokens are spent even if the deadline passed
             if deadline is not None and time.monotonic() >= deadline:
                 raise BudgetExhausted("Search wall-clock budget exhausted during generation.")
             return response.choices
