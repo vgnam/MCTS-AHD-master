@@ -38,7 +38,7 @@ llm_advisor:
       expertise: "generating efficient and robust code implementations for heuristics"
 
 # The chosen algorithm
-algorithm: ab-mcts-ahd
+algorithm: ab-mcts-ahd  # ab-mcts-ahd | mcts-ahd | moh | hifo-prompt
 
 # === Ablation switches for ab-mcts-ahd (all true = full GENESIS) ===
 # e.g. python main.py ablation.global_sharing=false
@@ -53,6 +53,31 @@ ablation:
     role_conflict: true
     abstraction: true
     assumption_repair: true
+
+# === Baselines (algorithm=moh | algorithm=hifo-prompt) ===
+# Both share max_fe, search_timeout, timeout, seed and model with GENESIS.
+baselines:
+  moh:                       # Meta-optimization of Heuristics (Shi et al., ICLR 2026)
+    pop_size: 10             # heuristic and meta-optimizer population sizes
+    batch_size: 5            # language_model.batch_size seen by generated optimizers
+    seed_pop_size: ${init_pop_size}  # valid seed heuristics before meta-optimization
+    min_base_pop: 3          # top-up before each meta-utility evaluation
+    max_outer_iterations: 10 # LLM loop-count check rejects optimizers above this
+    max_direction_rounds: 20 # cap on seed-direction rounds (no FE is spent on failed parses)
+    n_iterations: null       # meta iterations; null = run until the FE/time budget is spent
+    max_idle_iterations: 20  # stop if this many meta iterations in a row spend no FE
+    meta_model: null         # null = same model as `model`
+  hifo:                      # HiFo-Prompt (Chen et al., ICLR 2026)
+    pop_size: 8              # population size and offspring per operator
+    m: 2                     # parents for e1/e2
+    operators: [e1, e2, m1, m2, m3]
+    operator_weights: [1, 1, 1, 1, 1]
+    init_rounds: 2           # rounds of pop_size i1 offspring for the initial population
+    insights_per_prompt: 3
+    insight_pool_size: 30
+    insight_extract_prob: 0.8
+    use_insights: true       # ablation: Hindsight insight pool
+    use_navigator: true      # ablation: Foresight evolutionary navigator
 
 # Main GA loop parameters
 max_fe: ${oc.select:problem.max_fe,500} # Constructive tasks override to 1000

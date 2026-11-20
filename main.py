@@ -57,6 +57,10 @@ def main(cfg):
             from ahd_adapter import AHD as LHH
         elif cfg.algorithm == "ab-mcts-ahd":
             from ab_mcts_adapter import AB_AHD as LHH
+        elif cfg.algorithm == "moh":
+            from baseline_adapters import MoH_AHD_Adapter as LHH
+        elif cfg.algorithm in ("hifo-prompt", "hifo"):
+            from baseline_adapters import HiFo_AHD_Adapter as LHH
         else:
             raise NotImplementedError(f"Unknown algorithm: {cfg.algorithm}")
 

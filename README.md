@@ -68,6 +68,29 @@ the best GEN score, then the operator is chosen uniformly among eligible actions
 Without global sharing, the global prior remains fixed and GEN scoring uses only
 local information. Disabling an AGRE stage passes its input to the next stage.
 
+## Baselines: MoH and HiFo-Prompt
+
+```bash
+python main.py algorithm=moh problem=tsp_constructive seed=2025
+python main.py algorithm=hifo-prompt problem=cvrp_aco seed=2025
+python main.py algorithm=hifo-prompt baselines.hifo.use_insights=false
+```
+
+Both baselines are ports of the official code (MoH: `yiding-s/MoH`; HiFo-Prompt:
+`Challenger-XJTU/HiFo-Prompt`) and run under the same rules as GENESIS: the
+same `model`, `max_fe`, `search_timeout`, `timeout` and `seed`, with one FE per
+evaluator call and output files in the same format. Their settings are under
+`baselines.moh` / `baselines.hifo` in `cfg/config.yaml`.
+
+- **HiFo-Prompt** (`source/hifo_prompt.py`): Insight Pool (hindsight) +
+  Evolutionary Navigator (foresight), operators e1/e2/m1/m2/m3,
+  `pop_size` offspring per operator, run until the budget is spent.
+- **MoH** (`source/moh.py`): LLM-written meta-optimizers
+  `improve_algorithm(...)` that improve themselves; meta-utility = objective of
+  the best heuristic a meta-optimizer produces. Only one task (the configured
+  problem size) is used, and the reference code's "no `random`" rule (specific to
+  TSP-GLS) is not applied. Optimizer code is run in-process with `exec`, as in the reference.
+
 ## Offline verification
 
 Install `pytest` in the development environment, then run:
