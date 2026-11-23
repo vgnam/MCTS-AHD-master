@@ -77,11 +77,17 @@ class AB_MCTS_A_AHD:
         )
         self.use_agre = bool(abl.get("agre", True))
         self.agre_stages = dict(abl.get("agre_stages") or {})
+        # Robustness experiment: relative Gaussian noise on search-time objectives (0 = off).
+        self.eval_noise_sigma = float((self.config or {}).get("eval_noise_sigma") or 0.0)
+        if self.eval_noise_sigma < 0:
+            raise ValueError("eval_noise_sigma must be non-negative.")
 
         print("- GENESIS parameters loaded -")
         print(f"LLM Models: {self.llm_model_names}")
-        print(f"Ablation: {self.ablation}, AGRE: {self.use_agre}, AGRE stages: {self.agre_stages}")
+        print(f"Ablation: {self.ablation}, AGRE: {self.use_agre}, AGRE stages: {self.agre_stages}, "
+              f"eval noise sigma: {self.eval_noise_sigma}")
         seed = (self.config or {}).get("seed", 2024)
+        self.seed = seed
         random.seed(seed)
         np.random.seed(seed)
 
@@ -163,6 +169,9 @@ class AB_MCTS_A_AHD:
         filename = directory / f"best_population_{suffix}"
         filename.write_text(json.dumps(population[0], indent=2), encoding="utf-8")
         TOKEN_USAGE.checkpoint(self.eval_times, directory)
+        if getattr(self, "mcts", None) is not None:
+            (directory / "calibration.json").write_text(
+                json.dumps(self.mcts.calibration_log), encoding="utf-8")
         return str(filename)
 
     def run(self):
@@ -175,7 +184,8 @@ class AB_MCTS_A_AHD:
                 model_name, self.debug_mode, self.prob, select=self.select,
                 n_p=self.exp_n_proc, timeout=self.timeout, use_numba=self.use_numba,
                 use_local_llm=config.get('use_local', False), url=config.get('url', ''),
-                agre_stages=self.agre_stages, budget=self.budget)
+                agre_stages=self.agre_stages, budget=self.budget,
+                noise_sigma=self.eval_noise_sigma, noise_seed=self.seed)
         self.mcts = AB_MCTS_A('Root', self.llm_model_names, ablation=self.ablation)
         population = []
         try:

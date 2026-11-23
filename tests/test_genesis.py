@@ -383,3 +383,59 @@ def test_api_uses_requested_model_and_remaining_deadline(monkeypatch):
     with pytest.raises(BudgetExhausted):
         utils.chat_completion(1, [], 1., model='requested/model', deadline=100.)
     assert fake.call_count == 1
+
+
+def test_calibration_records_pre_update_student_t_predictive():
+    from scipy.stats import t as student_t
+    from source.ab_mcts import nig_predictive
+    tree = AB_MCTS_A('Root', ['test'])
+    first = add_node(tree, tree.root, 5.0, operator='e1')
+    gen = next(g for g in first.gen_nodes if g.operator_name == 'm1')
+    before = {'node': params(first), 'gen': (gen.mu_post, gen.kappa_post, gen.nu_post, gen.tau2_post)}
+    add_node(tree, first, 7.0, operator='m1')
+    record = tree.calibration_log[-1]
+    assert len(tree.calibration_log) == 2 and record['observation'] == 7.0
+    assert record['parent_observations'] == 1 and record['gen_observations'] == 0
+    for source, (mu, kappa, nu, tau2) in before.items():
+        df, loc, scale = nig_predictive(mu, kappa, nu, tau2)
+        assert record[source]['scale'] == pytest.approx(np.sqrt(tau2 * (kappa + 1) / kappa))
+        assert record[source]['pit'] == pytest.approx(student_t.cdf(7.0, df, loc, scale))
+        assert record[source]['nll'] == pytest.approx(-student_t.logpdf(7.0, df, loc, scale))
+
+
+def test_run_writes_calibration_log(tmp_path, monkeypatch):
+    search = make_search(tmp_path, max_fe=10)
+    interface = mock_interface(search.budget, [[float(20-i)] for i in range(10)])
+    monkeypatch.setattr('source.ab_mcts_ahd.InterfaceEC', lambda *a, **k: interface)
+    search.run()
+    records = json.loads((tmp_path / 'calibration.json').read_text())
+    assert len(records) == 10 and all(0 <= r['global']['pit'] <= 1 for r in records)
+
+
+def test_eval_noise_perturbs_search_objective_but_keeps_clean_value():
+    budget = SearchBudget(3)
+    interface = mock_interface(budget, [[10.0]] * 3)
+    _, clean = interface.evaluate_offspring(0, {'code': 'a'})
+    assert clean['objective'] == 10.0 and 'objective_clean' not in clean
+    interface.noise_sigma, interface._noise_rng = 0.1, np.random.default_rng(0)
+    _, first = interface.evaluate_offspring(0, {'code': 'b'})
+    expected = round(10.0 * (1 + 0.1 * np.random.default_rng(0).standard_normal()), 5)
+    assert first['objective_clean'] == 10.0 and first['objective'] == pytest.approx(expected)
+    assert first['objective'] != 10.0
+
+
+def test_eval_noise_config_reaches_interface(tmp_path, monkeypatch):
+    paras = Paras()
+    paras.set_paras(init_size=5, ec_fe_max=4, llm_model_names=['test'],
+                    exp_output_path=str(tmp_path), pop_size=30)
+    search = AB_MCTS_A_AHD(paras, None, prob_rank, pop_greedy,
+                          cfg={'search_timeout': None, 'eval_noise_sigma': 0.05, 'seed': 7})
+    seen = {}
+    def fake_interface(*args, **kwargs):
+        seen.update(kwargs)
+        return mock_interface(search.budget, [[float(9 - i)] for i in range(4)])
+    monkeypatch.setattr('source.ab_mcts_ahd.InterfaceEC', fake_interface)
+    search.run()
+    assert seen['noise_sigma'] == 0.05 and seen['noise_seed'] == 7
+    with pytest.raises(ValueError):
+        AB_MCTS_A_AHD(paras, None, prob_rank, pop_greedy, cfg={'eval_noise_sigma': -0.1})

@@ -15,6 +15,7 @@ import concurrent.futures
 
 
 class InterfaceEC():
+    noise_sigma = 0.0  # class default: clean objectives unless __init__ enables noise
     def __init__(self, m, api_endpoint, api_key, llm_model, debug_mode, interface_prob, select, n_p, timeout, use_numba,
                  **kwargs):
 
@@ -22,6 +23,10 @@ class InterfaceEC():
         assert 'url' in kwargs
 
         self.budget = kwargs.get("budget")
+        # Robustness experiment: the search sees objective * (1 + sigma * N(0, 1));
+        # the clean value is kept in offspring['objective_clean'].
+        self.noise_sigma = float(kwargs.pop("noise_sigma", 0.0) or 0.0)
+        self._noise_rng = np.random.default_rng(kwargs.pop("noise_seed", None))
         self.interface_eval = interface_prob
         prompts = interface_prob.prompts
 
@@ -180,8 +185,18 @@ class InterfaceEC():
             objs = self.interface_eval.batch_evaluate([offspring['code']], 0)
         if isinstance(objs, str) or not objs or not np.isfinite(objs[0]):
             return eval_times, None
-        offspring['objective'] = float(np.round(objs[0], 5))
+        clean = float(np.round(objs[0], 5))
+        offspring['objective'] = self._observe(clean)
+        if self.noise_sigma > 0:
+            offspring['objective_clean'] = clean
         return eval_times, offspring
+
+    def _observe(self, clean):
+        """Objective as seen by the search (clean unless eval noise is enabled)."""
+        if self.noise_sigma <= 0:
+            return clean
+        noise = self.noise_sigma * self._noise_rng.standard_normal()
+        return float(np.round(clean * (1.0 + noise), 5))
 
     def get_algorithm(self, eval_times, pop, operator, advice=None):
         while True:

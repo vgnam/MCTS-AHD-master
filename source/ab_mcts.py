@@ -4,7 +4,17 @@ from collections import defaultdict
 from dataclasses import dataclass
 import numpy as np
 from scipy.stats import invgamma, norm
+from scipy.stats import t as student_t
 import warnings
+
+
+def nig_predictive(mu, kappa, nu, tau2):
+    """One-step posterior predictive of an NIG(mu, kappa, nu, tau2) model.
+
+    A new observation is Student-t with ``nu`` degrees of freedom, location ``mu``
+    and scale ``sqrt(tau2 * (kappa + 1) / kappa)``; returns (df, loc, scale).
+    """
+    return float(nu), float(mu), float(math.sqrt(tau2 * (kappa + 1.0) / kappa))
 
 
 @dataclass
@@ -310,6 +320,9 @@ class AB_MCTS_A:
         self.llm_model_names = llm_model_names
         self.operators = ['counter', 'e2', 'm1', 'm2', 's1']  # List of 5 operators
         self.all_rewards_store = defaultdict(list)
+        # Prequential calibration records: the predictive of each posterior is taken
+        # before the new evaluation updates it (see _calibration_record).
+        self.calibration_log = []
 
         # Global hyper prior
         self.global_hyper = GlobalHyperPrior()
@@ -344,6 +357,8 @@ class AB_MCTS_A:
             raise ValueError("NIG observations must be finite.")
         node._generation_operator = op_name
         node._backpropagated = True
+        if node.parent is not None:
+            self.calibration_log.append(self._calibration_record(node, op_name, score))
         if score not in self.rank_list:
             self.rank_list.append(score)
             self.rank_list.sort()
@@ -362,3 +377,29 @@ class AB_MCTS_A:
             current = parent
         if self.ablation.global_sharing:
             self.global_hyper.update_global_posterior(score)
+
+    def _calibration_record(self, node, op_name, score):
+        """Score the pre-update predictive of each posterior that this evaluation updates.
+
+        ``node`` is the expanded parent's real-node posterior (outcomes in its subtree),
+        ``gen`` the operator posterior that generated the child, and ``global`` the shared
+        hyper-posterior. PIT = predictive CDF at the observation; NLL = -log density.
+        """
+        parent = node.parent
+        raw = node.raw_info if isinstance(node.raw_info, dict) else {}
+        record = {"observation": score, "observation_clean": raw.get("objective_clean"),
+                  "operator": op_name, "parent_depth": parent.depth,
+                  "parent_observations": len(parent.node_rewards),
+                  "method": node._generation_method}
+        sources = {"node": parent, "global": self.global_hyper}
+        gen = next((g for g in parent.gen_nodes if g.operator_name == op_name
+                    and g.llm_model_name == node._generation_action), None)
+        if gen is not None:
+            sources["gen"] = gen
+            record["gen_observations"] = len(gen.rewards)
+        for name, src in sources.items():
+            df, loc, scale = nig_predictive(src.mu_post, src.kappa_post, src.nu_post, src.tau2_post)
+            record[name] = {"df": df, "loc": loc, "scale": scale,
+                            "pit": float(student_t.cdf(score, df, loc, scale)),
+                            "nll": float(-student_t.logpdf(score, df, loc, scale))}
+        return record

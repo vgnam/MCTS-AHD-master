@@ -83,6 +83,7 @@ baselines:
 max_fe: ${oc.select:problem.max_fe,500} # Constructive tasks override to 1000
 candidates_per_expansion: 4 # N candidates, followed by at most one AGRE evaluation
 search_timeout: 60 # Whole search, including LLM calls and evaluations; null disables
+eval_noise_sigma: 0.0 # GENESIS robustness study: search sees obj * (1 + sigma * N(0,1)); 0 = off
 seed: 2024 # Override for each independent run
 pop_size: 30 # population size for GA
 init_pop_size: 5 # initial population size for GA
