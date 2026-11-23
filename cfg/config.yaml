@@ -10,7 +10,7 @@ hydra:
   run:
     dir: outputs/${problem.problem_name}-${problem.problem_type}/${algorithm}/${now:%Y-%m-%d_%H-%M-%S}
 
-model: openrouter/mistralai/codestral-2508 # Codestral via OpenRouter
+model: openrouter/openai/gpt-oss-120b:floor # GPT-OSS 120B via OpenRouter price routing
 temperature: 1  # temperature for chat completion
 
 # === LLM Advisor Configuration (list of advisor LLMs) ===

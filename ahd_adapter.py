@@ -18,6 +18,7 @@ class AHD:
                              ec_fe_max = self.cfg.max_fe,
                              exp_output_path = f"{workdir}/",
                              exp_debug_mode = False,
+                             llm_model = self.cfg.model,
                              eva_timeout=cfg.timeout)
 
     def evolve(self):

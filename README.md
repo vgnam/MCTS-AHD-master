@@ -1,13 +1,13 @@
 # GENESIS
 
 Run from the repository root after installing `requirements.txt`. The default
-model is `openrouter/mistralai/codestral-2508`, using OpenRouter (`OPENROUTER_API_KEY`).
+model is `openrouter/openai/gpt-oss-120b:floor`, using OpenRouter (`OPENROUTER_API_KEY`).
 The configured `model` is passed through to the API without a hard-coded override.
 
 ```bash
 python main.py
 python main.py problem=tsp_constructive seed=2025
-python main.py model=openrouter/mistralai/codestral-2508
+python main.py model=openrouter/openai/gpt-oss-120b:floor
 ```
 
 On Windows, `py -3.11` can replace `python`. Evaluation subprocesses use the
